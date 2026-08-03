@@ -64,4 +64,12 @@ jobs:
       - name: Run local CI gate
         run: |
           . .venv/bin/activate
-          ./scripts/ci.sh
+          set +e
+          ./scripts/ci.sh 2>&1 | tee /tmp/ao-ci-gate.log
+          ci_status=${PIPESTATUS[0]}
+          set -e
+          if [ "$ci_status" -ne 0 ]; then
+            gate_summary=$(tail -n 1 /tmp/ao-ci-gate.log)
+            echo "::error title=Local CI gate summary::$gate_summary"
+          fi
+          exit "$ci_status"

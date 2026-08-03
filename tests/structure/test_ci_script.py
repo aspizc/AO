@@ -58,3 +58,12 @@ def test_remote_ci_installs_tmux_for_the_required_session_test():
     )
 
     assert "sudo apt-get install --yes tmux" in workflow
+
+
+def test_remote_ci_surfaces_the_aggregate_gate_summary():
+    workflow = (REPO / ".github" / "workflows" / "ci.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "${PIPESTATUS[0]}" in workflow
+    assert "::error title=Local CI gate summary::" in workflow

@@ -47,7 +47,8 @@ def test_github_actions_ci_workflow_runs_local_ci_gate():
     run_commands = "\n".join(step.get("run", "") for step in steps)
     assert "uv pip sync --require-hashes requirements.lock" in run_commands
     assert "npm --prefix gateway ci" in run_commands
-    assert ". .venv/bin/activate\n./scripts/ci.sh" in run_commands
+    assert ". .venv/bin/activate" in run_commands
+    assert "./scripts/ci.sh 2>&1 | tee /tmp/ao-ci-gate.log" in run_commands
 
 
 def test_github_actions_ci_workflow_does_not_duplicate_test_logic():
