@@ -50,3 +50,11 @@ def test_ci_script_runs_lint_gate():
 def test_ci_script_is_executable():
     path = REPO / "scripts" / "ci.sh"
     assert os.access(path, os.X_OK)
+
+
+def test_remote_ci_installs_tmux_for_the_required_session_test():
+    workflow = (REPO / ".github" / "workflows" / "ci.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "sudo apt-get install --yes tmux" in workflow

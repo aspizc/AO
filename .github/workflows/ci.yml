@@ -48,6 +48,11 @@ jobs:
           enable-cache: true
           cache-dependency-glob: requirements.lock
 
+      - name: Install tmux
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tmux
+
       - name: Install dependencies
         run: |
           uv venv --python python .venv

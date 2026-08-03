@@ -54,7 +54,6 @@ def test_github_actions_ci_workflow_does_not_duplicate_test_logic():
     text = WORKFLOW.read_text(encoding="utf-8")
 
     assert "AGENTS_E2E_REAL" not in text
-    assert "tmux" not in text
 
     forbidden_gate_commands = [
         "ruff check",
