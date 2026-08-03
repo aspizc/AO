@@ -53,6 +53,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes tmux
 
+      - name: Prepare isolated tmux server
+        run: |
+          mkdir -p "$RUNNER_TEMP/ao-tmux"
+          echo "TMUX_TMPDIR=$RUNNER_TEMP/ao-tmux" >> "$GITHUB_ENV"
+          TMUX_TMPDIR="$RUNNER_TEMP/ao-tmux" tmux new-session -d -s ao-ci-bootstrap
+
       - name: Install dependencies
         run: |
           uv venv --python python .venv
@@ -73,3 +79,7 @@ jobs:
             echo "::error title=Local CI gate summary::$gate_summary"
           fi
           exit "$ci_status"
+
+      - name: Stop isolated tmux server
+        if: always()
+        run: tmux kill-server

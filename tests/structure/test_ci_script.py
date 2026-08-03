@@ -58,6 +58,10 @@ def test_remote_ci_installs_tmux_for_the_required_session_test():
     )
 
     assert "sudo apt-get install --yes tmux" in workflow
+    assert 'echo "TMUX_TMPDIR=$RUNNER_TEMP/ao-tmux" >> "$GITHUB_ENV"' in workflow
+    assert "tmux new-session -d -s ao-ci-bootstrap" in workflow
+    assert "if: always()" in workflow
+    assert "run: tmux kill-server" in workflow
 
 
 def test_remote_ci_surfaces_the_aggregate_gate_summary():
