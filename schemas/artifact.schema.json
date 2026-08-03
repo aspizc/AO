@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator/v4/artifact.schema.json",
+  "version": 1,
+  "title": "Artifact",
+  "type": "object",
+  "required": ["artifactId", "traceId", "kind", "classification", "producedBy", "createdAt", "path"],
+  "properties": {
+    "artifactId": { "type": "string", "minLength": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "kind": {
+      "enum": [
+        "plan",
+        "raw_diff",
+        "raw_code",
+        "raw_stacktrace",
+        "review_notes",
+        "test_report",
+        "doc",
+        "security_finding",
+        "summary"
+      ]
+    },
+    "classification": { "enum": ["unrestricted", "internal", "restricted"] },
+    "producedBy": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "sanitizedFrom": { "type": "string", "minLength": 1 },
+    "path": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

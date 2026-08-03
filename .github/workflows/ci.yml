@@ -1,0 +1,62 @@
+name: CI
+
+'on':
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Local CI gate (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - "22.13.0"
+          - "24"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: gateway/package-lock.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.21"
+          enable-cache: true
+          cache-dependency-glob: requirements.lock
+
+      - name: Install dependencies
+        run: |
+          uv venv --python python .venv
+          . .venv/bin/activate
+          uv pip sync --require-hashes requirements.lock
+          uv pip install --no-deps --no-build-isolation -e cli -e orchestrator-langgraph --offline
+          npm --prefix gateway ci
+
+      - name: Run local CI gate
+        run: |
+          . .venv/bin/activate
+          ./scripts/ci.sh

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/coordination-participant.schema.json",
+  "version": 1,
+  "title": "Coordination participant",
+  "description": "Public leased identity discoverable through the coordination plane. Lease tokens are never part of this representation.",
+  "type": "object",
+  "required": [
+    "protocolVersion",
+    "participantId",
+    "participantType",
+    "scopeId",
+    "capabilities",
+    "metadata",
+    "registeredAt",
+    "lastHeartbeatAt",
+    "leaseExpiresAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "protocolVersion": {
+      "const": 1
+    },
+    "participantId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "participantType": {
+      "enum": ["gateway", "orchestrator", "agent", "session"]
+    },
+    "scopeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "capabilities": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": {
+        "minLength": 1,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string",
+            "maxLength": 2048
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastHeartbeatAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "leaseExpiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

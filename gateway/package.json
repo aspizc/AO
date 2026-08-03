@@ -1,0 +1,31 @@
+{
+  "name": "agents-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Carlos Asensio Pizarro",
+  "type": "module",
+  "description": "MCP gateway for the agents-orchestrator project (V4)",
+  "main": "src/mcp_server.js",
+  "scripts": {
+    "lint": "eslint --config eslint.config.js src tests scripts",
+    "start": "node src/mcp_server.js",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js ../tests/gateway/**/*.test.js"
+  },
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "better-sqlite3": "^11.0.0",
+    "redis": "^6.1.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0"
+  }
+}

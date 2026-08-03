@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de código"
+  short_description: "Auditoría de código basada en evidencias"
+  default_prompt: "Usa $audit-code para auditar la calidad y corrección de este repositorio."

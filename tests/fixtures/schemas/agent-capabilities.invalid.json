@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "agents": {
+    "codex": {
+      "models": "gpt-5",
+      "allowedClassifications": ["unrestricted"],
+      "allowedRoles": ["coder"]
+    }
+  }
+}

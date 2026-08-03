@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "agents-gateway": {
+      "transport": "stdio",
+      "command": "node",
+      "args": ["./gateway/src/mcp_server.js"],
+      "env": {
+        "AGENTS_WORKSPACE": "./workspace",
+        "AGENTS_POLICIES_DIR": "./policies",
+        "AGENTS_DRY_RUN": "1",
+        "AGENTS_REPO_ROOTS": "REPLACE_WITH_ABSOLUTE_AGENTS_ORCHESTRATOR_PATH",
+        "AGENTS_CLAUDE_BIN": "claude"
+      }
+    }
+  }
+}

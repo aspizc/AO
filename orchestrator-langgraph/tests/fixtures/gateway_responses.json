@@ -1,0 +1,16 @@
+{
+  "agent.delegate": [
+    {
+      "sessionId": "ss-delegate-dry-run",
+      "stdout": "delegate completed",
+      "exitCode": 0,
+      "dryRun": true
+    },
+    {
+      "sessionId": "ss-review-dry-run",
+      "stdout": "Verdict: OK",
+      "exitCode": 0,
+      "dryRun": true
+    }
+  ]
+}

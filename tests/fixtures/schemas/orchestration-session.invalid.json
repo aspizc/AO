@@ -1,0 +1,7 @@
+{
+  "sessionId": "os-1",
+  "createdAt": "2026-01-01T10:00:00Z",
+  "status": "active",
+  "callerAgent": "claude-code",
+  "callerRole": "orchestrator"
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agents Gateway coordination"
+  short_description: "Coordinate independent orchestrators safely"
+  default_prompt: "Use $agents-gateway-coordination to connect two orchestrators and exchange work notices safely."

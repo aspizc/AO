@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de pruebas"
+  short_description: "Auditoría de pruebas y confianza de entrega"
+  default_prompt: "Usa $audit-tests para evaluar si este sistema puede cambiarse y publicarse con confianza."

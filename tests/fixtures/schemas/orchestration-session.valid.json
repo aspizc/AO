@@ -1,0 +1,9 @@
+{
+  "sessionId": "os-2026-01-01-abc",
+  "traceId": "tr-abc",
+  "createdAt": "2026-01-01T10:00:00Z",
+  "status": "active",
+  "callerAgent": "claude-code",
+  "callerRole": "orchestrator",
+  "goal": "Refactor module X"
+}

@@ -1,0 +1,83 @@
+# Dependencies and virtual environments
+node_modules/
+.npm/
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches, coverage, and build output
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+build/
+dist/
+*.egg-info/
+
+# Node caches, reports, and logs
+.nyc_output/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+.mcp.json
+.npmrc.local
+.pypirc
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local agent state; project skills remain versioned
+.claude/projects/
+.claude/settings.local.json
+
+# Runtime databases and logs
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.log
+
+# Runtime artifacts produced by the Gateway
+workspace/*
+!workspace/artifacts/
+!workspace/audit/
+!workspace/secrets/
+!workspace/state/
+workspace/artifacts/*
+workspace/audit/*
+workspace/secrets/*
+workspace/state/*
+!workspace/artifacts/.keep
+!workspace/audit/.keep
+!workspace/secrets/.keep
+!workspace/state/.keep
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

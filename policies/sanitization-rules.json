@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "secret.token",
+      "pattern": "\\b([Aa][Pp][Ii][_-]?[Kk][Ee][Yy]|[Tt][Oo][Kk][Ee][Nn]|[Ss][Ee][Cc][Rr][Ee][Tt])[\"']?\\s*[:=]\\s*[\"']?[A-Za-z0-9._-]{12,}",
+      "replacement": "$1=<REDACTED-SECRET>",
+      "appliesTo": ["raw_diff", "raw_code", "raw_stacktrace", "summary"],
+      "severity": "high"
+    },
+    {
+      "id": "absolute.path",
+      "pattern": "/home/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_./-]*)?",
+      "replacement": "<HOME>/...",
+      "appliesTo": ["raw_diff", "raw_code", "raw_stacktrace", "summary"],
+      "severity": "medium"
+    },
+    {
+      "id": "uuid",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b",
+      "replacement": "<UUID>",
+      "appliesTo": ["raw_diff", "raw_code", "raw_stacktrace", "summary"],
+      "severity": "medium"
+    },
+    {
+      "id": "internal.file",
+      "pattern": "(internal|private)/[A-Za-z0-9_./-]+",
+      "replacement": "<INTERNAL>/...",
+      "appliesTo": ["raw_diff", "raw_code", "raw_stacktrace", "summary"],
+      "severity": "medium"
+    }
+  ]
+}

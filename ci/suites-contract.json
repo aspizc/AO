@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "requiredSuiteIds": [
+    "lock.python",
+    "lint.python",
+    "lint.gateway",
+    "test.structure",
+    "test.gateway",
+    "test.e2e",
+    "smoke.mcp",
+    "policy.registry",
+    "test.cli",
+    "test.langgraph"
+  ],
+  "optionalSuiteIds": [
+    "test.redis-live",
+    "test.real-agents"
+  ],
+  "suites": [
+    {
+      "id": "lock.python",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "./scripts/requirements_lock.sh",
+        "--check-inputs"
+      ],
+      "include": [
+        "ci/requirements-build.in",
+        "cli/pyproject.toml",
+        "orchestrator-langgraph/pyproject.toml",
+        "requirements.lock",
+        "scripts/requirements_lock.sh"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
+      "id": "lint.python",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "ruff",
+        "check",
+        "cli",
+        "orchestrator-langgraph",
+        "scripts/ci_gate.py",
+        "tests/structure"
+      ],
+      "include": [
+        "cli/**/*.py",
+        "orchestrator-langgraph/**/*.py",
+        "scripts/ci_gate.py",
+        "tests/structure/**/*.py"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
+      "id": "lint.gateway",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "npm",
+        "--prefix",
+        "gateway",
+        "run",
+        "lint"
+      ],
+      "include": [
+        "gateway/eslint.config.js",
+        "gateway/scripts/**/*.mjs",
+        "gateway/src/**/*.js",
+        "gateway/tests/**/*.js"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
+      "id": "test.structure",
+      "classification": "required",
+      "runner": "pytest",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "include": [
+        "tests/structure/test_*.py"
+      ],
+      "exclude": [],
+      "minimumTests": 1,
+      "allowedSkips": [],
+      "timeoutSeconds": 300
+    },
+    {
+      "id": "test.gateway",
+      "classification": "required",
+      "runner": "node-test",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-reporter=tap"
+      ],
+      "include": [
+        "gateway/tests/**/*.test.js",
+        "tests/gateway/**/*.test.js"
+      ],
+      "exclude": [
+        "tests/gateway/*_live.test.js"
+      ],
+      "minimumTests": 1,
+      "allowedSkips": [
+        {
+          "id": "live postgres repository contract: create and read repository aggregate",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres repository contract: status updates report one changed row",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres repository contract: foreign key violation fails",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres repository contract: policy decisions are append only",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres literals round-trip adversarial strings",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres literals preserve NULL separately from string null",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres literals support named and positional params",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres reports changes for insert update and delete",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        },
+        {
+          "id": "live postgres rejects non-finite numeric literals before execution",
+          "classification": "infrastructure_unavailable",
+          "service": "postgres"
+        }
+      ],
+      "timeoutSeconds": 900
+    },
+    {
+      "id": "test.e2e",
+      "classification": "required",
+      "runner": "node-test",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-reporter=tap"
+      ],
+      "include": [
+        "tests/e2e/**/*.test.js"
+      ],
+      "exclude": [
+        "tests/e2e/mcp_two_agent_real.test.js"
+      ],
+      "minimumTests": 1,
+      "allowedSkips": [],
+      "timeoutSeconds": 300
+    },
+    {
+      "id": "smoke.mcp",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "node",
+        "scripts/smoke_mcp.mjs"
+      ],
+      "include": [
+        "scripts/smoke_mcp.mjs"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
+      "id": "policy.registry",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "agent-run",
+        "policy",
+        "validate"
+      ],
+      "include": [
+        "gateway/scripts/validate-registries.mjs",
+        "policies/*.json",
+        "schemas/*.json"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
+      "id": "test.cli",
+      "classification": "required",
+      "runner": "pytest",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "include": [
+        "tests/cli/test_*.py"
+      ],
+      "exclude": [],
+      "minimumTests": 1,
+      "allowedSkips": [],
+      "timeoutSeconds": 300
+    },
+    {
+      "id": "test.langgraph",
+      "classification": "required",
+      "runner": "pytest",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "include": [
+        "orchestrator-langgraph/tests/**/test_*.py"
+      ],
+      "exclude": [],
+      "minimumTests": 1,
+      "allowedSkips": [
+        {
+          "id": "tests.test_gateway_client::test_real_gateway_smoke",
+          "classification": "infrastructure_unavailable",
+          "service": "gateway-integration"
+        },
+        {
+          "id": "tests.test_plan_refine_graph::test_real_gateway_dry_run_smoke",
+          "classification": "infrastructure_unavailable",
+          "service": "gateway-integration"
+        },
+        {
+          "id": "tests.test_temporal_crash_recovery::test_temporal_worker_restart_replays_without_duplicate_implement_or_implicit_approval",
+          "classification": "infrastructure_unavailable",
+          "service": "temporal"
+        }
+      ],
+      "timeoutSeconds": 600
+    },
+    {
+      "id": "test.redis-live",
+      "classification": "optional-service",
+      "runner": "node-test",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-reporter=tap"
+      ],
+      "include": [
+        "tests/gateway/*_live.test.js"
+      ],
+      "exclude": [],
+      "minimumTests": 1,
+      "allowedSkips": [],
+      "readiness": {
+        "service": "redis",
+        "environmentPresent": [
+          "AGENTS_TEST_REDIS_URL"
+        ]
+      },
+      "timeoutSeconds": 900
+    },
+    {
+      "id": "test.real-agents",
+      "classification": "optional-service",
+      "runner": "node-test",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-reporter=tap"
+      ],
+      "include": [
+        "tests/e2e/mcp_two_agent_real.test.js"
+      ],
+      "exclude": [],
+      "minimumTests": 1,
+      "allowedSkips": [],
+      "readiness": {
+        "service": "real-agent-providers",
+        "environmentEquals": {
+          "AGENTS_E2E_REAL": "1"
+        }
+      },
+      "timeoutSeconds": 1800
+    }
+  ]
+}

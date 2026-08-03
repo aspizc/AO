@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interactive Gateway Orchestration"
+  short_description: "Supervise Gateway spawn loops without deadlines"
+  default_prompt: "Use $interactive-gateway-orchestration to run a supervised agent.spawn planner/coder/reviewer loop through agents-gateway with human approvals and no automatic task timeouts."

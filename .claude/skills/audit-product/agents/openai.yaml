@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de producto"
+  short_description: "Auditoría de producto y valor entregado"
+  default_prompt: "Usa $audit-product para evaluar si el producto cumple su promesa para sus usuarios."

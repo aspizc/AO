@@ -1,0 +1,100 @@
+{
+  "version": 2,
+  "agents": {
+    "gemini-cli": {
+      "binary": "gemini",
+      "models": ["gemini-2.5-pro", "gemini-2.5-flash"],
+      "defaultModel": "gemini-2.5-pro",
+      "allowedClassifications": ["unrestricted", "internal", "restricted"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "restricted-coder",
+        "reviewer",
+        "tester",
+        "documenter",
+        "security_reviewer"
+      ],
+      "requiresApprovalFor": [
+        "git.push.protected",
+        "dependency.change",
+        "code.write.protected_branch"
+      ],
+      "notes": "Only agent allowed for repos classified as restricted."
+    },
+    "claude-code": {
+      "binary": "claude",
+      "models": ["claude-fable-5", "claude-opus-5", "claude-opus-4-8"],
+      "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5" },
+      "defaultModel": "claude-fable-5",
+      "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+      "defaultReasoningEffort": "max",
+      "allowedClassifications": ["unrestricted", "internal"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "reviewer",
+        "tester",
+        "documenter",
+        "security_reviewer"
+      ],
+      "requiresApprovalFor": [
+        "git.push.protected",
+        "dependency.change",
+        "code.write.protected_branch"
+      ]
+    },
+    "codex": {
+      "binary": "codex",
+      "models": ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5", "gpt-5-codex"],
+      "modelAliases": { "gpt-5.6": "gpt-5.6-sol" },
+      "defaultModel": "gpt-5.6-sol",
+      "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+      "defaultReasoningEffort": "max",
+      "serviceTiers": ["priority"],
+      "defaultServiceTier": "priority",
+      "modelProfiles": {
+        "gpt-5.6-sol": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.6-terra": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.6-luna": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "gpt-5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "gpt-5-codex": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        }
+      },
+      "allowedClassifications": ["unrestricted", "internal", "restricted"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "restricted-coder",
+        "reviewer",
+        "tester",
+        "security_reviewer"
+      ],
+      "requiresApprovalFor": ["git.push.protected", "dependency.change"],
+      "enabled": true,
+      "notes": "Real codex exec adapter (codex-cli). Enabled; may plan, read, review, and write restricted repos."
+    }
+  },
+  "protectedBranches": ["main", "master", "release/*"]
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator/v4/task.schema.json",
+  "version": 1,
+  "title": "Task",
+  "type": "object",
+  "required": ["taskId", "traceId", "assignedAgent", "assignedRole", "repo", "status", "createdAt"],
+  "properties": {
+    "taskId": { "type": "string", "minLength": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "assignedAgent": { "type": "string", "minLength": 1 },
+    "assignedRole": { "type": "string", "minLength": 1 },
+    "repo": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["queued", "running", "blocked", "completed", "failed", "cancelled"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "parentTaskId": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string" }
+  },
+  "additionalProperties": false
+}

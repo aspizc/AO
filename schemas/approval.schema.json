@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator/v4/approval.schema.json",
+  "version": 1,
+  "title": "Approval",
+  "type": "object",
+  "required": ["approvalId", "traceId", "requestedBy", "action", "status", "createdAt"],
+  "properties": {
+    "approvalId": { "type": "string", "minLength": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "requestedBy": { "type": "string", "minLength": 1 },
+    "action": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["pending", "granted", "denied", "expired"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "decidedAt": { "type": "string", "format": "date-time" },
+    "decidedBy": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

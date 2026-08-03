@@ -1,0 +1,161 @@
+{
+  "approved": {
+    "task.assign": [
+      {
+        "taskId": "ts-plan"
+      },
+      {
+        "taskId": "ts-review"
+      }
+    ],
+    "agent.delegate": [
+      {
+        "sessionId": "ss-plan",
+        "stdout": "Draft plan v1",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review",
+        "stdout": "approved",
+        "exitCode": 0,
+        "decision": "approved",
+        "dryRun": true
+      }
+    ],
+    "artifact.put": [
+      {
+        "artifactId": "art-plan-v1",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-review-v1",
+        "kind": "review_notes"
+      }
+    ]
+  },
+  "refine_then_approve": {
+    "task.assign": [
+      {
+        "taskId": "ts-plan"
+      },
+      {
+        "taskId": "ts-review-1"
+      },
+      {
+        "taskId": "ts-refine"
+      },
+      {
+        "taskId": "ts-review-2"
+      }
+    ],
+    "agent.delegate": [
+      {
+        "sessionId": "ss-plan",
+        "stdout": "Draft plan v1",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review-1",
+        "stdout": "changes requested",
+        "exitCode": 0,
+        "decision": "changes_requested",
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-refine",
+        "stdout": "Draft plan v2",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review-2",
+        "stdout": "approved",
+        "exitCode": 0,
+        "decision": "approved",
+        "dryRun": true
+      }
+    ],
+    "artifact.put": [
+      {
+        "artifactId": "art-plan-v1",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-review-v1",
+        "kind": "review_notes"
+      },
+      {
+        "artifactId": "art-plan-v2",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-review-v2",
+        "kind": "review_notes"
+      }
+    ]
+  },
+  "limit": {
+    "task.assign": [
+      {
+        "taskId": "ts-plan"
+      },
+      {
+        "taskId": "ts-review-1"
+      },
+      {
+        "taskId": "ts-refine"
+      },
+      {
+        "taskId": "ts-review-2"
+      }
+    ],
+    "agent.delegate": [
+      {
+        "sessionId": "ss-plan",
+        "stdout": "Draft plan v1",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review-1",
+        "stdout": "changes requested",
+        "exitCode": 0,
+        "decision": "changes_requested",
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-refine",
+        "stdout": "Draft plan v2",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review-2",
+        "stdout": "changes requested",
+        "exitCode": 0,
+        "decision": "changes_requested",
+        "dryRun": true
+      }
+    ],
+    "artifact.put": [
+      {
+        "artifactId": "art-plan-v1",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-review-v1",
+        "kind": "review_notes"
+      },
+      {
+        "artifactId": "art-plan-v2",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-review-v2",
+        "kind": "review_notes"
+      }
+    ]
+  }
+}

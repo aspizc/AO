@@ -1,0 +1,8 @@
+{
+  "messageId": "msg-1",
+  "traceId": "tr-abc",
+  "from": "orchestrator",
+  "to": "coder",
+  "body": "Please implement the task.",
+  "createdAt": "not-a-date"
+}

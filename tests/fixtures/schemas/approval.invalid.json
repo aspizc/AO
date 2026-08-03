@@ -1,0 +1,8 @@
+{
+  "approvalId": "ap-1",
+  "traceId": "tr-abc",
+  "requestedBy": "orchestrator",
+  "action": "git.push",
+  "status": "waiting",
+  "createdAt": "2026-01-01T10:00:00Z"
+}

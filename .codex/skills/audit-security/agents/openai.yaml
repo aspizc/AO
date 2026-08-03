@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de seguridad"
+  short_description: "Auditoría de seguridad y amenazas"
+  default_prompt: "Usa $audit-security para modelar amenazas y auditar la seguridad de este sistema."

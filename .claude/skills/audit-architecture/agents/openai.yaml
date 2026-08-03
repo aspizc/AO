@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de arquitectura"
+  short_description: "Auditoría de arquitectura y operación"
+  default_prompt: "Usa $audit-architecture para reconstruir y auditar la arquitectura real del sistema."

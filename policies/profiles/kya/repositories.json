@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "repositories": {
+    "cvision": {
+      "classification": "restricted",
+      "allowedAgents": ["gemini-cli", "codex"],
+      "tags": ["computer-vision", "core"]
+    },
+    "cvlib": {
+      "classification": "restricted",
+      "allowedAgents": ["gemini-cli", "codex"],
+      "tags": ["library", "internal-api"]
+    },
+    "developer-tools": {
+      "classification": "internal",
+      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "tags": ["tooling"]
+    },
+    "sample-apps": {
+      "classification": "unrestricted",
+      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "tags": ["examples"]
+    },
+    "agents-orchestrator": {
+      "classification": "internal",
+      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "excludedPaths": ["policies/"],
+      "tags": ["self", "planning"]
+    },
+    "engineering_graph": {
+      "classification": "internal",
+      "allowedAgents": ["claude-code", "codex"],
+      "tags": ["planning", "external-plan-target"]
+    },
+    "kya": {
+      "classification": "internal",
+      "allowedAgents": ["claude-code", "codex"],
+      "tags": ["planning", "signicat", "verified-agents"]
+    }
+  }
+}

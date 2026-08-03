@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de UX"
+  short_description: "Auditoría de UX y accesibilidad real"
+  default_prompt: "Usa $audit-ux para auditar la experiencia, accesibilidad y respuesta visual de la interfaz."

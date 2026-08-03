@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/agent-capabilities.schema.json",
+  "version": 1,
+  "title": "Agent capabilities registry",
+  "type": "object",
+  "required": ["version", "agents"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "agents": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["allowedClassifications", "allowedRoles"],
+        "additionalProperties": true,
+        "properties": {
+          "binary": { "type": "string", "minLength": 1 },
+          "models": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "defaultModel": { "type": "string", "minLength": 1 },
+          "modelAliases": {
+            "type": "object",
+            "propertyNames": { "minLength": 1 },
+            "additionalProperties": { "type": "string", "minLength": 1 }
+          },
+          "reasoningEfforts": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "defaultReasoningEffort": { "type": "string", "minLength": 1 },
+          "serviceTiers": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "defaultServiceTier": { "type": "string", "minLength": 1 },
+          "modelProfiles": {
+            "type": "object",
+            "propertyNames": { "minLength": 1 },
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reasoningEfforts": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "defaultReasoningEffort": { "type": "string", "minLength": 1 },
+                "serviceTiers": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "defaultServiceTier": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          "allowedClassifications": {
+            "type": "array",
+            "items": { "enum": ["unrestricted", "internal", "restricted"] },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "allowedRoles": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "requiresApprovalFor": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "enabled": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "protectedBranches": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

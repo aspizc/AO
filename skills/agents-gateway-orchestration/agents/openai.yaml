@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agents Gateway orchestration"
+  short_description: "Operate the Gateway and supervised agents"
+  default_prompt: "Use $agents-gateway-orchestration to run this task through persistent supervised Gateway sessions."

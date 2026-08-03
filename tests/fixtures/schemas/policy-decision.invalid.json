@@ -1,0 +1,13 @@
+{
+  "decisionId": "pd-1",
+  "traceId": "tr-abc",
+  "context": {
+    "agent": "claude-code",
+    "role": "coder",
+    "repo": "developer-tools",
+    "action": "code.write"
+  },
+  "decision": "maybe",
+  "reasonCode": "ROLE_AND_REPO_ALLOWED",
+  "at": "2026-01-01T10:00:00Z"
+}

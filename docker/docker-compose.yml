@@ -1,0 +1,49 @@
+# Optional local infrastructure for development.
+#
+# App defaults remain SQLite and JSONL unless these values are explicitly set:
+#   AGENTS_DB_URL=postgres://agents:agents@localhost:5432/agents
+#   AGENTS_REDIS_URL=redis://localhost:6379/0
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: agents
+      POSTGRES_USER: agents
+      POSTGRES_PASSWORD: agents
+    ports:
+      - "5432:5432"
+    volumes:
+      - agents-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agents -d agents"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - agents-local
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - agents-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - agents-local
+
+volumes:
+  agents-postgres-data:
+  agents-redis-data:
+
+networks:
+  agents-local:
+    driver: bridge

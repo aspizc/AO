@@ -1,0 +1,11 @@
+{
+  "protocolVersion": 1,
+  "messageId": "msg.coordination-02",
+  "fromParticipantId": "orchestrator.build-01",
+  "toParticipantId": "agent.reviewer-01",
+  "scopeId": "workspace.agents-orchestrator",
+  "messageType": "review.requested",
+  "classification": "restricted",
+  "body": "This classification must not enter the coordination plane.",
+  "createdAt": "2026-07-25T10:01:00.000Z"
+}

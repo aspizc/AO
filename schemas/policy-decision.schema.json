@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator/v4/policy-decision.schema.json",
+  "version": 1,
+  "title": "PolicyDecision",
+  "type": "object",
+  "required": ["decisionId", "traceId", "context", "decision", "reasonCode", "at"],
+  "properties": {
+    "decisionId": { "type": "string", "minLength": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "context": {
+      "type": "object",
+      "required": ["agent", "role", "repo", "action"],
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "repo": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "decision": { "enum": ["allow", "deny", "require_approval", "allow_with_sanitization"] },
+    "reasonCode": { "type": "string", "minLength": 1 },
+    "at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+{
+  "artifactId": "art-1",
+  "traceId": "tr-abc",
+  "kind": "review_notes",
+  "classification": "internal",
+  "producedBy": "claude-code",
+  "createdAt": "2026-01-01T10:00:00Z",
+  "path": "workspace/artifacts/tr-abc/review-notes.md"
+}

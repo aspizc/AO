@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator/v4/orchestration-session.schema.json",
+  "version": 1,
+  "title": "OrchestrationSession",
+  "type": "object",
+  "required": ["sessionId", "traceId", "createdAt", "status", "callerAgent", "callerRole"],
+  "properties": {
+    "sessionId": { "type": "string", "minLength": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["active", "paused", "completed", "cancelled"] },
+    "callerAgent": { "type": "string", "minLength": 1 },
+    "callerRole": { "enum": ["orchestrator"] },
+    "goal": { "type": "string" }
+  },
+  "additionalProperties": false
+}

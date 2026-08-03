@@ -1,0 +1,71 @@
+{
+  "langgraph_push": {
+    "artifact.put": [
+      {
+        "artifactId": "art-selection",
+        "kind": "orchestrator_selection"
+      },
+      {
+        "artifactId": "art-plan",
+        "kind": "plan"
+      },
+      {
+        "artifactId": "art-push-intent",
+        "kind": "push_intent"
+      }
+    ],
+    "task.assign": [
+      {
+        "taskId": "ts-implement"
+      },
+      {
+        "taskId": "ts-test"
+      },
+      {
+        "taskId": "ts-review"
+      }
+    ],
+    "agent.delegate": [
+      {
+        "sessionId": "ss-implement",
+        "stdout": "implementation complete",
+        "exitCode": 0,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-test",
+        "stdout": "tests passed",
+        "exitCode": 0,
+        "status": "passed",
+        "passed": true,
+        "dryRun": true
+      },
+      {
+        "sessionId": "ss-review",
+        "stdout": "Verdict: OK",
+        "exitCode": 0,
+        "dryRun": true
+      }
+    ],
+    "approval.request": [
+      {
+        "approvalId": "apr-push",
+        "status": "pending"
+      }
+    ],
+    "approval.wait": [
+      {
+        "approvalId": "apr-push",
+        "status": "granted"
+      }
+    ]
+  },
+  "llm_default": {
+    "artifact.put": [
+      {
+        "artifactId": "art-selection",
+        "kind": "orchestrator_selection"
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría integral"
+  short_description: "Auditoría integral con hojas detalladas por lente"
+  default_prompt: "Usa $audit-project para auditar integralmente este proyecto y generar un consolidado y una hoja detallada por cada lente."

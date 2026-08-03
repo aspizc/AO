@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "roles": {
+    "orchestrator": {
+      "purpose": "Plan, decompose and coordinate. No direct write or raw restricted access.",
+      "allowActions": [
+        "task.assign",
+        "agent.delegate",
+        "agent.spawn",
+        "agent.ask",
+        "agent.view",
+        "agent.kill",
+        "artifact.get.sanitized",
+        "artifact.list",
+        "artifact.share",
+        "approval.request",
+        "approval.poll",
+        "approval.wait",
+        "policy.check",
+        "session.attach_info",
+        "session.intervention_note"
+      ],
+      "denyActions": [
+        "code.write",
+        "code.read.raw_restricted",
+        "artifact.get.raw_restricted",
+        "approval.respond"
+      ]
+    },
+    "planner": {
+      "purpose": "Produce structured plans for the orchestrator.",
+      "allowActions": ["artifact.put.plan", "artifact.get.sanitized", "policy.check"],
+      "denyActions": ["code.write", "agent.spawn"]
+    },
+    "coder": {
+      "purpose": "Write code in non-restricted repos.",
+      "allowActions": ["code.write", "code.read", "artifact.put", "artifact.get.sanitized"],
+      "denyActions": ["code.read.raw_restricted", "artifact.get.raw_restricted"]
+    },
+    "restricted-coder": {
+      "purpose": "Write code in restricted repos. Gemini and Codex may assume.",
+      "allowActions": [
+        "code.write",
+        "code.read.raw_restricted",
+        "artifact.put",
+        "artifact.put.raw_restricted",
+        "artifact.get.raw_restricted"
+      ],
+      "denyActions": ["artifact.share.cross_classification"]
+    },
+    "reviewer": {
+      "purpose": "Review summaries and sanitized diffs only.",
+      "allowActions": [
+        "artifact.get.sanitized",
+        "artifact.get.sanitized.raw_restricted",
+        "artifact.put.review_notes"
+      ],
+      "denyActions": ["code.write", "artifact.get.raw_restricted", "code.read.raw_restricted"]
+    },
+    "tester": {
+      "purpose": "Run and produce test reports.",
+      "allowActions": ["test.run", "artifact.put.test_report", "artifact.get.sanitized"],
+      "denyActions": ["code.write", "artifact.get.raw_restricted"]
+    },
+    "documenter": {
+      "purpose": "Produce documentation from sanitized inputs.",
+      "allowActions": ["artifact.put.doc", "artifact.get.sanitized"],
+      "denyActions": ["code.write", "artifact.get.raw_restricted"]
+    },
+    "security_reviewer": {
+      "purpose": "Inspect sanitized artifacts for security issues.",
+      "allowActions": ["artifact.get.sanitized", "artifact.put.security_finding"],
+      "denyActions": ["code.write", "artifact.get.raw_restricted"]
+    }
+  }
+}

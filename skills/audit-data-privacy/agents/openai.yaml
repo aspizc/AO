@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditoría de datos y privacidad"
+  short_description: "Auditoría de datos, privacidad y gobierno"
+  default_prompt: "Usa $audit-data-privacy para auditar datos, privacidad y gobierno sin acceder a registros personales."

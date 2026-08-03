@@ -1,0 +1,10 @@
+{
+  "taskId": "task-1",
+  "traceId": "tr-abc",
+  "assignedAgent": "gemini-cli",
+  "assignedRole": "coder",
+  "repo": "developer-tools",
+  "status": "queued",
+  "createdAt": "2026-01-01T10:00:00Z",
+  "goal": "Implement registry validation"
+}

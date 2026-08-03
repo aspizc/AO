@@ -1,0 +1,2 @@
+{"event_type":"gateway_tool_call","tool_name":"agent.delegate","actor_role":"coder","trace_id":"tr-llm-path","session_id":"ss-llm-coder","task_id":"ts-llm","timestamp":"2026-01-01T00:00:00.000Z"}
+{"event_type":"gateway_tool_call","tool_name":"agent.delegate","actor_role":"reviewer","trace_id":"tr-llm-path","session_id":"ss-llm-reviewer","task_id":"ts-llm","timestamp":"2026-01-01T00:00:01.000Z"}

@@ -1,0 +1,11 @@
+{
+  "protocolVersion": 1,
+  "participantId": "orchestrator.build-01",
+  "participantType": "worker",
+  "scopeId": "workspace.agents-orchestrator",
+  "capabilities": [],
+  "metadata": {},
+  "registeredAt": "2026-07-25T10:00:00.000Z",
+  "lastHeartbeatAt": "2026-07-25T10:00:10.000Z",
+  "leaseExpiresAt": "2026-07-25T10:00:40.000Z"
+}

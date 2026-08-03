@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "loadedAt": "2026-01-01T10:00:00Z",
+  "paths": {
+    "agents": "policies/agent-capabilities.json",
+    "repositories": "policies/repositories.json",
+    "roles": "policies/roles.json"
+  }
+}

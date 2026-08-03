@@ -1,0 +1,9 @@
+{
+  "taskId": "task-1",
+  "traceId": "tr-abc",
+  "assignedAgent": "gemini-cli",
+  "assignedRole": "coder",
+  "repo": "developer-tools",
+  "status": "unknown",
+  "createdAt": "2026-01-01T10:00:00Z"
+}

@@ -1,0 +1,16 @@
+{
+  "protocolVersion": 1,
+  "participantId": "orchestrator.build-01",
+  "participantType": "orchestrator",
+  "scopeId": "workspace.agents-orchestrator",
+  "displayName": "Build orchestrator",
+  "capabilities": ["coordination.v1", "task.delegate"],
+  "metadata": {
+    "repository": "agents-orchestrator",
+    "processId": 4312,
+    "supervised": true
+  },
+  "registeredAt": "2026-07-25T10:00:00.000Z",
+  "lastHeartbeatAt": "2026-07-25T10:00:10.000Z",
+  "leaseExpiresAt": "2026-07-25T10:00:40.000Z"
+}
