@@ -9,7 +9,18 @@ Redis coordination plane for independently running orchestrators.
 
 Created and maintained by **Carlos Asensio Pizarro**.
 
-Current release: v0.1.0, closing MVP2.0 plus PROJECT_V3 hardening.
+## Project status
+
+AO is under active development. `main` contains reviewed integrations; there
+is no tagged release as of 2026-10-06. Package version `0.1.0` is development
+metadata, not a published release.
+
+The latest verified implementation is [`ea18f4e`](https://github.com/aspizc/AO/commit/ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3):
+**2,625 passed, 0 failed, 12 declared integration skips**. The full local gate
+exited zero with `infrastructure_unavailable`, because PostgreSQL,
+Gateway/Temporal integration, and optional live providers were unavailable.
+See [current capabilities and evidence](docs/project-status.md) for the exact
+candidate, verification limits, and remaining work.
 
 Important: there is no privileged standalone orchestrator inside the Gateway.
 A human-facing LLM can take the orchestrator role, and optional peer clients
@@ -19,263 +30,138 @@ policy-governed actions. See
 
 ## Quickstart
 
-Clone the repository:
+Prerequisites: a Node.js version from the [runtime contract](docs/node-runtime.md),
+Python 3.11, and `uv` on `PATH`. CI pins uv `0.11.21`; lock regeneration
+requires that exact version. The complete repository gate requires Linux
+(including WSL2), Docker for the documented tmux build, a compatible
+[pinned tmux runtime](docs/tmux-runtime.md), and disposable Redis 7.
 
 ```bash
 git clone https://github.com/aspizc/AO.git
 cd AO
-```
-
-Use a Node.js version accepted by the
-[canonical Node runtime contract](docs/node-runtime.md). The Gateway npm
-install enforces that contract.
-
-Install local dependencies:
-
-```bash
-python3 -m venv .venv
+uv venv --python 3.11 .venv
 source .venv/bin/activate
-uv pip sync requirements.lock
-pip install --no-deps -e "cli[dev]" -e "orchestrator-langgraph"
-npm --prefix gateway install
-```
-
-`requirements.lock` is generated with `uv pip compile` from the Python
-subproject manifests. It locks the transitive Python environment while the
-editable installs keep local package code live without re-resolving
-dependencies. Regenerate it after dependency changes with the pinned
-universal/hash contract:
-
-```bash
-./scripts/requirements_lock.sh --upgrade
-```
-
-Validate policy registries and run the full local gate:
-
-```bash
+uv pip sync --require-hashes requirements.lock
+uv pip install --no-deps --no-build-isolation -e cli -e orchestrator-langgraph --offline
+npm --prefix gateway ci
 agent-run policy validate
-AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
+node scripts/smoke_mcp.mjs
+node --test tests/e2e/mcp_two_agent_workflow.test.js
 ```
 
-`./scripts/ci.sh` runs the required release verifier, structure tests, Gateway
-tests, E2E tests, CLI tests, Orchestrator LangGraph tests, and the isolated
-Redis 7 live lane. Supply your disposable Redis endpoint through
-`AGENTS_TEST_REDIS_URL`; a missing endpoint makes the gate fail. The E2E suite
-uses dry-run adapters and does not require real agent CLI execution. See the
-[CI contract](docs/ci-contract.md) for the exact required lanes and skip policy.
-Session tests also require the [pinned tmux runtime](docs/tmux-runtime.md);
-the public CI workflow builds it from verified inputs automatically.
+The smoke and two-agent tests use dry-run adapters. They exercise the MCP
+surface without calling a real provider. For supervised execution, install and
+authenticate the selected CLI and prepare the compatible tmux runtime first.
+The [operator guide](docs/operator-guide.md) covers repository registration,
+MCP host setup, dry-run calls, and troubleshooting.
 
-The [canonical MCP tool catalog](docs/mcp-tool-catalog.md) lists the complete
-versioned public surface. Runtime schemas, published JSON Schemas, examples,
-and safe error allowlists come from the same typed source.
+Configure the host to launch `node ./gateway/src/mcp_server.js` from this
+checkout with MCP server name `agents-gateway`. Start with `AGENTS_DRY_RUN=1`.
+Set `AGENTS_REQUEST_PRINCIPAL_AGENT=codex` for a Codex host; the default is
+`claude-code`. This identifies the host, independently of the coder/reviewer
+agents it launches. Use the [generic client configuration](client-config/README.md).
 
-The required release lane is offline and fail-closed: it rebuilds the complete
-lock graph across the reviewed Python environment matrix, validates the
-lock-derived SBOM/licenses, and verifies 1:1 primary OSV evidence. Candidate
-collection pins Git tree/blob bytes and signed independent reviews. See the
-[release contract](docs/release-candidate.md) and
-[ADR-V5-02](docs/adr/ADR-V5-02-pinned-release-evidence.md).
+The legacy `node scripts/smoke_mvp2.mjs` currently fails at `task.assign`
+with `REQUEST_CONTEXT_DENIED` because it creates a new Gateway connection
+for each call. Use the persistent-connection test above for the dry-run flow;
+see [known limits](docs/project-status.md#known-operator-limits).
 
-For a step-by-step operator path from clone to dry-run, read
-[docs/operator-guide.md](docs/operator-guide.md).
+## Agents and models
 
-For the MVP2.0 two-agent operator smoke, run:
+The canonical [provider profile](gateway/contracts/orchestrator-profile-v1.json)
+and `policies/agent-capabilities.json` govern availability and selection.
 
-```bash
-node scripts/smoke_mvp2.mjs
-```
+| Agent | Default selection | Execution |
+|---|---|---|
+| Codex | `gpt-5.6-sol`, effort `max`, tier `priority` | Headless and supervised |
+| Claude Code | `claude-fable-5`, effort `max` | Headless and supervised |
+| Antigravity CLI | `gemini-3.8-flash-high`, effort `high` | Headless and supervised; permission bypass is opt-in |
+| pi | `ollama/qwen3.8:27b`, effort `medium` | Optional CLI; explicit provider setup |
+| OpenCode | `ollama/qwen3.8:27b` | Optional CLI; explicit provider setup |
+| Gemini CLI | `gemini-2.5-pro` | Registry-only in the current executable profile |
 
-It defaults to dry-run. Set `AGENTS_DRY_RUN=0` only when `tmux`, Codex, and
-Claude are installed and logged in.
+Explicit alternatives include `gpt-6.1-sol` (`gpt-6.1`, default effort `xhigh`),
+`gpt-6-astra` (`astra`), `claude-sonnet-5-5` (`sonnet-5.5`), and
+`claude-opus-5-5` (`opus-5.5`). These entries do not change AO's defaults or
+prove live provider availability. See the [Codex](docs/adapters/codex.md),
+[Claude](docs/adapters/claude-code.md), [Antigravity](docs/adapters/antigravity.md),
+[pi](docs/adapters/pi.md), and [OpenCode](docs/adapters/opencode.md) guides.
 
 ## Architecture Summary
 
 ```text
-Human-facing LLM host
-  role: orchestrator
-        |
-        | MCP over stdio
-        v
-agents-gateway
-  tools -> services -> policy / audit / state / artifacts
-        |
-        | adapter calls after policy approval
-        v
-agent CLIs
-  headless dry-run or supervised tmux sessions
-
-MCP or trusted local client
-        |
-        | coordination.* / direct factory
-        v
-Redis 7 coordination namespace
-  leased presence + addressed inbox streams
-```
-
-The Gateway is the enforcement point:
-
-- deterministic policy decisions from versioned registries in `policies/`
-- append-only JSONL audit correlated by `traceId`
-- SQLite state for orchestrations, tasks, sessions, artifacts, approvals, and
-  policy decisions
-- filesystem artifact storage with deterministic sanitization
-- async approvals with bounded waits
-- bounded opt-in auto-approval scopes with audit (`AGENTS_AUTOAPPROVE`, see
-  [ADR-006](docs/adr/ADR-006-bounded-autoapprove.md)); default remains human
-  approval
-- Gemini and Claude adapters with dry-run and supervised paths
-- optional Antigravity, pi, and OpenCode adapters with explicit provider setup
-- Codex adapter with default headless execution coverage
-- session tools for attach info and human tmux intervention notes
-- optional V5 leased discovery and at-least-once addressed delivery through a
-  dedicated Redis namespace, exposed by eight `coordination.*` tools and the
-  same importable service
-
-## Operational Usability
-
-The supported practical dry-run flow is:
-
-```text
 human-facing orchestrator -> Gateway MCP -> coder child + reviewer child
+                                 |
+                      policy / state / audit / artifacts
+                                 |
+                 optional Redis coordination for independent peers
 ```
 
-The supported two-agent pairing uses Codex as coder and Claude as reviewer;
-the historical P/0/3 activation path is superseded by Stage W.
-This path is covered by `tests/e2e/mcp_two_agent_workflow.test.js` through the
-real MCP stdio Gateway surface. The orchestrator assigns a coder task, runs a
-child agent through `agent.*`, shares only sanitized artifacts with a reviewer
-child, records approval, and completes the orchestration.
+The Gateway exposes [33 versioned tools](docs/mcp-tool-catalog.md) over stdio:
+25 core tools and eight `coordination.*` tools. It applies deterministic
+registry policy, server-owned request/task/repository bindings, asynchronous
+approvals, sanitization, and audited agent sessions. Logs go to stderr.
+SQLite is the default durable state store.
 
-Codex is enabled in the base policy registry for coder, planner, reviewer, and
-restricted-coder roles. Repository policy still gates each invocation, and
-`agents-orchestrator` excludes `policies/` from Codex writes.
+The practical two-agent flow uses Codex as coder and Claude as reviewer.
+The historical P/0/3 activation path is superseded by Stage W and the
+[MVP2.0 runbook](docs/mvp2-orchestrator-runbook.md). `writer` and `editor`
+roles also support prose and documentation workflows.
 
-The `writer` and `editor` roles support prose workflows: a writer may write
-prose in non-restricted repositories and publish documentation artifacts; an
-editor reviews sanitized material and publishes review notes. Operators must
-register and allowlist their own repositories before using these roles.
+The coordination tools are `coordination.status`, `coordination.register`,
+`coordination.heartbeat`, `coordination.discover`, `coordination.unregister`,
+`coordination.send`, `coordination.receive`, and `coordination.ack`. The
+three message-tool contracts under `message.*` remain unchanged.
 
-## V5 Coordination Plane
+Optional coordination provides leased presence, discovery, addressed inboxes,
+reclaim, and transport ACK over Redis 7 standalone. MCP clients and trusted
+local Node clients share the same service. With no configured Redis URL,
+coordination returns `COORDINATION_UNAVAILABLE`; unrelated Gateway tools remain
+available. Messages cannot grant repository, review, merge, or approval authority.
+Read the [architecture](docs/architecture.md) and
+[coordination runbook](docs/coordination-bus.md).
 
-V5 lets independent orchestrators, gateways, agents, and supervised sessions
-register ephemeral identities, discover active peers, and exchange addressed
-messages. MCP clients use:
+For iterative work, assign tasks before `agent.spawn`, reuse sessions through
+`agent.ask`/`agent.view`, store artifacts, obtain an independent review, and
+close sessions with `agent.kill` before `orchestration.complete`. Review,
+integration, publication, promotion, and release are separate states. The
+[planning runbook](docs/planning-loop-runbook.md) and
+[installable skills](skills/README.md) describe the workflow.
 
-- `coordination.status`
-- `coordination.register`
-- `coordination.heartbeat`
-- `coordination.discover`
-- `coordination.unregister`
-- `coordination.send`
-- `coordination.receive`
-- `coordination.ack`
+## Verification and scope
 
-Trusted local Node clients can import `createCoordination` from
-`gateway/src/coordination.js`; both access paths share the same domain service.
-Coordination is disabled when no Redis URL is configured, without disabling
-unrelated Gateway tools; coordination calls return
-`COORDINATION_UNAVAILABLE`.
+After preparing tmux and an isolated disposable Redis endpoint, run the
+[operator guide's CI procedure](docs/operator-guide.md#4-run-local-ci):
 
-The plane is additive: it does not change the three message-tool contracts
-under `message.*` or publish coordination audit records to `agents:events`.
-Messages are untrusted input and cannot grant repository, approval, review,
-merge, or session authority. Redis 7 standalone with one shard is the
-supported V5 topology; see
-[the coordination runbook](docs/coordination-bus.md) for configuration,
-delivery semantics, trust boundaries, and rollout.
-
-## Sequential Task Scheduling
-
-For plan-driven implementation, the most reliable pattern is a deterministic
-human-facing scheduler that advances one task at a time. Child agents should
-execute the current state; they should not decide which plan task comes next.
-
-Use `plan/` and `plan/*/reviews/` as the source of truth:
-
-- choose the next task in plan order that has no `reviewed_OK` verdict
-- if the latest trial has `reviewed_KO`, relaunch the coder only for the
-  requested corrections
-- if a `to_review` file exists without an OK/KO verdict, launch or wait for the
-  reviewer instead of starting new implementation work
-- after an OK verdict, complete the orchestration and move to the next task
-- stop after 15 KO trials for the same task and ask for human intervention
-
-The normal Gateway sequence for each task is:
-
-```text
-orchestration.create
-task.assign coder
-agent.spawn coder
-agent.ask coder
-agent.view coder periodically
-artifact.put raw_diff / implementation_notes
-task.assign reviewer
-agent.spawn reviewer
-agent.ask reviewer
-artifact.put review_notes
-OK -> orchestration.complete -> next task
-KO -> same task, next trial, narrow coder prompt
+```bash
+AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
 ```
 
-Prefer `agent.spawn` for long implementation or review work so the operator can
-inspect the supervised tmux session through `session.attach_info` or
-`tmux attach`. Reserve `agent.delegate` for short one-shot tasks where live
-observation is not needed.
+The [CI contract](docs/ci-contract.md) defines locks, supply-chain verification,
+lint, structure, Gateway, E2E, CLI, LangGraph, and live Redis lanes. Missing
+required Redis fails the gate. Declared external-service skips remain visible;
+exit zero alone does not establish an all-infrastructure pass.
 
-Keep coder prompts small and bounded: list the allowed files, required tests,
-expected review file, and exact deliverable. Use the policy defaults: Codex
-`gpt-5.6-sol` at `max` on the `priority` (Fast) tier, and Claude
-`claude-fable-5` at `max`. If a coder session shows no output or file changes
-after a short interval, inspect it
-with `agent.view`, then kill and relaunch with a smaller scope if needed.
+`agent-run doctor --json` provides read-only local diagnostics. Coordination
+and runtime-authority probes still have explicit unavailable boundaries; see
+[Doctor's implementation and limits](docs/doctor.md).
 
-## Scope
+MVP2.0 scope is recorded in [ADR-005](docs/adr/ADR-005-mvp2-scope.md) and the
+[acceptance checklist](docs/mvp2-acceptance-checklist.md). V5 extends that
+foundation; [plan/](plan/README.md) retains the imported planning and review
+history. Planned sheets are not delivered capabilities.
 
-MVP scope is fixed in [ADR-004](docs/adr/ADR-004-mvp-scope.md).
-MVP2.0 scope is fixed in [ADR-005](docs/adr/ADR-005-mvp2-scope.md) and tracked
-by [docs/mvp2-acceptance-checklist.md](docs/mvp2-acceptance-checklist.md).
+PostgreSQL, Temporal, real provider execution, and the optional
+[LangGraph client](orchestrator-langgraph/README.md) have distinct integration
+requirements and verification limits. Multi-user authentication, cloud hosting,
+Redis Cluster/Sentinel, and IDE-specific configuration are outside the current
+verified path. No standalone privileged orchestrator binary is provided.
 
-In scope:
-
-- MCP stdio Gateway named `agents-gateway`
-- policy, registry, audit, state, artifact, sanitization, approval, session,
-  orchestration, and task flows
-- Gemini and Claude adapters
-- default-enabled Codex adapter documentation
-- dry-run restricted-flow E2E coverage
-- bounded opt-in auto-approval for explicitly configured scopes
-- host-agnostic operator docs and generic MCP config
-- optional Redis-backed V5 coordination through MCP and trusted direct access
-
-MVP2.0 scope:
-
-- per-invocation model selection through Gateway tools and adapters
-- Codex coder real headless and supervised execution
-- Claude reviewer with `claude-fable-5` at effort `max`
-- generic MCP host launcher profile, orchestrator prompt, and runbook
-- guarded real two-agent E2E and `scripts/smoke_mvp2.mjs`
-
-Out of scope:
-
-- Cursor, Antigravity IDE, and any specific IDE configuration
-- cloud deployment, multi-host networking, and multi-user authentication
-- a standalone orchestrator binary or `orchestrator/` process
-- Redis Cluster/Sentinel coordination topology and Redis as an authorization
-  boundary
-
-Experimental (PROJECT_V1, sin gate de produccion):
-
-- Postgres backend: experimental V1 state backend work is tracked in
-  [plan/PROJECT_V1/](plan/PROJECT_V1/README.md) and is not the MVP2.0
-  default runtime.
-- Redis Streams publisher: experimental V1 audit/event publishing exists in
-  the tree and can use [docker/docker-compose.yml](docker/docker-compose.yml)
-  as Optional local infrastructure.
-- `orchestrator-langgraph/`: experimental V1 LangGraph client/workflow code is
-  tracked in [plan/PROJECT_V1/](plan/PROJECT_V1/README.md) and is not a
-  standalone Gateway replacement.
-- OTel: experimental V1 telemetry export is opt-in and not a production gate.
+Dependency installation consumes the checked-in locks. For an intentional
+Python dependency update, use `./scripts/requirements_lock.sh` followed by
+`./scripts/requirements_lock.sh --check`; use `--upgrade` only when upgrading
+versions is the intended change. See the [release contract](docs/release-candidate.md)
+for candidate evidence and supply-chain verification.
 
 ## Runtime Environment
 
@@ -329,6 +215,8 @@ Their setup and defaults are documented in the
 
 ## Documentation
 
+- [docs/project-status.md](docs/project-status.md) — current implementation, verification, and release status.
+
 - [skills/README.md](skills/README.md) — project-local audit, Gateway
   orchestration, and cross-process coordination skills for Codex and Claude.
 - [docs/operator-guide.md](docs/operator-guide.md)
@@ -366,8 +254,8 @@ AO is open-source software released under the [MIT License](LICENSE).
 
 ## Contributing
 
-Issues and pull requests are welcome. Before submitting a change, run the
-local quality gate:
+Issues and pull requests are welcome. Prepare the documented Redis and tmux
+prerequisites, then run the local quality gate:
 
 ```bash
 AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh

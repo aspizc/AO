@@ -26,5 +26,6 @@ to this checkout. `AGENTS_DRY_RUN=1` is the default for safe rehearsal; set
 CLI login.
 
 The planning loop is scoped to `plan/**`, uses human approval before applying
-plan changes, and should run on a dedicated branch. The detailed runbook is
-added in Z/0/3.
+plan changes, and should run on a dedicated branch. Follow the
+[planning runbook](../../../docs/planning-loop-runbook.md), including the
+legacy smoke limitation and host/repository identity setup.

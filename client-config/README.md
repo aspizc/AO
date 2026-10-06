@@ -35,6 +35,8 @@ until a Redis URL is configured, while unrelated tools continue to work.
 | `AGENTS_COORDINATION_PREFIX` | optional | `agents:coord:v1` | Dedicated coordination namespace; must not overlap `agents:events`. |
 | `AGENTS_COORDINATION_SCOPE_ID` | optional | `agents-orchestrator` | Canonical coordination scope accepted by this Gateway instance. |
 | `AGENTS_TMUX_PREFIX` | optional | `ag-` | tmux session prefix. |
+| `AGENTS_REQUEST_PRINCIPAL_AGENT` | optional | `claude-code` | MCP host identity; set `codex` for a Codex host. Caller assertions must match. |
+| `AGENTS_REQUEST_CONTEXT_TTL_MS` | optional | `86400000` | Connection context lifetime in milliseconds; restart after expiry. |
 | `AGENTS_REPO_ROOTS` | required for spawn | empty | Colon-separated cwd allowlist. |
 | `AGENTS_APPROVAL_MAX_WAIT_MS` | optional | `60000` | Server-side cap on `approval.wait`. |
 | `AGENTS_AGENT_TIMEOUT_MS` | optional | `600000` | Server-side cap for agent `delegate` and `ask`. |
@@ -43,6 +45,12 @@ until a Redis URL is configured, while unrelated tools continue to work.
 See [`../docs/coordination-bus.md`](../docs/coordination-bus.md) for the full
 coordination configuration, lease lifecycle, delivery semantics, and secure
 Redis deployment requirements.
+
+Relative example paths assume the host starts in the AO checkout. Use absolute
+server and policy paths if it starts elsewhere. Repository IDs must be registered
+and map to canonical directories under `AGENTS_REPO_ROOTS`; allowlisting a path
+alone does not create a repository registration. See the
+[operator guide](../docs/operator-guide.md#5-launch-the-gateway-from-any-mcp-capable-host).
 
 ## Out of scope: IDE/host specifics
 

@@ -6,7 +6,8 @@ This document captures the Claude Code CLI contract used by
 ## Binary
 
 - Default: `claude` (configurable via `AGENTS_CLAUDE_BIN`).
-- Tested version: `2.1.207 (Claude Code)`.
+- The current repository gate verifies dry-run/fake-binary behavior. Check
+  `claude --version` and login on the operator machine before real execution.
 
 ## Headless mode
 
@@ -38,9 +39,13 @@ Notes:
   default registry selects `max`; Claude Code requires this session-only level
   on each launch.
 - Allowed canonical models are `claude-sonnet-5`, `claude-fable-5-1`,
-  `claude-fable-5`, `claude-opus-5`, and `claude-opus-4-8`. The default remains
+  `claude-fable-5`, `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-opus-5`,
+  and `claude-opus-4-8`. The default remains
   `claude-fable-5`; aliases `sonnet`, `fable`, and `opus` resolve to
   `claude-sonnet-5`, `claude-fable-5`, and `claude-opus-5` before launch.
+  Explicit aliases `sonnet-5.5` and `opus-5.5` / `opus-5-5` select the new
+  5.5 entries; `opus-5` preserves explicit access to `claude-opus-5`.
+  Model registration does not establish live provider availability.
 - Do not use `--dangerously-skip-permissions` or
   `--allow-dangerously-skip-permissions` in the adapter.
 
@@ -70,8 +75,8 @@ tmux, and the `claude` binary must not be required in dry-run mode.
 
 ## Manual verification checklist
 
-- [x] `claude --version` succeeds and the version is recorded above.
-- [x] `claude` is on PATH or `AGENTS_CLAUDE_BIN` points to it.
+- [ ] `claude --version` succeeds; record the version with the local smoke evidence.
+- [ ] `claude` is on PATH or `AGENTS_CLAUDE_BIN` points to it.
 - [ ] `tmux` is available (`tmux -V`).
 - [ ] Adapter dry-run tests pass (`O/0/1`).
 - [ ] A real supervised smoke test can launch `claude` in a tmux session from

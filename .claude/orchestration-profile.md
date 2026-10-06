@@ -105,7 +105,7 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 ## Quality gate
 
 - **Full gate:** `bash scripts/ci.sh` (wraps `python3 scripts/ci_gate.py`; structure + Gateway +
-  E2E + CLI + LangGraph suites; dry-run, no network needed). Plus `agent-run policy validate`
+  E2E + CLI + LangGraph suites; dry-run providers plus required disposable Redis 7). Plus `agent-run policy validate`
   after any policy-adjacent change and `git diff --check` before review.
 - Run the full gate **solo** per tree (turn-taking) and only after the coder settles; batch
   several reviewed-OK merges behind one gate when integrating a wave.
@@ -125,8 +125,9 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
   `orchestrator-langgraph`. Regenerate the lock only with
   `./scripts/requirements_lock.sh`, then verify with
   `./scripts/requirements_lock.sh --check`; keep it in its own commit.
-- Node: `npm --prefix gateway install` under the version accepted by `docs/node-runtime.md`.
-- The Codex sandbox has **no network** → install deps from the **host**. Keep lockfile churn in
+- Node: `npm --prefix gateway ci` under the version accepted by `docs/node-runtime.md`.
+- Network and sandbox availability depend on the current execution environment.
+  Use the authorized environment for dependency installation. Keep lockfile churn in
   its own commit, separate from any fix.
 
 ## Plan / task format

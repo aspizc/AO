@@ -1,5 +1,18 @@
 # orchestrator-langgraph
 
+This optional Python package is a peer client of `agents-gateway`; it does not
+replace the Gateway policy boundary. It contains plan/refinement and
+implementation/review flows plus Temporal activities/workflow support.
+
+## Install and verification
+
+From the AO root, use the shared [locked installation](../docs/ci-contract.md#reproducible-installation).
+The reviewed environment pins LangGraph 1.2.5 and LangGraph SDK 0.4.4.
+The latest full candidate gate recorded 81 package tests passing and three
+explicit Gateway/Temporal integration skips. This does not establish a live
+Temporal deployment or real provider workflow. See
+[project status](../docs/project-status.md) for the exact commit and evidence.
+
 ## Telemetry
 
 `orchestrator-langgraph` includes dependency-free, OTel-inspired span recording for tests and service diagnostics.

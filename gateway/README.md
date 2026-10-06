@@ -84,7 +84,7 @@ capabilities, scalar metadata, and a bounded lease duration. Omitting
 `scopeId` uses the instance's canonical scope; supplying a different one fails
 with `COORDINATION_SCOPE_MISMATCH` before Redis is written. Heartbeat can
 supply a new bounded lease duration; otherwise it uses the 15-minute default.
-The advertised and enforced v1 ceiling is one hour.
+The advertised and enforced v1 ceiling is 72 hours (`259200000` ms).
 
 `send` accepts only `internal` and `unrestricted`; `restricted` is denied.
 It also rejects secret-like or oversized bodies. The service, rather than the

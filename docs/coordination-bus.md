@@ -45,7 +45,9 @@ blocking receives at `AGENTS_COORDINATION_MAX_BLOCK_MS`. Coordination numeric
 configuration is parsed with JavaScript `Number`; every configured value must
 be a positive safe integer, and invalid values fail Gateway startup rather than
 silently weakening a guarantee. The default lease must not exceed the
-configured maximum, and the configured maximum cannot exceed one hour.
+configured maximum, and the configured maximum cannot exceed 72 hours (`259200000` ms). The original
+ADR-V5-01 records an earlier one-hour design limit; current runtime constants,
+schemas, and boundary tests define the expanded limit documented here.
 
 The generated MCP input schema advertises `body` as a string but does not
 advertise a `maxLength`; the shared service is authoritative for its UTF-8 byte
@@ -236,7 +238,7 @@ emit a coordination domain-audit event.
   },
   "limits": {
     "leaseDefaultMs": 900000,
-    "leaseMaxMs": 3600000
+    "leaseMaxMs": 259200000
   }
 }
 ```

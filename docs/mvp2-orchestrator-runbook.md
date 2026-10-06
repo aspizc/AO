@@ -9,7 +9,8 @@ It is host-agnostic and does not require any specific IDE.
 - A Node.js version accepted by the
   [runtime contract](node-runtime.md): `node --version`.
 - Python 3.11 or newer: `python3 --version`.
-- `tmux`: `tmux -V`.
+- The [pinned tmux runtime](tmux-runtime.md): `tmux -V`.
+- `uv` and disposable Redis 7 for the Linux/WSL2 repository gate.
 - Codex CLI installed and logged in: `codex --version`.
 - Claude CLI installed and logged in: `claude --version`.
 - A non-restricted working repository. Its absolute path must be allowed through
@@ -18,17 +19,19 @@ It is host-agnostic and does not require any specific IDE.
 ## 2. Install
 
 ```bash
-python3 -m venv .venv
+uv venv --python 3.11 .venv
 source .venv/bin/activate
-pip install -e "cli[dev]"
-npm --prefix gateway install
+uv pip sync --require-hashes requirements.lock
+uv pip install --no-deps --no-build-isolation -e cli -e orchestrator-langgraph --offline
+npm --prefix gateway ci
 PATH="$PWD/.venv/bin:$PATH" agent-run policy validate
 ```
 
-Run the normal local gate before trying real CLIs:
+Prepare the isolated tmux server and disposable Redis endpoint as described in
+the [operator guide](operator-guide.md), then run the local gate before real CLIs:
 
 ```bash
-PATH="$PWD/.venv/bin:$PATH" ./scripts/ci.sh
+AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
 ```
 
 ## 3. Mandatory Dry-Run Rehearsal
@@ -42,26 +45,30 @@ AGENTS_DRY_RUN=1 node scripts/smoke_mcp.mjs
 This verifies MCP stdio startup and tool discovery without requiring network,
 tmux, Codex, or Claude execution.
 
-Then run the MVP2.0 two-agent smoke. It defaults to dry-run and prints the
-effective agents, models, sessions, artifact root, audit path, and result:
+Then run the two-agent dry-run test, which retains one MCP connection for the
+trace and tasks:
 
 ```bash
-node scripts/smoke_mvp2.mjs
+node --test tests/e2e/mcp_two_agent_workflow.test.js
 ```
 
-The guarded real E2E lives at `tests/e2e/mcp_two_agent_real.test.js`. Normal CI
-runs it as skipped. Operators can run it only after the dry-run rehearsal and
-CLI login checks:
+### Legacy smoke limitation
+
+`node scripts/smoke_mvp2.mjs` currently opens a new Gateway process for every
+request. With connection-bound request contexts, its `task.assign` fails with
+`REQUEST_CONTEXT_DENIED`. This was reproduced on the published implementation;
+the script is not a verified dry-run or real-provider entry point. Use a
+persistent MCP host for the manual sequence below. Real provider execution
+was not established by the latest local gate.
+
+The guarded real E2E lives at `tests/e2e/mcp_two_agent_real.test.js`. The gate
+reports this optional service as unavailable without invoking it unless
+explicitly enabled. After dry-run rehearsal, CLI login, and runtime setup,
+operators can attempt that separate integration check:
 
 ```bash
 AGENTS_E2E_REAL=1 AGENTS_POLICIES_DIR="$PWD/policies" \
   node --test tests/e2e/mcp_two_agent_real.test.js
-```
-
-To run the smoke against real supervised CLIs instead of dry-run, use:
-
-```bash
-AGENTS_DRY_RUN=0 node scripts/smoke_mvp2.mjs
 ```
 
 ## 4. Configure the Real Profile
@@ -81,6 +88,11 @@ AGENTS_CODEX_BIN=codex
 AGENTS_CLAUDE_BIN=claude
 AGENTS_CODEX_SANDBOX=workspace-write
 ```
+
+`AGENTS_REQUEST_PRINCIPAL_AGENT` identifies the MCP host (`claude-code` by
+default, `codex` for a Codex host). The host identity is independent of the
+coder/reviewer selection. Register the working repository ID and make its
+canonical directory discoverable under the configured roots.
 
 `AGENTS_REPO_ROOTS` must be absolute. If it is unset or does not include the
 working repository, agent calls will fail with a cwd allowlist violation.
@@ -144,7 +156,7 @@ Autonomous mode is off by default. To let the Gateway auto-grant only the
 post-review acceptance gate, launch it with:
 
 ```bash
-AGENTS_AUTOAPPROVE=code.apply node scripts/smoke_mvp2.mjs
+AGENTS_AUTOAPPROVE=code.apply node ./gateway/src/mcp_server.js
 ```
 
 For a real supervised run, set the same variable in the MCP host environment

@@ -1,11 +1,20 @@
 # Doctor core, closed status probes, sample, and lock-only bootstrap
 
-This increment ships the pure injected `doctor` result core, its closed result
-schema, provider-login, coordination, and authority status probes, the portable
-input contract, and the synthetic hero sample. It does not wire a `doctor`
-command or supply the D-owned runtime authority needed to establish isolation
-or state ownership. These status bindings do not claim real isolation or
-ownership, a passing review, or a completion gate.
+The read-only diagnostic command is implemented and registered by the CLI:
+
+```bash
+agent-run doctor
+agent-run doctor --json
+```
+
+It composes the closed Doctor result core, six local core checks, provider
+login checks, and coordination/authority status probes. The production
+composition currently supplies an unavailable coordination snapshot and no
+runtime-authority capability, so a nonzero result can reflect those explicit
+boundaries. It does not establish runtime isolation, state ownership, review
+acceptance, or release readiness. The synthetic sample and lock-only bootstrap
+are separate from a completed real-provider workflow. See
+[project status](project-status.md) for the verified candidate.
 
 ## Synthetic input
 

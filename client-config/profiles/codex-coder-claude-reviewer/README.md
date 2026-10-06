@@ -22,4 +22,7 @@ Replace `REPLACE_WITH_ABSOLUTE_WORK_REPO_PATH` with the absolute path to the
 repository the agents may use as `cwd`. For a safe rehearsal, set
 `AGENTS_DRY_RUN=1` before running the real flow.
 
-The detailed terminal runbook is added in X/0/2.
+Follow the [two-agent runbook](../../../docs/mvp2-orchestrator-runbook.md).
+Set `AGENTS_REQUEST_PRINCIPAL_AGENT=codex` when the MCP host itself is Codex;
+otherwise the default host principal is `claude-code`. Optional new models
+are listed in the [Gateway guide](../../../gateway/README.md).

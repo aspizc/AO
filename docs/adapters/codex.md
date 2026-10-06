@@ -18,6 +18,20 @@ tmux operation.
 - Supervised tmux mode launches interactive `codex` with the same resolved
   model, reasoning effort, service tier, sandbox, and cwd.
 
+## Model selection
+
+The public default is `gpt-5.6-sol` / `max` / `priority`. Explicit alternatives
+include `gpt-6.1-sol` (alias `gpt-6.1`, default effort `xhigh`) and
+`gpt-6-astra` (aliases `astra` and `gpt-6`, default effort `max`). Both declare
+`low|medium|high|xhigh|max|ultra` in the Gateway contract. Legacy `sol`, `terra`,
+`luna`, and `gpt-5.6` aliases retain their existing versioned targets.
+
+The canonical [provider profile](../../gateway/contracts/orchestrator-profile-v1.json)
+and capability registries own the complete catalog. Registration verifies
+Gateway selection behavior; it does not prove that a logged-in provider can
+serve the selected model. Choose `serviceTier: "default"` explicitly when the
+operator wants the non-priority tier.
+
 ## Headless mode
 
 The real command shape is:

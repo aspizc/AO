@@ -1,5 +1,16 @@
 # Plan projects
 
+## AO publication and inherited planning baseline
+
+AO main is published through implementation commit `ea18f4e` (2026-10-06).
+See [current project status](../docs/project-status.md) for the verified tree,
+gate results, and remaining integration limits. No release tag exists at this
+cut. The generation table, counts, and source SHAs below describe the imported
+planning baseline; source-local `main`/`develop` and publication statements
+are historical provenance, not the current AO remote state.
+
+## Imported delivery tracks
+
 The implementation plan is split by project generation. Project numbers identify
 delivery tracks, not releases or a monotonic capability level. The table keeps
 the 2026-07-26 audit cut and the local post-audit integration correction
@@ -22,7 +33,7 @@ Project V5's implementation tree contains the delivered A foundation—[five
 historical epics and 25 executable sheets](PROJECT_V5/EPICS.md)—plus eight
 materialized B–I stages with [57 active executable leaves](PROJECT_V5/SHEETS.md),
 for 82 total. The arithmetic is
-`25 + (6 + 8 + 11 + 6 + 5 + 5 + 6 + 10) = 82`; current evidence supports
+`25 + (6 + 8 + 11 + 6 + 5 + 5 + 6 + 10) = 82`; the imported ledger records
 `39 complete + 4 in progress + 39 planned = 82`, and
 `4 + 39 = 43` sheets are open. The in-progress set is exactly `C/1/00`,
 `D/0/01`, `G/0/02`, and `H/0/01`. The non-executable D/0/07

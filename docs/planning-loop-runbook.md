@@ -18,15 +18,18 @@ git checkout -b plan/refine-stage-<x>
 
 ## 2. Dry-Run Rehearsal
 
-Run the smoke first. It defaults to dry-run and does not require Claude CLI
-execution:
+Start with the available MCP startup/tool-discovery check:
 
 ```bash
-node scripts/smoke_planning.mjs
+node scripts/smoke_mcp.mjs
 ```
 
-The smoke verifies the MCP tools, the planner/coder roles, model resolution for
-`claude-fable-5` at effort `max`, plan artifacts, review notes, and audit output.
+The legacy `node scripts/smoke_planning.mjs` was independently exercised during
+the documentation refresh and failed at `task.assign` with
+`REQUEST_CONTEXT_DENIED`. It opens a new Gateway process per request and loses
+the connection-bound context. It is not a verified end-to-end rehearsal.
+Use a persistent MCP host for the manual planning sequence below; the current
+local gate does not establish a full live planning workflow.
 
 ## 3. Configure the Real Profile
 
@@ -44,7 +47,11 @@ AGENTS_REPO_ROOTS=/absolute/path/to/agents-orchestrator
 AGENTS_CLAUDE_BIN=claude
 ```
 
-`AGENTS_REPO_ROOTS` must be the absolute path to this checkout.
+Register the repository ID and map it to a canonical directory under an
+absolute `AGENTS_REPO_ROOTS`. The imported `agents-orchestrator` ID does not
+automatically bind a checkout named `AO`; adapt the operator-owned registration
+and host setup together. Set `AGENTS_REQUEST_PRINCIPAL_AGENT=codex` if the host
+is Codex; otherwise the default host identity is `claude-code`.
 
 ## 4. Connect Host And Prompts
 
@@ -56,6 +63,12 @@ Load these prompts:
 - `prompts/planner_apply_coder_prompt.md` for the apply coder session.
 
 The host should call Gateway tools, not local shell commands, for orchestration.
+
+The `planner` role is valid for planning assignments but is not spawnable in
+the current policy. For a persistent supervised plan-author session, use the
+allowed `coder` role with a plan-only brief, as described in the repository's
+[orchestration profile](../.claude/orchestration-profile.md). Keep the planner
+persona and the Gateway permission role distinct.
 
 ## 5. Loop
 
@@ -79,10 +92,10 @@ The host should call Gateway tools, not local shell commands, for orchestration.
 ## 6. Autonomous Mode
 
 Autonomous mode is off by default. To let the Gateway auto-grant only the
-planning apply gate, launch the smoke with:
+planning apply gate, configure the persistent Gateway host with:
 
 ```bash
-AGENTS_AUTOAPPROVE=plan.apply node scripts/smoke_planning.mjs
+AGENTS_AUTOAPPROVE=plan.apply node ./gateway/src/mcp_server.js
 ```
 
 For a real run, set the same variable in the MCP host environment beside
@@ -92,8 +105,8 @@ For a real run, set the same variable in the MCP host environment beside
 `plan.apply` means the orchestrator may let the apply-coder edit `plan/**`
 after the planner draft. The planner still reviews `git diff plan/` afterward
 and records `review_notes`. If `OPEN DECISIONS / QUESTIONS FOR HUMAN` remain
-unanswered, use the planner's recommended option and record that choice in
-review notes and audit-visible artifacts.
+unanswered, keep those decisions pending for the operator. Auto-approval of
+a bounded apply action does not answer outstanding human decisions.
 
 Autonomous mode does not grant protected pushes, dependency changes, protected
 branch writes, production-code edits, or restricted repository work. Those
