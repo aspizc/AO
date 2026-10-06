@@ -57,8 +57,8 @@ for each PROJECT_V<N> version / wave (and its hardening increments) on the roadm
       finding has exactly one owning sheet).
 
   PHASE 2 — IMPLEMENT     → invoke ao-build-orchestration   (the fast inner gate)
-    - One sheet at a time: Codex coder (gpt-5.6-sol, max, priority) + distinct Claude reviewer
-      (claude-fable-5, max), committed review trail, ≤15 trials, focused checks then one full
+    - One sheet at a time: Codex coder (gpt-6.1-sol, max, priority) + distinct Claude reviewer
+      (claude-opus-5-5, max), committed review trail, ≤15 trials, focused checks then one full
       bash scripts/ci.sh, pathspec commits, serial --no-ff integration. Do NOT audit here.
     - Continue until the wave/version's sheets are reviewed-OK, INTEGRATED, and the gate is green.
 
@@ -129,9 +129,9 @@ version/wave to be done to good quality:
 - **SPAWN, never DELEGATE** for iterative work; keep the tmux attach path available to the
   operator; drive with `agent_ask`, observe with `agent_view`, reuse the live coder session for
   KO→fix, fresh trace per re-review round.
-- **Roles/models** from the profile: Codex `gpt-5.6-sol` max/priority codes; Claude
-  `claude-fable-5` max reviews (fallback `claude-opus-4-8` when the plan window is exhausted);
-  audits at `ultra`/max. On `POLICY_DENIED`, stop and report the `ruleId` — never downgrade.
+- **Roles/models** from the profile: Codex `gpt-6.1-sol` max/priority codes; Claude
+  `claude-opus-5-5` max reviews (fallback `claude-opus-4-8` when the plan window is exhausted);
+  audits at `max`. On `POLICY_DENIED`, stop and report the `ruleId` — never downgrade.
 - **Tool shapes:** `orchestration_create` flat; `task_assign` nested (and BEFORE `agent_spawn`);
   `agent_spawn` flat. Codex cwd never exposes `policies/`.
 - **Commits:** only reviewed-OK work, explicit pathspec, `git branch --show-current` first;

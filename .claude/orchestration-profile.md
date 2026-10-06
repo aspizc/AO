@@ -79,17 +79,17 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 
 - **Orchestrator:** the human-facing LLM session (Claude Code in current practice). There is no
   standalone orchestrator process (ADR-002).
-- **Coder:** agent `codex`, model `gpt-5.6-sol`, reasoningEffort `max`, serviceTier `priority`
+- **Coder:** agent `codex`, model `gpt-6.1-sol`, reasoningEffort `max`, serviceTier `priority`
   (policy defaults; `gpt-5.6` aliases to `gpt-5.6-sol`).
-- **Reviewer:** agent `claude-code`, model `claude-fable-5`, reasoningEffort `max` — cross-vendor
+- **Reviewer:** agent `claude-code`, model `claude-opus-5-5`, reasoningEffort `max` — cross-vendor
   review is this project's supported pairing (Codex codes, Claude reviews). Owner-approved
   fallback when the Max-plan window is exhausted: `claude-opus-4-8`.
 - **Planner:** the planner ROLE is not spawnable (`role.deny_action` — verified live 2026-07-27,
   same as the KYA profile): spawn plan-author helpers as `coder` role with the plan-author
   persona fixed by the brief (plan documents only). The Stage Z loop's planner-role
   `task.assign` remains valid for non-spawn flows.
-- **Audit:** `codex` `gpt-5.6-sol` at `ultra` for independent audits (observed V5 practice), or
-  `claude-fable-5` at `max`.
+- **Audit:** `codex` `gpt-6.1-sol` at `max` for independent audits, or
+  `claude-opus-5-5` at `max`.
 - On `POLICY_DENIED`: stop, report the `ruleId`, never silently downgrade model/agent.
 
 ## Prompt templates (start briefs from these; keep their Working rules intact)

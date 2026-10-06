@@ -24,8 +24,8 @@ function fakeRegistries({
   return {
     getAgent: () => ({
       enabled,
-      models: ["gpt-5.6-sol", "gpt-5", "gpt-5-codex"],
-      defaultModel: "gpt-5.6-sol",
+      models: ["gpt-6.1-sol", "gpt-5", "gpt-5-codex"],
+      defaultModel: "gpt-6.1-sol",
       reasoningEfforts: ["low", "medium", "high", "max"],
       defaultReasoningEffort: "max",
       serviceTiers: ["default", "priority"],
@@ -89,14 +89,14 @@ test("spawn launch line includes model effort service tier sandbox and cwd", asy
     cwd: root,
     traceId: "tr-codex-launch",
     role: "coder",
-    model: "gpt-5.6-sol",
+    model: "gpt-6.1-sol",
     reasoningEffort: "max",
     serviceTier: "priority",
   });
 
   assert.equal(
     result.launchCommand,
-    `codex -m gpt-5.6-sol -c model_reasoning_effort="max" -c service_tier="priority" -s workspace-write -C ${root}`,
+    `codex -m gpt-6.1-sol -c model_reasoning_effort="max" -c service_tier="priority" -s workspace-write -C ${root}`,
   );
 });
 
@@ -111,7 +111,7 @@ test("spawn without an explicit tier preserves the public priority default", asy
 
   assert.equal(
     result.launchCommand,
-    `codex -m gpt-5.6-sol -c model_reasoning_effort="max" -c service_tier="priority" -s workspace-write -C ${root}`,
+    `codex -m gpt-6.1-sol -c model_reasoning_effort="max" -c service_tier="priority" -s workspace-write -C ${root}`,
   );
 });
 

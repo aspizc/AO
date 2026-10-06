@@ -23,7 +23,7 @@ Preferred adapter command shape:
 
 ```bash
 claude --print --output-format json --permission-mode dontAsk \
-  --no-session-persistence --model claude-fable-5 --effort max "<prompt>"
+  --no-session-persistence --model claude-opus-5-5 --effort max "<prompt>"
 ```
 
 Notes:
@@ -40,8 +40,8 @@ Notes:
   on each launch.
 - Allowed canonical models are `claude-sonnet-5`, `claude-fable-5-1`,
   `claude-fable-5`, `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-opus-5`,
-  and `claude-opus-4-8`. The default remains
-  `claude-fable-5`; aliases `sonnet`, `fable`, and `opus` resolve to
+  and `claude-opus-4-8`. The default is
+  `claude-opus-5-5`; aliases `sonnet`, `fable`, and `opus` resolve to
   `claude-sonnet-5`, `claude-fable-5`, and `claude-opus-5` before launch.
   Explicit aliases `sonnet-5.5` and `opus-5.5` / `opus-5-5` select the new
   5.5 entries; `opus-5` preserves explicit access to `claude-opus-5`.

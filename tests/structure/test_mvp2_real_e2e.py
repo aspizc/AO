@@ -39,10 +39,10 @@ def test_mvp2_real_e2e_exercises_two_agent_contract():
     ):
         assert token in text
 
-    assert "gpt-5.6-sol" in text
+    assert "gpt-6.1-sol" in text
     assert "max" in text
     assert "priority" in text
-    assert "claude-fable-5" in text
+    assert "claude-opus-5-5" in text
     assert "AGENT_MODEL_RESOLVED" in text
     assert "SANITIZATION_APPLIED" in text
 

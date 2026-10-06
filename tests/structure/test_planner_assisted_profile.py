@@ -36,7 +36,7 @@ def test_planner_assisted_env_and_readme_describe_roles_and_scope():
         "absolute path",
         "AGENTS_DRY_RUN=1",
         "AGENTS_DRY_RUN=0",
-        "claude-fable-5",
+        "claude-opus-5-5",
         "max",
         "planner_system_prompt.md",
         "planner_apply_coder_prompt.md",

@@ -26,9 +26,9 @@ target agent. Aliases resolve to canonical model IDs before audit and adapter
 execution. `reasoningEffort` and `serviceTier` are only effective for agents
 that declare the corresponding allowlists in `policies/agent-capabilities.json`.
 
-The default Codex profile resolves to `gpt-5.6-sol`, effort `max`, and service
+The default Codex profile resolves to `gpt-6.1-sol`, effort `max`, and service
 tier `priority` (Fast). The default Claude profile resolves to
-`claude-fable-5` with effort `max`; its only allowed Claude 4.x model is
+`claude-opus-5-5` with effort `max`; its only allowed Claude 4.x model is
 `claude-opus-4-8`.
 
 Two more agents run local or third-party models. `pi` defaults to

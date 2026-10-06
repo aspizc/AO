@@ -5,8 +5,8 @@ assisted planning loop over this repository.
 
 ## Agents and roles
 
-- Planner: `claude-code`, role `planner`, model `claude-fable-5`, effort `max`.
-- Apply coder: `claude-code`, role `coder`, model `claude-fable-5`, effort `max`.
+- Planner: `claude-code`, role `planner`, model `claude-opus-5-5`, effort `max`.
+- Apply coder: `claude-code`, role `coder`, model `claude-opus-5-5`, effort `max`.
 - Gateway policies: base `./policies`; this repository is registered as
   `agents-orchestrator` with `internal` classification.
 

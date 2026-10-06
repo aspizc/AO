@@ -9,7 +9,7 @@ const TOOL_NAMESPACES = new Set(TOOL_NAMES.map((name) => name.split(".")[0]));
 const TOOL_NAMESPACE_WILDCARDS = new Set(
   [...TOOL_NAMESPACES].map((namespace) => `${namespace}.*`),
 );
-const NON_TOOL_DOTTED_TOKENS = new Set(["coordination.v1"]);
+const NON_TOOL_DOTTED_TOKENS = new Set(["coordination.v1", "artifact.put.review_notes"]);
 const SOURCE_FILE_SUFFIXES = new Set(["cjs", "js", "json", "md", "mjs", "py"]);
 const DOTTED_TOKEN = /\b[a-z][a-z0-9_]*\.(?:[a-z_*][a-z0-9_*]*)(?:\.[a-z_*][a-z0-9_*]*)*/g;
 const TOOL_CALL_FENCE =

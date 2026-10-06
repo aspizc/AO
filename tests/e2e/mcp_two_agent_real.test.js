@@ -99,7 +99,7 @@ test("real MVP2 flow runs Codex coder and Claude reviewer through MCP stdio", { 
       cwd: client.paths.sampleAppsRepo,
       traceId,
       taskId: coderTask.taskId,
-      model: "gpt-5.6-sol",
+      model: "gpt-6.1-sol",
       reasoningEffort: "max",
       serviceTier: "priority",
     }));
@@ -158,7 +158,7 @@ test("real MVP2 flow runs Codex coder and Claude reviewer through MCP stdio", { 
       cwd: client.paths.sampleAppsRepo,
       traceId,
       taskId: reviewerTask.taskId,
-      model: "claude-fable-5",
+      model: "claude-opus-5-5",
       reasoningEffort: "max",
     }));
     assert.equal(reviewerSession.dryRun, false);
@@ -210,7 +210,7 @@ test("real MVP2 flow runs Codex coder and Claude reviewer through MCP stdio", { 
         (event) =>
           event.type === "AGENT_MODEL_RESOLVED" &&
           event.agent === "codex" &&
-          event.model === "gpt-5.6-sol" &&
+          event.model === "gpt-6.1-sol" &&
           event.reasoningEffort === "max" &&
           event.serviceTier === "priority",
       ),
@@ -221,7 +221,7 @@ test("real MVP2 flow runs Codex coder and Claude reviewer through MCP stdio", { 
         (event) =>
           event.type === "AGENT_MODEL_RESOLVED" &&
           event.agent === "claude-code" &&
-          event.model === "claude-fable-5" &&
+          event.model === "claude-opus-5-5" &&
           event.reasoningEffort === "max",
       ),
       "missing resolved Claude model",

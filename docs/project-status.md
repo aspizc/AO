@@ -5,13 +5,14 @@ versions and imported plan generations do not establish a release.
 
 ## Published implementation and evidence
 
-The latest verified implementation is
+The preceding verified implementation is
 [`ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3`](https://github.com/aspizc/AO/commit/ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3),
 published on AO's `main`. Its implementation/checkpoint tree
 `4a61ac6bb9854a41840e7aee57d31f0ba574761b` passed the full local gate;
 the published commit adds the independent verdict, handoff, gate JSON, and
-review index. Subsequent documentation changes do not constitute a new runtime
-verification or release.
+review index. The model-default update in this tree has a separate
+[verification and review trail](../plan/PROJECT_V5/reviews/README.md#current-model-defaults-2026-10-06);
+its evidence does not constitute a release.
 
 - Full command: `bash scripts/ci.sh`, exit **0**.
 - **2,625 passed, 0 failed, 12 skipped; 2,637 total**, `errors: []`.
@@ -64,9 +65,9 @@ a persistent MCP connection; tool discovery alone does not validate it.
 
 ## Public defaults
 
-AO keeps Codex `gpt-5.6-sol` / `max` / `priority` and Claude
-`claude-fable-5` / `max`. Sol 6.1 and Claude Sonnet/Opus 5.5 are available as
-explicit model selections. Existing aliases and repository permissions remain
+AO defaults to Codex `gpt-6.1-sol` / `max` / `priority` and Claude
+`claude-opus-5-5` / `max`, as selected by the project owner. Claude Sonnet 5.5
+and Codex Astra remain explicit alternatives. Existing aliases and repository permissions remain
 unchanged. Coordination defaults are a 15-minute lease, a 72-hour maximum
 lease, and 24-hour dedupe/ACK/orphan-inbox windows.
 

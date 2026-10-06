@@ -31,7 +31,7 @@ def test_planning_runbook_covers_operator_loop_and_safety():
         "git diff plan/",
         "workspace/artifacts",
         "workspace/audit/events.jsonl",
-        "claude-fable-5",
+        "claude-opus-5-5",
         "max",
         "plan/**",
     ):
@@ -51,7 +51,7 @@ def test_planning_smoke_exists_and_reports_evidence():
         "artifact.put.plan",
         "artifact.put.review_notes",
         "OPEN DECISIONS",
-        "claude-fable-5",
+        "claude-opus-5-5",
         "max",
         "Planning loop smoke",
         "artifacts",

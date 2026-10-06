@@ -16,14 +16,15 @@ def test_active_policy_profiles_share_current_codex_and_claude_defaults():
         codex = agents["codex"]
         claude = agents["claude-code"]
 
-        assert codex["defaultModel"] == "gpt-5.6-sol"
+        assert codex["defaultModel"] == "gpt-6.1-sol"
         assert codex["defaultReasoningEffort"] == "max"
+        assert codex["modelProfiles"]["gpt-6.1-sol"]["defaultReasoningEffort"] == "max"
         assert codex["defaultServiceTier"] == "priority"
         assert codex["modelAliases"]["gpt-5.6"] == "gpt-5.6-sol"
         assert {"gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"} <= set(codex["models"])
 
         assert claude["models"] == ["claude-sonnet-5", "claude-sonnet-5-5", "claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-opus-4-8"]
-        assert claude["defaultModel"] == "claude-fable-5"
+        assert claude["defaultModel"] == "claude-opus-5-5"
         assert claude["defaultReasoningEffort"] == "max"
         assert claude["modelAliases"] == {
             "fable": "claude-fable-5",
@@ -74,6 +75,6 @@ def test_kya_runner_uses_current_codex_defaults():
     wrapper = (ROOT / "scripts" / "kya_run_task_mcp.sh").read_text(encoding="utf-8")
 
     for text in (runner, wrapper):
-        assert "gpt-5.6-sol" in text
+        assert "gpt-6.1-sol" in text
         assert "max" in text
         assert "priority" in text

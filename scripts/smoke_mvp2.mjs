@@ -175,7 +175,7 @@ async function run() {
       cwd: workRepo,
       traceId,
       taskId: coderTask.taskId,
-      model: "gpt-5.6-sol",
+      model: "gpt-6.1-sol",
       reasoningEffort: "max",
       serviceTier: "priority",
     });
@@ -229,7 +229,7 @@ async function run() {
       cwd: workRepo,
       traceId,
       taskId: reviewerTask.taskId,
-      model: "claude-fable-5",
+      model: "claude-opus-5-5",
       reasoningEffort: "max",
     });
     reviewerSessionId = reviewerSession.sessionId;
@@ -270,8 +270,8 @@ async function run() {
     process.stdout.write(
       [
         "MVP2.0 smoke",
-        `  coder    : codex model=gpt-5.6-sol effort=max serviceTier=priority sandbox=${process.env.AGENTS_CODEX_SANDBOX || "workspace-write"}`,
-        "  reviewer : claude-code model=claude-fable-5 effort=max",
+        `  coder    : codex model=gpt-6.1-sol effort=max serviceTier=priority sandbox=${process.env.AGENTS_CODEX_SANDBOX || "workspace-write"}`,
+        "  reviewer : claude-code model=claude-opus-5-5 effort=max",
         `  sessions : ${coderSessionId}, ${reviewerSessionId}`,
         `  artifacts: ${artifactRoot} (${artifacts.length} recorded, review=${reviewNotes.artifactId})`,
         `  audit    : ${auditLog}`,

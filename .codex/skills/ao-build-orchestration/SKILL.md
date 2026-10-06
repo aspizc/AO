@@ -1,6 +1,6 @@
 ---
 name: ao-build-orchestration
-description: Implement and review agents-orchestrator plan sheets through the repo's own agents-gateway using a SPAWN-based coder/reviewer loop (persistent tmux sessions via agent_spawn + agent_ask + agent_view), never one-shot delegate for iterative work. Codex (gpt-5.6-sol, max, priority) codes test-first; a distinct Claude (claude-fable-5, max) session reviews; verdicts land as a committed review trail with up to 15 trials per sheet; the orchestrator gates with bash scripts/ci.sh and commits only reviewed-OK work with explicit pathspecs. Trigger when the user asks to implement/build/code a plan sheet or wave, run the implementation loop, "implementar la hoja/tarea/slice", "que el coder haga X", or review a coder's sheet. Do NOT use to write/refine plans (use ao-plan-orchestration) or run audits (use ao-audit-orchestration).
+description: Implement and review agents-orchestrator plan sheets through the repo's own agents-gateway using a SPAWN-based coder/reviewer loop (persistent tmux sessions via agent_spawn + agent_ask + agent_view), never one-shot delegate for iterative work. Codex (gpt-6.1-sol, max, priority) codes test-first; a distinct Claude (claude-opus-5-5, max) session reviews; verdicts land as a committed review trail with up to 15 trials per sheet; the orchestrator gates with bash scripts/ci.sh and commits only reviewed-OK work with explicit pathspecs. Trigger when the user asks to implement/build/code a plan sheet or wave, run the implementation loop, "implementar la hoja/tarea/slice", "que el coder haga X", or review a coder's sheet. Do NOT use to write/refine plans (use ao-plan-orchestration) or run audits (use ao-audit-orchestration).
 ---
 
 # agents-orchestrator Build Orchestration (spawn-based coder/reviewer loop)
@@ -49,14 +49,14 @@ clock deadlines**: a transport timeout is not evidence the agent stopped.
 orchestration_create({callerAgent, callerRole:"orchestrator", goal, prefix})            → traceId
 task_assign({traceId, caller:{...,"orchestrator"}, target:{agent:"codex", role:"coder",
              action:"implement"}, repo:"agents-orchestrator"})                          → taskId
-agent_spawn({agent:"codex", role:"coder", model:"gpt-5.6-sol", reasoningEffort:"max",
+agent_spawn({agent:"codex", role:"coder", model:"gpt-6.1-sol", reasoningEffort:"max",
              serviceTier:"priority", repo:"agents-orchestrator", cwd:<scoped>,
              traceId, taskId})                                                          → coderSession
 agent_ask({sessionId:coderSession, prompt:<coder brief>, traceId})
 agent_view({sessionId:coderSession, traceId})       # classify the pane; steer if drifting
 # coder settles → orchestrator gates → artifact_put raw_diff / implementation_notes
 task_assign({... target:{agent:"claude-code", role:"reviewer", action:"code.read"}})    → reviewerTaskId
-agent_spawn({agent:"claude-code", role:"reviewer", model:"claude-fable-5",
+agent_spawn({agent:"claude-code", role:"reviewer", model:"claude-opus-5-5",
              reasoningEffort:"max", repo:"agents-orchestrator", cwd:<same tree>,
              traceId, taskId:reviewerTaskId})                                           → reviewerSession
 agent_ask({sessionId:reviewerSession, prompt:<reviewer brief + handoff path>, traceId})
@@ -126,7 +126,7 @@ agent_ask({sessionId:reviewerSession, prompt:<reviewer brief + handoff path>, tr
    ready." It is a non-blocking notice while the provider takes longer, *not* a prompt. Option 1
    is highlighted and Enter selects it, so **any** keystroke you send risks a silent downgrade —
    typing `2` does not move the selection, it goes to the composer, and the following Enter takes
-   option 1. Leave the pane alone and audit the banner (`gpt-5.6-sol max`) after every dispatch;
+   option 1. Leave the pane alone and audit the banner (`gpt-6.1-sol max`) after every dispatch;
    a banner reading `gpt-5.6-luna low` means a downgrade already happened.
 8. **Codex content-filter turn abort** (`cyber_policy`) → the *turn* died, not the session:
    **resume with a short nudge, never respawn** (context and findings are intact). For work that

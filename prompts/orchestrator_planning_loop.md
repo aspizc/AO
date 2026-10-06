@@ -10,7 +10,7 @@ throughout the loop.
 ## Loop
 
 1. draft: use `task.assign` for the planner, then `agent.spawn` and `agent.ask`
-   with `claude-code` in role `planner`, model `claude-fable-5`, and
+   with `claude-code` in role `planner`, model `claude-opus-5-5`, and
    `reasoningEffort: max`. Ask the
    planner to draft or refine plan tasks and store the plan with
    `artifact.put` and `kind: "plan"`.
@@ -25,7 +25,7 @@ throughout the loop.
 
    and wait with `approval.wait`. A timeout or pending result is not approval.
 4. apply: use `task.assign` for the coder, then `agent.spawn` and `agent.ask`
-   with `claude-code` in role `coder`, model `claude-fable-5`, and
+   with `claude-code` in role `coder`, model `claude-opus-5-5`, and
    `reasoningEffort: max`. Instruct the
    coder to edit only `plan/**` and to inspect `git diff`.
 5. review: send the sanitized diff or summary back to a planner session with

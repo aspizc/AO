@@ -137,7 +137,7 @@ PATH="$PWD/.venv/bin:$PATH" agent-run audit show --limit 100
 ```
 
 The default audit file is `workspace/audit/events.jsonl`. Confirm planner and
-coder roles, model `claude-fable-5` at effort `max`, plan artifacts, review notes,
+coder roles, model `claude-opus-5-5` at effort `max`, plan artifacts, review notes,
 `APPROVAL_REQUIRED`, `APPROVAL_AUTO_GRANTED` when `AGENTS_AUTOAPPROVE=plan.apply`
 is enabled, and final orchestration completion.
 

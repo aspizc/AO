@@ -20,9 +20,9 @@ tmux operation.
 
 ## Model selection
 
-The public default is `gpt-5.6-sol` / `max` / `priority`. Explicit alternatives
-include `gpt-6.1-sol` (alias `gpt-6.1`, default effort `xhigh`) and
-`gpt-6-astra` (aliases `astra` and `gpt-6`, default effort `max`). Both declare
+The public default is `gpt-6.1-sol` (alias `gpt-6.1`) / `max` / `priority`.
+An explicit alternative is `gpt-6-astra` (aliases `astra` and `gpt-6`, default
+effort `max`). Both declare
 `low|medium|high|xhigh|max|ultra` in the Gateway contract. Legacy `sol`, `terra`,
 `luna`, and `gpt-5.6` aliases retain their existing versioned targets.
 
@@ -37,7 +37,7 @@ operator wants the non-priority tier.
 The real command shape is:
 
 ```bash
-codex exec -m gpt-5.6-sol -c model_reasoning_effort="max" \
+codex exec -m gpt-6.1-sol -c model_reasoning_effort="max" \
   -c service_tier="priority" \
   -s workspace-write -C <cwd> "<prompt>"
 ```
@@ -56,7 +56,7 @@ Notes:
 The supervised launch line is:
 
 ```bash
-codex -m gpt-5.6-sol -c model_reasoning_effort="max" \
+codex -m gpt-6.1-sol -c model_reasoning_effort="max" \
   -c service_tier="priority" -s workspace-write -C <cwd>
 ```
 

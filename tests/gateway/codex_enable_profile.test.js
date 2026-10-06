@@ -177,10 +177,10 @@ test("mvp2 profile preserves public sol max priority defaults", () => {
     reg,
   );
 
-  assert.equal(reg.getAgent("codex").defaultModel, "gpt-5.6-sol");
+  assert.equal(reg.getAgent("codex").defaultModel, "gpt-6.1-sol");
   assert.equal(reg.getAgent("codex").defaultReasoningEffort, "max");
   assert.equal(reg.getAgent("codex").defaultServiceTier, "priority");
-  assert.equal(decision.model, "gpt-5.6-sol");
+  assert.equal(decision.model, "gpt-6.1-sol");
   assert.equal(decision.reasoningEffort, "max");
   assert.equal(decision.serviceTier, "priority");
 });
@@ -239,7 +239,7 @@ test("kya profile codex coder defaults to sol at max", () => {
   );
 
   assert.equal(decision.decision, "allow");
-  assert.equal(decision.model, "gpt-5.6-sol");
+  assert.equal(decision.model, "gpt-6.1-sol");
   assert.equal(decision.reasoningEffort, "max");
 });
 

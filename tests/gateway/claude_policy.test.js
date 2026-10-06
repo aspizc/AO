@@ -66,5 +66,5 @@ test("claude delegate on unrestricted repo works in dry run", async () => {
 
   assert.equal(result.exitCode, 0);
   assert.equal(result.dryRun, true);
-  assert.match(result.stdout, /^\[dry-run claude model=claude-fable-5 effort=max\]/);
+  assert.match(result.stdout, /^\[dry-run claude model=claude-opus-5-5 effort=max\]/);
 });

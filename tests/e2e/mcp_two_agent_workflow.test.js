@@ -53,7 +53,7 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
       profileId: "canonical-orchestrator",
       agent: "codex",
       provider: "codex",
-      model: "gpt-5.6-sol",
+      model: "gpt-6.1-sol",
       reasoningEffort: "max",
       serviceTier: "priority",
       resolutionSource: {

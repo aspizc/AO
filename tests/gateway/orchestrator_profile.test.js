@@ -40,7 +40,7 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
         terra: "gpt-5.6-terra",
         luna: "gpt-5.6-luna",
       },
-      defaultModel: "gpt-5.6-sol",
+      defaultModel: "gpt-6.1-sol",
       defaultReasoningEffort: "max",
       defaultServiceTier: "priority",
       execution: "available",
@@ -51,7 +51,7 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
         },
         "gpt-6.1-sol": {
           reasoningEfforts: CODEX_NEW_EFFORTS,
-          defaultReasoningEffort: "xhigh",
+          defaultReasoningEffort: "max",
         },
         "gpt-5.6-sol": {
           reasoningEfforts: CODEX_NEW_EFFORTS,
@@ -90,7 +90,7 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
         "opus-5.5": "claude-opus-5-5",
         "opus-5-5": "claude-opus-5-5",
       },
-      defaultModel: "claude-fable-5",
+      defaultModel: "claude-opus-5-5",
       defaultReasoningEffort: "max",
       defaultServiceTier: null,
       execution: "available",
@@ -281,7 +281,7 @@ test("defaults resolve in the declared hierarchy with one deterministic digest",
     profileId: "canonical-orchestrator",
     agent: "codex",
     provider: "codex",
-    model: "gpt-5.6-sol",
+    model: "gpt-6.1-sol",
     reasoningEffort: "max",
     serviceTier: "priority",
     resolutionSource: {
@@ -422,7 +422,7 @@ test("ambient model, effort, and tier variables never influence resolution", () 
       resolveEffectiveAgentSelection({ agent: "claude-code" }),
     );
     const selection = resolveEffectiveAgentSelection({ agent: "claude-code" });
-    assert.equal(selection.model, "claude-fable-5");
+    assert.equal(selection.model, "claude-opus-5-5");
     assert.equal(selection.reasoningEffort, "max");
     assert.equal(selection.serviceTier, null);
     assert.equal(JSON.stringify(selection).includes("environment-secret-override"), false);

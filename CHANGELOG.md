@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Changed the public defaults to Codex `gpt-6.1-sol` / `max` / `priority`
+  and Claude `claude-opus-5-5` / `max`, including the model-specific Codex
+  effort, capability profiles, execution examples, and orchestration guides.
+  Legacy explicit selections and aliases retain their existing targets.
+
 - Refreshed the public README, implementation status, operator setup, adapter
   catalogs, diagnostics and CI guidance against the published AO candidate.
   Corrected historical release claims, lock-install commands, and coordination

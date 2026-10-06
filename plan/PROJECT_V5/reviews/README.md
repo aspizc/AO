@@ -6,6 +6,7 @@ rewriting history.
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Current model defaults | 1 | [to review](MODEL_DEFAULTS_2026_10_06-1_to_review.md) | [OK](MODEL_DEFAULTS_2026_10_06-1_reviewed_OK.md) |
 | Public project documentation refresh | 1 | [to review](DOCS_REFRESH_2026_10_06-1_to_review.md) | [OK](DOCS_REFRESH_2026_10_06-1_reviewed_OK.md) |
 | Portable upstream models and MCP launch settings | 1 | [to review](UPSTREAM_WORKING_2026_10_06-1_to_review.md) | [OK](UPSTREAM_WORKING_2026_10_06-1_reviewed_OK.md) |
 | Public AO upstream integration | 1 | [to review](UPSTREAM_SYNC_2026_10_06-1_to_review.md) | [OK](UPSTREAM_SYNC_2026_10_06-1_reviewed_OK.md) |
@@ -201,3 +202,16 @@ D/0/07d Checkpoint 1 — Trial 2
 `AUTHORITY_PARENT run cp1-unit-teardown` gate cannot be formed — the request
 and candidate tree supply no concrete expectation-ledger, review-base, or
 authority-parent operands. Dispositive; broad gates not run; CP1 stays blocked.
+
+## Current model defaults (2026-10-06)
+
+The owner-selected default update is tracked by
+[the implementation checkpoint](MODEL_DEFAULTS_2026_10_06_checkpoint.md).
+Candidate tree `d3548ed7d6900dc5fc97a284576e624ab6a9c1b9` has an
+[independent OK verdict](MODEL_DEFAULTS_2026_10_06-1_reviewed_OK.md) and
+[full gate report](MODEL_DEFAULTS_2026_10_06-1_gate.json): 2,626 passed,
+0 failed, 12 declared integration skips; exit 0, aggregate
+`infrastructure_unavailable`. Live provider execution was not run.
+Gateway test artifact: `art-4f66c8dc-a91e-466f-82ef-3c71231dfb8f`.
+The final commit adds handoff, report, verdict and index evidence to that
+verified tree; this is not a release or an all-infrastructure pass.
