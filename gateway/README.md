@@ -7,6 +7,27 @@ installation.
 The [canonical MCP tool catalog](../docs/mcp-tool-catalog.md) is generated from
 the typed runtime catalog and pins all 33 tool names in protocol order.
 
+## MCP client identity and context lifetime
+
+Set `AGENTS_REQUEST_PRINCIPAL_AGENT` in the Gateway launch environment to the
+agent running the MCP host (`claude-code` by default, or `codex`). The role
+remains `orchestrator`. Tool arguments cannot change this identity; mismatched
+caller agents or roles are rejected with `REQUEST_CONTEXT_DENIED`.
+
+`AGENTS_REQUEST_CONTEXT_TTL_MS` sets a positive integer lifetime in milliseconds
+for the connection context. The default is 24 hours (`86400000`); an operator
+can explicitly configure a longer session, such as `604800000` for seven days.
+The lifetime is measured from connection creation, not renewed by each request.
+Protected calls after expiry are denied; restart the connection to create a
+fresh context. These settings do not alter coordination leases or retention.
+
+The model catalog also accepts explicit `gpt-6.1-sol` (`gpt-6.1`),
+`claude-sonnet-5-5` (`sonnet-5.5`), and `claude-opus-5-5` (`opus-5.5` or
+`opus-5-5`) selections. Codex keeps its `gpt-5.6-sol` / `max` / `priority`
+defaults; Claude keeps `claude-fable-5` / `max`. Existing aliases keep their
+previous targets. Registration does not establish provider availability;
+real execution still requires a compatible authenticated provider CLI.
+
 ## Gateway Telemetry
 
 Gateway MCP tool calls can emit one OTel-inspired span per `tools/call` request.

@@ -305,6 +305,8 @@ Experimental (PROJECT_V1, sin gate de produccion):
 | `AGENTS_COORDINATION_ORPHAN_INBOX_TTL_MS` | `86400000` | Retention applied when stale inbox cleanup is scheduled. |
 | `AGENTS_TMUX_PREFIX` | `ag-` | tmux session prefix. |
 | `AGENTS_REPO_ROOTS` | empty | Colon-separated cwd allowlist. |
+| `AGENTS_REQUEST_PRINCIPAL_AGENT` | `claude-code` | Agent identity of the MCP host, set at Gateway launch (for example `codex`). Caller arguments must match it. |
+| `AGENTS_REQUEST_CONTEXT_TTL_MS` | `86400000` | Positive integer lifetime of the connection request context in milliseconds; expired contexts deny protected actions. |
 | `AGENTS_APPROVAL_MAX_WAIT_MS` | `60000` | Server-side cap on `approval.wait`. |
 | `AGENTS_AUTOAPPROVE` | empty | Comma-separated approval scopes to auto-grant; default off and bounded by ADR-006. |
 | `AGENTS_AGENT_TIMEOUT_MS` | `600000` | Server-side cap for agent `delegate` and `ask`. |

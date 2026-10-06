@@ -12,7 +12,7 @@ import fs from "node:fs";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
 
-import { evaluate } from "../../gateway/src/core/policy_engine.js";
+import { evaluate, resolveAgentExecutionProfile } from "../../gateway/src/core/policy_engine.js";
 import { loadRegistries } from "../../gateway/src/core/registry.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -384,4 +384,39 @@ test("agent_without_canonical_profile_fails_closed", () => {
     field: "registry",
     provider: null,
   });
+});
+
+test("optional upstream models resolve across profiles without changing public defaults or roles", () => {
+  for (const profile of ["", "profiles/mvp2", "profiles/kya"]) {
+    const registries = loadRegistries({ policiesDir: path.join(REPO_ROOT, "policies", profile) });
+    for (const [agent, model, alias, effort] of [
+      ["codex", "gpt-6.1-sol", "gpt-6.1", "xhigh"],
+      ["claude-code", "claude-sonnet-5-5", "sonnet-5.5", "max"],
+      ["claude-code", "claude-opus-5-5", "opus-5.5", "max"],
+    ]) {
+      for (const requestedModel of [model, alias]) {
+        const resolved = resolveAgentExecutionProfile({ agent, model: requestedModel }, registries);
+        assert.equal(resolved.decision, "allow");
+        assert.equal(resolved.model, model);
+        assert.equal(resolved.reasoningEffort, effort);
+        for (const role of ["orchestrator", "coder", "reviewer", "restricted-coder"]) {
+          const result = evaluate({ agent, role, effectiveSelection: resolved.effectiveSelection, action: "policy.check" }, registries);
+          const allowed = registries.getAgent(agent).allowedRoles.includes(role);
+          assert.equal(result.decision, allowed ? "allow" : "deny", `${profile} ${agent} ${role}`);
+          if (allowed) {
+            assert.equal(result.model, model);
+            assert.equal(result.reasoningEffort, effort);
+          } else {
+            assert.equal(result.ruleId, "role.agent_not_allowed_for_role");
+          }
+        }
+      }
+    }
+    for (const [agent, model] of [["codex", "gpt-5.6-sol"], ["claude-code", "claude-fable-5"]]) {
+      const result = resolveAgentExecutionProfile({ agent }, registries);
+      assert.equal(result.model, model);
+      assert.equal(result.reasoningEffort, "max");
+      if (agent === "codex") assert.equal(result.serviceTier, "priority");
+    }
+  }
 });

@@ -34,6 +34,7 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
       aliases: {
         "gpt-6": "gpt-6-astra",
         astra: "gpt-6-astra",
+        "gpt-6.1": "gpt-6.1-sol",
         "gpt-5.6": "gpt-5.6-sol",
         sol: "gpt-5.6-sol",
         terra: "gpt-5.6-terra",
@@ -47,6 +48,10 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
         "gpt-6-astra": {
           reasoningEfforts: CODEX_NEW_EFFORTS,
           defaultReasoningEffort: "max",
+        },
+        "gpt-6.1-sol": {
+          reasoningEfforts: CODEX_NEW_EFFORTS,
+          defaultReasoningEffort: "xhigh",
         },
         "gpt-5.6-sol": {
           reasoningEfforts: CODEX_NEW_EFFORTS,
@@ -80,6 +85,10 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
         fable: "claude-fable-5",
         opus: "claude-opus-5",
         sonnet: "claude-sonnet-5",
+        "opus-5": "claude-opus-5",
+        "sonnet-5.5": "claude-sonnet-5-5",
+        "opus-5.5": "claude-opus-5-5",
+        "opus-5-5": "claude-opus-5-5",
       },
       defaultModel: "claude-fable-5",
       defaultReasoningEffort: "max",
@@ -99,6 +108,14 @@ test("provider matrix is the exact H/0/00 executable contract", () => {
           defaultReasoningEffort: null,
         },
         "claude-opus-5": {
+          reasoningEfforts: CLAUDE_EFFORTS,
+          defaultReasoningEffort: null,
+        },
+        "claude-sonnet-5-5": {
+          reasoningEfforts: CLAUDE_EFFORTS,
+          defaultReasoningEffort: null,
+        },
+        "claude-opus-5-5": {
           reasoningEfforts: CLAUDE_EFFORTS,
           defaultReasoningEffort: null,
         },

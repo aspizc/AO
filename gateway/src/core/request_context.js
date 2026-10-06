@@ -8,6 +8,7 @@ import {
 } from "./policy_types.js";
 
 export const REQUEST_CONTEXT_ERROR = "REQUEST_CONTEXT_DENIED";
+export const DEFAULT_REQUEST_CONTEXT_TTL_MS = 86_400_000;
 
 const RUNTIME = new WeakMap();
 const EFFECTIVE_BINDINGS = new WeakSet();
@@ -927,7 +928,7 @@ export function createGatewayRequestContext({
     Number.isSafeInteger(config.requestContextTtlMs)
     && config.requestContextTtlMs > 0
       ? config.requestContextTtlMs
-      : 24 * 60 * 60 * 1000;
+      : DEFAULT_REQUEST_CONTEXT_TTL_MS;
   return createRequestContext({
     principalId: config.requestPrincipalId || "local-stdio-operator",
     agent: config.requestPrincipalAgent || "claude-code",
