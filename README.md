@@ -73,17 +73,16 @@ and `policies/agent-capabilities.json` govern availability and selection.
 
 | Agent | Default selection | Execution |
 |---|---|---|
-| Codex | `gpt-5.6-sol`, effort `max`, tier `priority` | Headless and supervised |
-| Claude Code | `claude-fable-5`, effort `max` | Headless and supervised |
+| Codex | `gpt-6.1-sol`, effort `max`, tier `priority` | Headless and supervised |
+| Claude Code | `claude-opus-5-5`, effort `max` | Headless and supervised |
 | Antigravity CLI | `gemini-3.8-flash-high`, effort `high` | Headless and supervised; permission bypass is opt-in |
 | pi | `ollama/qwen3.8:27b`, effort `medium` | Optional CLI; explicit provider setup |
 | OpenCode | `ollama/qwen3.8:27b` | Optional CLI; explicit provider setup |
 | Gemini CLI | `gemini-2.5-pro` | Registry-only in the current executable profile |
 
-Explicit alternatives include `gpt-6.1-sol` (`gpt-6.1`, default effort `xhigh`),
-`gpt-6-astra` (`astra`), `claude-sonnet-5-5` (`sonnet-5.5`), and
-`claude-opus-5-5` (`opus-5.5`). These entries do not change AO's defaults or
-prove live provider availability. See the [Codex](docs/adapters/codex.md),
+The default models also accept aliases `gpt-6.1` and `opus-5.5`. Explicit
+alternatives include `gpt-6-astra` (`astra`) and `claude-sonnet-5-5`
+(`sonnet-5.5`). Catalog registration does not prove live provider availability. See the [Codex](docs/adapters/codex.md),
 [Claude](docs/adapters/claude-code.md), [Antigravity](docs/adapters/antigravity.md),
 [pi](docs/adapters/pi.md), and [OpenCode](docs/adapters/opencode.md) guides.
 

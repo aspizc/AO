@@ -138,3 +138,23 @@ test("reference validation accepts only canonical namespace wildcards", () => {
     ["non-canonical tool reference `policy.*`"],
   );
 });
+
+
+test("review-note policy actions are not callable MCP tool names", () => {
+  const assignment = '```json mcp-tool-call\n'
+    + JSON.stringify({
+      tool: "task.assign",
+      arguments: {
+        traceId: "tr-review",
+        caller: { agent: "claude-code", role: "orchestrator" },
+        target: { agent: "claude-code", role: "reviewer", action: "artifact.put.review_notes" },
+        repo: "sample-apps",
+        brief: "Review sanitized diff",
+      },
+    }) + '\n```';
+  assert.deepEqual(validateToolReferences(assignment), []);
+  assert.deepEqual(validateToolCallExamples(assignment), []);
+  const fictionalCall = '```json mcp-tool-call\n'
+    + JSON.stringify({ tool: "artifact.put.review_notes", arguments: {} }) + '\n```';
+  assert.deepEqual(validateToolCallExamples(fictionalCall), ["example 1: unknown canonical tool"]);
+});

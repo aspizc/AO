@@ -59,7 +59,7 @@ test("agent_models_and_defaults_are_declared", () => {
   assert.equal(reg.agents.codex.modelAliases.sol, "gpt-5.6-sol");
   assert.equal(reg.agents.codex.modelAliases.terra, "gpt-5.6-terra");
   assert.equal(reg.agents.codex.modelAliases.luna, "gpt-5.6-luna");
-  assert.equal(reg.agents.codex.defaultModel, "gpt-5.6-sol");
+  assert.equal(reg.agents.codex.defaultModel, "gpt-6.1-sol");
   assert.deepEqual(reg.agents.codex.reasoningEfforts, ["low", "medium", "high", "xhigh", "max", "ultra"]);
   assert.equal(reg.agents.codex.defaultReasoningEffort, "max");
   assert.equal(
@@ -97,7 +97,7 @@ test("agent_models_and_defaults_are_declared", () => {
     "opus-5.5": "claude-opus-5-5",
     "opus-5-5": "claude-opus-5-5",
   });
-  assert.equal(reg.agents["claude-code"].defaultModel, "claude-fable-5");
+  assert.equal(reg.agents["claude-code"].defaultModel, "claude-opus-5-5");
   assert.equal(reg.agents["claude-code"].defaultReasoningEffort, "max");
   assert.equal(reg.agents["gemini-cli"].defaultModel, "gemini-2.5-pro");
   assert.equal(reg.agents["gemini-cli"].defaultReasoningEffort, undefined);

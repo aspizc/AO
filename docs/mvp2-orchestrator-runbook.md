@@ -128,7 +128,7 @@ Expected Gateway tool shape:
 
 1. `orchestration.create` creates a `traceId`.
 2. `task.assign` assigns the coder task to `agent: codex`, `role: coder`.
-3. `agent.spawn` starts Codex supervised with `model: gpt-5.6-sol`,
+3. `agent.spawn` starts Codex supervised with `model: gpt-6.1-sol`,
    `reasoningEffort: max`, and `serviceTier: priority` (Fast).
 4. `agent.ask` sends the implementation task to Codex.
 5. `agent.view` checks Codex progress.
@@ -136,7 +136,7 @@ Expected Gateway tool shape:
    passes the returned `sharedArtifactId` as the `artifactId` to `artifact.get`
    for reviewer handoff.
 7. `task.assign` assigns review work to `agent: claude-code`, `role: reviewer`.
-8. `agent.spawn` starts Claude reviewer with `model: claude-fable-5` and
+8. `agent.spawn` starts Claude reviewer with `model: claude-opus-5-5` and
    `reasoningEffort: max`.
 9. `agent.ask` requests review of the sanitized diff or summary.
 10. If protected push or dependency changes require approval, use
@@ -244,7 +244,7 @@ artifact.
 | Codex disabled | The host points `AGENTS_POLICIES_DIR` at a custom registry where Codex is disabled. | Use the base `AGENTS_POLICIES_DIR=./policies` registry or enable Codex in the custom registry. |
 | cwd allowlist violation | `AGENTS_REPO_ROOTS` is missing, relative, or does not include the work repo. | Use the absolute repo path. |
 | tmux failure | `tmux` is not installed or unavailable in the host environment. | Install tmux or rehearse with `AGENTS_DRY_RUN=1`. |
-| model not allowed | The host requested a model outside the agent registry. | Use Codex `gpt-5.6-sol`/`max`/`priority` and Claude `claude-fable-5`/`max`; Claude 4.x alternatives are limited to `claude-opus-4-8`. |
+| model not allowed | The host requested a model outside the agent registry. | Use Codex `gpt-6.1-sol`/`max`/`priority` and Claude `claude-opus-5-5`/`max`; Claude 4.x alternatives are limited to `claude-opus-4-8`. |
 | CLI login failure | `codex` or `claude` is not installed, not on PATH, or not logged in. | Run the CLI manually and complete login before retrying. |
 | approvals stay pending | The human has not responded. | Use `agent-run approve ...` or the configured approval response path. |
 | `code.apply` stays pending | Autonomous mode is off or the context is restricted. | Approve manually, or launch with `AGENTS_AUTOAPPROVE=code.apply` for non-restricted work. |

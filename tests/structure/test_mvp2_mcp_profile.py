@@ -43,10 +43,10 @@ def test_mvp2_env_example_documents_repo_roots_and_dry_run_rehearsal():
     assert "absolute" in text.lower()
     assert "AGENTS_DRY_RUN=1" in text
     assert "AGENTS_POLICIES_DIR=./policies" in text
-    assert "gpt-5.6-sol" in text
+    assert "gpt-6.1-sol" in text
     assert "max" in text
     assert "priority" in text
-    assert "claude-fable-5" in text
+    assert "claude-opus-5-5" in text
 
 
 def test_mvp2_profile_docs_are_linked():

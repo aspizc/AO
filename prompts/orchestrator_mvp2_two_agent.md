@@ -15,10 +15,10 @@ automatically for every governed tool call.
 
 Use exactly these child agents for the standard MVP2.0 flow:
 
-- Coder: `agent: codex`, `role: coder`, `model: gpt-5.6-sol`,
+- Coder: `agent: codex`, `role: coder`, `model: gpt-6.1-sol`,
   `reasoningEffort: max`, `serviceTier: priority` (Fast).
 - Reviewer: `agent: claude-code`, `role: reviewer`,
-  `model: claude-fable-5`, `reasoningEffort: max`.
+  `model: claude-opus-5-5`, `reasoningEffort: max`.
 
 Codex is prohibited in `restricted` repositories. The reviewer must never
 receive raw restricted artifacts. Use sanitized artifacts and Gateway sharing
@@ -31,14 +31,14 @@ tools for handoff.
    schema accepts it; never inject it into a schema that does not.
 2. Use `task.assign` to assign implementation work to the Codex coder.
 3. Start the coder with `agent.spawn` using the Codex agent, coder role, model
-   `gpt-5.6-sol`, `reasoningEffort: max`, and `serviceTier: priority`. Use
+   `gpt-6.1-sol`, `reasoningEffort: max`, and `serviceTier: priority`. Use
    `agent.ask` to provide the task and `agent.view` to inspect progress.
 4. Have the coder produce artifacts through the Gateway. For review handoff,
    use `artifact.share`, then pass its returned `sharedArtifactId` as the
    `artifactId` to `artifact.get` with the reviewer's `requesterAgent` and
    `requesterRole`.
 5. Start the reviewer with `agent.spawn` using the Claude reviewer and model
-   `claude-fable-5` with `reasoningEffort: max`. Use `agent.ask` to request
+   `claude-opus-5-5` with `reasoningEffort: max`. Use `agent.ask` to request
    review of the sanitized diff or summary and `agent.view` to inspect
    progress. Capture review output with `artifact.put` and
    `kind: "review_notes"` when applicable.

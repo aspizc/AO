@@ -25,8 +25,8 @@ function fakeRegistries({
   return {
     getAgent: () => ({
       enabled,
-      models: ["gpt-5.6-sol", "gpt-5", "gpt-5-codex"],
-      defaultModel: "gpt-5.6-sol",
+      models: ["gpt-6.1-sol", "gpt-5", "gpt-5-codex"],
+      defaultModel: "gpt-6.1-sol",
       reasoningEfforts: ["low", "medium", "high", "max"],
       defaultReasoningEffort: "max",
       serviceTiers: ["default", "priority"],
@@ -124,12 +124,12 @@ test("enabled dry run delegate works and audits lifecycle", async () => {
   assert.equal(result.exitCode, 0, result.stderr);
   assert.equal(result.stderr, "");
   assert.equal(result.dryRun, true);
-  assert.equal(result.model, "gpt-5.6-sol");
+  assert.equal(result.model, "gpt-6.1-sol");
   assert.equal(result.reasoningEffort, "max");
   assert.equal(result.serviceTier, "priority");
   assert.match(
     result.stdout,
-    /^\[dry-run codex model=gpt-5\.6-sol effort=max serviceTier=priority sandbox=workspace-write\]/,
+    /^\[dry-run codex model=gpt-6\.1-sol effort=max serviceTier=priority sandbox=workspace-write\]/,
   );
   assert.match(result.stdout, /prompt=write tests/);
   assert.deepEqual(
@@ -146,18 +146,18 @@ test("enabled dry run delegate reports model effort sandbox and cwd", async () =
     prompt: "write tests",
     traceId: "tr-codex-dry-model",
     role: "coder",
-    model: "gpt-5.6-sol",
+    model: "gpt-6.1-sol",
     reasoningEffort: "max",
     serviceTier: "priority",
   });
 
-  assert.equal(result.model, "gpt-5.6-sol");
+  assert.equal(result.model, "gpt-6.1-sol");
   assert.equal(result.reasoningEffort, "max");
   assert.equal(result.serviceTier, "priority");
   assert.equal(result.sandbox, "workspace-write");
   assert.match(
     result.stdout,
-    /^\[dry-run codex model=gpt-5\.6-sol effort=max serviceTier=priority sandbox=workspace-write\]/,
+    /^\[dry-run codex model=gpt-6\.1-sol effort=max serviceTier=priority sandbox=workspace-write\]/,
   );
   assert.match(result.stdout, new RegExp(`cwd=${root}`));
 });
@@ -202,20 +202,20 @@ test("enabled real delegate invokes fake codex exec with model effort sandbox an
     prompt: "implement",
     traceId: "tr-codex-real",
     role: "coder",
-    model: "gpt-5.6-sol",
+    model: "gpt-6.1-sol",
     reasoningEffort: "max",
     serviceTier: "priority",
   });
   const argv = JSON.parse(fs.readFileSync(argvFile, "utf-8"));
 
   assert.equal(result.dryRun, false);
-  assert.equal(result.model, "gpt-5.6-sol");
+  assert.equal(result.model, "gpt-6.1-sol");
   assert.equal(result.reasoningEffort, "max");
   assert.equal(result.serviceTier, "priority");
   assert.deepEqual(argv, [
     "exec",
     "-m",
-    "gpt-5.6-sol",
+    "gpt-6.1-sol",
     "-c",
     'model_reasoning_effort="max"',
     "-c",

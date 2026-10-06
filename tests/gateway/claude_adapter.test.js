@@ -70,7 +70,7 @@ test("dry run delegate returns canonical default selection output", async () => 
   assert.equal(result.dryRun, true);
   assert.match(
     result.stdout,
-    /^\[dry-run claude model=claude-fable-5 effort=max\]/,
+    /^\[dry-run claude model=claude-opus-5-5 effort=max\]/,
   );
   assert.match(result.stdout, /prompt=write tests/);
   assert.match(result.stdout, new RegExp(`cwd=${root}`));
@@ -84,13 +84,13 @@ test("dry run delegate reports the resolved model and effort when provided", asy
     prompt: "write tests",
     traceId: "tr-claude-dry-model",
     role: "coder",
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
 
-  assert.equal(result.model, "claude-fable-5");
+  assert.equal(result.model, "claude-opus-5-5");
   assert.equal(result.reasoningEffort, "max");
-  assert.match(result.stdout, /^\[dry-run claude model=claude-fable-5 effort=max\]/);
+  assert.match(result.stdout, /^\[dry-run claude model=claude-opus-5-5 effort=max\]/);
 });
 
 test("delegate real passes model and effort flags to claude cli", async () => {
@@ -107,7 +107,7 @@ test("delegate real passes model and effort flags to claude cli", async () => {
     prompt: "review",
     traceId: "tr-claude-real-model",
     role: "coder",
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
   const argv = JSON.parse(fs.readFileSync(argvFile, "utf-8"));
@@ -121,7 +121,7 @@ test("delegate real passes model and effort flags to claude cli", async () => {
     "dontAsk",
     "--no-session-persistence",
     "--model",
-    "claude-fable-5",
+    "claude-opus-5-5",
     "--effort",
     "max",
     "review",
@@ -147,7 +147,7 @@ test("delegate real uses canonical defaults when request fields are omitted", as
 
   assert.deepEqual(argv.slice(6, 10), [
     "--model",
-    "claude-fable-5",
+    "claude-opus-5-5",
     "--effort",
     "max",
   ]);
@@ -246,11 +246,11 @@ test("dry run spawn reports launch command with model and effort", async () => {
     cwd: root,
     traceId: "tr-claude-spawn-model",
     role: "coder",
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
 
-  assert.equal(spawned.launchCommand, "claude --model claude-fable-5 --effort max");
+  assert.equal(spawned.launchCommand, "claude --model claude-opus-5-5 --effort max");
 });
 
 test("spawn cwd guard runs in dry run", async () => {

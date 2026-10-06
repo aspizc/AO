@@ -151,7 +151,7 @@ async function run() {
     prompt: "Draft a small planning update with OPEN DECISIONS / QUESTIONS FOR HUMAN.",
     traceId,
     taskId: plannerTask.taskId,
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
   const planArtifact = callTool("artifact.put", {
@@ -179,7 +179,7 @@ async function run() {
     prompt: "Dry-run apply the approved planning change to plan/** only; do not touch other paths.",
     traceId,
     taskId: coderTask.taskId,
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
 
@@ -198,7 +198,7 @@ async function run() {
     prompt: "Review the apply-coder result and write precise review notes.",
     traceId,
     taskId: reviewTask.taskId,
-    model: "claude-fable-5",
+    model: "claude-opus-5-5",
     reasoningEffort: "max",
   });
   const reviewNotes = callTool("artifact.put", {
@@ -225,8 +225,8 @@ async function run() {
   process.stdout.write(
     [
       "Planning loop smoke",
-      "  planner  : claude-code role=planner model=claude-fable-5 effort=max",
-      "  coder    : claude-code role=coder model=claude-fable-5 effort=max",
+      "  planner  : claude-code role=planner model=claude-opus-5-5 effort=max",
+      "  coder    : claude-code role=coder model=claude-opus-5-5 effort=max",
       `  artifacts: ${artifactRoot} (${artifacts.length} recorded, plan=${planArtifact.artifactId}, review=${reviewNotes.artifactId})`,
       `  audit    : ${auditLog}`,
       `  mode     : ${dryRun === "1" ? "dry-run" : "real"}`,

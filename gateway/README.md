@@ -21,10 +21,10 @@ The lifetime is measured from connection creation, not renewed by each request.
 Protected calls after expiry are denied; restart the connection to create a
 fresh context. These settings do not alter coordination leases or retention.
 
-The model catalog also accepts explicit `gpt-6.1-sol` (`gpt-6.1`),
-`claude-sonnet-5-5` (`sonnet-5.5`), and `claude-opus-5-5` (`opus-5.5` or
-`opus-5-5`) selections. Codex keeps its `gpt-5.6-sol` / `max` / `priority`
-defaults; Claude keeps `claude-fable-5` / `max`. Existing aliases keep their
+Codex defaults to `gpt-6.1-sol` / `max` / `priority`; Claude defaults to
+`claude-opus-5-5` / `max`. The default models also accept `gpt-6.1` and
+`opus-5.5` / `opus-5-5`, respectively. The catalog includes the explicit
+alternative `claude-sonnet-5-5` (`sonnet-5.5`). Existing aliases keep their
 previous targets. Registration does not establish provider availability;
 real execution still requires a compatible authenticated provider CLI.
 

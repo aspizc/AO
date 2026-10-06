@@ -3,9 +3,9 @@
 This profile connects a host-agnostic MCP client to `agents-gateway` for the
 MVP2.0 two-agent flow:
 
-- Codex coder: `gpt-5.6-sol`, reasoning effort `max`, Fast service tier
+- Codex coder: `gpt-6.1-sol`, reasoning effort `max`, Fast service tier
   (`priority`), sandbox `workspace-write`.
-- Claude reviewer: `claude-fable-5`, reasoning effort `max`.
+- Claude reviewer: `claude-opus-5-5`, reasoning effort `max`.
 - Gateway policies: base `policies/`, where Codex is enabled by default and
   still gated by repository policy.
 

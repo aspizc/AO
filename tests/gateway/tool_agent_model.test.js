@@ -145,11 +145,11 @@ test("delegate without model uses canonical defaults and audits them", async () 
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
   assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
   assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
-  assert.equal(calls[0].args.effectiveSelection.model, "gpt-5.6-sol");
+  assert.equal(calls[0].args.effectiveSelection.model, "gpt-6.1-sol");
   assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "max");
   assert.equal(calls[0].args.effectiveSelection.serviceTier, "priority");
   assert.equal(events.length, 1);
-  assert.equal(events[0].model, "gpt-5.6-sol");
+  assert.equal(events[0].model, "gpt-6.1-sol");
   assert.equal(events[0].reasoningEffort, "max");
   assert.equal(events[0].serviceTier, "priority");
 });
@@ -275,7 +275,7 @@ test("a provider with no adapter result contract is rejected before the adapter 
   assert.equal(calls.length, 0);
 });
 
-test("claude defaults to opus 5 medium without a codex service tier", async () => {
+test("claude defaults to Opus 5.5 max without a Codex service tier", async () => {
   const { repoRoot } = fresh();
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-claude", taskId: "ts-model-claude", agent: "claude-code", role: "reviewer" });
@@ -293,7 +293,7 @@ test("claude defaults to opus 5 medium without a codex service tier", async () =
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
   assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
   assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
-  assert.equal(calls[0].args.effectiveSelection.model, "claude-fable-5");
+  assert.equal(calls[0].args.effectiveSelection.model, "claude-opus-5-5");
   assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "max");
   assert.equal(calls[0].args.effectiveSelection.serviceTier, null);
 });

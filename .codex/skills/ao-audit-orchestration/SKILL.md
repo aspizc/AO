@@ -23,8 +23,8 @@ Read `.claude/orchestration-profile.md` first for the resolved profile.
 
 A full audit is **deep, slow, and costly** — a gate, not a heartbeat. Run it **at a version/plan
 boundary** (a PROJECT_V<N> wave or version complete and green) **or on explicit request** — never
-per sheet (the per-sheet reviewer is the cheap inner gate). Profile: `codex` `gpt-5.6-sol` at
-`ultra` for independent audits (V5 practice), or `claude-fable-5` at `max`. You may fan out
+per sheet (the per-sheet reviewer is the cheap inner gate). Profile: `codex` `gpt-6.1-sol` at
+`max` for independent audits, or `claude-opus-5-5` at `max`. You may fan out
 read-only discovery sub-agents (Agent tool) in parallel, but the synthesis and **every
 Critical/High finding is verified firsthand** by the high-reasoning session.
 

@@ -68,7 +68,7 @@ test("default_model_used_when_omitted", () => {
   );
 
   assert.equal(result.decision, "allow");
-  assert.equal(result.model, "claude-fable-5");
+  assert.equal(result.model, "claude-opus-5-5");
   assert.equal(result.reasoningEffort, "max");
 });
 
@@ -122,14 +122,14 @@ test("disallowed_model_denied_with_safe_reason_and_metadata", () => {
   });
 });
 
-test("codex preserves the public sol max priority defaults", () => {
+test("codex defaults to Sol 6.1 max on the priority tier", () => {
   const result = evaluate(
     { agent: "codex", role: "coder", repo: "sample-apps", action: "agent.delegate" },
     reg,
   );
 
   assert.equal(result.decision, "allow");
-  assert.equal(result.model, "gpt-5.6-sol");
+  assert.equal(result.model, "gpt-6.1-sol");
   assert.equal(result.reasoningEffort, "max");
   assert.equal(result.serviceTier, "priority");
 });
@@ -386,11 +386,11 @@ test("agent_without_canonical_profile_fails_closed", () => {
   });
 });
 
-test("optional upstream models resolve across profiles without changing public defaults or roles", () => {
+test("current defaults and explicit alternatives resolve across profiles without changing roles", () => {
   for (const profile of ["", "profiles/mvp2", "profiles/kya"]) {
     const registries = loadRegistries({ policiesDir: path.join(REPO_ROOT, "policies", profile) });
     for (const [agent, model, alias, effort] of [
-      ["codex", "gpt-6.1-sol", "gpt-6.1", "xhigh"],
+      ["codex", "gpt-6.1-sol", "gpt-6.1", "max"],
       ["claude-code", "claude-sonnet-5-5", "sonnet-5.5", "max"],
       ["claude-code", "claude-opus-5-5", "opus-5.5", "max"],
     ]) {
@@ -412,7 +412,7 @@ test("optional upstream models resolve across profiles without changing public d
         }
       }
     }
-    for (const [agent, model] of [["codex", "gpt-5.6-sol"], ["claude-code", "claude-fable-5"]]) {
+    for (const [agent, model] of [["codex", "gpt-6.1-sol"], ["claude-code", "claude-opus-5-5"]]) {
       const result = resolveAgentExecutionProfile({ agent }, registries);
       assert.equal(result.model, model);
       assert.equal(result.reasoningEffort, "max");

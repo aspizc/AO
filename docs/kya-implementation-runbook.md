@@ -17,9 +17,9 @@ sequence until this runner has its own corrected integration evidence.
 
 | Role | Agent | Model | Reasoning effort | Service tier |
 |---|---|---|---|---|
-| Planner / orchestrator | claude-code (human-facing host session) | `claude-fable-5` | `max` | n/a |
-| Coder | codex | `gpt-5.6-sol` | `max` | `priority` (Fast) |
-| Reviewer | codex by default; claude-code (`claude-fable-5`) when the planner wants an independent vendor | per agent | `max` | `priority` for codex |
+| Planner / orchestrator | claude-code (human-facing host session) | `claude-opus-5-5` | `max` | n/a |
+| Coder | codex | `gpt-6.1-sol` | `max` | `priority` (Fast) |
+| Reviewer | codex by default; claude-code (`claude-opus-5-5`) when the planner wants an independent vendor | per agent | `max` | `priority` for codex |
 
 The planner is the human-facing LLM session (ADR-002: there is no separate
 orchestrator process). The planner never writes KYA production code directly;
@@ -77,7 +77,7 @@ KYA_CODER_PROMPT='/tmp/kya_impl_v0_1_02b_coder_prompt.md'
 KYA_REVIEW_PROMPT='/tmp/kya_impl_v0_1_02b_reviewer_prompt.md'
 ```
 
-Optional overrides: `KYA_CODEX_MODEL` (default `gpt-5.6-sol`),
+Optional overrides: `KYA_CODEX_MODEL` (default `gpt-6.1-sol`),
 `KYA_CODEX_EFFORT` (default `max`), `KYA_CODEX_SERVICE_TIER` (default
 `priority`), `KYA_REVIEWER_AGENT` (default `codex`), `KYA_REVIEWER_MODEL`,
 `KYA_REVIEWER_EFFORT`, `KYA_REVIEWER_SERVICE_TIER`, `AGENTS_WORKSPACE` (default

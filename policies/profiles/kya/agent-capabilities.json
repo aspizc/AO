@@ -78,7 +78,7 @@
       "binary": "claude",
       "models": ["claude-sonnet-5", "claude-sonnet-5-5", "claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-opus-4-8"],
       "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5", "sonnet": "claude-sonnet-5", "opus-5": "claude-opus-5", "sonnet-5.5": "claude-sonnet-5-5", "opus-5.5": "claude-opus-5-5", "opus-5-5": "claude-opus-5-5" },
-      "defaultModel": "claude-fable-5",
+      "defaultModel": "claude-opus-5-5",
       "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
       "defaultReasoningEffort": "max",
       "allowedClassifications": ["unrestricted", "internal"],
@@ -111,7 +111,7 @@
         "terra": "gpt-5.6-terra",
         "luna": "gpt-5.6-luna"
       },
-      "defaultModel": "gpt-5.6-sol",
+      "defaultModel": "gpt-6.1-sol",
       "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
       "defaultReasoningEffort": "max",
       "serviceTiers": ["default", "priority"],
@@ -123,7 +123,7 @@
         },
         "gpt-6.1-sol": {
           "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
-          "defaultReasoningEffort": "xhigh"
+          "defaultReasoningEffort": "max"
         },
         "gpt-5.6-sol": {
           "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],

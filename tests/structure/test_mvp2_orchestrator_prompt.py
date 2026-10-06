@@ -19,12 +19,12 @@ def test_mvp2_prompt_names_agents_roles_and_models():
 
     assert "agent: codex" in text
     assert "role: coder" in text
-    assert "model: gpt-5.6-sol" in text
+    assert "model: gpt-6.1-sol" in text
     assert "reasoningEffort: max" in text
     assert "serviceTier: priority" in text
     assert "agent: claude-code" in text
     assert "role: reviewer" in text
-    assert "model: claude-fable-5" in text
+    assert "model: claude-opus-5-5" in text
 
 
 def test_mvp2_prompt_describes_supervised_tool_sequence():
