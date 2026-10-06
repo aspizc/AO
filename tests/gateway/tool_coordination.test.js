@@ -140,7 +140,7 @@ test("registration schema advertises the lease ceiling and optional canonical sc
   assert.deepEqual(register.inputSchema.properties.leaseTtlMs, {
     type: "integer",
     minimum: 1,
-    maximum: 3_600_000,
+    maximum: 259_200_000,
   });
 });
 
@@ -163,13 +163,13 @@ test("registration and heartbeat report lease validation with the domain code an
           };
     const result = await tools[`coordination.${operation}`].handler({
       ...base,
-      leaseTtlMs: 3_600_001,
+      leaseTtlMs: 259_200_001,
     });
 
     assert.equal(result.isError, true);
     assert.deepEqual(parseResult(result), {
       error: "COORDINATION_INVALID_INPUT",
-      message: "leaseTtlMs exceeds maximum 3600000",
+      message: "leaseTtlMs exceeds maximum 259200000",
       code: "COORDINATION_INVALID_INPUT",
     });
   }

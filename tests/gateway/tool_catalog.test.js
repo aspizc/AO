@@ -122,15 +122,18 @@ test("catalog error allowlists are operation-specific and complete", () => {
   assert.deepEqual(codes("orchestration.view"), [
     "INVALID_INPUT",
     "TOOL_ERROR",
+    "REQUEST_CONTEXT_DENIED",
   ]);
   assert.deepEqual(codes("approval.respond"), [
     "INVALID_INPUT",
     "TOOL_ERROR",
+    "REQUEST_CONTEXT_DENIED",
     "NOT_FOUND",
   ]);
   assert.deepEqual(codes("agent.ask"), [
     "INVALID_INPUT",
     "TOOL_ERROR",
+    "REQUEST_CONTEXT_DENIED",
     "NOT_FOUND",
     "POLICY_DENIED",
     "ADAPTER_DISABLED",
@@ -140,6 +143,7 @@ test("catalog error allowlists are operation-specific and complete", () => {
     assert.deepEqual(codes(name), [
       "INVALID_INPUT",
       "TOOL_ERROR",
+      "REQUEST_CONTEXT_DENIED",
       "NOT_FOUND",
       "ADAPTER_DISABLED",
       "TIMEOUT",

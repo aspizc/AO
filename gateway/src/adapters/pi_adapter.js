@@ -1,0 +1,418 @@
+import { spawnSync } from "node:child_process";
+import { BaseAdapter, assertSafeCwd } from "./base_adapter.js";
+import { buildTmuxTarget } from "./session_naming.js";
+import {
+  buildCapturePaneCmd,
+  buildKillSessionCmd,
+  buildNewSessionCmd,
+  buildSendKeysCmd,
+  isTmuxAvailable,
+  tmuxSync,
+} from "./tmux_client.js";
+import { append as auditAppend } from "../core/audit.js";
+import {
+  evaluate,
+  resolveAgentExecutionProfile,
+} from "../core/policy_engine.js";
+import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
+import {
+  RequestContextError,
+  assertServerOwnedExecutionBinding,
+} from "../core/request_context.js";
+import { assertModelCredentials, localBaseUrl } from "./model_credentials.js";
+
+const AGENT_ID = "pi";
+const DEFAULT_TIMEOUT_MS = 600_000;
+
+function isDryRun(config) {
+  return config?.dryRun === true || process.env.AGENTS_DRY_RUN === "1";
+}
+
+function piBin(config) {
+  return config?.piBin || process.env.AGENTS_PI_BIN || "pi";
+}
+
+/**
+ * pi takes the model as `--model <provider/id>` and the reasoning depth as
+ * `--thinking <off|minimal|low|medium|high|xhigh>`; `--print` makes the run
+ * non-interactive and `--mode json` gives a parseable event stream.
+ */
+function buildPiArgs({ model = null, reasoningEffort = null, prompt = null } = {}) {
+  const args = [];
+  if (model) args.push("--model", model);
+  if (reasoningEffort) args.push("--thinking", reasoningEffort);
+  args.push("--print", "--mode", "json");
+  if (prompt !== null) args.push(prompt);
+  return args;
+}
+
+function buildPiLaunch(config, { model = null, reasoningEffort = null } = {}) {
+  const launch = [piBin(config)];
+  if (model) launch.push("--model", model);
+  if (reasoningEffort) launch.push("--thinking", reasoningEffort);
+  return launch;
+}
+
+/**
+ * A local model is reached over an OpenAI-compatible endpoint, so the base URL
+ * travels to the child as an env var rather than as an argv flag.
+ */
+function childEnv(model, base = process.env) {
+  const url = localBaseUrl(model, base);
+  if (!url) return { ...base };
+  return { ...base, OLLAMA_BASE_URL: url, OLLAMA_HOST: url };
+}
+
+function effectiveModel(decision, consumer, agentId) {
+  const selection = consumeEffectiveAgentSelection(decision.effectiveSelection, {
+    agent: agentId,
+    consumer,
+  });
+  return {
+    model: selection.model,
+    reasoningEffort: selection.reasoningEffort,
+  };
+}
+
+function assertSuppliedSelection({
+  effectiveSelection,
+  model,
+  reasoningEffort,
+  serviceTier,
+}, consumer, agentId) {
+  if (effectiveSelection === null || effectiveSelection === undefined) return;
+  consumeEffectiveAgentSelection(effectiveSelection, {
+    agent: agentId,
+    consumer,
+    rawSelection: { model, reasoningEffort, serviceTier },
+  });
+}
+
+function auditSessionStarted({ traceId, agentId, role, mode, tmuxTarget = null }) {
+  auditAppend({
+    type: "SESSION_STARTED",
+    traceId,
+    agent: agentId || AGENT_ID,
+    role,
+    mode,
+    tmuxTarget,
+  });
+}
+
+function auditSessionClosed({ traceId, agentId, role, mode, exitCode = null, tmuxTarget = null }) {
+  auditAppend({
+    type: "SESSION_CLOSED",
+    traceId,
+    agent: agentId || AGENT_ID,
+    role,
+    exitCode,
+    mode,
+    tmuxTarget,
+  });
+}
+
+function auditSessionInput({ traceId, agentId, role, tmuxTarget, prompt }) {
+  auditAppend({
+    type: "SESSION_INPUT",
+    traceId,
+    agent: agentId || AGENT_ID,
+    role,
+    tmuxTarget,
+    prompt: String(prompt).slice(0, 200),
+  });
+}
+
+function auditAdapterError({ traceId, agentId, role, where, err }) {
+  auditAppend({
+    type: "ERROR",
+    traceId,
+    agent: agentId || AGENT_ID,
+    role,
+    where,
+    error: String(err?.message || err),
+    policy: err?.policy || null,
+    code: err?.code || null,
+  });
+}
+
+function preflight(adapter, ctx) {
+  const result = evaluate(ctx, adapter.registries);
+  return assertPolicyAllowed(result);
+}
+
+function assertPolicyAllowed(result) {
+  if (result.decision !== "allow") {
+    const err = new Error("request denied by policy");
+    err.code = "POLICY_DENIED";
+    err.decision = result;
+    err.policy = result;
+    throw err;
+  }
+  return result;
+}
+
+function assertTmuxOk(result, action) {
+  if (result.status !== 0) {
+    throw new Error(`tmux ${action} failed: ${result.stderr || result.error?.message || "unknown error"}`);
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export class PiAdapter extends BaseAdapter {
+  constructor(opts = {}) {
+    super({ id: opts.id || AGENT_ID, ...opts });
+  }
+
+  async delegate({
+    cwd,
+    prompt,
+    traceId,
+    taskId = null,
+    targetAction = null,
+    role,
+    repo = null,
+    model = null,
+    reasoningEffort = null,
+    serviceTier = null,
+    effectiveSelection = null,
+    requestBinding = null,
+  }) {
+    try {
+      const hasRequestBinding =
+        requestBinding !== null && requestBinding !== undefined;
+      if (hasRequestBinding) {
+        assertServerOwnedExecutionBinding(requestBinding, {
+          action: "agent.delegate",
+          agent: this.id,
+          role,
+          repositoryId: repo,
+          traceId,
+          taskId,
+          cwd,
+          targetAction,
+        });
+      }
+      assertSuppliedSelection({
+        effectiveSelection,
+        model,
+        reasoningEffort,
+        serviceTier,
+      }, "delegate", this.id);
+      const decision = hasRequestBinding
+        ? assertPolicyAllowed(resolveAgentExecutionProfile({
+            agent: this.id,
+            effectiveSelection,
+            model,
+            reasoningEffort,
+            serviceTier,
+          }, this.registries))
+        : preflight(this, {
+            agent: this.id,
+            role,
+            action: "agent.delegate",
+            repo,
+            model,
+            reasoningEffort,
+            serviceTier,
+            effectiveSelection,
+          });
+      const {
+        model: effectiveModelValue,
+        reasoningEffort: effectiveReasoningEffort,
+      } = effectiveModel(decision, "delegate", this.id);
+      assertModelCredentials(effectiveModelValue);
+      const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      auditSessionStarted({ traceId, agentId: this.id, role, mode: "headless" });
+
+      if (isDryRun(this.config)) {
+        const result = {
+          stdout:
+            `[dry-run ${this.id}${effectiveModelValue ? ` model=${effectiveModelValue}` : ""}` +
+            `${effectiveReasoningEffort ? ` thinking=${effectiveReasoningEffort}` : ""}]\n` +
+            `prompt=${prompt}\ncwd=${safeCwd}`,
+          stderr: "",
+          exitCode: 0,
+          dryRun: true,
+          model: effectiveModelValue,
+          reasoningEffort: effectiveReasoningEffort,
+          effectiveSelection: decision.effectiveSelection,
+        };
+        auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
+        return result;
+      }
+
+      const proc = spawnSync(
+        piBin(this.config),
+        buildPiArgs({
+          model: effectiveModelValue,
+          reasoningEffort: effectiveReasoningEffort,
+          prompt,
+        }),
+        {
+          cwd: safeCwd,
+          encoding: "utf-8",
+          env: childEnv(effectiveModelValue),
+          timeout: this.config.adapterTimeoutMs || DEFAULT_TIMEOUT_MS,
+        },
+      );
+      const result = {
+        stdout: proc.stdout || "",
+        stderr: proc.stderr || String(proc.error?.message || ""),
+        exitCode: proc.status ?? -1,
+        dryRun: false,
+        model: effectiveModelValue,
+        reasoningEffort: effectiveReasoningEffort,
+        effectiveSelection: decision.effectiveSelection,
+      };
+      auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
+      return result;
+    } catch (err) {
+      if (
+        !(err instanceof RequestContextError)
+        && err?.code !== "EFFECTIVE_SELECTION_INVALID"
+      ) {
+        auditAdapterError({ traceId, agentId: this.id, role, where: "delegate", err });
+      }
+      throw err;
+    }
+  }
+
+  async spawn({
+    cwd,
+    traceId,
+    taskId = null,
+    targetAction = null,
+    role,
+    repo = null,
+    model = null,
+    reasoningEffort = null,
+    serviceTier = null,
+    effectiveSelection = null,
+    requestBinding = null,
+  }) {
+    try {
+      const hasRequestBinding =
+        requestBinding !== null && requestBinding !== undefined;
+      if (hasRequestBinding) {
+        assertServerOwnedExecutionBinding(requestBinding, {
+          action: "agent.spawn",
+          agent: this.id,
+          role,
+          repositoryId: repo,
+          traceId,
+          taskId,
+          cwd,
+          targetAction,
+        });
+      }
+      assertSuppliedSelection({
+        effectiveSelection,
+        model,
+        reasoningEffort,
+        serviceTier,
+      }, "spawn", this.id);
+      const decision = hasRequestBinding
+        ? assertPolicyAllowed(resolveAgentExecutionProfile({
+            agent: this.id,
+            effectiveSelection,
+            model,
+            reasoningEffort,
+            serviceTier,
+          }, this.registries))
+        : preflight(this, {
+            agent: this.id,
+            role,
+            action: "agent.spawn",
+            repo,
+            model,
+            reasoningEffort,
+            serviceTier,
+            effectiveSelection,
+          });
+      const {
+        model: effectiveModelValue,
+        reasoningEffort: effectiveReasoningEffort,
+      } = effectiveModel(decision, "spawn", this.id);
+      assertModelCredentials(effectiveModelValue);
+      const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const tmuxTarget = buildTmuxTarget({
+        traceId,
+        agent: this.id,
+        role,
+        prefix: this.config.tmuxPrefix,
+      });
+      const dryRun = isDryRun(this.config);
+      const launchCommand = buildPiLaunch(this.config, {
+        model: effectiveModelValue,
+        reasoningEffort: effectiveReasoningEffort,
+      }).join(" ");
+
+      if (!dryRun) {
+        if (!isTmuxAvailable()) throw new Error("tmux is required for pi supervised mode");
+        assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
+        assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: launchCommand })), "send-keys");
+      }
+
+      auditSessionStarted({ traceId, agentId: this.id, role, mode: "supervised", tmuxTarget });
+      return {
+        sessionId: tmuxTarget,
+        tmuxTarget,
+        attachCommand: `tmux attach -t ${tmuxTarget}`,
+        launchCommand,
+        dryRun,
+        effectiveSelection: decision.effectiveSelection,
+      };
+    } catch (err) {
+      if (
+        !(err instanceof RequestContextError)
+        && err?.code !== "EFFECTIVE_SELECTION_INVALID"
+      ) {
+        auditAdapterError({ traceId, agentId: this.id, role, where: "spawn", err });
+      }
+      throw err;
+    }
+  }
+
+  async ask({ tmuxTarget, prompt, traceId, role, repo = null }) {
+    try {
+      preflight(this, { agent: this.id, role, action: "agent.ask", repo });
+      if (isDryRun(this.config)) {
+        auditSessionInput({ traceId, agentId: this.id, role, tmuxTarget, prompt });
+        return { snapshot: `[dry-run ${this.id} ask]\n${prompt}\n[ok]`, dryRun: true };
+      }
+
+      assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: prompt })), "send-keys");
+      await sleep(this.config.tmuxAskDelayMs || 1500);
+      const captured = tmuxSync(buildCapturePaneCmd({ target: tmuxTarget, lines: 400 }));
+      assertTmuxOk(captured, "capture-pane");
+      auditSessionInput({ traceId, agentId: this.id, role, tmuxTarget, prompt });
+      return { snapshot: captured.stdout || "", dryRun: false };
+    } catch (err) {
+      auditAdapterError({ traceId, agentId: this.id, role, where: "ask", err });
+      throw err;
+    }
+  }
+
+  async view({ tmuxTarget }) {
+    if (isDryRun(this.config)) {
+      return { snapshot: `[dry-run ${this.id} view]`, dryRun: true };
+    }
+
+    const captured = tmuxSync(buildCapturePaneCmd({ target: tmuxTarget, lines: 400 }));
+    assertTmuxOk(captured, "capture-pane");
+    return { snapshot: captured.stdout || "", dryRun: false };
+  }
+
+  async kill({ tmuxTarget, traceId, role }) {
+    const dryRun = isDryRun(this.config);
+    if (!dryRun) {
+      assertTmuxOk(tmuxSync(buildKillSessionCmd({ target: tmuxTarget })), "kill-session");
+    }
+
+    auditSessionClosed({ traceId, agentId: this.id, role, mode: "supervised", tmuxTarget });
+    return { closed: true, dryRun };
+  }
+}

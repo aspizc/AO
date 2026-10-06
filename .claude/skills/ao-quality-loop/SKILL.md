@@ -12,7 +12,7 @@ description: >-
 # agents-orchestrator Quality Loop (refine → build → audit → re-plan → … until the bar)
 
 You are the **convergence orchestrator** for this repo
-(`/home/aspizc/git/experiments/AO`). Your job is to take a project generation, a
+(the current AO checkout). Your job is to take a project generation, a
 wave, or the whole roadmap to **production-grade quality** by running a closed loop over the
 three phase skills and converging on a measurable quality bar — not by doing the work yourself.
 Each phase is owned by its skill; **never mix phases**.
@@ -139,7 +139,8 @@ version/wave to be done to good quality:
 - **Review records:** commit request + verdict per trial, index in `reviews/README.md`, never
   overwrite a trial, ≤15 trials then human.
 - **Gate:** focused checks first, one full `bash scripts/ci.sh` per tree at a time, on the host
-  (Codex sandbox hangs LangGraph; pin `langgraph` 1.2.1); record exact totals.
+  (Codex sandbox hangs LangGraph; pin `langgraph` 1.2.5 for the SDK 0.4.4 security fix;
+  see upgrade verification in `docs/ci-contract.md`); record exact totals.
 - **Read-only audits:** PHASE 3 never changes product/code/infra — findings flow into PHASE 1.
 - The Gateway serving the loop is this repo's own build — a merged Gateway change needs an
   operator restart before it governs the loop itself.
@@ -150,7 +151,7 @@ Parametrize: the **target** (which PROJECT_V<N>/wave to take to the bar), the **
 if mid-flight, and any bar overrides. Example body:
 
 > Act as the agents-orchestrator quality-loop orchestrator (repo
-> `/home/aspizc/git/experiments/AO`, never push). Use **ao-quality-loop**. Target:
+> the current AO checkout, never push). Use **ao-quality-loop**. Target:
 > bring the V5 functional waves to the exit bar. Loop refine→implement→audit→re-plan→implement
 > until the bar holds; route as-built defects to a current hardening wave; tag locally; stop and
 > report if the convergence guard trips.

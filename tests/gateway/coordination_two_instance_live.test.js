@@ -27,6 +27,7 @@ function createClientTracker({ beforeAckEval = null } = {}) {
     factory(options) {
       const inner = createClient(options);
       let countedOpen = false;
+      let countedDestroyed = false;
       created += 1;
       return {
         get isOpen() {
@@ -34,6 +35,10 @@ function createClientTracker({ beforeAckEval = null } = {}) {
         },
         on(event, listener) {
           inner.on(event, listener);
+          return this;
+        },
+        off(event, listener) {
+          inner.off(event, listener);
           return this;
         },
         async connect() {
@@ -57,6 +62,8 @@ function createClientTracker({ beforeAckEval = null } = {}) {
           return inner.sendCommand(command);
         },
         destroy() {
+          if (countedDestroyed) return;
+          countedDestroyed = true;
           if (countedOpen) {
             countedOpen = false;
             open -= 1;
@@ -207,6 +214,7 @@ test(
       maxInboxLength: 2,
       clientFactory: trackerB.factory,
     });
+    const ownedQueues = [queueA, queueB];
     const serviceA = createService({
       queue: queueA,
       uuid: "instance:a",
@@ -453,6 +461,7 @@ test(
         prefix,
         maxInboxLength: 2,
       });
+      ownedQueues.push(replacementQueue);
       const replacementService = createService({
         queue: replacementQueue,
         uuid: "instance:a",
@@ -472,13 +481,15 @@ test(
           });
         },
       });
+      const raceQueue = createRedisCoordinationQueue({
+        redisUrl,
+        prefix,
+        maxInboxLength: 2,
+        clientFactory: raceTracker.factory,
+      });
+      ownedQueues.push(raceQueue);
       const raceService = createService({
-        queue: createRedisCoordinationQueue({
-          redisUrl,
-          prefix,
-          maxInboxLength: 2,
-          clientFactory: raceTracker.factory,
-        }),
+        queue: raceQueue,
         uuid: "unused",
         audits: [],
       });
@@ -570,13 +581,15 @@ test(
         /leaseToken|leaseTokenHash|body/,
       );
 
+      await Promise.all(ownedQueues.map((queue) => queue.close()));
       for (const tracker of [trackerA, trackerB, raceTracker]) {
         const snapshot = tracker.snapshot();
         assert.equal(snapshot.open, 0);
         assert.equal(snapshot.created, snapshot.destroyed);
-        assert.ok(snapshot.created > 0);
+        assert.equal(snapshot.created, 1);
       }
     } finally {
+      await Promise.all(ownedQueues.map((queue) => queue.close()));
       await exactPrefixCleanup(raw, prefix);
       if (raw.isOpen) raw.destroy();
     }

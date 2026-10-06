@@ -5,10 +5,11 @@ skill-capable MCP host) to drive the `agents-gateway` MCP server well. They are
 **consumer-facing**: copy them into the client that mounts the gateway, in any
 project. They are not loaded by the gateway itself.
 
-Core doctrine, carried by every orchestration skill here: **spawn persistent
+For iterative plan, build, and audit work, the core doctrine is: **spawn persistent
 tmux sessions through the gateway and reuse them** (`agent_spawn` + `agent_ask`
 + `agent_view`), instead of one-shot `agent_delegate`, so worker context
-survives follow-ups and the orchestrator's own context stays small.
+survives follow-ups and the orchestrator's own context stays small. Independent
+one-shot ideation reviews may use `agent.delegate`.
 
 ## Inventory
 
@@ -16,6 +17,7 @@ survives follow-ups and the orchestrator's own context stays small.
 |---|---|
 | `agents-gateway-orchestration` | **Foundation.** The 33-tool surface, canonical lifecycle, tool shapes, session identity & reuse rules, liveness protocol, approvals/artifacts/messages, coordination plane, safety defaults. Load it before any `mcp__agents-gateway__*` work; the other skills assume it. |
 | `agents-gateway-coordination` | Dedicated cross-process coordination workflow: leased presence, discovery, addressed delivery, heartbeat, reclaim/ACK, recovery, authority boundaries, and `COORDINATION_*` troubleshooting. |
+| `ideation-orchestration-gateway` | Human-led concept drafting, constructive challenge, bounded specialist panels, simulated personas, and evidence-aware handoff to planning. |
 | `plan-orchestration-gateway` | PLAN phase: author/refine/decompose/production-review implementation plans via gateway spawns. |
 | `build-orchestration-gateway` | IMPLEMENT phase: test-first coder + independent reviewer loop on gateway tmux sessions; orchestrator gates and commits reviewed-OK work only. |
 | `audit-orchestration-gateway` | AUDIT phase: spawn a high-reasoning auditor (plus read-only discovery fan-out); for multi-lens audits, produce a visible index, consolidated report, and one standalone sheet per executed lens; convert findings into plan work. |

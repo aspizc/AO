@@ -71,6 +71,16 @@
       "purpose": "Inspect sanitized artifacts for security issues.",
       "allowActions": ["artifact.get.sanitized", "artifact.put.security_finding"],
       "denyActions": ["code.write", "artifact.get.raw_restricted"]
+    },
+    "writer": {
+      "purpose": "Write prose in non-restricted repos: novel chapters, copywriting and documentation. Works from sanitized briefs, style guides and review notes; never reads raw restricted material.",
+      "allowActions": ["code.write", "code.read", "artifact.put", "artifact.put.doc", "artifact.get.sanitized"],
+      "denyActions": ["code.read.raw_restricted", "artifact.get.raw_restricted"]
+    },
+    "editor": {
+      "purpose": "Editorial reviewer for the writing system: checks manuscripts, copy and documentation against the brief, continuity and style guide, and writes review notes. Never rewrites the text directly.",
+      "allowActions": ["code.read", "artifact.get.sanitized", "artifact.get.sanitized.raw_restricted", "artifact.put.review_notes"],
+      "denyActions": ["code.write", "artifact.get.raw_restricted", "code.read.raw_restricted"]
     }
   }
 }

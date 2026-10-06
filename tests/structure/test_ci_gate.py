@@ -24,6 +24,22 @@ def test_github_actions_ci_workflow_runs_local_ci_gate():
     assert list(jobs) == ["ci"]
     job = jobs["ci"]
     assert job["runs-on"] == "ubuntu-latest"
+    assert job["env"] == {
+        "AGENTS_TEST_REDIS_URL": "redis://127.0.0.1:6379/0",
+        "D007C_RUN_REAL_TMUX_PROBE": "1",
+    }
+    assert job["services"] == {
+        "redis": {
+            "image": "redis:7.2-alpine",
+            "ports": ["6379:6379"],
+            "options": (
+                '--health-cmd "redis-cli ping" '
+                "--health-interval 1s "
+                "--health-timeout 5s "
+                "--health-retries 30"
+            ),
+        },
+    }
     assert job["strategy"] == {
         "fail-fast": False,
         "matrix": {"node-version": ["22.13.0", "24"]},
@@ -55,6 +71,8 @@ def test_github_actions_ci_workflow_does_not_duplicate_test_logic():
     text = WORKFLOW.read_text(encoding="utf-8")
 
     assert "AGENTS_E2E_REAL" not in text
+    assert "redis:7.2-alpine" in text
+    assert "redis-cli ping" in text
 
     forbidden_gate_commands = [
         "ruff check",

@@ -13,23 +13,23 @@
     },
     "developer-tools": {
       "classification": "internal",
-      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "allowedAgents": ["antigravity", "claude-code", "codex", "gemini-cli", "opencode", "pi"],
       "tags": ["tooling"]
     },
     "sample-apps": {
       "classification": "unrestricted",
-      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "allowedAgents": ["antigravity", "claude-code", "codex", "gemini-cli", "opencode", "pi"],
       "tags": ["examples"]
     },
     "agents-orchestrator": {
       "classification": "internal",
-      "allowedAgents": ["gemini-cli", "claude-code", "codex"],
+      "allowedAgents": ["antigravity", "claude-code", "codex", "gemini-cli", "opencode", "pi"],
       "excludedPaths": ["policies/"],
       "tags": ["self", "planning"]
     },
     "engineering_graph": {
       "classification": "internal",
-      "allowedAgents": ["claude-code", "codex"],
+      "allowedAgents": ["antigravity", "claude-code", "codex", "opencode", "pi"],
       "tags": ["planning", "external-plan-target"]
     }
   }

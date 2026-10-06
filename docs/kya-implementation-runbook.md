@@ -1,8 +1,7 @@
 # KYA implementation runbook
 
-Operating contract for implementing the KYA project
-(`/home/carase/git/experiments/kya`, "Know Your Agent" / Signicat Verified
-Agents) through the Gateway.
+Operating contract for implementing a KYA ("Know Your Agent") project through
+the Gateway. Use the operator's KYA checkout as the working repository.
 
 ## Roles and models
 

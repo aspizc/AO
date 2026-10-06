@@ -18,84 +18,18 @@ function parseToolBody(result) {
   return JSON.parse(result.content[0].text);
 }
 
-function shellQuote(value) {
-  return `'${value.replaceAll("'", "'\\''")}'`;
-}
-
-function runMcpRequest({ env, method, params = {} }) {
-  const requests = [
-    {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2024-11-05",
-        capabilities: {},
-        clientInfo: { name: "mcp-e2e", version: "0" },
-      },
-    },
-    {
-      jsonrpc: "2.0",
-      method: "notifications/initialized",
-      params: {},
-    },
-    { jsonrpc: "2.0", id: 2, method, params },
-  ];
-  return new Promise((resolve, reject) => {
-    const requestDir = fs.mkdtempSync(path.join(env.AGENTS_WORKSPACE, "mcp-call-"));
-    const inputFile = path.join(requestDir, "input.jsonl");
-    const stdoutFile = path.join(requestDir, "stdout.log");
-    const stderrFile = path.join(requestDir, "stderr.log");
-    fs.writeFileSync(inputFile, `${requests.map((request) => JSON.stringify(request)).join("\n")}\n`);
-    const command = [
-      ...Object.entries(env).map(([key, value]) => `${key}=${shellQuote(String(value))}`),
-      shellQuote(process.execPath),
-      shellQuote(SERVER),
-      "<",
-      shellQuote(inputFile),
-      ">",
-      shellQuote(stdoutFile),
-      "2>",
-      shellQuote(stderrFile),
-    ].join(" ");
-    const child = spawn("bash", ["-lc", command], {
-      cwd: REPO_ROOT,
-      stdio: "ignore",
-    });
-    const timer = setTimeout(() => {
-      child.kill();
-      const stderr = fs.existsSync(stderrFile) ? fs.readFileSync(stderrFile, "utf-8") : "";
-      reject(new Error(`MCP request timed out: ${method}; stderr=${stderr}`));
-    }, 5000);
-
-    child.on("error", (err) => {
+function waitForExit(child, timeoutMs) {
+  if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, timeoutMs);
+    child.once("exit", () => {
       clearTimeout(timer);
-      reject(err);
-    });
-    child.on("exit", (code, signal) => {
-      clearTimeout(timer);
-      const stdout = fs.existsSync(stdoutFile) ? fs.readFileSync(stdoutFile, "utf-8") : "";
-      const stderr = fs.existsSync(stderrFile) ? fs.readFileSync(stderrFile, "utf-8") : "";
-      if (code !== 0) {
-        reject(new Error(`MCP server failed code=${code} signal=${signal} stderr=${stderr}`));
-        return;
-      }
-      const responses = stdout
-        .trim()
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line));
-      const response = responses.find((item) => item.id === 2);
-      if (!response) {
-        reject(new Error(`missing MCP response for ${method}; stdout=${stdout}; stderr=${stderr}`));
-        return;
-      }
-      resolve(response);
+      resolve();
     });
   });
 }
 
-export function startMcpClient({ env = {} } = {}) {
+export async function startMcpClient({ env = {} } = {}) {
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "ag-mcp-e2e-"));
   const reposRoot = mkdirp(path.join(workspace, "repos"));
   const cvisionRepo = mkdirp(path.join(reposRoot, "cvision"));
@@ -108,9 +42,81 @@ export function startMcpClient({ env = {} } = {}) {
     AGENTS_REPO_ROOTS: reposRoot,
     ...env,
   };
+  const child = spawn(process.execPath, [SERVER], {
+    cwd: REPO_ROOT,
+    env: serverEnv,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  const pending = new Map();
+  let nextId = 1;
+  let stdoutBuffer = "";
+  let stderr = "";
+  let stopped = false;
+
+  function rejectPending(error) {
+    for (const entry of pending.values()) {
+      clearTimeout(entry.timer);
+      entry.reject(error);
+    }
+    pending.clear();
+  }
+
+  child.stdout.setEncoding("utf8");
+  child.stdout.on("data", (chunk) => {
+    stdoutBuffer += chunk;
+    while (stdoutBuffer.includes("\n")) {
+      const newline = stdoutBuffer.indexOf("\n");
+      const line = stdoutBuffer.slice(0, newline);
+      stdoutBuffer = stdoutBuffer.slice(newline + 1);
+      if (!line) continue;
+      let message;
+      try {
+        message = JSON.parse(line);
+      } catch {
+        rejectPending(new Error("MCP server emitted invalid JSON"));
+        continue;
+      }
+      const entry = pending.get(message.id);
+      if (!entry) continue;
+      pending.delete(message.id);
+      clearTimeout(entry.timer);
+      entry.resolve(message);
+    }
+  });
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk) => {
+    stderr = `${stderr}${chunk}`.slice(-64_000);
+  });
+  child.on("error", rejectPending);
+  child.on("exit", (code, signal) => {
+    stopped = true;
+    rejectPending(
+      new Error(`MCP server stopped code=${code} signal=${signal}; stderr=${stderr}`),
+    );
+  });
 
   function request(method, params = {}) {
-    return runMcpRequest({ env: serverEnv, method, params });
+    if (stopped) {
+      return Promise.reject(new Error(`MCP server is stopped; stderr=${stderr}`));
+    }
+    const id = nextId;
+    nextId += 1;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pending.delete(id);
+        reject(new Error(`MCP request timed out: ${method}; stderr=${stderr}`));
+      }, 5_000);
+      pending.set(id, { resolve, reject, timer });
+      child.stdin.write(
+        `${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`,
+        (error) => {
+          if (!error) return;
+          clearTimeout(timer);
+          pending.delete(id);
+          reject(error);
+        },
+      );
+    });
   }
 
   async function callTool(name, args = {}) {
@@ -118,6 +124,19 @@ export function startMcpClient({ env = {} } = {}) {
     if (response.error) throw new Error(`${name} failed: ${JSON.stringify(response.error)}`);
     return { result: response.result, body: parseToolBody(response.result) };
   }
+
+  await request("initialize", {
+    protocolVersion: "2024-11-05",
+    capabilities: {},
+    clientInfo: { name: "mcp-e2e", version: "0" },
+  });
+  child.stdin.write(
+    `${JSON.stringify({
+      jsonrpc: "2.0",
+      method: "notifications/initialized",
+      params: {},
+    })}\n`,
+  );
 
   return {
     workspace,
@@ -129,7 +148,15 @@ export function startMcpClient({ env = {} } = {}) {
     },
     request,
     callTool,
-    cleanup() {
+    async cleanup() {
+      if (!stopped) {
+        child.stdin.end();
+        await waitForExit(child, 2_000);
+      }
+      if (!stopped) {
+        child.kill("SIGTERM");
+        await waitForExit(child, 2_000);
+      }
       fs.rmSync(workspace, { recursive: true, force: true });
     },
   };

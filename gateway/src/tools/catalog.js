@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { z } from "zod";
 
+import { isRequestContextProtectedAction } from "../core/request_context.js";
 import {
   MAX_COORDINATION_LEASE_TTL_MS,
 } from "../core/coordination_contract.js";
@@ -40,6 +41,7 @@ const ERROR_MESSAGES = Object.freeze({
   ORCHESTRATION_NOT_FOUND: "orchestration was not found",
   PARENT_NOT_FOUND: "parent message was not found",
   POLICY_DENIED: "request denied by policy",
+  REQUEST_CONTEXT_DENIED: "request context denied",
   ROLE_FORBIDDEN: "role is not allowed to perform this operation",
   SANITIZATION_MISSING: "required sanitized artifact is unavailable",
   TIMEOUT: "tool operation timed out",
@@ -177,7 +179,16 @@ function createSpec({
     throw new TypeError(`tool description must end with a period: ${name}`);
   }
   const inputSchema = deepFreeze(zodToJsonSchema(schema));
-  const publicErrorCodes = [...new Set(["INVALID_INPUT", "TOOL_ERROR", ...errorCodes])];
+  const publicErrorCodes = [
+    ...new Set([
+      "INVALID_INPUT",
+      "TOOL_ERROR",
+      ...(isRequestContextProtectedAction(name)
+        ? ["REQUEST_CONTEXT_DENIED"]
+        : []),
+      ...errorCodes,
+    ]),
+  ];
   const errorMessages = Object.fromEntries(
     publicErrorCodes
       .filter((code) => ERROR_MESSAGES[code])

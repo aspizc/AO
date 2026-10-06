@@ -133,8 +133,9 @@ import {
   createOrchestratorCoordinationClient,
 } from "./src/coordination.js";
 
+const coordination = createCoordination({ config: loadConfig() });
 const client = createOrchestratorCoordinationClient({
-  coordination: createCoordination({ config: loadConfig() }),
+  coordination,
   registration: {
     displayName: "Primary orchestrator",
     capabilities: ["coordination.v1"],
@@ -149,6 +150,7 @@ try {
   // Select a trusted peer before using send, receive, or ack.
 } finally {
   await client.stop();
+  await coordination["close"]();
 }
 ```
 
@@ -210,9 +212,13 @@ falls back to `AGENTS_REDIS_URL`. An empty result disables coordination.
 | `AGENTS_COORDINATION_PREFIX` | `agents:coord:v1` | Dedicated safe key prefix; `<prefix>:events` must not equal `agents:events` |
 | `AGENTS_COORDINATION_SCOPE_ID` | `agents-orchestrator` | Canonical safe scope accepted by this Gateway instance |
 | `AGENTS_COORDINATION_LEASE_DEFAULT_MS` | `900000` | Positive safe integer, not above lease maximum |
-| `AGENTS_COORDINATION_LEASE_MAX_MS` | `3600000` | Positive safe integer, at most the v1 ceiling of one hour |
+| `AGENTS_COORDINATION_LEASE_MAX_MS` | `259200000` | Positive safe integer, at most the v1 ceiling of 72 hours |
 | `AGENTS_COORDINATION_INBOX_MAX_LEN` | `10000` | Positive safe integer; sends fail before overflow |
 | `AGENTS_COORDINATION_MAX_BLOCK_MS` | `30000` | Positive safe integer; upper bound for receive blocking |
+| `AGENTS_COORDINATION_COMMAND_CONCURRENCY` | `64` | Positive safe integer; in-flight command-client admission bound |
+| `AGENTS_COORDINATION_COMMAND_QUEUE_MAX` | `256` | Positive safe integer; queued command-operation bound |
+| `AGENTS_COORDINATION_BLOCKING_QUEUE_MAX` | `32` | Positive safe integer; queued blocking-receive bound |
+| `AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS` | `2000` | Positive safe integer; graceful client-drain bound |
 | `AGENTS_COORDINATION_MESSAGE_MAX_BYTES` | `65536` | Positive safe integer, at most the v1 schema limit of 65536 |
 | `AGENTS_COORDINATION_DEDUPE_TTL_MS` | `86400000` | Positive safe integer; equal-send retry window |
 | `AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS` | `86400000` | Positive safe integer; exact ACK retry window |
@@ -221,6 +227,19 @@ falls back to `AGENTS_REDIS_URL`. An empty result disables coordination.
 Numeric values are parsed with JavaScript `Number()` and must resolve to
 positive safe integers. Lease values above the configured maximum and message
 limits above 65,536 are rejected; they are not silently clamped.
+
+Each Gateway owns one lazy persistent RESP2 command client and one dedicated
+blocking client for its coordination service. Admission is bounded before
+node-redis receives work. Offline queuing and automatic reconnect are disabled:
+a failed dispatched operation is never replayed, while the next operation
+coalesces one fresh connection attempt through its completed handshake.
+`isOpen` is not treated as readiness: open-but-not-ready callers wait and
+dispatch nothing. Stdin end, `SIGINT`, and `SIGTERM` close the registry once,
+drain up to the configured timeout, cancel remaining work through a lane-owned
+shutdown epoch, detach listeners, and destroy only those owned clients. After
+the deadline every unsettled caller receives `COORDINATION_UNAVAILABLE`; late
+transport outcomes are consumed, and connecting/post-handshake cleanup is
+tracked separately for each connection generation.
 
 Redis 7 standalone with one shard is the supported V5 topology. Cluster,
 Sentinel, custom TLS CA/client-certificate settings, and automated ACL/TLS
@@ -277,7 +296,9 @@ participant metadata are excluded from coordination audit records.
 
 Do not stop or restart a shared MCP process to validate V5. Prove the build
 against an ephemeral Redis 7 instance with an isolated UUID-like prefix and
-opt-in test variables; never point live tests at a shared prefix and never use
-`FLUSHDB`. Existing Gateway processes keep their startup tool registry. Each
-client adopts the eight tools when it starts a new Gateway process (or
-reconnects in a mode that launches a fresh stdio process).
+the required `AGENTS_TEST_REDIS_URL` test variable; never point live tests at a
+shared prefix and never use `FLUSHDB`. The full CI gate reports missing Redis
+test infrastructure separately and returns nonzero. Existing Gateway processes
+keep their startup tool registry. Each client adopts the eight tools when it
+starts a new Gateway process (or reconnects in a mode that launches a fresh
+stdio process).

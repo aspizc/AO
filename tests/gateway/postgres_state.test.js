@@ -5,6 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { PostgresDatabase } from "../../gateway/src/core/postgres_db.js";
 import { initState, getDb, _resetForTests } from "../../gateway/src/core/state.js";
 import { createFakePostgresExecutor } from "./fake_postgres_executor.js";
 import { installRepositoryContractTests } from "./repository_contracts.js";
@@ -119,6 +120,49 @@ test("postgres_prepared_statements_keep_better_sqlite_shape", async () => {
   assert.ok(calls.some((sql) => sql.includes("status = 'completed'")));
   state._resetForTests();
 });
+
+for (const scenario of [
+  {
+    name: "UPDATE run returns one change",
+    statement: "UPDATE tasks SET status = ? WHERE task_id = ?",
+    params: ["completed", "task-1"],
+    changes: 1,
+    expectedSql:
+      "WITH changed AS (UPDATE tasks SET status = 'completed' WHERE task_id = 'task-1' RETURNING 1) " +
+      "SELECT COUNT(*)::int AS changes FROM changed",
+  },
+  {
+    name: "DELETE run returns zero changes",
+    statement: "DELETE FROM tasks WHERE task_id = @taskId",
+    params: [{ taskId: "missing-task" }],
+    changes: 0,
+    expectedSql:
+      "WITH changed AS (DELETE FROM tasks WHERE task_id = 'missing-task' RETURNING 1) " +
+      "SELECT COUNT(*)::int AS changes FROM changed",
+  },
+]) {
+  test(`postgres ${scenario.name} with a top-level data-modifying CTE`, () => {
+    const calls = [];
+    const db = new PostgresDatabase({
+      url: "postgres://offline/changes",
+      executor(sql) {
+        calls.push(sql);
+        assert.doesNotMatch(
+          sql,
+          /FROM \(\s*WITH changed AS \(\s*(?:UPDATE|DELETE)\b/i,
+          "Postgres rejects a data-modifying CTE nested in a derived table",
+        );
+        assert.equal(sql, scenario.expectedSql);
+        return `${scenario.changes}\n`;
+      },
+    });
+
+    const result = db.prepare(scenario.statement).run(...scenario.params);
+
+    assert.deepEqual(result, { changes: scenario.changes });
+    assert.deepEqual(calls, [scenario.expectedSql]);
+  });
+}
 
 test("postgres_migration_is_versioned_and_not_sqlite_specific", () => {
   const sql = fs.readFileSync(POSTGRES_MIGRATION, "utf-8");

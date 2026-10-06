@@ -110,11 +110,11 @@ test("coordination lease errors retain the exact safe field-specific limit", asy
 
   const result = await tools["coordination.register"].handler({
     participantType: "orchestrator",
-    leaseTtlMs: 3_600_001,
+    leaseTtlMs: 259_200_001,
   });
   assert.deepEqual(parse(result), {
     error: "COORDINATION_INVALID_INPUT",
-    message: "leaseTtlMs exceeds maximum 3600000",
+    message: "leaseTtlMs exceeds maximum 259200000",
     code: "COORDINATION_INVALID_INPUT",
   });
 });

@@ -1,0 +1,48 @@
+{
+  "$schema": "../../schemas/doctor-profile-v1.schema.json",
+  "schemaVersion": "doctor-profile/v1",
+  "profileId": "canonical-orchestrator",
+  "repository": "repository.json",
+  "plan": "plan.json",
+  "selections": [
+    {
+      "id": "planner",
+      "phase": "plan",
+      "agent": "codex",
+      "role": "planner",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "max",
+      "serviceTier": "priority",
+      "tools": [
+        "artifact.put",
+        "artifact.list"
+      ]
+    },
+    {
+      "id": "coder",
+      "phase": "execute",
+      "agent": "claude-code",
+      "role": "coder",
+      "model": "claude-fable-5",
+      "reasoningEffort": "max",
+      "serviceTier": null,
+      "tools": [
+        "artifact.put",
+        "artifact.list"
+      ]
+    },
+    {
+      "id": "tester",
+      "phase": "execute",
+      "agent": "codex",
+      "role": "tester",
+      "model": "gpt-5.6-terra",
+      "reasoningEffort": "high",
+      "serviceTier": "priority",
+      "tools": [
+        "artifact.put",
+        "artifact.list"
+      ]
+    }
+  ]
+}

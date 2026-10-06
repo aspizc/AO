@@ -36,6 +36,8 @@ def test_ci_script_runs_lint_gate():
         "cli",
         "orchestrator-langgraph",
         "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/release_candidate.py",
         "tests/structure",
     ]
     assert suites["lint.gateway"]["argv"] == [
@@ -52,12 +54,20 @@ def test_ci_script_is_executable():
     assert os.access(path, os.X_OK)
 
 
-def test_remote_ci_installs_tmux_for_the_required_session_test():
+def test_remote_ci_builds_pinned_tmux_for_required_retained_control_tests():
     workflow = (REPO / ".github" / "workflows" / "ci.yml").read_text(
         encoding="utf-8"
     )
 
-    assert "sudo apt-get install --yes tmux" in workflow
+    assert 'docker pull "$tmux_builder_image"' in workflow
+    assert "gateway/vendor/tmux-agents/manifest.json" in workflow
+    assert "https://github.com/tmux/tmux/releases/download/3.6a/tmux-3.6a.tar.gz" in workflow
+    assert "gateway/vendor/tmux-agents/build-offline.sh" in workflow
+    assert workflow.index("build-offline.sh") < workflow.index("tmux new-session")
+    assert 'echo "$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_PATH"' in workflow
+    assert 'echo "D007C_TEST_TMUX_PATH=$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_ENV"' in workflow
+    assert 'D007C_RUN_REAL_TMUX_PROBE: "1"' in workflow
+    assert "sudo apt-get install --yes tmux" not in workflow
     assert 'echo "TMUX_TMPDIR=$RUNNER_TEMP/ao-tmux" >> "$GITHUB_ENV"' in workflow
     assert "tmux new-session -d -s ao-ci-bootstrap" in workflow
     assert "if: always()" in workflow

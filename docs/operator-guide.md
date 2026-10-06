@@ -11,7 +11,9 @@ IDE.
   [runtime contract](node-runtime.md) (`node --version`).
 - Python 3.11 or newer (`python3 --version`).
 - [uv](https://docs.astral.sh/uv/) for the hash-checked Python lock.
-- tmux for supervised sessions.
+- The [pinned tmux runtime](tmux-runtime.md) for retained-control session tests
+  and compatible supervised sessions.
+- A disposable Redis 7 standalone instance for the required live CI lane.
 
 ## 2. Clone and install
 
@@ -38,17 +40,21 @@ command.
 ## 4. Run local CI
 
 ```bash
-./scripts/ci.sh
+AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
 ```
 
 All checks must pass before running orchestrations.
 The suite list, skip policy, dependency regeneration, and machine-readable
-result are defined by the [CI contract](ci-contract.md). The default gate does
-not contact Redis, Postgres, Temporal, or real agent providers.
+result are defined by the [CI contract](ci-contract.md). The default gate
+contacts only the disposable Redis 7 endpoint supplied through
+`AGENTS_TEST_REDIS_URL`; never use the shared coordination Redis. GitHub
+Actions provisions and health-checks this service automatically.
 Its final status can be `infrastructure_unavailable` with exit zero when every
 unavailable case is explicitly allowlisted; only `passed` means that no suite
-reported unavailable infrastructure. Suite timeouts and SIGINT/SIGTERM stop
-the owned child process group and still produce one JSON result.
+reported unavailable infrastructure. Missing required Redis readiness also
+uses `infrastructure_unavailable`, but returns nonzero. Suite timeouts and
+SIGINT/SIGTERM stop the owned child process group and still produce one JSON
+result.
 
 Optional local infrastructure for V1 experimental Postgres and Redis Streams
 work lives in [`../docker/docker-compose.yml`](../docker/docker-compose.yml).
@@ -88,6 +94,13 @@ node ./gateway/src/mcp_server.js
 Use `agents-gateway` as the MCP server name. See
 [`../client-config/mcp.json.example`](../client-config/mcp.json.example) for
 the generic configuration example.
+
+The process owns its coordination command/blocking Redis clients. End stdin or
+send `SIGINT`/`SIGTERM` for an orderly stop; the Gateway stops admission,
+drains for `AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS` (2 seconds by default),
+settles any remaining caller as `COORDINATION_UNAVAILABLE`, consumes late
+transport outcomes, and releases listeners/sockets. Do not restart or stop a
+Redis server merely to close a Gateway.
 
 Adapting this example to a specific IDE or host format is out of scope for
 this project.
@@ -137,6 +150,13 @@ From any MCP client, call the tools in this shape:
 In dry-run mode the Gateway returns deterministic mock responses. It must not
 require real network access or real agent CLI execution.
 
+The agent, role, repository, trace, task, and cwd fields in these public calls
+are assertions, not authority. The Gateway binds them to the task and canonical
+repository server-side. An internal execution binding cannot be cloned or
+reused for another spawn/delegate tuple; mismatches return
+`REQUEST_CONTEXT_DENIED` before adapter lookup, session persistence, model
+resolution audit, or launch. This does not change the public MCP arguments.
+
 Inspect the audit:
 
 ```bash
@@ -164,7 +184,10 @@ Gateway launch with `AGENTS_AUTOAPPROVE=scope1,scope2`; see
 [`ADR-006`](adr/ADR-006-bounded-autoapprove.md). Auto-granted approvals emit
 `APPROVAL_AUTO_GRANTED` with `decidedBy: "operator-autonomous-mode"`.
 `git.push.protected`, `dependency.change`, `code.write.protected_branch`, and
-restricted contexts always require a human decision.
+restricted contexts always require a human decision. Repository-affecting
+auto-approval also requires one server-owned task, canonical repository, and
+known repository classification in the current request context; omitted,
+ambiguous, or caller-invented lineage never becomes authority.
 
 ## 9. Troubleshooting
 

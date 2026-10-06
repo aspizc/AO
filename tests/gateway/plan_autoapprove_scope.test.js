@@ -23,7 +23,12 @@ test("plan_apply_pending_when_scope_absent", async () => {
     traceId: "tr-plan-apply-default",
     action: "plan.apply",
     requestedBy: "orchestrator",
-    context: { repo: "agents-orchestrator", scope: "plan/**" },
+    context: {
+      taskId: "ts-plan-auto",
+      repo: "agents-orchestrator",
+      classification: "internal",
+      scope: "plan/**",
+    },
     config: { autoApproveScopes: [] },
   });
   const autoGrants = await query({ traceId: "tr-plan-apply-default", type: "APPROVAL_AUTO_GRANTED" });
@@ -39,7 +44,12 @@ test("plan_apply_auto_granted_when_scope_present", async () => {
     traceId: "tr-plan-apply-auto",
     action: "plan.apply",
     requestedBy: "orchestrator",
-    context: { repo: "agents-orchestrator", scope: "plan/**" },
+    context: {
+      taskId: "ts-plan-auto",
+      repo: "agents-orchestrator",
+      classification: "internal",
+      scope: "plan/**",
+    },
     config: { autoApproveScopes: ["plan.apply"] },
   });
   const autoGrants = await query({ traceId: "tr-plan-apply-auto", type: "APPROVAL_AUTO_GRANTED" });

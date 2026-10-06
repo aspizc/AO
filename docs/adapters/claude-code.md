@@ -6,7 +6,6 @@ This document captures the Claude Code CLI contract used by
 ## Binary
 
 - Default: `claude` (configurable via `AGENTS_CLAUDE_BIN`).
-- Local path observed during O/0/0 research: `/home/carase/.local/bin/claude`.
 - Tested version: `2.1.207 (Claude Code)`.
 
 ## Headless mode
@@ -38,9 +37,10 @@ Notes:
 - `--effort <level>` is set from the policy-resolved reasoning effort. The
   default registry selects `max`; Claude Code requires this session-only level
   on each launch.
-- Allowed canonical models are `claude-fable-5`, `claude-opus-5`, and
-  `claude-opus-4-8`; aliases `fable` and `opus` resolve to `claude-fable-5` and
-  `claude-opus-5` before launch.
+- Allowed canonical models are `claude-sonnet-5`, `claude-fable-5-1`,
+  `claude-fable-5`, `claude-opus-5`, and `claude-opus-4-8`. The default remains
+  `claude-fable-5`; aliases `sonnet`, `fable`, and `opus` resolve to
+  `claude-sonnet-5`, `claude-fable-5`, and `claude-opus-5` before launch.
 - Do not use `--dangerously-skip-permissions` or
   `--allow-dangerously-skip-permissions` in the adapter.
 

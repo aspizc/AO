@@ -50,7 +50,14 @@ test("planner remains denied code write and agent spawn", () => {
 test("claude coder can write plans in agents-orchestrator internal repo", () => {
   const repo = reg.getRepo("agents-orchestrator");
   assert.equal(repo.classification, "internal");
-  assert.deepEqual(repo.allowedAgents, ["gemini-cli", "claude-code", "codex"]);
+  assert.deepEqual(repo.allowedAgents, [
+    "antigravity",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "opencode",
+    "pi",
+  ]);
   assert.deepEqual(repo.tags, ["self", "planning"]);
 
   const result = evaluate(
@@ -70,11 +77,17 @@ test("planner cannot write even in agents-orchestrator", () => {
   assert.equal(result.ruleId, "role.deny_action");
 });
 
-test("restricted repositories remain gemini and codex only", () => {
+test("restricted repositories preserve the existing gemini and codex allowlist", () => {
   for (const repoId of ["cvision", "cvlib"]) {
     const repo = reg.getRepo(repoId);
 
     assert.equal(repo.classification, "restricted");
     assert.deepEqual(repo.allowedAgents, ["gemini-cli", "codex"]);
+    const result = evaluate(
+      { agent: "antigravity", role: "coder", repo: repoId, action: "agent.spawn" },
+      reg,
+    );
+    assert.equal(result.decision, "deny");
+    assert.equal(result.ruleId, "classification.repo_not_allowed");
   }
 });

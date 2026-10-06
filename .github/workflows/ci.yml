@@ -18,6 +18,19 @@ jobs:
     name: Local CI gate (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      AGENTS_TEST_REDIS_URL: redis://127.0.0.1:6379/0
+      D007C_RUN_REAL_TMUX_PROBE: "1"
+    services:
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - "6379:6379"
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 30
     strategy:
       fail-fast: false
       matrix:
@@ -48,10 +61,19 @@ jobs:
           enable-cache: true
           cache-dependency-glob: requirements.lock
 
-      - name: Install tmux
+      - name: Build pinned tmux runtime
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes tmux
+          tmux_builder_image=$(python -c "import json; print(json.load(open('gateway/vendor/tmux-agents/manifest.json'))['offlineLinuxBuilder']['image'])")
+          docker pull "$tmux_builder_image"
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 \
+            https://github.com/tmux/tmux/releases/download/3.6a/tmux-3.6a.tar.gz \
+            --output "$RUNNER_TEMP/tmux-3.6a.tar.gz"
+          gateway/vendor/tmux-agents/build-offline.sh \
+            "$RUNNER_TEMP/tmux-3.6a.tar.gz" "$RUNNER_TEMP/ao-tools"
+          mkdir -p "$RUNNER_TEMP/ao-tools/bin"
+          ln -s ../tmux-3.6a-agents.1-linux-amd64 "$RUNNER_TEMP/ao-tools/bin/tmux"
+          echo "$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_PATH"
+          echo "D007C_TEST_TMUX_PATH=$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_ENV"
 
       - name: Prepare isolated tmux server
         run: |

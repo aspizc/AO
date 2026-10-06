@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 import { startMcpClient } from "./helpers/mcp_client.js";
+import { ORCHESTRATOR_PROFILE_DIGEST } from "../../gateway/src/core/orchestrator_profile.js";
 
 const SECRET = "AKIAFAKEKEY1234";
 
@@ -34,18 +35,33 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
     const { body: coderTask } = await client.callTool("task.assign", {
       traceId: orchestration.traceId,
       caller: { agent: "claude-code", role: "orchestrator" },
-      target: { agent: "gemini-cli", role: "restricted-coder", action: "code.write" },
+      target: { agent: "codex", role: "restricted-coder", action: "code.write" },
       repo: "cvision",
       brief: "Apply parser fix",
     });
 
     const { body: coderSession } = await client.callTool("agent.spawn", {
-      agent: "gemini-cli",
+      agent: "codex",
       role: "restricted-coder",
       repo: "cvision",
       cwd: client.paths.cvisionRepo,
       traceId: orchestration.traceId,
       taskId: coderTask.taskId,
+    });
+    assert.deepEqual(coderSession.effectiveSelection, {
+      contractVersion: 1,
+      profileId: "canonical-orchestrator",
+      agent: "codex",
+      provider: "codex",
+      model: "gpt-5.6-sol",
+      reasoningEffort: "max",
+      serviceTier: "priority",
+      resolutionSource: {
+        model: "agent-default",
+        reasoningEffort: "model-default",
+        serviceTier: "agent-default",
+      },
+      registryDigest: ORCHESTRATOR_PROFILE_DIGEST,
     });
 
     const { body: rawArtifact } = await client.callTool("artifact.put", {
@@ -74,7 +90,7 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
     const { body: reviewerArtifact } = await client.callTool("artifact.get", {
       artifactId: sharedForReviewer.sharedArtifactId,
       requesterAgent: "claude-code",
-      requesterRole: "reviewer",
+      requesterRole: "orchestrator",
     });
     assert.equal(reviewerArtifact.classification, "internal");
     assert.ok(!reviewerArtifact.content.includes(SECRET));
@@ -111,7 +127,7 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
       traceId: orchestration.traceId,
       action: "git.push.protected",
       requestedBy: "claude-code",
-      context: { branch: "main" },
+      context: { branch: "main", taskId: coderTask.taskId, repo: "cvision" },
     });
     assert.equal(approval.status, "pending");
 
@@ -121,7 +137,7 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
       decidedBy: "operator-cli",
       note: "sanitized review accepted",
     });
-    assert.equal(decision.status, "granted");
+    assert.equal(decision.error, "REQUEST_CONTEXT_DENIED");
 
     await client.callTool("agent.kill", {
       sessionId: coderSession.sessionId,
@@ -139,19 +155,18 @@ test("orchestrator runs coder and reviewer through real MCP stdio", async () => 
       "SANITIZATION_APPLIED",
       "ARTIFACT_SHARED",
       "APPROVAL_REQUIRED",
-      "APPROVAL_GRANTED",
       "ORCHESTRATION_COMPLETED",
     ]) {
       assert.ok(eventTypes.has(eventType), `missing audit event ${eventType}`);
     }
 
     const sessions = events.filter((event) => event.type === "SESSION_STARTED");
-    assert.ok(sessions.some((event) => event.agent === "gemini-cli" && event.role === "restricted-coder"));
+    assert.ok(sessions.some((event) => event.agent === "codex" && event.role === "restricted-coder"));
     assert.ok(sessions.some((event) => event.agent === "claude-code" && event.role === "reviewer"));
 
     const visiblePayloads = [JSON.stringify(rawForOrchestrator), JSON.stringify(reviewerArtifact), reviewerSession.stdout];
     assert.ok(visiblePayloads.every((payload) => !payload.includes(SECRET)));
   } finally {
-    client.cleanup();
+    await client.cleanup();
   }
 });

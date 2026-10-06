@@ -67,9 +67,13 @@ test("coordination_config_has_bounded_defaults_and_reuses_the_shared_redis_url",
   assert.equal(config.coordinationPrefix, "agents:coord:v1");
   assert.equal(config.coordinationScopeId, "agents-orchestrator");
   assert.equal(config.coordinationLeaseDefaultMs, 900_000);
-  assert.equal(config.coordinationLeaseMaxMs, 3_600_000);
+  assert.equal(config.coordinationLeaseMaxMs, 259_200_000);
   assert.equal(config.coordinationInboxMaxLen, 10_000);
   assert.equal(config.coordinationMaxBlockMs, 30_000);
+  assert.equal(config.coordinationCommandConcurrency, 64);
+  assert.equal(config.coordinationCommandQueueMax, 256);
+  assert.equal(config.coordinationBlockingQueueMax, 32);
+  assert.equal(config.coordinationShutdownTimeoutMs, 2_000);
   assert.equal(config.coordinationMessageMaxBytes, 65_536);
   assert.equal(config.coordinationDedupeTtlMs, 86_400_000);
   assert.equal(config.coordinationAckTombstoneTtlMs, 86_400_000);
@@ -86,6 +90,10 @@ test("coordination_config_loads_explicit_url_and_bounded_setting_overrides", () 
     AGENTS_COORDINATION_LEASE_MAX_MS: "600000",
     AGENTS_COORDINATION_INBOX_MAX_LEN: "2500",
     AGENTS_COORDINATION_MAX_BLOCK_MS: "5000",
+    AGENTS_COORDINATION_COMMAND_CONCURRENCY: "12",
+    AGENTS_COORDINATION_COMMAND_QUEUE_MAX: "48",
+    AGENTS_COORDINATION_BLOCKING_QUEUE_MAX: "6",
+    AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS: "750",
     AGENTS_COORDINATION_MESSAGE_MAX_BYTES: "32768",
     AGENTS_COORDINATION_DEDUPE_TTL_MS: "7200000",
     AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS: "3600000",
@@ -99,6 +107,10 @@ test("coordination_config_loads_explicit_url_and_bounded_setting_overrides", () 
   assert.equal(config.coordinationLeaseMaxMs, 600_000);
   assert.equal(config.coordinationInboxMaxLen, 2_500);
   assert.equal(config.coordinationMaxBlockMs, 5_000);
+  assert.equal(config.coordinationCommandConcurrency, 12);
+  assert.equal(config.coordinationCommandQueueMax, 48);
+  assert.equal(config.coordinationBlockingQueueMax, 6);
+  assert.equal(config.coordinationShutdownTimeoutMs, 750);
   assert.equal(config.coordinationMessageMaxBytes, 32_768);
   assert.equal(config.coordinationDedupeTtlMs, 7_200_000);
   assert.equal(config.coordinationAckTombstoneTtlMs, 3_600_000);
@@ -123,6 +135,10 @@ test("coordination_config_rejects_invalid_or_non_positive_integer_settings", () 
     "AGENTS_COORDINATION_LEASE_MAX_MS",
     "AGENTS_COORDINATION_INBOX_MAX_LEN",
     "AGENTS_COORDINATION_MAX_BLOCK_MS",
+    "AGENTS_COORDINATION_COMMAND_CONCURRENCY",
+    "AGENTS_COORDINATION_COMMAND_QUEUE_MAX",
+    "AGENTS_COORDINATION_BLOCKING_QUEUE_MAX",
+    "AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS",
     "AGENTS_COORDINATION_MESSAGE_MAX_BYTES",
     "AGENTS_COORDINATION_DEDUPE_TTL_MS",
     "AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS",
@@ -166,9 +182,9 @@ test("coordination_config_rejects_a_lease_maximum_above_the_v1_contract", () => 
   assert.throws(
     () =>
       loadConfig({
-        AGENTS_COORDINATION_LEASE_MAX_MS: "3600001",
+        AGENTS_COORDINATION_LEASE_MAX_MS: "259200001",
       }),
-    /AGENTS_COORDINATION_LEASE_MAX_MS must not exceed 3600000/,
+    /AGENTS_COORDINATION_LEASE_MAX_MS must not exceed 259200000/,
   );
 });
 
@@ -208,6 +224,20 @@ test("codex_binary_and_sandbox_defaults_and_overrides", () => {
   assert.equal(overrideConfig.codexSandbox, "read-only");
 });
 
+test("antigravity_binary_defaults_and_overrides", () => {
+  const defaultConfig = loadConfig({});
+  const overrideConfig = loadConfig({
+    AGENTS_ANTIGRAVITY_BIN: "/opt/agy/bin/agy",
+  });
+  const aliasOverrideConfig = loadConfig({
+    AGENTS_AGY_BIN: "/opt/custom/agy",
+  });
+
+  assert.equal(defaultConfig.antigravityBin, "agy");
+  assert.equal(overrideConfig.antigravityBin, "/opt/agy/bin/agy");
+  assert.equal(aliasOverrideConfig.antigravityBin, "/opt/custom/agy");
+});
+
 test("repo_roots_are_colon_separated", () => {
   const config = loadConfig({ AGENTS_REPO_ROOTS: "/repo/a:/repo/b" });
 
@@ -229,4 +259,13 @@ test("message access secret env override wins", () => {
   const config = loadConfig({ AGENTS_MESSAGE_ACCESS_SECRET: "operator-secret" });
 
   assert.equal(config.messageAccessSecret, "operator-secret");
+});
+
+
+test("antigravity permission bypass is opt-in with the exact environment value 1", () => {
+  assert.equal(loadConfig({}).antigravityAuto, false);
+  assert.equal(loadConfig({ AGENTS_ANTIGRAVITY_AUTO: "1" }).antigravityAuto, true);
+  for (const value of ["0", "true", "false", ""]) {
+    assert.equal(loadConfig({ AGENTS_ANTIGRAVITY_AUTO: value }).antigravityAuto, false);
+  }
 });

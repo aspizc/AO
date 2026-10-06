@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/orchestrator-profile-v1.schema.json",
+  "title": "Canonical orchestrator profile",
+  "type": "object",
+  "required": [
+    "$schema",
+    "version",
+    "profileId",
+    "roles",
+    "providers",
+    "prerequisites",
+    "workflows",
+    "toolGuidance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "version": { "const": 1 },
+    "profileId": { "const": "canonical-orchestrator" },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "providers": {
+      "type": "object",
+      "required": ["codex", "claude-code", "gemini-cli", "antigravity", "pi", "opencode"],
+      "additionalProperties": false,
+      "properties": {
+        "codex": { "$ref": "#/$defs/provider" },
+        "claude-code": { "$ref": "#/$defs/provider" },
+        "gemini-cli": { "$ref": "#/$defs/provider" },
+        "antigravity": { "$ref": "#/$defs/provider" },
+        "pi": { "$ref": "#/$defs/provider" },
+        "opencode": { "$ref": "#/$defs/provider" }
+      }
+    },
+    "prerequisites": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/prerequisite" }
+    },
+    "workflows": {
+      "type": "object",
+      "required": ["plan", "execute", "coordinate", "review", "recovery", "completion"],
+      "additionalProperties": false,
+      "properties": {
+        "plan": { "$ref": "#/$defs/workflow" },
+        "execute": { "$ref": "#/$defs/workflow" },
+        "coordinate": { "$ref": "#/$defs/workflow" },
+        "review": { "$ref": "#/$defs/workflow" },
+        "recovery": { "$ref": "#/$defs/workflow" },
+        "completion": { "$ref": "#/$defs/workflow" }
+      }
+    },
+    "toolGuidance": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/toolGuidance" }
+    }
+  },
+  "$defs": {
+    "nullableString": {
+      "type": ["string", "null"]
+    },
+    "nullableStringArray": {
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        { "type": "null" }
+      ]
+    },
+    "model": {
+      "type": "object",
+      "required": ["reasoningEfforts", "defaultReasoningEffort"],
+      "additionalProperties": false,
+      "properties": {
+        "reasoningEfforts": { "$ref": "#/$defs/nullableStringArray" },
+        "defaultReasoningEffort": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "required": [
+        "agent",
+        "provider",
+        "execution",
+        "argvOwner",
+        "aliases",
+        "defaultModel",
+        "defaultReasoningEffort",
+        "serviceTiers",
+        "defaultServiceTier",
+        "models"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "provider": { "type": "string", "minLength": 1 },
+        "execution": { "enum": ["available", "registry-only"] },
+        "argvOwner": { "type": "string", "minLength": 1 },
+        "aliases": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "defaultModel": { "type": "string", "minLength": 1 },
+        "defaultReasoningEffort": { "$ref": "#/$defs/nullableString" },
+        "serviceTiers": { "$ref": "#/$defs/nullableStringArray" },
+        "defaultServiceTier": { "$ref": "#/$defs/nullableString" },
+        "models": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/model" }
+        }
+      }
+    },
+    "prerequisite": {
+      "type": "object",
+      "required": ["availability", "capability"],
+      "additionalProperties": false,
+      "properties": {
+        "availability": { "const": "unavailable" },
+        "capability": { "type": "string", "minLength": 1 }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": ["promptId", "instruction", "tools", "artifacts", "prerequisites"],
+      "additionalProperties": false,
+      "properties": {
+        "promptId": { "type": "string", "pattern": "^orchestrator\\.[a-z]+\\.v1$" },
+        "instruction": { "type": "string", "minLength": 20 },
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "prerequisites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "toolGuidance": {
+      "type": "object",
+      "required": [
+        "effect",
+        "risk",
+        "destructive",
+        "idempotency",
+        "retry",
+        "protectedEffect"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "effect": { "enum": ["read", "mutation"] },
+        "risk": { "enum": ["low", "medium", "high", "critical"] },
+        "destructive": { "type": "boolean" },
+        "idempotency": {
+          "enum": ["read-only", "natural", "caller-keyed", "operation-key", "none"]
+        },
+        "retry": { "enum": ["safe", "poll", "same-input-only", "never"] },
+        "protectedEffect": { "type": "boolean" }
+      }
+    }
+  }
+}

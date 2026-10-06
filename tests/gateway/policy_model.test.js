@@ -100,7 +100,7 @@ test("allowed_model_resolves_ok", () => {
   assert.equal(claude.model, "claude-opus-4-8");
 });
 
-test("disallowed_model_denied_with_reason", () => {
+test("disallowed_model_denied_with_safe_reason_and_metadata", () => {
   const result = evaluate(
     {
       agent: "claude-code",
@@ -114,10 +114,15 @@ test("disallowed_model_denied_with_reason", () => {
 
   assert.equal(result.decision, "deny");
   assert.equal(result.ruleId, "agent.model.allowed");
-  assert.match(result.reason, /model gpt-5 not allowed for agent claude-code/);
+  assert.equal(result.reason, "effective agent selection rejected");
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_MODEL_UNSUPPORTED",
+    field: "model",
+    provider: "claude-code",
+  });
 });
 
-test("codex defaults to gpt-5.6-sol max on the priority service tier", () => {
+test("codex preserves the public sol max priority defaults", () => {
   const result = evaluate(
     { agent: "codex", role: "coder", repo: "sample-apps", action: "agent.delegate" },
     reg,
@@ -145,6 +150,51 @@ test("gpt-5.6 alias resolves to the canonical sol model", () => {
   assert.equal(result.model, "gpt-5.6-sol");
   assert.equal(result.reasoningEffort, "max");
   assert.equal(result.serviceTier, "priority");
+});
+
+test("astra alias resolves to gpt-6-astra and accepts every effort up to ultra", () => {
+  const aliasResult = evaluate(
+    {
+      agent: "codex",
+      role: "coder",
+      repo: "sample-apps",
+      action: "agent.delegate",
+      model: "astra",
+    },
+    reg,
+  );
+  const ultraResult = evaluate(
+    {
+      agent: "codex",
+      role: "coder",
+      repo: "sample-apps",
+      action: "agent.delegate",
+      model: "gpt-6",
+      reasoningEffort: "ultra",
+    },
+    reg,
+  );
+  const lowResult = evaluate(
+    {
+      agent: "codex",
+      role: "coder",
+      repo: "sample-apps",
+      action: "agent.delegate",
+      model: "gpt-6-astra",
+      reasoningEffort: "low",
+    },
+    reg,
+  );
+
+  assert.equal(aliasResult.decision, "allow");
+  assert.equal(aliasResult.model, "gpt-6-astra");
+  assert.equal(aliasResult.reasoningEffort, "max");
+  assert.equal(aliasResult.serviceTier, "priority");
+  assert.equal(ultraResult.decision, "allow");
+  assert.equal(ultraResult.model, "gpt-6-astra");
+  assert.equal(ultraResult.reasoningEffort, "ultra");
+  assert.equal(lowResult.decision, "allow");
+  assert.equal(lowResult.reasoningEffort, "low");
 });
 
 test("claude aliases resolve to current canonical models", () => {
@@ -252,7 +302,7 @@ test("reasoning effort is denied for agents that do not declare it", () => {
   assert.equal(result.ruleId, "agent.reasoning_effort.allowed");
 });
 
-test("disallowed_reasoning_effort_denied", () => {
+test("disallowed_reasoning_effort_denied_without_echoing_it", () => {
   const result = evaluate(
     {
       agent: "codex",
@@ -266,10 +316,16 @@ test("disallowed_reasoning_effort_denied", () => {
 
   assert.equal(result.decision, "deny");
   assert.equal(result.ruleId, "agent.reasoning_effort.allowed");
-  assert.match(result.reason, /reasoning effort extreme not allowed for agent codex/);
+  assert.equal(result.reason, "effective agent selection rejected");
+  assert.equal(result.reason.includes("extreme"), false);
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_REASONING_UNSUPPORTED",
+    field: "reasoningEffort",
+    provider: "codex",
+  });
 });
 
-test("agent_without_models_block_keeps_validating", () => {
+test("agent_without_canonical_profile_fails_closed", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "model-reg-"));
   fs.writeFileSync(
     path.join(tmp, "agent-capabilities.json"),
@@ -320,6 +376,12 @@ test("agent_without_models_block_keeps_validating", () => {
     legacy,
   );
 
-  assert.equal(result.decision, "allow");
+  assert.equal(result.decision, "deny");
+  assert.equal(result.ruleId, "agent.model.allowed");
   assert.equal(result.model, undefined);
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_REGISTRY_DRIFT",
+    field: "registry",
+    provider: null,
+  });
 });

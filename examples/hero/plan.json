@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "hero-plan/v1",
+  "planId": "synthetic-greeting",
+  "repositoryId": "sample-apps",
+  "goal": "Make one bounded wording change to the synthetic status message and verify the rendered source.",
+  "steps": [
+    {
+      "id": "draft-change",
+      "selectionId": "planner",
+      "target": "app/index.html",
+      "instruction": "Describe the exact status-message change without modifying the application.",
+      "expectedArtifact": "plan"
+    },
+    {
+      "id": "apply-change",
+      "selectionId": "coder",
+      "target": "app/index.html",
+      "instruction": "Apply only the planned status-message change to the static application.",
+      "expectedArtifact": "raw_diff"
+    },
+    {
+      "id": "verify-change",
+      "selectionId": "tester",
+      "target": "app/index.html",
+      "instruction": "Verify that the requested status message is present and that the HTML remains well formed.",
+      "expectedArtifact": "test_report"
+    }
+  ]
+}

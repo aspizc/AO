@@ -140,11 +140,20 @@ test("role deny action matches action prefix", () => {
   assertDecision(result, "deny", "role.deny_action");
 });
 
-test("unknown action default-allows when all registry layers pass", () => {
-  // Characterizes audit finding S2: unknown actions currently fall through to allow.
+test("unknown action is denied by the closed action layer", () => {
   const result = explain(baseContext({ action: "foo.bar" }), reg);
 
-  assertDecision(result, "allow", "ok");
+  assertDecision(result, "deny", "action.unknown");
+  assert.deepEqual(
+    result.layers.map((layer) => layer.name),
+    ["action"],
+  );
+});
+
+test("missing action is denied by the closed action layer", () => {
+  const result = explain(baseContext({ action: undefined }), reg);
+
+  assertDecision(result, "deny", "action.unknown");
 });
 
 test("unknown agent is denied by classification first", () => {
@@ -159,32 +168,48 @@ test("unknown repo is denied by classification first", () => {
   assertDecision(result, "deny", "repo.unknown");
 });
 
-test("delegation denies a model outside the agent allowlist", () => {
+test("delegation rejects a noncanonical provider before its registry model can apply", () => {
   const result = evaluate(baseContext({ action: "agent.delegate", model: "gpt-other" }), reg);
 
   assertDecision(result, "deny", "agent.model.allowed");
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_REGISTRY_DRIFT",
+    field: "registry",
+    provider: null,
+  });
 });
 
-test("delegation resolves the default model when omitted", () => {
+test("delegation does not resolve defaults from a noncanonical registry", () => {
   const result = evaluate(baseContext({ action: "agent.delegate" }), reg);
 
-  assertDecision(result, "allow", "ok");
-  assert.equal(result.model, "gpt-test-default");
+  assertDecision(result, "deny", "agent.model.allowed");
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_REGISTRY_DRIFT",
+    field: "registry",
+    provider: null,
+  });
+  assert.equal(result.model, undefined);
 });
 
-test("delegation denies reasoning effort outside the agent allowlist", () => {
+test("noncanonical registry effort values cannot become a selection authority", () => {
   const result = evaluate(baseContext({ action: "agent.delegate", reasoningEffort: "extreme" }), reg);
 
-  assertDecision(result, "deny", "agent.reasoning_effort.allowed");
+  assertDecision(result, "deny", "agent.model.allowed");
+  assert.deepEqual(result.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_REGISTRY_DRIFT",
+    field: "registry",
+    provider: null,
+  });
+  assert.equal(result.reasoningEffort, undefined);
 });
 
-test("explain includes all five layers in order when policy allows", () => {
+test("explain includes every layer in order when policy allows", () => {
   const result = explain(baseContext({ action: "artifact.get", artifactKind: "review_notes" }), reg);
 
   assertDecision(result, "allow", "ok");
   assert.deepEqual(
     result.layers.map((layer) => layer.name),
-    ["classification", "model", "role", "approval", "sanitization"],
+    ["action", "classification", "model", "role", "approval", "sanitization"],
   );
 });
 
@@ -194,6 +219,6 @@ test("explain stops after classification deny without evaluating later layers", 
   assertDecision(result, "deny", "classification.excluded_path");
   assert.deepEqual(
     result.layers.map((layer) => layer.name),
-    ["classification"],
+    ["action", "classification"],
   );
 });

@@ -29,8 +29,8 @@ function fakeRegistries({
       defaultModel: "gpt-5.6-sol",
       reasoningEfforts: ["low", "medium", "high", "max"],
       defaultReasoningEffort: "max",
-      serviceTiers: ["priority"],
-      defaultServiceTier: "priority",
+      serviceTiers: ["default", "priority"],
+      defaultServiceTier: "default",
       allowedClassifications: ["unrestricted", "internal", "restricted"],
       allowedRoles: ["planner", "coder", "restricted-coder", "reviewer", "tester"],
       requiresApprovalFor: [],
@@ -162,6 +162,30 @@ test("enabled dry run delegate reports model effort sandbox and cwd", async () =
   assert.match(result.stdout, new RegExp(`cwd=${root}`));
 });
 
+test("an unrequested tier preserves the public priority default", async () => {
+  const { root } = setup();
+  const argvFile = path.join(root, "argv.json");
+  const subject = adapter(root, {
+    enabled: true,
+    dryRun: false,
+    codexBin: fakeCodexBin(root, argvFile),
+    codexSandbox: "workspace-write",
+    adapterTimeoutMs: 1000,
+  });
+
+  const result = await subject.delegate({
+    cwd: root,
+    prompt: "implement",
+    traceId: "tr-codex-default-tier",
+    role: "coder",
+  });
+  const argv = JSON.parse(fs.readFileSync(argvFile, "utf-8"));
+
+  assert.equal(result.serviceTier, "priority");
+  assert.ok(argv.includes('service_tier="priority"'));
+  assert.ok(!argv.includes('service_tier="default"'));
+});
+
 test("enabled real delegate invokes fake codex exec with model effort sandbox and cwd", async () => {
   const { root } = setup();
   const argvFile = path.join(root, "argv.json");
@@ -215,7 +239,7 @@ test("enabled delegate still applies policy", async () => {
         traceId: "tr-codex-policy",
         role: "coder",
       }),
-    /policy denied/,
+    /request denied by policy/,
   );
 });
 
@@ -333,7 +357,16 @@ test("disallowed model is denied before process", async () => {
         model: "claude-opus-4-8",
         reasoningEffort: "medium",
       }),
-    /model claude-opus-4-8 not allowed/,
+    (error) => {
+      assert.equal(error.code, "POLICY_DENIED");
+      assert.equal(error.message, "request denied by policy");
+      assert.deepEqual(error.decision.selectionRejection, {
+        code: "EFFECTIVE_SELECTION_MODEL_UNSUPPORTED",
+        field: "model",
+        provider: "codex",
+      });
+      return true;
+    },
   );
   assert.equal(fs.existsSync(argvFile), false);
 });

@@ -43,7 +43,7 @@ test("orchestration tools create and view sessions", async () => {
   assert.equal(viewed.session.session_id, created.sessionId);
 });
 
-test("orchestration lifecycle tools update status", async () => {
+test("orchestration lifecycle tools defer cancellation without an observed outcome", async () => {
   fresh();
   const tools = Object.fromEntries(buildOrchestrationTools().map((tool) => [tool.name, tool]));
   const created = parseToolResult(
@@ -52,7 +52,25 @@ test("orchestration lifecycle tools update status", async () => {
 
   assert.equal(parseToolResult(await tools["orchestration.pause"].handler({ traceId: created.traceId })).status, "paused");
   assert.equal(parseToolResult(await tools["orchestration.resume"].handler({ traceId: created.traceId })).status, "active");
-  assert.equal(parseToolResult(await tools["orchestration.cancel"].handler({ traceId: created.traceId })).status, "cancelled");
+
+  const cancelResult = await tools["orchestration.cancel"].handler({ traceId: created.traceId });
+  assert.equal(cancelResult.isError, true);
+  assert.deepEqual(parseToolResult(cancelResult), {
+    error: "TOOL_ERROR",
+    code: "TOOL_ERROR",
+    message: "tool operation failed",
+  });
+
+  const viewed = parseToolResult(
+    await tools["orchestration.view"].handler({ traceId: created.traceId }),
+  );
+  assert.equal(viewed.session.status, "active");
+
+  const events = await queryAudit({ traceId: created.traceId });
+  assert.deepEqual(
+    events.map((event) => event.type),
+    ["ORCHESTRATION_CREATED", "ORCHESTRATION_PAUSED", "ORCHESTRATION_RESUMED"],
+  );
 });
 
 test("task assign tool delegates to service and preserves audit", async () => {

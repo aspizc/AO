@@ -61,8 +61,9 @@ test(
       socket: { reconnectStrategy: false },
     });
     await raw.connect();
+    let queue;
     try {
-      const queue = createRedisCoordinationQueue({ redisUrl, prefix });
+      queue = createRedisCoordinationQueue({ redisUrl, prefix });
       const registerRecord = participant("pt-register");
       await raw.sendCommand([
         "XADD",
@@ -142,6 +143,7 @@ test(
         -1,
       );
     } finally {
+      await queue?.close();
       await exactPrefixCleanup(raw, prefix);
       raw.destroy();
     }

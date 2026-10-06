@@ -10,6 +10,7 @@ from pathlib import Path
 
 import typer
 
+from .doctor_command import doctor
 from .output import (
     emit,
     fail,
@@ -36,6 +37,7 @@ audit_app = typer.Typer(help="Inspect the local audit log.")
 
 app.add_typer(policy_app, name="policy")
 app.add_typer(audit_app, name="audit")
+app.command("doctor")(doctor)
 
 
 def _version() -> str:

@@ -4,9 +4,14 @@ Estado: **G-1/G0 autorizados; ejecución canónica por absorción V5 activa**. E
 worktrees preliminares M0/0/00–01 basados en `develop@bfab1fb`, pero la línea
 canónica avanzó más allá de `d521afb` y `main`/`develop` se alinearon localmente
 después de la auditoría. Sus manifests/reviews son evidencia histórica y no
-cierran ninguna tarea del plan revisado. La decisión exacta del owner, base y
-límites de promoción se registra en [`PLAN_APPROVAL.md`](PLAN_APPROVAL.md);
-tag, push y publicación siguen fuera de alcance.
+cierran por sí solos ninguna tarea del plan revisado. La evidencia V5 posterior
+sí deja M0/4/00 absorbida y M0/0/00, M0/3/00, M0/4/01, M0/4/02 y E/0/00
+parciales, según el
+[ledger de absorción](../PROJECT_V5/V4_ABSORPTION.md). V5 conserva la
+propiedad de toda implementación restante; no se programan ramas ni reviews V4
+duplicadas. La decisión exacta del owner, base y límites de promoción se
+registra en [`PLAN_APPROVAL.md`](PLAN_APPROVAL.md); tag, push y publicación
+siguen fuera de alcance.
 
 V4 remedia las auditorias 2026-06-19/2026-07-11 y la revalidacion integral
 2026-07-26. El objetivo es que un host o
@@ -25,7 +30,9 @@ las [12 hojas de épica](epics/README.md) y en los 72 ficheros atómicos
    anterior y los worktrees preliminares quedan, sin rebase, como evidencia.
 2. G0 autoriza ejecutar una sola línea de integración V5 desde ese baseline.
    Las 72 hojas V4 se cierran mediante el ledger de absorción, no duplicando
-   ramas de producto.
+   ramas de producto. La reconciliación actual registra 1 hoja absorbida, 5
+   parciales y 66 planificadas. Las 71 no terminales se cierran mediante 45
+   hojas V5 abiertas, no mediante 71 implementaciones adicionales.
 3. Cada task branch nace del head de integración que ya contiene **todas** sus
    dependencias exactas.
 4. Tras tests/reviews/gate, la tarea vuelve a integration y se registra su tree

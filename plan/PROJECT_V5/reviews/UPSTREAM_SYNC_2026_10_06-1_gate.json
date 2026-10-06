@@ -1,0 +1,243 @@
+{
+  "candidateTree": "46b45bb78846ad775a1ad54a8a9f763007e93af5",
+  "command": "bash scripts/ci.sh",
+  "exitCode": 0,
+  "nodeVersion": "22.22.1",
+  "pythonVersion": "3.11.15",
+  "tmuxVersion": "3.6a-agents.1",
+  "redisImage": "redis:7.2-alpine",
+  "rawLogSha256": "248313f4a4d5f2c7dc2e2a75650d2d8d11d1d56d5fa73fd1f1bd26df2543c222",
+  "report": {
+    "counts": {
+      "failed": 0,
+      "passed": 2619,
+      "skipped": 12,
+      "tests": 2631
+    },
+    "errors": [],
+    "schemaVersion": 1,
+    "status": "infrastructure_unavailable",
+    "suites": [
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lock.python",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "release.candidate",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lint.python",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lint.gateway",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 447,
+          "skipped": 0,
+          "tests": 447
+        },
+        "errors": [],
+        "id": "test.structure",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1614,
+          "skipped": 9,
+          "tests": 1623
+        },
+        "errors": [],
+        "id": "test.gateway",
+        "infrastructureUnavailable": [
+          {
+            "id": "live postgres repository contract: create and read repository aggregate",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: status updates report one changed row",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: foreign key violation fails",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: policy decisions are append only",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals round-trip adversarial strings",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals preserve NULL separately from string null",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals support named and positional params",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres reports changes for insert update and delete",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres rejects non-finite numeric literals before execution",
+            "service": "postgres"
+          }
+        ],
+        "status": "infrastructure_unavailable"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 25,
+          "skipped": 0,
+          "tests": 25
+        },
+        "errors": [],
+        "id": "test.e2e",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "smoke.mcp",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "policy.registry",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 424,
+          "skipped": 0,
+          "tests": 424
+        },
+        "errors": [],
+        "id": "test.cli",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 81,
+          "skipped": 3,
+          "tests": 84
+        },
+        "errors": [],
+        "id": "test.langgraph",
+        "infrastructureUnavailable": [
+          {
+            "id": "tests.test_gateway_client::test_real_gateway_smoke",
+            "service": "gateway-integration"
+          },
+          {
+            "id": "tests.test_plan_refine_graph::test_real_gateway_dry_run_smoke",
+            "service": "gateway-integration"
+          },
+          {
+            "id": "tests.test_temporal_crash_recovery::test_temporal_worker_restart_replays_without_duplicate_implement_or_implicit_approval",
+            "service": "temporal"
+          }
+        ],
+        "status": "infrastructure_unavailable"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 22,
+          "skipped": 0,
+          "tests": 22
+        },
+        "errors": [],
+        "id": "test.redis-live",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "optional-service",
+        "counts": {
+          "failed": 0,
+          "passed": 0,
+          "skipped": 0,
+          "tests": 0
+        },
+        "errors": [],
+        "id": "test.real-agents",
+        "infrastructureUnavailable": [],
+        "service": "real-agent-providers",
+        "status": "infrastructure_unavailable"
+      }
+    ]
+  }
+}

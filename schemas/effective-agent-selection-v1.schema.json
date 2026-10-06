@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/effective-agent-selection-v1.schema.json",
+  "title": "EffectiveAgentSelection",
+  "type": "object",
+  "required": [
+    "contractVersion",
+    "profileId",
+    "agent",
+    "provider",
+    "model",
+    "reasoningEffort",
+    "serviceTier",
+    "resolutionSource",
+    "registryDigest"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": 1 },
+    "profileId": { "const": "canonical-orchestrator" },
+    "agent": { "enum": ["codex", "claude-code", "gemini-cli"] },
+    "provider": { "enum": ["codex", "claude-code", "gemini-cli"] },
+    "model": { "type": "string", "minLength": 1 },
+    "reasoningEffort": { "type": ["string", "null"] },
+    "serviceTier": { "type": ["string", "null"] },
+    "resolutionSource": {
+      "type": "object",
+      "required": ["model", "reasoningEffort", "serviceTier"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "enum": ["explicit-canonical", "explicit-alias", "agent-default"]
+        },
+        "reasoningEffort": {
+          "enum": ["explicit", "model-default", "agent-default", "unsupported"]
+        },
+        "serviceTier": {
+          "enum": ["explicit", "model-default", "agent-default", "unsupported"]
+        }
+      }
+    },
+    "registryDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

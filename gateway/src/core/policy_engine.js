@@ -1,8 +1,19 @@
-import { Decision, isRawKind, normalizePolicyContext } from "./policy_types.js";
+import {
+  Decision,
+  isCanonicalAction,
+  isRawKind,
+  normalizePolicyContext,
+} from "./policy_types.js";
 import { POLICY_RULE } from "./policy_rules.js";
+import {
+  consumeEffectiveAgentSelection,
+  resolveEffectiveAgentSelectionForConsumer,
+  safeSelectionRejection,
+  validateRuntimeAgentCapabilities,
+} from "./orchestrator_profile.js";
 
-function deny(reason, ruleId) {
-  return { decision: Decision.DENY, reason, ruleId };
+function deny(reason, ruleId, details = {}) {
+  return { decision: Decision.DENY, reason, ruleId, ...details };
 }
 
 function allow(reason, ruleId) {
@@ -15,6 +26,13 @@ function allowWithSanitization(reason, ruleId) {
 
 function actionMatchesDeny(action, denyActions) {
   return denyActions.includes(action) || denyActions.some((denied) => action.startsWith(`${denied}.`));
+}
+
+function evaluateAction(ctx) {
+  if (!isCanonicalAction(ctx.action)) {
+    return deny("action is not in the canonical catalog", POLICY_RULE.ACTION_UNKNOWN);
+  }
+  return null;
 }
 
 function normalizePolicyPath(value) {
@@ -173,122 +191,73 @@ function resolvesModels(action) {
   return action === "agent.delegate" || action === "agent.spawn";
 }
 
-function resolveModel(agent, agentId, requestedModel) {
-  if (!Array.isArray(agent.models)) return { ok: true };
-  const requestedOrDefault = requestedModel || agent.defaultModel;
-  if (!requestedOrDefault) return { ok: true };
-  const model = agent.models.includes(requestedOrDefault)
-    ? requestedOrDefault
-    : agent.modelAliases?.[requestedOrDefault];
-  if (!model || !agent.models.includes(model)) {
-    return {
-      ok: false,
-      decision: deny(
-        `model ${requestedOrDefault} not allowed for agent ${agentId}`,
-        POLICY_RULE.AGENT_MODEL_ALLOWED,
-      ),
-    };
+function selectionRuleId(rejection) {
+  if (rejection.field === "reasoningEffort") {
+    return POLICY_RULE.AGENT_REASONING_EFFORT_ALLOWED;
   }
-
-  return { ok: true, model };
+  if (rejection.field === "serviceTier") {
+    return POLICY_RULE.AGENT_SERVICE_TIER_ALLOWED;
+  }
+  if (rejection.field === "agent") return POLICY_RULE.AGENT_UNKNOWN;
+  return POLICY_RULE.AGENT_MODEL_ALLOWED;
 }
 
-function modelProfile(agent, model) {
-  if (!model || !agent.modelProfiles || typeof agent.modelProfiles !== "object") return null;
-  return agent.modelProfiles[model] || null;
-}
-
-function resolveReasoningEffort(agent, agentId, model, requestedReasoningEffort) {
-  const profile = modelProfile(agent, model);
-  const reasoningEfforts = profile?.reasoningEfforts || agent.reasoningEfforts;
-  if (!Array.isArray(reasoningEfforts)) {
-    if (!requestedReasoningEffort) return { ok: true };
-    return {
-      ok: false,
-      decision: deny(
-        `reasoning effort ${requestedReasoningEffort} not supported by agent ${agentId}`,
-        POLICY_RULE.AGENT_REASONING_EFFORT_ALLOWED,
-      ),
-    };
-  }
-  const reasoningEffort =
-    requestedReasoningEffort || profile?.defaultReasoningEffort || agent.defaultReasoningEffort;
-  if (!reasoningEffort) return { ok: true };
-  if (!reasoningEfforts.includes(reasoningEffort)) {
-    return {
-      ok: false,
-      decision: deny(
-        `reasoning effort ${reasoningEffort} not allowed for agent ${agentId}`,
-        POLICY_RULE.AGENT_REASONING_EFFORT_ALLOWED,
-      ),
-    };
-  }
-
-  return { ok: true, reasoningEffort };
-}
-
-function resolveServiceTier(agent, agentId, model, requestedServiceTier) {
-  const profile = modelProfile(agent, model);
-  const serviceTiers = profile?.serviceTiers || agent.serviceTiers;
-  if (!Array.isArray(serviceTiers)) {
-    if (!requestedServiceTier) return { ok: true };
-    return {
-      ok: false,
-      decision: deny(
-        `service tier ${requestedServiceTier} not supported by agent ${agentId}`,
-        POLICY_RULE.AGENT_SERVICE_TIER_ALLOWED,
-      ),
-    };
-  }
-  const serviceTier = requestedServiceTier || profile?.defaultServiceTier || agent.defaultServiceTier;
-  if (!serviceTier) return { ok: true };
-  if (!serviceTiers.includes(serviceTier)) {
-    return {
-      ok: false,
-      decision: deny(
-        `service tier ${serviceTier} not allowed for agent ${agentId}`,
-        POLICY_RULE.AGENT_SERVICE_TIER_ALLOWED,
-      ),
-    };
-  }
-
-  return { ok: true, serviceTier };
+export function selectionDenialDecision(error) {
+  const selectionRejection = safeSelectionRejection(error);
+  if (!selectionRejection) return null;
+  return deny(
+    "effective agent selection rejected",
+    selectionRuleId(selectionRejection),
+    { selectionRejection },
+  );
 }
 
 function evaluateModel(ctx, registries) {
-  if (!resolvesModels(ctx.action)) return null;
-  const agent = registries.getAgent(ctx.agent);
-  if (!agent) return null;
+  if (!resolvesModels(ctx.action) && !ctx.effectiveSelection) return null;
+  const resolved = resolveAgentExecutionProfile(ctx, registries);
+  if (resolved.decision !== Decision.ALLOW) return resolved;
+  return resolved;
+}
 
-  const resolvedModel = resolveModel(agent, ctx.agent, ctx.model);
-  if (!resolvedModel.ok) return resolvedModel.decision;
-
-  const resolvedReasoning = resolveReasoningEffort(
-    agent,
-    ctx.agent,
-    resolvedModel.model,
-    ctx.reasoningEffort,
-  );
-  if (!resolvedReasoning.ok) return resolvedReasoning.decision;
-
-  const resolvedServiceTier = resolveServiceTier(
-    agent,
-    ctx.agent,
-    resolvedModel.model,
-    ctx.serviceTier,
-  );
-  if (!resolvedServiceTier.ok) return resolvedServiceTier.decision;
-
-  if (!resolvedModel.model && !resolvedReasoning.reasoningEffort && !resolvedServiceTier.serviceTier) {
-    return null;
+export function resolveAgentExecutionProfile(rawContext, registries) {
+  try {
+    const agentId = String(rawContext?.targetAgent ?? rawContext?.agent ?? "");
+    const suppliedSelection = (
+      rawContext?.effectiveSelection !== null
+      && rawContext?.effectiveSelection !== undefined
+    );
+    const effectiveSelection = suppliedSelection
+      ? consumeEffectiveAgentSelection(rawContext.effectiveSelection, {
+          agent: agentId,
+          consumer: "policy",
+          rawSelection: {
+            model: rawContext?.model,
+            reasoningEffort: rawContext?.reasoningEffort,
+            serviceTier: rawContext?.serviceTier,
+          },
+        })
+      : resolveEffectiveAgentSelectionForConsumer(
+          {
+            agent: agentId,
+            model: rawContext?.model,
+            reasoningEffort: rawContext?.reasoningEffort,
+            serviceTier: rawContext?.serviceTier,
+          },
+          "policy",
+        );
+    validateRuntimeAgentCapabilities(registries);
+    return {
+      ...allow("agent model resolved", POLICY_RULE.AGENT_MODEL_ALLOWED),
+      model: effectiveSelection.model,
+      reasoningEffort: effectiveSelection.reasoningEffort,
+      serviceTier: effectiveSelection.serviceTier,
+      effectiveSelection,
+    };
+  } catch (error) {
+    const decision = selectionDenialDecision(error);
+    if (decision) return decision;
+    throw error;
   }
-
-  return {
-    ...allow("agent model resolved", POLICY_RULE.AGENT_MODEL_ALLOWED),
-    ...(resolvedModel.model ? { model: resolvedModel.model } : {}),
-    ...(resolvedReasoning.reasoningEffort ? { reasoningEffort: resolvedReasoning.reasoningEffort } : {}),
-    ...(resolvedServiceTier.serviceTier ? { serviceTier: resolvedServiceTier.serviceTier } : {}),
-  };
 }
 
 function roleHasRawRestrictedAccess(role) {
@@ -337,6 +306,7 @@ function evaluateSanitization(ctx, registries) {
 
 function runPipeline(ctx, registries) {
   const layers = [
+    ["action", evaluateAction],
     ["classification", evaluateClassification],
     ["model", evaluateModel],
     ["role", evaluateRole],
@@ -356,6 +326,9 @@ function runPipeline(ctx, registries) {
     if (result?.model) effective.model = result.model;
     if (result?.reasoningEffort) effective.reasoningEffort = result.reasoningEffort;
     if (result?.serviceTier) effective.serviceTier = result.serviceTier;
+    if (result?.effectiveSelection) {
+      effective.effectiveSelection = result.effectiveSelection;
+    }
   }
 
   return {
@@ -364,13 +337,37 @@ function runPipeline(ctx, registries) {
   };
 }
 
+function validateSelectionRegistry(ctx, registries) {
+  if (!resolvesModels(ctx.action) && !ctx.effectiveSelection) return null;
+  try {
+    validateRuntimeAgentCapabilities(registries);
+    return null;
+  } catch (error) {
+    const decision = selectionDenialDecision(error);
+    if (decision) return decision;
+    throw error;
+  }
+}
+
 export function evaluate(rawCtx, registries) {
   const ctx = normalizePolicyContext(rawCtx);
+  const registryDecision = validateSelectionRegistry(ctx, registries);
+  if (registryDecision) return registryDecision;
   return runPipeline(ctx, registries).final;
 }
 
 export function explain(rawCtx, registries) {
   const ctx = normalizePolicyContext(rawCtx);
+  const registryDecision = validateSelectionRegistry(ctx, registries);
+  if (registryDecision) {
+    return {
+      decision: registryDecision.decision,
+      reason: registryDecision.reason,
+      ruleId: registryDecision.ruleId,
+      layers: [{ name: "model", result: registryDecision }],
+      context: ctx,
+    };
+  }
   const { final, trace } = runPipeline(ctx, registries);
   return {
     decision: final.decision,

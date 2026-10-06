@@ -1,4 +1,5 @@
 export const POLICY_RULE = Object.freeze({
+  ACTION_UNKNOWN: "action.unknown",
   AGENT_MODEL_ALLOWED: "agent.model.allowed",
   AGENT_REASONING_EFFORT_ALLOWED: "agent.reasoning_effort.allowed",
   AGENT_SERVICE_TIER_ALLOWED: "agent.service_tier.allowed",

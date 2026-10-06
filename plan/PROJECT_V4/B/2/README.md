@@ -11,4 +11,7 @@ especificación detallada, rollback y trazabilidad.
 | [B/2/02](02.md) | Mutación, wake y retirada MCP | [EP-05](../../epics/EP-05.md) | Planificada |
 | [B/2/03](03.md) | Grants de orquestador YOLO y launch unconfined | [EP-05](../../epics/EP-05.md) | Planificada |
 
+Absorción reconciliada: `B/2/03` cierra por V5 `E/0/05` y sus dependencias de
+aislamiento, decisión, control, budgets y prueba real.
+
 [← Stage B](../README.md) · [Índice de stage](../TASKS.md) · [Catálogo global](../../SHEETS.md)

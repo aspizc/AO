@@ -70,4 +70,13 @@ Este fichero es un índice; las especificaciones canónicas viven en los fichero
 | [B/5/01](5/01.md) | Artifact/egress/audit MCP E2E | [EP-07](../epics/EP-07.md) | Planificada |
 | [B/5/02](5/02.md) | Lifecycle/control-plane E2E | [EP-07](../epics/EP-07.md) | Planificada |
 
+## Reconciliación de absorción V5
+
+- `B/0/04` → D/0/02.
+- `B/2/03` → E/0/05 y sus prerequisitos/consumidores.
+- `B/4/00` y `B/4/02` → I/0/08 como owner del endpoint/cutover MCP 0.2;
+  C/0/01, D/0/00, E/0/02 e I/0/03 son dependencias. `B/4/01` → I/0/06 como
+  owner del worker shim, con D/0/05 e I/0/08 para non-recursion y drain.
+- `B/5/02` → C/0/03 + C/1/03 + D/0/04 + E/0/05.
+
 [← Proyecto V4](../README.md) · [Catálogo global de tareas](../SHEETS.md)

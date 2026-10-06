@@ -12,4 +12,7 @@ especificación detallada, rollback y trazabilidad.
 | [B/0/03](03.md) | Cancelación y concurrencia MCP | [EP-03](../../epics/EP-03.md) | Planificada |
 | [B/0/04](04.md) | Projector restricted determinista | [EP-06](../../epics/EP-06.md) | Planificada |
 
+Absorción reconciliada: `B/0/04` cierra por V5 `D/0/02`; F consume el
+projector, pero no es su owner.
+
 [← Stage B](../README.md) · [Índice de stage](../TASKS.md) · [Catálogo global](../../SHEETS.md)

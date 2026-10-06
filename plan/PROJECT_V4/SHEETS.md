@@ -6,15 +6,19 @@ especificación ejecutable vive en cada fichero
 
 Cada ficha incluye estado, épica, objetivo, scope/evidencia, aceptación,
 tests/gate, dependencias, esfuerzo/riesgo, detalle de implementación, rollback
-y fuente. Estado actual: **G-1/G0 autorizados; las 72 hojas continúan
-planificadas o parciales hasta que su owner V5 satisfaga el
-[ledger de absorción](../PROJECT_V5/V4_ABSORPTION.md)**.
+y fuente. Estado actual: **G-1/G0 autorizados; M0/4/00 absorbida,
+M0/0/00, M0/3/00, M0/4/01, M0/4/02 y E/0/00 parciales, y las demás hojas
+conservan su estado hasta que su owner V5 satisfaga el
+[ledger de absorción](../PROJECT_V5/V4_ABSORPTION.md)**. V5 es el único owner
+de implementación: 1 hoja está absorbida, 5 parciales y 66 planificadas. Las
+71 no terminales cierran por 45 hojas V5 abiertas; no se programa trabajo V4
+duplicado.
 
 ## M0 — 12 tareas
 
 | ID | Título | Épica | Estado |
 |---|---|---|---|
-| [`M0/0/00`](M0/0/00.md) | Reconciliar topología de release y congelar base/manifest | [EP-00](epics/EP-00.md) | Planificada |
+| [`M0/0/00`](M0/0/00.md) | Reconciliar topología de release y congelar base/manifest | [EP-00](epics/EP-00.md) | Parcial |
 | [`M0/0/01`](M0/0/01.md) | Harness bootstrap seguro de review | [EP-09](epics/EP-09.md) | Planificada |
 | [`M0/1/00`](M0/1/00.md) | KYA profile y policy | [EP-01](epics/EP-01.md) | Planificada |
 | [`M0/1/01`](M0/1/01.md) | KYA runner y verdict | [EP-01](epics/EP-01.md) | Planificada |
@@ -22,10 +26,10 @@ planificadas o parciales hasta que su owner V5 satisfaga el
 | [`M0/2/00`](M0/2/00.md) | Schema, registry y policy de modelos | [EP-01](epics/EP-01.md) | Planificada |
 | [`M0/2/01`](M0/2/01.md) | Adapters y service tier | [EP-01](epics/EP-01.md) | Planificada |
 | [`M0/2/02`](M0/2/02.md) | Consumidores y activación | [EP-01](epics/EP-01.md) | Planificada |
-| [`M0/3/00`](M0/3/00.md) | SCA npm completo y lock corregido | [EP-00](epics/EP-00.md) | Planificada |
-| [`M0/4/00`](M0/4/00.md) | Gate reproducible y manifest de suites/skips | [EP-00](epics/EP-00.md) | Planificada |
-| [`M0/4/01`](M0/4/01.md) | Redis 7 y V5 concurrente required | [EP-11](epics/EP-11.md) | Planificada |
-| [`M0/4/02`](M0/4/02.md) | Estado, aceptación y promoción verificables | [EP-00](epics/EP-00.md) | Planificada |
+| [`M0/3/00`](M0/3/00.md) | SCA npm completo y lock corregido | [EP-00](epics/EP-00.md) | Parcial |
+| [`M0/4/00`](M0/4/00.md) | Gate reproducible y manifest de suites/skips | [EP-00](epics/EP-00.md) | Absorbida/entregada |
+| [`M0/4/01`](M0/4/01.md) | Redis 7 y V5 concurrente required | [EP-11](epics/EP-11.md) | Parcial |
+| [`M0/4/02`](M0/4/02.md) | Estado, aceptación y promoción verificables | [EP-00](epics/EP-00.md) | Parcial |
 ## A — 3 tareas
 
 | ID | Título | Épica | Estado |
@@ -90,7 +94,7 @@ planificadas o parciales hasta que su owner V5 satisfaga el
 
 | ID | Título | Épica | Estado |
 |---|---|---|---|
-| [`E/0/00`](E/0/00.md) | Runtime fence, Python y dependency scan | [EP-10](epics/EP-10.md) | Planificada |
+| [`E/0/00`](E/0/00.md) | Runtime fence, Python y dependency scan | [EP-10](epics/EP-10.md) | Parcial |
 | [`E/0/01`](E/0/01.md) | Semántica estricta de resultados | [EP-10](epics/EP-10.md) | Planificada |
 | [`E/0/02`](E/0/02.md) | Verdict estricto plan-refine | [EP-10](epics/EP-10.md) | Planificada |
 | [`E/1/00`](E/1/00.md) | Golden legacy y contrato normativo V2 | [EP-10](epics/EP-10.md) | Planificada |
@@ -106,6 +110,20 @@ planificadas o parciales hasta que su owner V5 satisfaga el
 | [`E/2/02`](E/2/02.md) | `v1-agents-real` | [EP-11](epics/EP-11.md) | Planificada |
 | [`E/2/03`](E/2/03.md) | Promotion/stability evidence | [EP-11](epics/EP-11.md) | Planificada |
 | [`E/3/00`](E/3/00.md) | Retirar ITRP LangGraph | [EP-10](epics/EP-10.md) | Planificada |
+
+## Owners V5 reconciliados para las diez absorciones corregidas
+
+| V4 | Owner(s) de cierre V5 |
+|---|---|
+| `B/0/04` | `D/0/02` |
+| `B/2/03`, `C/0/04` | `E/0/05`, con `D/0/02`, `D/0/05–06`, `E/0/02–03`, `H/0/05` |
+| `B/4/00` | `I/0/08` endpoint/version owner; `C/0/01`, `D/0/00` dependencies |
+| `B/4/01` | `I/0/06` worker-shim owner; `D/0/05`, `I/0/08` non-recursion/drain |
+| `B/4/02` | `I/0/08` consumer/cutover owner; `C/0/01`, `D/0/00`, `E/0/02`, `I/0/03`, `I/0/06` dependencies |
+| `B/5/02` | `C/0/03`, `C/1/03`, `D/0/04`, `E/0/05` |
+| `E/0/00` | `C/0/00`, `C/0/02`, `I/0/06` |
+| `E/0/02` | `I/0/08` |
+| `M0/2/01` | `H/0/00` selection source/resolver; `D/0/01` exact argv/effective-audit consumer |
 
 ## Navegación
 

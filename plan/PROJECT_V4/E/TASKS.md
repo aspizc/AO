@@ -10,7 +10,7 @@ Este fichero es un índice; las especificaciones canónicas viven en los fichero
 
 | Tarea | Título | Épica | Estado |
 |---|---|---|---|
-| [E/0/00](0/00.md) | Runtime fence, Python y dependency scan | [EP-10](../epics/EP-10.md) | Planificada |
+| [E/0/00](0/00.md) | Runtime fence, Python y dependency scan | [EP-10](../epics/EP-10.md) | Parcial |
 | [E/0/01](0/01.md) | Semántica estricta de resultados | [EP-10](../epics/EP-10.md) | Planificada |
 | [E/0/02](0/02.md) | Verdict estricto plan-refine | [EP-10](../epics/EP-10.md) | Planificada |
 ## E/1 — Temporal V2
@@ -44,5 +44,11 @@ Este fichero es un índice; las especificaciones canónicas viven en los fichero
 | Tarea | Título | Épica | Estado |
 |---|---|---|---|
 | [E/3/00](3/00.md) | Retirar ITRP LangGraph | [EP-10](../epics/EP-10.md) | Planificada |
+
+## Reconciliación de absorción V5
+
+- `E/0/00` → C/0/00 + C/0/02 + I/0/06; los dos primeros están entregados,
+  por lo que la hoja es parcial.
+- `E/0/02` → I/0/08, que conserva plan-refine con parser cerrado.
 
 [← Proyecto V4](../README.md) · [Catálogo global de tareas](../SHEETS.md)

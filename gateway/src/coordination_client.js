@@ -1,6 +1,13 @@
 import {
   COORDINATION_PROTOCOL_VERSION,
 } from "./core/coordination_contract.js";
+import {
+  managedClientLineageBeginRejoin,
+  managedClientLineageFault,
+  managedClientLineageReady,
+  managedClientLineageStopped,
+  registerManagedClientLineage,
+} from "./core/coordination_consumer_lineage.js";
 
 const CLIENT_STATES = new Set([
   "starting",
@@ -19,6 +26,7 @@ const LEASE_LOSS_CODES = new Set([
   "COORDINATION_AUTH_FAILED",
   "COORDINATION_LEASE_EXPIRED",
   "COORDINATION_LEASE_CHANGED",
+  "COORDINATION_LEASE_NOT_FOUND",
 ]);
 const TERMINAL_CLIENT_CODES = new Set([
   "COORDINATION_CLIENT_CLOCK_INVALID",
@@ -391,6 +399,7 @@ export function createOrchestratorCoordinationClient({
   let rejoinActive = false;
   let stopFlight = null;
   let canonicalScopeId = null;
+  let managedClient = null;
   const lifecycleController = new AbortController();
 
   function detach(promise) {
@@ -529,6 +538,7 @@ export function createOrchestratorCoordinationClient({
       clearScheduledTimer();
       rejoinActive = false;
       state = "degraded";
+      managedClientLineageFault(managedClient);
       return;
     }
     if (attempt < retry.maxAttempts) {
@@ -546,6 +556,7 @@ export function createOrchestratorCoordinationClient({
     }
     rejoinActive = false;
     state = "degraded";
+    managedClientLineageFault(managedClient);
   }
 
   async function attemptRejoin(expectedEpoch, attempt) {
@@ -579,6 +590,10 @@ export function createOrchestratorCoordinationClient({
     retryAttempt = 0;
     lastError = null;
     state = "ready";
+    registerManagedClientLineage(managedClient, {
+      configuredScopeId: canonicalScopeId,
+    });
+    managedClientLineageReady(managedClient, getStatus());
     try {
       scheduleHeartbeat(expectedEpoch);
     } catch (error) {
@@ -603,6 +618,7 @@ export function createOrchestratorCoordinationClient({
     lastError = safeLastError(error);
     const rejoinEpoch = epoch + 1;
     epoch = rejoinEpoch;
+    managedClientLineageBeginRejoin(managedClient);
     detach(attemptRejoin(rejoinEpoch, 1));
   }
 
@@ -719,6 +735,7 @@ export function createOrchestratorCoordinationClient({
 
         installRegistration(returnedRegistration);
         state = "ready";
+        managedClientLineageReady(managedClient, getStatus());
         scheduleHeartbeat(startEpoch);
         return getStatus();
       } catch (error) {
@@ -753,7 +770,7 @@ export function createOrchestratorCoordinationClient({
     return startFlight;
   }
 
-  async function invoke(operation, input = {}) {
+  async function invoke(operation, input = {}, { signal } = {}) {
     if (!INVOCABLE_OPERATIONS.has(operation)) {
       throw clientError(
         "COORDINATION_CLIENT_INVALID_OPERATION",
@@ -770,11 +787,15 @@ export function createOrchestratorCoordinationClient({
     const callEpoch = epoch;
     const ownedCredentials = credentials;
     try {
-      return await coordination[operation]({
-        ...structuredClone(value),
-        participantId: ownedCredentials.participantId,
-        leaseToken: ownedCredentials.leaseToken,
-      });
+      return await coordination[operation](
+        {
+          ...structuredClone(value),
+          participantId: ownedCredentials.participantId,
+          leaseToken: ownedCredentials.leaseToken,
+        },
+        // MUTATION_GUARD: managed-operation-signal
+        { signal },
+      );
     } catch (error) {
       if (
         LEASE_LOSS_CODES.has(safeErrorCode(error))
@@ -801,16 +822,21 @@ export function createOrchestratorCoordinationClient({
     leaseTtlMs = null;
     retryAttempt = 0;
     lastError = null;
+    managedClientLineageStopped(managedClient);
 
     bestEffortUnregister(ownedCredentials);
     stopFlight = Promise.resolve(getStatus());
     return stopFlight;
   }
 
-  return Object.freeze({
+  managedClient = Object.freeze({
     start,
     invoke,
     getStatus,
     stop,
   });
+  registerManagedClientLineage(managedClient, {
+    configuredScopeId: registration.scopeId,
+  });
+  return managedClient;
 }

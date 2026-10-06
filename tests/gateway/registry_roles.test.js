@@ -18,7 +18,18 @@ const REQUIRED_ROLES = [
   "tester",
   "documenter",
   "security_reviewer",
+  "writer",
+  "editor",
 ];
+
+test("writer_writes_prose_and_editor_only_reviews", () => {
+  assert.ok(reg.roles.writer.allowActions.includes("code.write"));
+  assert.ok(reg.roles.writer.allowActions.includes("artifact.put.doc"));
+  assert.ok(reg.roles.writer.denyActions.includes("artifact.get.raw_restricted"));
+  assert.ok(reg.roles.editor.allowActions.includes("artifact.put.review_notes"));
+  assert.ok(reg.roles.editor.denyActions.includes("code.write"));
+  assert.ok(reg.roles.editor.denyActions.includes("artifact.get.raw_restricted"));
+});
 
 test("all_v4_roles_exist", () => {
   for (const role of REQUIRED_ROLES) {

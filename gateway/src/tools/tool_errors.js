@@ -1,4 +1,5 @@
 import { isCanonicalPolicyRuleId } from "../core/policy_rules.js";
+import { safeSelectionRejection } from "../core/orchestrator_profile.js";
 
 const SAFE_DECISIONS = new Set([
   "allow",
@@ -139,6 +140,10 @@ export function safeToolErrorBody(error, contract = {}) {
   if (code === "POLICY_DENIED") {
     const decision = safePolicyDecision(error?.decision);
     if (decision) body.decision = decision;
+    const selectionRejection = safeSelectionRejection(
+      error?.decision?.selectionRejection,
+    );
+    if (selectionRejection) body.selectionRejection = selectionRejection;
   }
   return body;
 }

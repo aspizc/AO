@@ -41,7 +41,7 @@ test("explain_returns_final_decision_context_and_layer_trace", () => {
   });
   assert.deepEqual(
     result.layers.map((layer) => layer.name),
-    ["classification", "model", "role", "approval", "sanitization"],
+    ["action", "classification", "model", "role", "approval", "sanitization"],
   );
   assert.equal(result.layers.at(-1).result.decision, "allow_with_sanitization");
 });
@@ -76,6 +76,6 @@ test("explain_stops_trace_after_first_non_allow_decision", () => {
   assert.equal(result.decision, "deny");
   assert.deepEqual(
     result.layers.map((layer) => layer.name),
-    ["classification"],
+    ["action", "classification"],
   );
 });

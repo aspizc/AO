@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "hero-repository/v1",
+  "repositoryId": "sample-apps",
+  "classification": "unrestricted",
+  "root": "app",
+  "entrypoint": "index.html"
+}

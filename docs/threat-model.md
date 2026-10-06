@@ -166,13 +166,18 @@ or update entries here.
   through prompt/tool flow. Cannot set Gateway environment or mutate approval
   state directly.
 - **Primary control:** Auto-approval is operator-only via `AGENTS_AUTOAPPROVE`,
-  default off, scope allowlist, immutable `NEVER_AUTO`, and restricted contexts
-  excluded.
+  default off, closed action catalog, scope allowlist, immutable `NEVER_AUTO`,
+  and restricted contexts excluded. Repository-affecting actions additionally
+  require one task owned by the current request context plus a canonical
+  repository and known server-owned classification; caller assertions never
+  grant that authority.
 - **Defense in depth:** Orchestrator cannot call `approval.respond`;
   auto-grants emit `APPROVAL_AUTO_GRANTED`; ADR-006 documents boundaries;
-  bypass regression covers protected and restricted cases.
+  missing, ambiguous, unknown, cross-context, and restricted lineage fail
+  before an auto-grant, and boundary regressions cover those cases.
 - **Tested by:** `Q/0/5`,
   `tests/gateway/autoapprove_mechanism.test.js`,
+  `tests/gateway/request_context_boundary.test.js`,
   `tests/e2e/bypass_regression.test.js#autoapproval_never_grants_protected_or_restricted_even_if_listed`
 
 ### TM-13 - Stale lease or replacement-incarnation mutation
@@ -189,6 +194,7 @@ or update entries here.
 - **Tested by:** `tests/gateway/coordination_service_lifecycle.test.js`,
   `tests/gateway/coordination_service_receive.test.js`,
   `tests/gateway/coordination_queue_receive.test.js`,
+  `tests/gateway/coordination_multi_client_race_live.test.js`,
   `tests/e2e/bypass_regression.test.js#stale_coordination_lease_cannot_act_as_a_replacement_incarnation`
 
 ### TM-14 - Coordination body injection or authority confusion
@@ -242,6 +248,7 @@ or update entries here.
   `tests/gateway/coordination_service_foundation.test.js`,
   `tests/gateway/coordination_service_send.test.js`,
   `tests/gateway/coordination_service_ack.test.js`,
+  `tests/gateway/coordination_multi_client_race_live.test.js`,
   `tests/e2e/bypass_regression.test.js#coordination_rejects_cross_scope_delivery_and_cross_inbox_acknowledgement`
 
 ### TM-17 - Raw Redis client bypasses the coordination service
@@ -292,7 +299,33 @@ or update entries here.
 - **Tested by:** `tests/gateway/coordination_service_send.test.js`,
   `tests/gateway/coordination_queue_send.test.js`,
   `tests/gateway/coordination_two_instance_live.test.js`,
+  `tests/gateway/coordination_multi_client_race_live.test.js`,
   `tests/e2e/bypass_regression.test.js#bounded_dedupe_contract_allows_redelivery_after_the_backing_record_expires`
+
+### TM-20 - Execution-binding replay or adapter fallback
+
+- **Description:** Code holding a valid server-owned `agent.spawn` or
+  `agent.delegate` binding reuses it with another control action, target agent,
+  role, repository, trace, task, or canonical cwd, or clones the object and
+  relies on an adapter to reinterpret it as a legacy call.
+- **Attacker capability:** Can influence an internal service/adapter handoff or
+  retain one valid binding. Cannot add an object to the private server-owned
+  binding set.
+- **Primary control:** Before adapter lookup, session persistence, model audit,
+  or launch, the agent service checks binding provenance and the complete
+  effective tuple. It then uses the binding values exclusively for execution.
+  Claude, Codex, and Gemini repeat the same check, including the assigned
+  target action, trace, task, and realpath cwd.
+- **Defense in depth:** Every non-null invalid or mismatched binding returns
+  `REQUEST_CONTEXT_DENIED`; only an absent binding may use the legacy policy
+  path. Matrix regressions assert zero adapter lookup/invocation, session rows,
+  `SESSION_STARTED`, `AGENT_MODEL_RESOLVED`, or other audit mutation under
+  caller-controlled lineage, while retaining normal post-authority error audit
+  and the positive orchestrator-to-assigned-planner launch through a canonical
+  symlink alias.
+- **Tested by:**
+  `tests/gateway/request_context_execution_binding.test.js`,
+  `tests/gateway/request_context_boundary.test.js#control-plane_actor_is_distinct_from_the_assigned_launch_target`
 
 ## Living document
 

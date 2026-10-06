@@ -4,7 +4,6 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { GeminiAdapter } from "../../gateway/src/adapters/gemini_adapter.js";
-import { CwdViolation } from "../../gateway/src/adapters/base_adapter.js";
 import { configureAudit, query, _resetForTests as resetAudit } from "../../gateway/src/core/audit.js";
 
 function setup() {
@@ -34,25 +33,41 @@ function adapter(root, overrides = {}) {
   });
 }
 
-test("dry run spawn returns session info", async () => {
-  const { root } = setup();
-  const result = await adapter(root).spawn({ cwd: root, traceId: "tr1", role: "coder" });
+function assertRegistryOnly(error) {
+  assert.equal(error.code, "POLICY_DENIED");
+  assert.equal(error.message, "request denied by policy");
+  assert.deepEqual(error.decision.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_PROVIDER_UNAVAILABLE",
+    field: "agent",
+    provider: "gemini-cli",
+  });
+  return true;
+}
 
-  assert.equal(result.dryRun, true);
-  assert.equal(result.sessionId, result.tmuxTarget);
-  assert.equal(result.tmuxTarget, "ag-tr1-gemini-coder");
-  assert.equal(result.attachCommand, "tmux attach -t ag-tr1-gemini-coder");
+test("registry-only Gemini denies dry-run spawn", async () => {
+  const { root } = setup();
+
+  await assert.rejects(
+    () => adapter(root).spawn({ cwd: root, traceId: "tr1", role: "coder" }),
+    assertRegistryOnly,
+  );
 });
 
-test("spawn audits supervised session start", async () => {
+test("registry-only spawn audits no supervised session start", async () => {
   const { root } = setup();
-  const result = await adapter(root).spawn({ cwd: root, traceId: "tr-audit", role: "coder" });
+  await assert.rejects(
+    () => adapter(root).spawn({
+      cwd: root,
+      traceId: "tr-audit",
+      role: "coder",
+    }),
+    assertRegistryOnly,
+  );
   const events = await query({ traceId: "tr-audit" });
 
   assert.equal(events.length, 1);
-  assert.equal(events[0].type, "SESSION_STARTED");
-  assert.equal(events[0].mode, "supervised");
-  assert.equal(events[0].tmuxTarget, result.tmuxTarget);
+  assert.equal(events[0].type, "ERROR");
+  assert.equal(events[0].where, "spawn");
 });
 
 test("dry run ask returns response and audits bounded input", async () => {
@@ -92,12 +107,12 @@ test("kill marks supervised session closed in audit", async () => {
   assert.equal(events[0].tmuxTarget, "ag-x");
 });
 
-test("spawn cwd guard runs in dry run", async () => {
+test("registry-only spawn denial precedes cwd guard", async () => {
   const { root } = setup();
   const outside = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "gemini-supervised-outside-")));
 
   await assert.rejects(
     () => adapter(root).spawn({ cwd: outside, traceId: "tr-deny", role: "coder" }),
-    CwdViolation,
+    assertRegistryOnly,
   );
 });

@@ -1,0 +1,1373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/doctor-result-v1.schema.json",
+  "title": "Doctor result",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "profileId",
+    "status",
+    "checks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "doctor-result/v1"
+    },
+    "profileId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^(?!(?:ghp|github-pat|glpat|sk|tok|xoxb|xoxp)-)[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?![\\s\\S])"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "warn",
+        "fail"
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/configCheck"
+        },
+        {
+          "$ref": "#/$defs/dependencyCheck"
+        },
+        {
+          "$ref": "#/$defs/policyCheck"
+        },
+        {
+          "$ref": "#/$defs/profileCheck"
+        },
+        {
+          "$ref": "#/$defs/repositoryCheck"
+        },
+        {
+          "$ref": "#/$defs/runtimeCheck"
+        },
+        {
+          "$ref": "#/$defs/claudeLoginCheck"
+        },
+        {
+          "$ref": "#/$defs/codexLoginCheck"
+        },
+        {
+          "$ref": "#/$defs/coordinationCheck"
+        },
+        {
+          "$ref": "#/$defs/coordinationScopeCheck"
+        },
+        {
+          "$ref": "#/$defs/isolationCheck"
+        },
+        {
+          "$ref": "#/$defs/stateOwnershipCheck"
+        }
+      ],
+      "items": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "checks": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "const": "fail"
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "fail"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "checks": {
+            "allOf": [
+              {
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "required": [
+                      "status"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "fail"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "const": "warn"
+                    }
+                  }
+                },
+                "minContains": 1
+              }
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "warn"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "checks": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "warn",
+                      "fail"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "pass"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "remediation": {
+      "type": "object",
+      "required": [
+        "doc",
+        "anchor"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "doc": {
+          "const": "docs/doctor.md"
+        },
+        "anchor": {
+          "enum": [
+            "bootstrap",
+            "coordination",
+            "isolation",
+            "provider-login",
+            "state-ownership",
+            "synthetic-input"
+          ]
+        }
+      }
+    },
+    "bootstrapRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "bootstrap"
+            }
+          }
+        }
+      ]
+    },
+    "coordinationRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "coordination"
+            }
+          }
+        }
+      ]
+    },
+    "isolationRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "isolation"
+            }
+          }
+        }
+      ]
+    },
+    "providerLoginRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "provider-login"
+            }
+          }
+        }
+      ]
+    },
+    "stateOwnershipRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "state-ownership"
+            }
+          }
+        }
+      ]
+    },
+    "syntheticInputRemediation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/remediation"
+        },
+        {
+          "properties": {
+            "anchor": {
+              "const": "synthetic-input"
+            }
+          }
+        }
+      ]
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "code",
+        "summary",
+        "remediation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "warn",
+            "fail"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "remediation": {
+          "$ref": "#/$defs/remediation"
+        }
+      }
+    },
+    "configCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "config"
+            },
+            "remediation": {
+              "$ref": "#/$defs/syntheticInputRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "CONFIG_VALID"
+                },
+                "summary": {
+                  "const": "Configuration paths are valid."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "CONFIG_DEPRECATED"
+                },
+                "summary": {
+                  "const": "Configuration uses a supported legacy layout."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CONFIG_MISSING"
+                },
+                "summary": {
+                  "const": "Required configuration paths are unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CONFIG_INVALID"
+                },
+                "summary": {
+                  "const": "Configuration paths do not satisfy the supported contract."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CONFIG_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The configuration check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dependencyCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "dependency"
+            },
+            "remediation": {
+              "$ref": "#/$defs/bootstrapRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "DEPENDENCIES_READY"
+                },
+                "summary": {
+                  "const": "Required dependencies are available."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "DEPENDENCY_UPDATE_AVAILABLE"
+                },
+                "summary": {
+                  "const": "An optional dependency update is available."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "OPTIONAL_DEPENDENCY_MISSING"
+                },
+                "summary": {
+                  "const": "An optional dependency is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REQUIRED_DEPENDENCY_MISSING"
+                },
+                "summary": {
+                  "const": "A required dependency is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "DEPENDENCY_VERSION_UNSUPPORTED"
+                },
+                "summary": {
+                  "const": "A dependency version is unsupported."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "DEPENDENCY_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The dependency check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "policyCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "policy"
+            },
+            "remediation": {
+              "$ref": "#/$defs/syntheticInputRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "POLICY_VALID"
+                },
+                "summary": {
+                  "const": "The policy registry is valid."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "POLICY_DEPRECATED"
+                },
+                "summary": {
+                  "const": "The policy registry uses a supported legacy contract."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "POLICY_MISSING"
+                },
+                "summary": {
+                  "const": "The policy registry is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "POLICY_INVALID"
+                },
+                "summary": {
+                  "const": "The policy registry is invalid."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "POLICY_DRIFTED"
+                },
+                "summary": {
+                  "const": "The policy registry does not match the canonical contract."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "POLICY_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The policy check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "profileCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "profile"
+            },
+            "remediation": {
+              "$ref": "#/$defs/syntheticInputRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "PROFILE_VALID"
+                },
+                "summary": {
+                  "const": "The orchestrator profile is valid."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "PROFILE_DEPRECATED"
+                },
+                "summary": {
+                  "const": "The profile uses a supported legacy contract."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "PROFILE_MISSING"
+                },
+                "summary": {
+                  "const": "The orchestrator profile is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "PROFILE_INVALID"
+                },
+                "summary": {
+                  "const": "The orchestrator profile is invalid."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "PROFILE_DRIFTED"
+                },
+                "summary": {
+                  "const": "The profile does not match the canonical contract."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "PROFILE_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The profile check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "repositoryCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "repository"
+            },
+            "remediation": {
+              "$ref": "#/$defs/syntheticInputRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "REPOSITORY_CANONICAL"
+                },
+                "summary": {
+                  "const": "The repository binding is canonical."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "REPOSITORY_LEGACY"
+                },
+                "summary": {
+                  "const": "The repository uses a supported legacy binding."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REPOSITORY_MISSING"
+                },
+                "summary": {
+                  "const": "The repository binding is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REPOSITORY_AMBIGUOUS"
+                },
+                "summary": {
+                  "const": "The repository binding is ambiguous."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REPOSITORY_NONCANONICAL"
+                },
+                "summary": {
+                  "const": "The repository binding is not canonical."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REPOSITORY_ESCAPED"
+                },
+                "summary": {
+                  "const": "The repository binding escapes its allowed boundary."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "REPOSITORY_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The repository check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "runtimeCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "runtime"
+            },
+            "remediation": {
+              "$ref": "#/$defs/bootstrapRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "RUNTIME_SUPPORTED"
+                },
+                "summary": {
+                  "const": "The runtime is supported."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "warn"
+                },
+                "code": {
+                  "const": "RUNTIME_DEPRECATED"
+                },
+                "summary": {
+                  "const": "The runtime is supported but deprecated."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "RUNTIME_UNAVAILABLE"
+                },
+                "summary": {
+                  "const": "The required runtime is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "RUNTIME_UNSUPPORTED"
+                },
+                "summary": {
+                  "const": "The runtime version is unsupported."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "RUNTIME_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "The runtime check could not be completed safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "claudeLoginCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "claude-login"
+            },
+            "remediation": {
+              "$ref": "#/$defs/providerLoginRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "CLAUDE_LOGIN_READY"
+                },
+                "summary": {
+                  "const": "Claude Code CLI is installed and authenticated."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "CLAUDE_LOGIN_NOT_REQUIRED"
+                },
+                "summary": {
+                  "const": "Claude Code login is not required for a registry-only provider."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CLAUDE_CLI_UNAVAILABLE"
+                },
+                "summary": {
+                  "const": "Claude Code CLI is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CLAUDE_LOGIN_TIMEOUT"
+                },
+                "summary": {
+                  "const": "Claude Code login status did not complete within the safe timeout."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CLAUDE_LOGIN_REQUIRED"
+                },
+                "summary": {
+                  "const": "Claude Code login is missing or stale."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CLAUDE_LOGIN_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "Claude Code login status could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "codexLoginCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "codex-login"
+            },
+            "remediation": {
+              "$ref": "#/$defs/providerLoginRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "CODEX_LOGIN_READY"
+                },
+                "summary": {
+                  "const": "Codex CLI is installed and authenticated."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "CODEX_LOGIN_NOT_REQUIRED"
+                },
+                "summary": {
+                  "const": "Codex login is not required for a registry-only provider."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CODEX_CLI_UNAVAILABLE"
+                },
+                "summary": {
+                  "const": "Codex CLI is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CODEX_LOGIN_TIMEOUT"
+                },
+                "summary": {
+                  "const": "Codex login status did not complete within the safe timeout."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CODEX_LOGIN_REQUIRED"
+                },
+                "summary": {
+                  "const": "Codex login is missing or stale."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "CODEX_LOGIN_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "Codex login status could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "coordinationCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "coordination"
+            },
+            "remediation": {
+              "$ref": "#/$defs/coordinationRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "COORDINATION_READY"
+                },
+                "summary": {
+                  "const": "Coordination is ready."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "COORDINATION_UNAVAILABLE"
+                },
+                "summary": {
+                  "const": "Coordination is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "COORDINATION_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "Coordination status could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "coordinationScopeCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "coordination-scope"
+            },
+            "remediation": {
+              "$ref": "#/$defs/coordinationRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "COORDINATION_SCOPE_MATCH"
+                },
+                "summary": {
+                  "const": "Coordination uses the configured canonical scope."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "COORDINATION_SCOPE_MISMATCH"
+                },
+                "summary": {
+                  "const": "Coordination does not use the configured canonical scope."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "COORDINATION_SCOPE_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "Coordination scope could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "isolationCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "isolation"
+            },
+            "remediation": {
+              "$ref": "#/$defs/isolationRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "ISOLATION_READY"
+                },
+                "summary": {
+                  "const": "The D-owned isolation authority reports ready."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "ISOLATION_UNAVAILABLE"
+                },
+                "summary": {
+                  "const": "Isolation authority is unavailable."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "ISOLATION_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "Isolation status could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "stateOwnershipCheck": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "state-ownership"
+            },
+            "remediation": {
+              "$ref": "#/$defs/stateOwnershipRemediation"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                },
+                "code": {
+                  "const": "STATE_OWNERSHIP_OWNED"
+                },
+                "summary": {
+                  "const": "The D-owned authority reports exclusive state ownership."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "STATE_OWNERSHIP_CONFLICT"
+                },
+                "summary": {
+                  "const": "The D-owned authority reports a second writer."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "STATE_OWNERSHIP_STALE"
+                },
+                "summary": {
+                  "const": "The D-owned authority reports stale state ownership."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "STATE_OWNERSHIP_UNVERIFIABLE"
+                },
+                "summary": {
+                  "const": "State ownership cannot be verified."
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                },
+                "code": {
+                  "const": "STATE_OWNERSHIP_PROBE_ERROR"
+                },
+                "summary": {
+                  "const": "State ownership status could not be checked safely."
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

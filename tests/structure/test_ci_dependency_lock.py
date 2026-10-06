@@ -24,7 +24,7 @@ def test_python_lock_regeneration_is_portable_and_checkable():
         "--universal",
         "--python-version 3.11",
         "--generate-hashes",
-        "--exclude-newer 2026-07-26T00:00:00Z",
+        "--exclude-newer 2026-10-06T00:00:00Z",
         "--check",
         "--check-inputs",
         "cli/pyproject.toml",

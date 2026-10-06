@@ -5,6 +5,56 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Integrated reusable improvements from the committed agents-orchestrator
+  upstream through `393b056`, preserving AO public defaults and excluding
+  personal repository registrations and execution preferences. Updated six
+  vulnerable transitive npm dependencies within existing dependency ranges.
+  Updated security-affected SDK and Python dependencies, with LangGraph 1.2.5
+  verified against the implementation/review graph regression suite.
+
+- Fixed Antigravity, pi and OpenCode being unusable through the gateway.
+  The agent service only declared an adapter result contract for `codex` and
+  `claude-code`, so an Antigravity, pi or opencode run was rejected with an
+  invalid-selection policy denial after the adapter had already started the
+  session, leaving an orphan tmux session that made the retry fail as a
+  duplicate. The three adapters now consume and return the effective agent
+  selection like Codex and Claude, the service declares their result contracts,
+  and a provider without a contract is rejected before the adapter runs so a
+  denial can no longer leak a session.
+- Added the Gemini 3.8 Flash models (`high`, `medium`, `low`) and the
+  `gemini-3.8-flash` alias to the Antigravity entry in the base, MVP2 and KYA
+  capability registries and the canonical orchestrator profile, matching the
+  `agy models` catalog. Every Antigravity model keeps the `low|medium|high`
+  thinking levels with `high` as the default, and `gemini-3.8-flash-high` is
+  now the Antigravity default model.
+- Added Antigravity (`agy`) permission bypass as an explicit opt-in:
+  `AGENTS_ANTIGRAVITY_AUTO=1` enables `--dangerously-skip-permissions` for
+  headless execution and supervised tmux sessions. Permission prompts remain
+  enabled by default.
+- Added generic `writer` and `editor` roles for prose and documentation to the
+  base, MVP2 and KYA role registries, agent capability registries and canonical
+  orchestrator profile. `writer` may write prose files and `artifact.put.doc`;
+  `editor` is read-only and writes `artifact.put.review_notes`.
+- Added `gpt-6-astra` (GPT-6 Astra) to the codex capability registries (base,
+  MVP2, KYA) and the canonical orchestrator profile with the full reasoning
+  ladder `low|medium|high|xhigh|max|ultra` (default `max`), plus the `astra`
+  and `gpt-6` aliases. Codex keeps the public `gpt-5.6-sol` default with
+  `max` reasoning and the `priority` service tier.
+- Added optional `claude-sonnet-5` and `claude-fable-5-1` models to the Claude
+  Code capability registries and canonical orchestrator profile. Claude keeps
+  `claude-fable-5` as its default and `fable` alias, with `max` reasoning.
+- Replaced disposable per-operation coordination Redis connections with
+  per-service persistent command/blocking clients, bounded admission,
+  coalesced next-call reconnect, zero hidden semantic retries, and bounded
+  idempotent registry/process shutdown. A shutdown-epoch fence now settles
+  active callers at the drain deadline, consumes late transport outcomes, and
+  repeats cleanup when a connection finishes opening after close. Connection
+  reuse now follows the lane-owned successful-handshake state instead of
+  node-redis `isOpen`, so open-but-not-ready callers coalesce correctly.
+- Promoted the Redis 7 coordination acceptance suite to required CI with a
+  health-checked disposable workflow service, machine-readable required-service
+  readiness failure, repeated independent-client race coverage, and a
+  fail-closed namespace leak guard.
 - Added one immutable 33-tool Gateway catalog with Zod/JSON Schema parity,
   closed schemas plus an explicit legacy `message.*` strip-compatibility
   exception, a versioned projection digest, generated public documentation,
@@ -16,6 +66,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
   Hardened it with a non-refreshable topology/skip/readiness contract, finite
   per-suite timeouts, process-group cancellation/reaping, strict TAP
   accounting, honest unavailable aggregate states, and safe byte decoding.
+- Added the external, content-addressed `release-candidate/v1` and
+  `release-state/v1` contracts, with full Git/ref/evidence validation,
+  merge/descendant promotion ancestry, byte-recomputed evidence, trusted-clock
+  checks, an independent license allowlist, a versioned/freshness-bound offline
+  SCA database with exact graph coverage, and candidate-bound expiring advisory
+  waivers. Candidate verification reuses the authoritative CI manifest and
+  non-refreshable topology/skip/readiness contract instead of maintaining a
+  second release-suite inventory. Trial 2 hardens the contract with exact refs,
+  pinned tree/blob verification, review-only evidence-head advancement,
+  Ed25519 reviewer trust roots, a cross-platform hash-lock matrix, raw and
+  canonical primary OSV evidence with 1:1 coverage, a 30-day waiver ceiling,
+  and canonical release provenance/checklist artifacts. Trial 3 makes Git
+  identity replacement-invariant, rejects legacy grafts, enforces reviewer
+  independence from both author and committer, fully terminates timed-out Git
+  process groups, aligns normalized mail identities across schema/runtime, and
+  removes absolute local paths from validation errors. Trial 4 replaces the
+  inherited Git environment with a minimal deterministic allowlist, disables
+  global/system configuration, and neutralizes the complete repository-local
+  environment inventory including external graft and shallow ancestry files.
 - Added Project V5's Redis 7 coordination plane for inter-orchestrator
   coordination: an importable direct factory and eight additive
   `coordination.*` MCP tools sharing leased identities, scope/digest fences,

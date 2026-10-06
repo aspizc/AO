@@ -28,9 +28,13 @@ artifacts, approvals, audit, or the legacy `message.*` tools.
 | `AGENTS_COORDINATION_PREFIX` | `agents:coord:v1` | Versioned Redis key prefix. Use a different prefix for tests or a separate trust domain. |
 | `AGENTS_COORDINATION_SCOPE_ID` | `agents-orchestrator` | Canonical safe scope accepted by this Gateway instance. Omitted registration scope resolves to this value. |
 | `AGENTS_COORDINATION_LEASE_DEFAULT_MS` | `900000` | Default participant lease requested by registration and heartbeat: 15 minutes. |
-| `AGENTS_COORDINATION_LEASE_MAX_MS` | `3600000` | Maximum accepted lease duration and protocol v1 ceiling: one hour. |
+| `AGENTS_COORDINATION_LEASE_MAX_MS` | `259200000` | Maximum accepted lease duration and protocol v1 ceiling: 72 hours. |
 | `AGENTS_COORDINATION_INBOX_MAX_LEN` | `10000` | Per-participant inbox retention/backpressure bound. Pending entries must not be trimmed. |
 | `AGENTS_COORDINATION_MAX_BLOCK_MS` | `30000` | Server-side maximum duration of one blocking receive. |
+| `AGENTS_COORDINATION_COMMAND_CONCURRENCY` | `64` | In-flight admission bound for the owned persistent command client. |
+| `AGENTS_COORDINATION_COMMAND_QUEUE_MAX` | `256` | Maximum queued command operations before `COORDINATION_UNAVAILABLE` backpressure. |
+| `AGENTS_COORDINATION_BLOCKING_QUEUE_MAX` | `32` | Maximum queued blocking receives behind the owned blocking client. |
+| `AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS` | `2000` | Graceful drain bound before active Redis calls are cancelled. |
 | `AGENTS_COORDINATION_MESSAGE_MAX_BYTES` | `65536` | Maximum UTF-8 byte length of one message body. |
 | `AGENTS_COORDINATION_DEDUPE_TTL_MS` | `86400000` | Idempotency window for equal sender/message retries; an equal retry renews it. |
 | `AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS` | `86400000` | Window in which an exact recipient-scoped transport ACK retry is a no-op success. |
@@ -538,9 +542,19 @@ await coordination.send({
 
 `createCoordination` accepts an already normalized configuration object and is
 the supported direct entry point. Construction is lazy and does not connect to
-Redis. The shipped adapter creates and destroys one RESP2 client per operation,
-so there is no long-lived client or public `close` method. On orderly shutdown,
-unregister the participant and discard the service object.
+Redis. Each factory-created service owns one persistent RESP2 command client
+and one dedicated blocking client. Healthy calls reuse them, and
+`coordination.close()` idempotently drains and destroys both without affecting
+another service instance. There is no process-global Redis singleton.
+
+The adapter sets `disableOfflineQueue` and disables node-redis automatic
+reconnect. It never retries an operation after dispatch: a transport failure
+returns `COORDINATION_UNAVAILABLE`, invalidates that lane, and lets only a
+later semantic call establish a replacement connection. Concurrent lazy
+connect/reconnect callers share one connection attempt through its complete
+handshake. Node-redis `isOpen` is not readiness: an open-but-not-ready caller
+continues waiting on that attempt and sends no command. Command and blocking
+admission queues are bounded by the runtime settings above.
 
 The default direct audit callback is the local JSONL-only writer. In the
 Gateway it is already configured; a standalone embedding may configure the
@@ -558,8 +572,9 @@ import {
   createOrchestratorCoordinationClient,
 } from "../gateway/src/coordination.js";
 
+const coordination = createCoordination({ config });
 const client = createOrchestratorCoordinationClient({
-  coordination: createCoordination({ config }),
+  coordination,
   registration: {
     displayName: "orchestrator-codex",
     capabilities: ["coordination.v1", "review"],
@@ -574,6 +589,7 @@ try {
   // Handle peer selection and messages as untrusted input.
 } finally {
   await client.stop();
+  await coordination.close();
 }
 ```
 
@@ -592,13 +608,16 @@ widen that window up to ±25%. `retry.maxAttempts` is the total bounded attempt
 count for one heartbeat or re-registration episode; delays start at
 `retry.baseDelayMs`, double, and cap at `retry.maxDelayMs`.
 
-The factory is reusable, but every returned client is a single-use lifecycle
-instance. `stop()` is the terminal local boundary: it does not assume the
-injected direct service can cancel an already-running call. Instead it advances
-the lifecycle epoch, resolves immediately from local state, suppresses late
-rejection handling, prevents late success from returning to `ready` or
-starting rejoin, and performs detached best-effort unregister if a late
-registration yields usable credentials.
+The managed profile borrows rather than owns its injected direct service, so
+`stop()` does not close it; the embedding that called `createCoordination`
+retains that responsibility. The factory is reusable, but every returned
+client is a single-use lifecycle instance. `stop()` is the terminal local
+boundary: it does not assume the injected direct service can cancel an
+already-running call. Instead it advances the lifecycle epoch, resolves
+immediately from local state, suppresses late rejection handling, prevents
+late success from returning to `ready` or starting rejoin, and performs
+detached best-effort unregister if a late registration yields usable
+credentials.
 
 A transient heartbeat outage moves the profile to `degraded` while finite
 heartbeat retries run. Exhaustion leaves no timer and tells the operator to
@@ -834,16 +853,54 @@ If a process crashes between steps 5 and 7, another consumer can reclaim the
 entry after `reclaimIdleMs`. The handler must detect that step 5 already
 happened and avoid repeating a non-idempotent effect.
 
+### WIRING-A runtime availability limit
+
+The Redis reclaim above applies only to a pending transport delivery. It does
+not provide automatic restart or crash recovery for the store-backed
+WIRING-A consumer runtime.
+
+The ratified WIRING-A part-A availability contract—not a claim that the
+runtime is implemented or released—uses non-expiring store owner state. If
+that runtime crashes, or if an operator restores a backup captured while the
+owner state was active, the scope remains blocked indefinitely. Part A has no
+automatic restart, takeover, clear, or crash-recovery path. Do not delete the
+owner state or infer safe takeover from PID absence, elapsed time, heartbeat
+loss, participant lease expiry, or a failed probe.
+
+The same indefinite block can occur without a crash: a claim can commit before
+later result validation fails; initialization compensation can fail; an
+orderly stop's exact release can fail or remain uncertain; or the persistent
+generation can reach its maximum. In each case the durable row remains the
+authority and part A fails closed.
+
+A released-state snapshot is not an online recovery shortcut. Restoring it can
+roll the persistent generation backward and make an old generation reusable.
+Any restore, copy, or store move for the same managed-client lineage—whether
+the captured row is active or released—requires a separately reviewed offline
+maintenance transition under enforced global quiescence: fence every process
+that can use the store or participant, prevent restart and access, obtain
+exclusive offline control, preserve and advance the durable generation, and
+then reprovision. That transition is not implemented by part A. Durable epoch
+fencing and crash/reclaim closure belong to WIRING part B.
+
 On orderly shutdown:
 
 1. stop accepting new local work;
 2. finish or leave in-flight messages pending for recovery;
 3. transport-ack only completed handling;
-4. call `coordination.unregister`; and
-5. discard the direct service object after outstanding calls finish.
+4. call `coordination.unregister`;
+5. call `coordination.close()`; and
+6. discard the closed service object.
 
-The shipped direct factory owns no persistent Redis connection: each operation
-destroys its own RESP2 client.
+`close()` stops admission, rejects queued work, drains active calls up to
+`AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS`, then destroys its owned clients to
+cancel remaining transport work. At that deadline a lane-owned shutdown epoch
+settles every remaining caller with `COORDINATION_UNAVAILABLE`; late transport
+successes and failures are observed but cannot become caller results. A client
+that finishes connecting after close is destroyed again in its now-open
+post-handshake phase, even if its connecting-phase destroy was ignored.
+`close()` is safe to call more than once. The Gateway invokes the same closure
+once on stdin end, `SIGINT`, or `SIGTERM`.
 
 If the lease token is lost, do not try to reconstruct it from Redis. Register a
 new participant and let the old identity expire.
@@ -921,10 +978,21 @@ running, and let each MCP client start or reconnect to a new Gateway process
 during its normal lifecycle. Configuration changes likewise take effect only
 in a newly started process.
 
-For live acceptance, use a disposable Redis 7 standalone container and expose
-its URL only as `AGENTS_TEST_REDIS_URL` to the test process. Every live test
-derives a UUID coordination prefix and removes only keys under that exact
-prefix. Never point the live suite at a production coordination namespace,
+Live acceptance is the required `test.redis-live` CI lane. GitHub Actions
+provisions one disposable `redis:7.2-alpine` standalone service per Node matrix
+job, waits for its health check, and exposes its loopback URL only as
+`AGENTS_TEST_REDIS_URL` to the test process. A local `./scripts/ci.sh` run must
+receive the URL of an independently managed disposable Redis 7 standalone
+instance. With no URL, the gate reports required infrastructure as
+`infrastructure_unavailable` and returns nonzero instead of producing a false
+skipped green result.
+
+The required lane asserts Redis major version 7, standalone/non-cluster primary
+topology, and repeated independent-client race schedules. It fails on a runtime
+skip, zero tests, a protocol assertion, or leaked keys. Every live test derives
+a UUID coordination prefix and removes only keys under that exact prefix; a
+final read-only guard verifies that no `agents:test:v5:*` namespace remains.
+Never point the live suite at a production or shared coordination namespace,
 never reuse a different project's prefix, and never run `FLUSHDB`.
 
 The ordinary unit, structure, MCP-list, and smoke checks require neither a live
@@ -946,6 +1014,8 @@ Operational claims in this runbook are backed by:
 | eight MCP schemas, read-only status, and bidirectional direct/MCP parity | `tests/gateway/tool_coordination.test.js` and `tests/gateway/coordination_surface_parity.test.js` |
 | JSONL-only coordination audit and unchanged legacy publisher | `tests/gateway/coordination_audit.test.js` |
 | two independent services on Redis 7, isolated key inspection, replacement, recovery, and cleanup | `tests/gateway/coordination_two_instance_live.test.js` |
+| repeated multi-client equality/conflict, pending/reclaim, replacement/expiry, connection-loss, and atomic ACK races | `tests/gateway/coordination_multi_client_race_live.test.js` |
+| zero leaked test namespaces after the complete required live lane | `tests/gateway/zz_coordination_namespace_guard_live.test.js` |
 
 ACL policy, TLS certificate handling, Redis Sentinel, Redis Cluster, and
 multi-tenant network isolation are not exercised by that automated suite; they
