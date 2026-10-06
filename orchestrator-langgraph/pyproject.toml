@@ -6,8 +6,9 @@ license = "MIT"
 authors = [{ name = "Carlos Asensio Pizarro" }]
 requires-python = ">=3.11"
 dependencies = [
-  "langgraph>=1.2.1,<1.2.2",
-  "mcp>=1.27.2,<2",
+  "langgraph>=1.2.5,<1.2.6",
+  "langgraph-sdk>=0.4.4,<0.5",
+  "mcp>=1.28.1,<2",
   "temporalio>=1.28.0,<2",
 ]
 
@@ -16,7 +17,7 @@ redis = [
   "redis>=5,<6",
 ]
 dev = [
-  "ruff>=0.4",
+  "ruff>=0.4,<0.16",
 ]
 
 [build-system]

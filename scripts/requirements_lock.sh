@@ -52,7 +52,7 @@ import sys
 root = Path(sys.argv[1])
 contract = (
     f"uv={sys.argv[2]};python=3.11;all-extras;universal;generate-hashes;"
-    "exclude-newer=2026-07-26T00:00:00Z"
+    "exclude-newer=2026-10-06T00:00:00Z"
 )
 digest = sha256()
 for relative in (
@@ -122,7 +122,7 @@ compile=(
   --universal
   --python-version 3.11
   --generate-hashes
-  --exclude-newer 2026-07-26T00:00:00Z
+  --exclude-newer 2026-10-06T00:00:00Z
   --custom-compile-command "./scripts/requirements_lock.sh"
   --output-file "$TARGET"
   --quiet
