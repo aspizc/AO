@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const BASE = path.join(REPO_ROOT, "policies");
 const MVP2 = path.join(REPO_ROOT, "policies", "profiles", "mvp2");
+const KYA = path.join(REPO_ROOT, "policies", "profiles", "kya");
 
 test("base registry enables codex", () => {
   const reg = loadRegistries({ policiesDir: BASE });
@@ -164,7 +165,7 @@ test("mvp2 profile allows codex on restricted repos", () => {
   assert.equal(decision.decision, "allow");
 });
 
-test("mvp2 profile codex default is gpt-5.6-sol max fast", () => {
+test("mvp2 profile preserves public sol max priority defaults", () => {
   const reg = loadRegistries({ policiesDir: MVP2 });
   const decision = evaluate(
     {
@@ -182,4 +183,97 @@ test("mvp2 profile codex default is gpt-5.6-sol max fast", () => {
   assert.equal(decision.model, "gpt-5.6-sol");
   assert.equal(decision.reasoningEffort, "max");
   assert.equal(decision.serviceTier, "priority");
+});
+
+test("kya profile preserves the public priority default", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const decision = evaluate(
+    { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate" },
+    reg,
+  );
+
+  assert.equal(reg.getAgent("codex").defaultServiceTier, "priority");
+  assert.equal(decision.decision, "allow");
+  assert.equal(decision.serviceTier, "priority");
+});
+
+test("kya profile still grants the priority (Fast) tier when it is asked for", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const decision = evaluate(
+    {
+      agent: "codex",
+      role: "coder",
+      repo: "kya",
+      action: "agent.delegate",
+      serviceTier: "priority",
+    },
+    reg,
+  );
+
+  assert.equal(decision.decision, "allow");
+  assert.equal(decision.serviceTier, "priority");
+});
+
+test("kya profile denies a service tier that is not declared", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const decision = evaluate(
+    {
+      agent: "codex",
+      role: "coder",
+      repo: "kya",
+      action: "agent.delegate",
+      serviceTier: "turbo",
+    },
+    reg,
+  );
+
+  assert.equal(decision.decision, "deny");
+  assert.equal(decision.ruleId, "agent.service_tier.allowed");
+});
+
+test("kya profile codex coder defaults to sol at max", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const decision = evaluate(
+    { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate" },
+    reg,
+  );
+
+  assert.equal(decision.decision, "allow");
+  assert.equal(decision.model, "gpt-5.6-sol");
+  assert.equal(decision.reasoningEffort, "max");
+});
+
+test("kya profile resolves the sol, terra and luna aliases", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const resolve = (model) =>
+    evaluate(
+      { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate", model },
+      reg,
+    );
+
+  assert.equal(resolve("sol").model, "gpt-5.6-sol");
+  assert.equal(resolve("terra").model, "gpt-5.6-terra");
+  assert.equal(resolve("luna").model, "gpt-5.6-luna");
+  assert.equal(resolve("gpt-5.6").model, "gpt-5.6-sol");
+});
+
+test("ultra is granted on sol and terra but denied on luna", () => {
+  const reg = loadRegistries({ policiesDir: KYA });
+  const withUltra = (model) =>
+    evaluate(
+      {
+        agent: "codex",
+        role: "coder",
+        repo: "kya",
+        action: "agent.delegate",
+        model,
+        reasoningEffort: "ultra",
+      },
+      reg,
+    );
+
+  assert.equal(withUltra("gpt-5.6-sol").decision, "allow");
+  assert.equal(withUltra("gpt-5.6-terra").decision, "allow");
+  assert.equal(withUltra("gpt-5.6-luna").decision, "deny");
+  assert.equal(withUltra("gpt-5.6-luna").ruleId, "agent.reasoning_effort.allowed");
 });

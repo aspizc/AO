@@ -232,6 +232,6 @@ test("real MVP2 flow runs Codex coder and Claude reviewer through MCP stdio", { 
       await bestEffortKill(client, traceId, reviewerSession);
       await bestEffortKill(client, traceId, coderSession);
     }
-    client.cleanup();
+    await client.cleanup();
   }
 });

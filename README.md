@@ -43,27 +43,39 @@ npm --prefix gateway install
 `requirements.lock` is generated with `uv pip compile` from the Python
 subproject manifests. It locks the transitive Python environment while the
 editable installs keep local package code live without re-resolving
-dependencies. Regenerate it after dependency changes with:
+dependencies. Regenerate it after dependency changes with the pinned
+universal/hash contract:
 
 ```bash
-uv pip compile cli/pyproject.toml orchestrator-langgraph/pyproject.toml --all-extras --python-version 3.13 --output-file requirements.lock
+./scripts/requirements_lock.sh --upgrade
 ```
 
 Validate policy registries and run the full local gate:
 
 ```bash
 agent-run policy validate
-./scripts/ci.sh
+AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
 ```
 
-`./scripts/ci.sh` runs structure tests, Gateway tests, E2E tests, CLI tests,
-and Orchestrator LangGraph tests. The E2E suite uses dry-run adapters and does
-not require network access, real restricted repositories, or real agent CLI
-execution.
+`./scripts/ci.sh` runs the required release verifier, structure tests, Gateway
+tests, E2E tests, CLI tests, Orchestrator LangGraph tests, and the isolated
+Redis 7 live lane. Supply your disposable Redis endpoint through
+`AGENTS_TEST_REDIS_URL`; a missing endpoint makes the gate fail. The E2E suite
+uses dry-run adapters and does not require real agent CLI execution. See the
+[CI contract](docs/ci-contract.md) for the exact required lanes and skip policy.
+Session tests also require the [pinned tmux runtime](docs/tmux-runtime.md);
+the public CI workflow builds it from verified inputs automatically.
 
 The [canonical MCP tool catalog](docs/mcp-tool-catalog.md) lists the complete
 versioned public surface. Runtime schemas, published JSON Schemas, examples,
 and safe error allowlists come from the same typed source.
+
+The required release lane is offline and fail-closed: it rebuilds the complete
+lock graph across the reviewed Python environment matrix, validates the
+lock-derived SBOM/licenses, and verifies 1:1 primary OSV evidence. Candidate
+collection pins Git tree/blob bytes and signed independent reviews. See the
+[release contract](docs/release-candidate.md) and
+[ADR-V5-02](docs/adr/ADR-V5-02-pinned-release-evidence.md).
 
 For a step-by-step operator path from clone to dry-run, read
 [docs/operator-guide.md](docs/operator-guide.md).
@@ -113,6 +125,7 @@ The Gateway is the enforcement point:
   [ADR-006](docs/adr/ADR-006-bounded-autoapprove.md)); default remains human
   approval
 - Gemini and Claude adapters with dry-run and supervised paths
+- optional Antigravity, pi, and OpenCode adapters with explicit provider setup
 - Codex adapter with default headless execution coverage
 - session tools for attach info and human tmux intervention notes
 - optional V5 leased discovery and at-least-once addressed delivery through a
@@ -137,6 +150,11 @@ child, records approval, and completes the orchestration.
 Codex is enabled in the base policy registry for coder, planner, reviewer, and
 restricted-coder roles. Repository policy still gates each invocation, and
 `agents-orchestrator` excludes `policies/` from Codex writes.
+
+The `writer` and `editor` roles support prose workflows: a writer may write
+prose in non-restricted repositories and publish documentation artifacts; an
+editor reviews sanitized material and publishes review notes. Operators must
+register and allowlist their own repositories before using these roles.
 
 ## V5 Coordination Plane
 
@@ -274,9 +292,13 @@ Experimental (PROJECT_V1, sin gate de produccion):
 | `AGENTS_COORDINATION_PREFIX` | `agents:coord:v1` | Dedicated coordination key prefix; must not overlap `agents:events`. |
 | `AGENTS_COORDINATION_SCOPE_ID` | `agents-orchestrator` | Canonical coordination scope for this Gateway instance. |
 | `AGENTS_COORDINATION_LEASE_DEFAULT_MS` | `900000` | Default participant lease; must not exceed the configured maximum. |
-| `AGENTS_COORDINATION_LEASE_MAX_MS` | `3600000` | Maximum accepted participant lease and v1 ceiling. |
+| `AGENTS_COORDINATION_LEASE_MAX_MS` | `259200000` | Maximum accepted participant lease and v1 ceiling (72 hours). |
 | `AGENTS_COORDINATION_INBOX_MAX_LEN` | `10000` | Per-participant inbox capacity bound. |
 | `AGENTS_COORDINATION_MAX_BLOCK_MS` | `30000` | Maximum server-side blocking receive duration. |
+| `AGENTS_COORDINATION_COMMAND_CONCURRENCY` | `64` | Maximum admitted in-flight operations on the persistent command client. |
+| `AGENTS_COORDINATION_COMMAND_QUEUE_MAX` | `256` | Maximum queued command operations before explicit backpressure. |
+| `AGENTS_COORDINATION_BLOCKING_QUEUE_MAX` | `32` | Maximum queued blocking receives behind the dedicated blocking client. |
+| `AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS` | `2000` | Maximum graceful drain before owned Redis clients are cancelled. |
 | `AGENTS_COORDINATION_MESSAGE_MAX_BYTES` | `65536` | Maximum UTF-8 message body size and v1 upper bound. |
 | `AGENTS_COORDINATION_DEDUPE_TTL_MS` | `86400000` | Equal-send idempotency window. |
 | `AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS` | `86400000` | Exact ACK retry window. |
@@ -291,9 +313,17 @@ Experimental (PROJECT_V1, sin gate de produccion):
 | `AGENTS_DRY_RUN` | `0` | If `1`, adapters do not spawn real subprocesses. |
 | `AGENTS_CODEX_BIN` | `codex` | Codex CLI binary for real Codex adapter execution. |
 | `AGENTS_CODEX_SANDBOX` | `workspace-write` | Sandbox passed to `codex exec`. |
+| `AGENTS_ANTIGRAVITY_BIN` | `agy` | Antigravity CLI binary. |
+| `AGENTS_AGY_BIN` | `agy` | Shorthand alias for `AGENTS_ANTIGRAVITY_BIN`. |
+| `AGENTS_ANTIGRAVITY_AUTO` | `0` | Explicit opt-in to Antigravity permission bypass. |
 | `AGENTS_OTEL_ENABLED` | `false` | V1 experimental telemetry flag; set truthy to enable OTel-inspired export. |
 | `AGENTS_OTEL_EXPORTER` | `stderr` | V1 experimental telemetry exporter. |
 | `AGENTS_OTEL_SERVICE_NAME` | `agents-gateway` | V1 experimental telemetry service name. |
+
+The optional pi and OpenCode adapters additionally read `AGENTS_PI_BIN`,
+`AGENTS_OPENCODE_BIN`, `AGENTS_OPENCODE_AUTO`, and `AGENTS_OLLAMA_BASE_URL`.
+Their setup and defaults are documented in the
+[pi](docs/adapters/pi.md) and [OpenCode](docs/adapters/opencode.md) guides.
 
 ## Documentation
 
@@ -314,6 +344,12 @@ Experimental (PROJECT_V1, sin gate de produccion):
 - [docs/adr/ADR-V5-01-redis-coordination-plane.md](docs/adr/ADR-V5-01-redis-coordination-plane.md)
 - [docs/adapters/claude-code.md](docs/adapters/claude-code.md)
 - [docs/adapters/codex.md](docs/adapters/codex.md)
+- [docs/adapters/antigravity.md](docs/adapters/antigravity.md)
+- [docs/adapters/pi.md](docs/adapters/pi.md)
+- [docs/adapters/opencode.md](docs/adapters/opencode.md)
+- [client-config/local-models/README.md](client-config/local-models/README.md)
+- [docs/doctor.md](docs/doctor.md) — implemented diagnostic core and its current limits
+- [docs/release-candidate.md](docs/release-candidate.md)
 - [docs/adr/](docs/adr/)
 - [client-config/mcp.json.example](client-config/mcp.json.example)
 - [plan/](plan/README.md) — project index; the V5 coordination delivery tree
@@ -332,5 +368,5 @@ Issues and pull requests are welcome. Before submitting a change, run the
 local quality gate:
 
 ```bash
-./scripts/ci.sh
+AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
 ```

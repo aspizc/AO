@@ -367,6 +367,16 @@ equivalent single-shard endpoint. Redis Cluster is outside v1 because its
 authoritative `EVAL` scripts span participant, inbox, dedupe, tombstone, and
 metadata keys. Redis Sentinel discovery and automatic failover configuration
 are also outside the v1 factory contract.
+
+That acceptance is a required CI lane rather than an operator opt-in. Each
+remote matrix job uses a health-checked disposable Redis 7.2 standalone
+service. The lane runs independent clients through repeated send contention,
+replacement/expiry fences, pending reclaim, all-or-nothing ACK, and bounded
+tombstone behavior. It rejects skips, zero tests, the wrong Redis
+version/topology, or keys left under the isolated test namespace. A missing
+local test URL is reported as unavailable required infrastructure and returns
+nonzero without contacting a shared Redis instance.
+
 Outside that boundary, deployments must use all of:
 
 - dedicated Redis credentials and least-privilege ACLs;
@@ -380,12 +390,36 @@ recipient inbox and prevent that peer from forging other senders. Consequently,
 raw multi-tenant writes are not supported. A deployment needing that model must
 put an authenticated relay/service in front of Redis.
 
-The shipped adapter sends inline `EVAL` scripts and creates a fresh RESP2
-client for each operation, destroying that client afterward. It does not
-publish script hashes or expose a supported raw ACK/send helper. A client in
-another language may interoperate only by implementing the complete documented
-wire operation, including every fence and atomic mutation; plain `XADD` or
-`XACK` is not service-equivalent.
+The shipped adapter sends inline `EVAL` scripts through two clients owned by
+each service instance: one persistent multiplexed command client and one
+persistent serialized blocking client. Both connect lazily. Command
+concurrency, command waiters, blocking waiters, and graceful shutdown are
+bounded; there is no process-global client singleton.
+
+Node-redis offline queuing and automatic reconnect are disabled. A transport
+failure never causes the adapter to replay the dispatched semantic operation.
+It invalidates and destroys that lane, returns the safe unavailable error, and
+allows only a later caller to perform one coalesced reconnect. Orderly
+service/Gateway shutdown stops admission, rejects queued work, drains to the
+configured deadline, then advances a lane-owned shutdown epoch before
+destroying its owned clients. Every admitted operation carries that epoch: an
+unsettled caller receives `COORDINATION_UNAVAILABLE` at the deadline, while
+its eventual transport result or error is consumed and cannot cross the
+shutdown fence. A destroy attempted while connect is pending does not suppress
+the required cleanup if that client later becomes open. Client errors and
+listener cleanup cannot alter fencing or result semantics.
+
+The lane's in-flight connect promise is authoritative until its handshake
+settles. Node-redis may report `isOpen` while `isReady` is still false, so the
+adapter never uses `isOpen` as successful-handshake evidence. Only the
+lane-owned `ready` state permits dispatch. Cleanup attempts are deduplicated by
+connection generation and lane phase; a connecting-phase destroy therefore
+cannot suppress the post-handshake destroy required by a concurrent close.
+
+The adapter does not publish script hashes or expose a supported raw ACK/send
+helper. A client in another language may interoperate only by implementing the
+complete documented wire operation, including every fence and atomic mutation;
+plain `XADD` or `XACK` is not service-equivalent.
 
 `rediss://` delegates certificate verification to node-redis and the host
 system trust configuration. The v1 environment surface does not expose custom
@@ -408,6 +442,12 @@ suite; operators must validate them in their target environment.
   or validation.
 - Raw Redis interoperability is possible, but its trust and operational costs
   are explicit.
+- Healthy calls reuse per-service connections; bounded admission fails
+  explicitly instead of growing an offline/in-memory queue without limit.
+- A failed non-idempotent operation is never transport-retried. Callers choose
+  whether a later request is safe under the documented message/ACK contracts.
+- The required live lane proves the Redis-specific race contract on every
+  remote CI matrix job; fake-client tests remain complementary unit evidence.
 - `agents:events` consumers remain compatible because coordination uses a
   separate prefix and coordination service/tool-call audit uses the JSONL-only
   writer instead of the legacy Redis publisher.

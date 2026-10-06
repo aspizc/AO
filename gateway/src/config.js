@@ -154,6 +154,26 @@ export function loadConfig(env = process.env) {
       30_000,
       "AGENTS_COORDINATION_MAX_BLOCK_MS",
     ),
+    coordinationCommandConcurrency: parsePositiveInteger(
+      env.AGENTS_COORDINATION_COMMAND_CONCURRENCY,
+      64,
+      "AGENTS_COORDINATION_COMMAND_CONCURRENCY",
+    ),
+    coordinationCommandQueueMax: parsePositiveInteger(
+      env.AGENTS_COORDINATION_COMMAND_QUEUE_MAX,
+      256,
+      "AGENTS_COORDINATION_COMMAND_QUEUE_MAX",
+    ),
+    coordinationBlockingQueueMax: parsePositiveInteger(
+      env.AGENTS_COORDINATION_BLOCKING_QUEUE_MAX,
+      32,
+      "AGENTS_COORDINATION_BLOCKING_QUEUE_MAX",
+    ),
+    coordinationShutdownTimeoutMs: parsePositiveInteger(
+      env.AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS,
+      2_000,
+      "AGENTS_COORDINATION_SHUTDOWN_TIMEOUT_MS",
+    ),
     coordinationMessageMaxBytes: parseBoundedPositiveInteger(
       env.AGENTS_COORDINATION_MESSAGE_MAX_BYTES,
       COORDINATION_MESSAGE_V1_BODY_MAX_LENGTH,
@@ -182,6 +202,8 @@ export function loadConfig(env = process.env) {
     messageAccessSecret: loadOrCreateMessageAccessSecret(env, workspace),
     codexBin: env.AGENTS_CODEX_BIN || "codex",
     codexSandbox: env.AGENTS_CODEX_SANDBOX || "workspace-write",
+    antigravityBin: env.AGENTS_ANTIGRAVITY_BIN || env.AGENTS_AGY_BIN || "agy",
+    antigravityAuto: env.AGENTS_ANTIGRAVITY_AUTO === "1",
     dryRun: env.AGENTS_DRY_RUN === "1",
     repoRoots: (env.AGENTS_REPO_ROOTS || "").split(":").filter(Boolean),
     autoApproveScopes: parseCsv(env.AGENTS_AUTOAPPROVE),

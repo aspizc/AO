@@ -1,0 +1,38 @@
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -80,0 +81 @@ dist_tmux_SOURCES = \
++	cmd-agents-capture.c \
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -163 +163 @@ am__dist_tmux_SOURCES_DIST = alerts.c arguments.c attributes.c cfg.c \
+-	client.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
++	client.c cmd-agents-capture.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
+@@ -200 +200 @@ dist_tmux_OBJECTS = alerts.$(OBJEXT) arguments.$(OBJEXT) \
+-	cmd-attach-session.$(OBJEXT) cmd-bind-key.$(OBJEXT) \
++	cmd-agents-capture.$(OBJEXT) cmd-attach-session.$(OBJEXT) cmd-bind-key.$(OBJEXT) \
+@@ -531 +531 @@ dist_tmux_SOURCES = alerts.c arguments.c attributes.c cfg.c client.c \
+-	cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
++	cmd-agents-capture.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
+@@ -692,0 +693 @@ distclean-compile:
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd-agents-capture.Po@am__quote@
+diff --git a/cmd.c b/cmd.c
+--- a/cmd.c
++++ b/cmd.c
+@@ -29,0 +30 @@
++extern const struct cmd_entry cmd_agents_capture_entry;
+@@ -121,0 +123 @@ const struct cmd_entry *cmd_table[] = {
++	&cmd_agents_capture_entry,
+diff --git a/options-table.c b/options-table.c
+--- a/options-table.c
++++ b/options-table.c
+@@ -372 +372 @@
+-	  .default_num = 1,
++	  .default_num = 0,
+diff --git a/tmux.c b/tmux.c
+--- a/tmux.c
++++ b/tmux.c
+@@ -346 +346 @@ getversion(void)
+-	return (TMUX_VERSION);
++	return (TMUX_VERSION "-agents.1");

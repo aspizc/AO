@@ -12,7 +12,7 @@ description: >-
 # agents-orchestrator Plan Orchestration (spawn-based)
 
 You are the **planner/orchestrator** (the human-facing session) for this repo
-(`/home/aspizc/git/experiments/AO`). Your job: turn source documents and audit
+(the current AO checkout). Your job: turn source documents and audit
 findings into **executable, reviewable plans** in the project's exact format, and keep them
 production-grade. You author plan documents only — **no implementation code** lands from this
 skill (that is `ao-build-orchestration`). You may **spawn helper agents** to draft, refine,

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import crypto from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -14,10 +15,20 @@ import {
 } from "./core/audit.js";
 import { loadRegistries } from "./core/registry.js";
 import { configureSanitizer } from "./core/sanitizer.js";
+import { createProcessTermination } from "./core/process_lifecycle.js";
+import {
+  createGatewayRequestContext,
+  isRequestContextProtectedAction,
+  revokeRequestContext,
+  REQUEST_CONTEXT_ERROR,
+} from "./core/request_context.js";
 import { initState } from "./core/state.js";
 import { createTelemetry, safeToolCallAttributes, traceIdForCall } from "./core/telemetry.js";
 import { getToolContract } from "./tools/catalog.js";
-import { getToolRegistry } from "./tools/index.js";
+import {
+  closeToolRegistry,
+  getToolRegistry,
+} from "./tools/index.js";
 
 const COORDINATION_TOOL_PREFIX = "coordination.";
 
@@ -125,6 +136,9 @@ export function createCallToolHandler({
   telemetry = createTelemetry({ telemetry: { enabled: false } }),
   append = auditAppend,
   appendLocalOnly = auditAppendLocalOnly,
+  requestContext,
+  transportBinding,
+  now = () => new Date().toISOString(),
 }) {
   return async (request, extra = {}) => {
     const traceId = traceIdForCall(request, extra);
@@ -138,7 +152,23 @@ export function createCallToolHandler({
       const tool = tools.find((candidate) => candidate.name === request.params.name);
       if (!tool) throw new Error("unknown tool");
 
-      const result = await tool.handler(request.params.arguments || {});
+      const protectedAction = isRequestContextProtectedAction(tool.name);
+      if (protectedAction && tool.requestContextBoundary !== true) {
+        throw new Error("protected tool is missing its request context boundary");
+      }
+      const invocation = protectedAction
+        ? {
+            requestContext,
+            actionCatalogVersion: tool.actionCatalogVersion,
+            audience: transportBinding?.audience,
+            connectionId: transportBinding?.connectionId,
+            now: now(),
+          }
+        : null;
+      const result = await tool.handler(
+        request.params.arguments || {},
+        invocation,
+      );
       const status = result?.isError ? "error" : "ok";
       const attributes = safeToolCallAttributes({ request, extra, traceId, status });
       const errorCode = parseToolErrorCode(result, tool);
@@ -156,6 +186,22 @@ export function createCallToolHandler({
       return result;
     } catch (err) {
       const attributes = safeToolCallAttributes({ request, extra, traceId, status: "error" });
+      // WHY A REFUSAL WAS REFUSED — IN THE OPERATOR'S LOG ONLY.
+      //
+      // `deny(reasonCode)` throws a RequestContextError carrying the exact check that fired —
+      // trace_denied, capability_denied, expired, connection_mismatch and sixteen others — and
+      // nothing recorded it anywhere. The client is deliberately told only
+      // REQUEST_CONTEXT_DENIED, which is the right call for a sanitized surface; the cost was
+      // that the OPERATOR could not see it either. Twenty distinct causes behind one
+      // indistinguishable message.
+      //
+      // Two orchestrator sessions spent an afternoon doing black-box argument search against a
+      // check that knew the answer and would not say it, and produced two confident wrong
+      // diagnoses on the way. This changes NOT ONE BYTE of what the client receives; it writes
+      // the reason where the person debugging can read it.
+      if (err?.code === REQUEST_CONTEXT_ERROR && typeof err?.reasonCode === "string") {
+        attributes["request_context.reason_code"] = err.reasonCode.slice(0, 120);
+      }
       span.setAttributes(attributes);
       span.setStatus({ code: "ERROR" });
       span.recordException(err);
@@ -193,6 +239,16 @@ async function main() {
 
   const tools = getToolRegistry({ config, registries });
   const telemetry = createTelemetry(config);
+  const transportBinding = {
+    audience: "agents-gateway",
+    connectionId: crypto.randomUUID(),
+  };
+  const requestContext = createGatewayRequestContext({
+    config,
+    registries,
+    actionCatalogVersion: tools[0]?.actionCatalogVersion,
+    connectionId: transportBinding.connectionId,
+  });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: tools.map((tool) => ({
@@ -209,14 +265,42 @@ async function main() {
       telemetry,
       append: auditAppend,
       appendLocalOnly: auditAppendLocalOnly,
+      requestContext,
+      transportBinding,
     }),
   );
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
   logErr("info", "gateway connected", { tools: tools.length, workspace: config.workspace });
-  process.stdin.resume();
-  await new Promise((resolve) => process.stdin.on("end", resolve));
+  const termination = createProcessTermination({
+    input: process.stdin,
+    signals: process,
+  });
+  let stopped;
+  try {
+    process.stdin.resume();
+    stopped = await termination.wait;
+  } finally {
+    termination.dispose();
+    revokeRequestContext(requestContext);
+    try {
+      await closeToolRegistry(tools);
+    } finally {
+      try {
+        await server.close();
+      } catch (err) {
+        logErr("warn", "gateway transport close failed", {
+          error: String(err?.message || err),
+        });
+      } finally {
+        process.stdin.pause();
+      }
+    }
+  }
+  logErr("info", "gateway stopped", stopped);
+  if (stopped.signal === "SIGINT") process.exitCode = 130;
+  if (stopped.signal === "SIGTERM") process.exitCode = 143;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

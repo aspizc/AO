@@ -38,6 +38,10 @@ function createFakeClient({
       listeners.set(event, listener);
       return this;
     },
+    off(event, listener) {
+      if (listeners.get(event) === listener) listeners.delete(event);
+      return this;
+    },
     async connect() {
       connectCalls += 1;
       if (connectError) throw connectError;
@@ -107,7 +111,7 @@ test("construction and description are lazy and never open Redis", () => {
   assert.equal(factoryCalls, 0);
 });
 
-test("health probe is lazy, read-only, and releases its disposable client", async () => {
+test("health probe is lazy, read-only, and retains its owned client until close", async () => {
   const client = createFakeClient({ responses: ["PONG"] });
   let factoryCalls = 0;
   const queue = createRedisCoordinationQueue({
@@ -123,7 +127,10 @@ test("health probe is lazy, read-only, and releases its disposable client", asyn
   assert.equal(factoryCalls, 1);
   assert.deepEqual(client.commands, [["PING"]]);
   assert.equal(client.connectCalls, 1);
+  assert.equal(client.destroyCalls, 0);
+  assert.deepEqual(await queue.close(), { status: "closed" });
   assert.equal(client.destroyCalls, 1);
+  assert.equal(client.listeners.size, 0);
 });
 
 test("health probe distinguishes unavailable transport from invalid Redis replies", async () => {
@@ -157,52 +164,45 @@ test("disabled adapter fails explicitly without constructing a client", async ()
   assert.equal(factoryCalls, 0);
 });
 
-test("each operation uses a fresh RESP2 client and closes only its own client", async () => {
-  const clients = [
-    createFakeClient({ responses: [JSON.stringify({ participantId: "pt:a" })] }),
-    createFakeClient({ responses: [null] }),
-  ];
+test("healthy operations reuse one owned RESP2 client until explicit close", async () => {
+  const client = createFakeClient({
+    responses: [JSON.stringify({ participantId: "pt:a" }), null],
+  });
   const factoryOptions = [];
+  const factoryContexts = [];
   const queue = createRedisCoordinationQueue({
     redisUrl: "redis://127.0.0.1:6399/15",
     connectTimeoutMs: 321,
-    clientFactory(options) {
+    clientFactory(options, context) {
       factoryOptions.push(structuredClone(options));
-      return clients[factoryOptions.length - 1];
+      factoryContexts.push(context);
+      return client;
     },
   });
 
   assert.deepEqual(await queue.getParticipant("pt:a"), { participantId: "pt:a" });
   assert.equal(await queue.getParticipant("pt:b"), null);
-  assert.equal(clients[0].connectCalls, 1);
-  assert.equal(clients[1].connectCalls, 1);
-  assert.equal(clients[0].destroyCalls, 1);
-  assert.equal(clients[1].destroyCalls, 1);
-  assert.deepEqual(clients[0].commands, [[
-    "GET",
-    "agents:coord:v1:presence:pt%3Aa",
-  ]]);
-  assert.deepEqual(factoryOptions, [
-    {
-      url: "redis://127.0.0.1:6399/15",
-      RESP: 2,
-      socket: {
-        connectTimeout: 321,
-        reconnectStrategy: false,
-      },
-    },
-    {
-      url: "redis://127.0.0.1:6399/15",
-      RESP: 2,
-      socket: {
-        connectTimeout: 321,
-        reconnectStrategy: false,
-      },
-    },
+  assert.equal(client.connectCalls, 1);
+  assert.equal(client.destroyCalls, 0);
+  assert.deepEqual(client.commands, [
+    ["GET", "agents:coord:v1:presence:pt%3Aa"],
+    ["GET", "agents:coord:v1:presence:pt%3Ab"],
   ]);
+  assert.deepEqual(factoryOptions, [{
+    url: "redis://127.0.0.1:6399/15",
+    RESP: 2,
+    disableOfflineQueue: true,
+    socket: {
+      connectTimeout: 321,
+      reconnectStrategy: false,
+    },
+  }]);
+  assert.deepEqual(factoryContexts, [{ kind: "command" }]);
+  await queue.close();
+  assert.equal(client.destroyCalls, 1);
 });
 
-test("an already-open injected client is not reconnected but is still released", async () => {
+test("an already-open injected client is owned without reconnect and closes explicitly", async () => {
   const client = createFakeClient({
     initiallyOpen: true,
     responses: [JSON.stringify({ participantId: "pt-a" })],
@@ -214,6 +214,8 @@ test("an already-open injected client is not reconnected but is still released",
 
   assert.deepEqual(await queue.getParticipant("pt-a"), { participantId: "pt-a" });
   assert.equal(client.connectCalls, 0);
+  assert.equal(client.destroyCalls, 0);
+  await queue.close();
   assert.equal(client.destroyCalls, 1);
 });
 
@@ -296,6 +298,7 @@ test("participant decoding accepts only JSON objects or null", async () => {
       queue.getParticipant("pt-a"),
       "COORDINATION_INVALID_DATA",
     );
+    await queue.close();
     assert.equal(client.destroyCalls, 1);
   }
 });
@@ -327,14 +330,23 @@ test("dependency failures map to one safe unavailable error and cleanup stays be
   );
 });
 
-test("client error observers and observer failures never alter operation semantics", async () => {
-  const client = createFakeClient({
+test("client error observers stay safe while the failed connection is replaced", async () => {
+  const failed = createFakeClient({
     responses: [JSON.stringify({ participantId: "pt-a" })],
   });
+  const replacement = createFakeClient({
+    responses: [JSON.stringify({ participantId: "pt-a" })],
+  });
+  const clients = [failed, replacement];
+  let factoryCalls = 0;
   let observerCalls = 0;
   const queue = createRedisCoordinationQueue({
     redisUrl: "redis://isolated.invalid",
-    clientFactory: () => client,
+    clientFactory: () => {
+      const client = clients[factoryCalls];
+      factoryCalls += 1;
+      return client;
+    },
     onError() {
       observerCalls += 1;
       throw new Error("sentinel observer failure");
@@ -342,9 +354,15 @@ test("client error observers and observer failures never alter operation semanti
   });
 
   const operation = queue.getParticipant("pt-a");
-  client.listeners.get("error")?.(new Error("sentinel async client error"));
-  assert.deepEqual(await operation, { participantId: "pt-a" });
+  failed.listeners.get("error")?.(new Error("sentinel async client error"));
+  await expectQueueCode(operation, "COORDINATION_UNAVAILABLE");
   assert.equal(observerCalls, 1);
+  assert.deepEqual(
+    await queue.getParticipant("pt-a"),
+    { participantId: "pt-a" },
+  );
+  assert.equal(factoryCalls, 2);
+  await queue.close();
 });
 
 test("constructor rejects invalid prefixes, client hooks, and numeric limits", () => {
@@ -356,6 +374,10 @@ test("constructor rejects invalid prefixes, client hooks, and numeric limits", (
     { connectTimeoutMs: 1.5 },
     { maxInboxLength: 0 },
     { orphanInboxTtlMs: Number.MAX_SAFE_INTEGER + 1 },
+    { maxCommandConcurrency: 0 },
+    { maxCommandQueue: 0 },
+    { maxBlockingQueue: 0 },
+    { shutdownTimeoutMs: 0 },
   ]) {
     assert.throws(
       () => createRedisCoordinationQueue(options),

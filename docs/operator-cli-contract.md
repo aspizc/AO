@@ -30,3 +30,13 @@ The default Codex profile resolves to `gpt-5.6-sol`, effort `max`, and service
 tier `priority` (Fast). The default Claude profile resolves to
 `claude-fable-5` with effort `max`; its only allowed Claude 4.x model is
 `claude-opus-4-8`.
+
+Two more agents run local or third-party models. `pi` defaults to
+`ollama/qwen3.8:27b` with `--thinking medium`, and its effort enum is
+`off | minimal | low | medium | high | xhigh` — not the codex/claude ladder, so
+`max` and `ultra` are policy denials. `opencode` defaults to the same local model
+and declares **no** effort dimension, so any `reasoningEffort` on it is denied.
+Both also carry `moonshotai/kimi-k3`, which is refused before launch with
+`MODEL_CREDENTIAL_MISSING` until `MOONSHOT_API_KEY` is set. See
+[docs/adapters/pi.md](adapters/pi.md) and
+[docs/adapters/opencode.md](adapters/opencode.md).

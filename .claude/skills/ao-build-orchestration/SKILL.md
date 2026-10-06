@@ -100,7 +100,9 @@ agent_ask({sessionId:reviewerSession, prompt:<reviewer brief + handoff path>, tr
 2. **One full `bash scripts/ci.sh`** after the focused set is green; record exact totals
    (passed/failed/deferred) in the handoff. Run it **solo per tree** (turn-taking) and **on the
    host, never inside the Codex sandbox** (the sandbox hangs the LangGraph suite). `langgraph`
-   stays pinned to 1.2.1. Docs-only changes need the relevant doc/structure check +
+   stays pinned to 1.2.5 for the SDK 0.4.4 security fix; the isolated upgrade
+   check passed 81 tests with 3 integration skips (see `docs/ci-contract.md`).
+   Docs-only changes need the relevant doc/structure check +
    `git diff --check`, not the full gate.
 3. A DEFERRED-as-pass lane or an unexplained failure is a finding to attribute, not noise;
    never retry to green without attributing the first failure.

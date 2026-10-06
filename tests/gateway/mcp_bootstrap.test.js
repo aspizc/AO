@@ -101,6 +101,7 @@ test("server_initializes_lists_tools_and_audits_boot", () => {
     ],
   );
   assert.ok(stderr.includes("gateway connected"), `missing connect log: ${stderr}`);
+  assert.ok(stderr.includes("gateway stopped"), `missing stop log: ${stderr}`);
   assert.ok(!stdout.includes("gateway connected"), "stdout was polluted with logs");
 
   const auditLog = path.join(workspace, "audit", "events.jsonl");

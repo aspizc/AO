@@ -10,7 +10,15 @@ import {
   tmuxSync,
 } from "./tmux_client.js";
 import { append as auditAppend } from "../core/audit.js";
-import { evaluate } from "../core/policy_engine.js";
+import {
+  evaluate,
+  resolveAgentExecutionProfile,
+} from "../core/policy_engine.js";
+import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
+import {
+  RequestContextError,
+  assertServerOwnedExecutionBinding,
+} from "../core/request_context.js";
 
 const AGENT_ID = "claude-code";
 const DEFAULT_TIMEOUT_MS = 600_000;
@@ -45,10 +53,17 @@ function buildClaudeLaunch(config, { model = null, reasoningEffort = null } = {}
   return launch;
 }
 
-function effectiveModel(decision, { model = null, reasoningEffort = null } = {}) {
+function effectiveModel(decision, consumer) {
+  const selection = consumeEffectiveAgentSelection(
+    decision.effectiveSelection,
+    {
+      agent: AGENT_ID,
+      consumer,
+    },
+  );
   return {
-    model: decision.model || model || null,
-    reasoningEffort: decision.reasoningEffort || reasoningEffort || null,
+    model: selection.model,
+    reasoningEffort: selection.reasoningEffort,
   };
 }
 
@@ -100,14 +115,32 @@ function auditAdapterError({ traceId, role, where, err }) {
 
 function preflight(adapter, ctx) {
   const result = evaluate(ctx, adapter.registries);
+  return assertPolicyAllowed(result);
+}
+
+function assertPolicyAllowed(result) {
   if (result.decision !== "allow") {
-    const err = new Error(`policy denied: ${result.reason}`);
+    const err = new Error("request denied by policy");
     err.code = "POLICY_DENIED";
     err.decision = result;
     err.policy = result;
     throw err;
   }
   return result;
+}
+
+function assertSuppliedSelection({
+  effectiveSelection,
+  model,
+  reasoningEffort,
+  serviceTier,
+}, consumer) {
+  if (effectiveSelection === null || effectiveSelection === undefined) return;
+  consumeEffectiveAgentSelection(effectiveSelection, {
+    agent: AGENT_ID,
+    consumer,
+    rawSelection: { model, reasoningEffort, serviceTier },
+  });
 }
 
 function assertTmuxOk(result, action) {
@@ -125,20 +158,63 @@ export class ClaudeAdapter extends BaseAdapter {
     super({ id: AGENT_ID, ...opts });
   }
 
-  async delegate({ cwd, prompt, traceId, role, repo = null, model = null, reasoningEffort = null }) {
+  async delegate({
+    cwd,
+    prompt,
+    traceId,
+    taskId = null,
+    targetAction = null,
+    role,
+    repo = null,
+    model = null,
+    reasoningEffort = null,
+    serviceTier = null,
+    effectiveSelection = null,
+    requestBinding = null,
+  }) {
     try {
-      const decision = preflight(this, {
-        agent: AGENT_ID,
-        role,
-        action: "agent.delegate",
-        repo,
+      const hasRequestBinding =
+        requestBinding !== null && requestBinding !== undefined;
+      if (hasRequestBinding) {
+        assertServerOwnedExecutionBinding(requestBinding, {
+          action: "agent.delegate",
+          agent: AGENT_ID,
+          role,
+          repositoryId: repo,
+          traceId,
+          taskId,
+          cwd,
+          targetAction,
+        });
+      }
+      assertSuppliedSelection({
+        effectiveSelection,
         model,
         reasoningEffort,
-      });
+        serviceTier,
+      }, "delegate");
+      const decision = hasRequestBinding
+        ? assertPolicyAllowed(resolveAgentExecutionProfile({
+            agent: AGENT_ID,
+            effectiveSelection,
+            model,
+            reasoningEffort,
+            serviceTier,
+          }, this.registries))
+        : preflight(this, {
+            agent: AGENT_ID,
+            role,
+            action: "agent.delegate",
+            repo,
+            model,
+            reasoningEffort,
+            serviceTier,
+            effectiveSelection,
+          });
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
-      } = effectiveModel(decision, { model, reasoningEffort });
+      } = effectiveModel(decision, "delegate");
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
       auditSessionStarted({ traceId, role, mode: "headless" });
 
@@ -153,6 +229,7 @@ export class ClaudeAdapter extends BaseAdapter {
           dryRun: true,
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
+          effectiveSelection: decision.effectiveSelection,
         };
         auditSessionClosed({ traceId, role, mode: "headless", exitCode: result.exitCode });
         return result;
@@ -178,29 +255,77 @@ export class ClaudeAdapter extends BaseAdapter {
         dryRun: false,
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
+        effectiveSelection: decision.effectiveSelection,
       };
       auditSessionClosed({ traceId, role, mode: "headless", exitCode: result.exitCode });
       return result;
     } catch (err) {
-      auditAdapterError({ traceId, role, where: "delegate", err });
+      if (
+        !(err instanceof RequestContextError)
+        && err?.code !== "EFFECTIVE_SELECTION_INVALID"
+      ) {
+        auditAdapterError({ traceId, role, where: "delegate", err });
+      }
       throw err;
     }
   }
 
-  async spawn({ cwd, traceId, role, repo = null, model = null, reasoningEffort = null }) {
+  async spawn({
+    cwd,
+    traceId,
+    taskId = null,
+    targetAction = null,
+    role,
+    repo = null,
+    model = null,
+    reasoningEffort = null,
+    serviceTier = null,
+    effectiveSelection = null,
+    requestBinding = null,
+  }) {
     try {
-      const decision = preflight(this, {
-        agent: AGENT_ID,
-        role,
-        action: "agent.spawn",
-        repo,
+      const hasRequestBinding =
+        requestBinding !== null && requestBinding !== undefined;
+      if (hasRequestBinding) {
+        assertServerOwnedExecutionBinding(requestBinding, {
+          action: "agent.spawn",
+          agent: AGENT_ID,
+          role,
+          repositoryId: repo,
+          traceId,
+          taskId,
+          cwd,
+          targetAction,
+        });
+      }
+      assertSuppliedSelection({
+        effectiveSelection,
         model,
         reasoningEffort,
-      });
+        serviceTier,
+      }, "spawn");
+      const decision = hasRequestBinding
+        ? assertPolicyAllowed(resolveAgentExecutionProfile({
+            agent: AGENT_ID,
+            effectiveSelection,
+            model,
+            reasoningEffort,
+            serviceTier,
+          }, this.registries))
+        : preflight(this, {
+            agent: AGENT_ID,
+            role,
+            action: "agent.spawn",
+            repo,
+            model,
+            reasoningEffort,
+            serviceTier,
+            effectiveSelection,
+          });
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
-      } = effectiveModel(decision, { model, reasoningEffort });
+      } = effectiveModel(decision, "spawn");
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
       const tmuxTarget = buildTmuxTarget({
         traceId,
@@ -227,9 +352,15 @@ export class ClaudeAdapter extends BaseAdapter {
         attachCommand: `tmux attach -t ${tmuxTarget}`,
         launchCommand,
         dryRun,
+        effectiveSelection: decision.effectiveSelection,
       };
     } catch (err) {
-      auditAdapterError({ traceId, role, where: "spawn", err });
+      if (
+        !(err instanceof RequestContextError)
+        && err?.code !== "EFFECTIVE_SELECTION_INVALID"
+      ) {
+        auditAdapterError({ traceId, role, where: "spawn", err });
+      }
       throw err;
     }
   }

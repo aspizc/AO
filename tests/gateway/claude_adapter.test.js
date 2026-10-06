@@ -55,7 +55,7 @@ function fakeClaudeBin(dir, argvFile) {
   return bin;
 }
 
-test("dry run delegate returns deterministic mock output", async () => {
+test("dry run delegate returns canonical default selection output", async () => {
   const { root } = setup();
 
   const result = await adapter(root).delegate({
@@ -68,7 +68,10 @@ test("dry run delegate returns deterministic mock output", async () => {
   assert.equal(result.exitCode, 0);
   assert.equal(result.stderr, "");
   assert.equal(result.dryRun, true);
-  assert.match(result.stdout, /^\[dry-run claude\]/);
+  assert.match(
+    result.stdout,
+    /^\[dry-run claude model=claude-fable-5 effort=max\]/,
+  );
   assert.match(result.stdout, /prompt=write tests/);
   assert.match(result.stdout, new RegExp(`cwd=${root}`));
 });
@@ -125,7 +128,7 @@ test("delegate real passes model and effort flags to claude cli", async () => {
   ]);
 });
 
-test("delegate real omits model and effort flags when neither is resolved", async () => {
+test("delegate real uses canonical defaults when request fields are omitted", async () => {
   const { root } = setup();
   const argvFile = path.join(root, "argv.json");
   const subject = adapter(root, {
@@ -142,8 +145,12 @@ test("delegate real omits model and effort flags when neither is resolved", asyn
   });
   const argv = JSON.parse(fs.readFileSync(argvFile, "utf-8"));
 
-  assert.equal(argv.includes("--model"), false);
-  assert.equal(argv.includes("--effort"), false);
+  assert.deepEqual(argv.slice(6, 10), [
+    "--model",
+    "claude-fable-5",
+    "--effort",
+    "max",
+  ]);
   assert.equal(argv.at(-1), "review");
 });
 
@@ -179,7 +186,7 @@ test("policy deny prevents delegate session start and audits error", async () =>
         traceId: "tr-claude-deny",
         role: "coder",
       }),
-    /policy denied/,
+    /request denied by policy/,
   );
   const events = await query({ traceId: "tr-claude-deny" });
 

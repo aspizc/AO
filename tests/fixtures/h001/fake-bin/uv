@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+label=""
+if [[ "$#" -eq 1 && "$1" == "--version" ]]; then
+  label="uv-version"
+elif [[ "$#" -eq 4 && "$1" == "venv" && "$2" == "--python" && "$3" == "3.11" && "$4" == ".venv" ]]; then
+  label="uv-venv"
+elif [[ "$#" -eq 4 && "$1" == "pip" && "$2" == "sync" && "$3" == "--require-hashes" && "$4" == "requirements.lock" ]]; then
+  label="uv-sync"
+elif [[ "$#" -eq 9 && "$1" == "pip" && "$2" == "install" && "$3" == "--no-deps" && "$4" == "--no-build-isolation" && "$5" == "-e" && "$6" == "cli" && "$7" == "-e" && "$8" == "orchestrator-langgraph" && "$9" == "--offline" ]]; then
+  label="uv-editable"
+else
+  printf 'unexpected fake uv invocation\n' >&2
+  exit 97
+fi
+
+: "${H001_INSTALL_LOG:?H001_INSTALL_LOG is required}"
+printf 'uv' >>"$H001_INSTALL_LOG"
+printf '\t%s' "$@" >>"$H001_INSTALL_LOG"
+printf '\n' >>"$H001_INSTALL_LOG"
+
+if [[ "${H001_FAIL_ON:-}" == "$label" ]]; then
+  exit 86
+fi
+
+case "$label" in
+  uv-version)
+    printf 'uv %s\n' "${H001_UV_VERSION:-0.11.21}"
+    ;;
+  uv-venv)
+    if [[ -n "${H001_VENV_BIN_SYMLINK_TARGET:-}" ]]; then
+      mkdir -p .venv
+      ln -s "$H001_VENV_BIN_SYMLINK_TARGET" .venv/bin
+    else
+      mkdir -p .venv/bin .venv/lib
+      ln -sfn lib .venv/lib64
+      printf 'VIRTUAL_ENV=%q\nexport VIRTUAL_ENV\nPATH="$VIRTUAL_ENV/bin:$PATH"\nexport PATH\n' \
+        "$PWD/.venv" >.venv/bin/activate
+    fi
+    ;;
+  uv-sync)
+    : >.venv/.h001-synced
+    ;;
+  uv-editable)
+    : >.venv/.h001-editable
+    ;;
+esac

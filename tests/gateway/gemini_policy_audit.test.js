@@ -26,7 +26,18 @@ function setup() {
   return { root };
 }
 
-test("policy deny prevents delegate session start and audits error", async () => {
+function assertRegistryOnly(error) {
+  assert.equal(error.code, "POLICY_DENIED");
+  assert.equal(error.message, "request denied by policy");
+  assert.deepEqual(error.decision.selectionRejection, {
+    code: "EFFECTIVE_SELECTION_PROVIDER_UNAVAILABLE",
+    field: "agent",
+    provider: "gemini-cli",
+  });
+  return true;
+}
+
+test("registry-only authority precedes role policy for delegate", async () => {
   const { root } = setup();
   const adapter = new GeminiAdapter({
     config: { dryRun: true, repoRoots: [root] },
@@ -35,7 +46,7 @@ test("policy deny prevents delegate session start and audits error", async () =>
 
   await assert.rejects(
     () => adapter.delegate({ cwd: root, prompt: "x", traceId: "tr-deny", role: "coder" }),
-    /policy denied/,
+    assertRegistryOnly,
   );
   const events = await query({ traceId: "tr-deny" });
 
@@ -46,23 +57,23 @@ test("policy deny prevents delegate session start and audits error", async () =>
   assert.equal(events[0].policy.decision, "deny");
 });
 
-test("policy allow preserves delegate lifecycle audit", async () => {
+test("an otherwise allowed delegate still has no lifecycle audit", async () => {
   const { root } = setup();
   const adapter = new GeminiAdapter({
     config: { dryRun: true, repoRoots: [root] },
     registries: fakeRegistries(),
   });
 
-  await adapter.delegate({ cwd: root, prompt: "x", traceId: "tr-allow", role: "coder" });
+  await assert.rejects(
+    () => adapter.delegate({ cwd: root, prompt: "x", traceId: "tr-allow", role: "coder" }),
+    assertRegistryOnly,
+  );
   const events = await query({ traceId: "tr-allow" });
 
-  assert.deepEqual(
-    events.map((event) => event.type),
-    ["SESSION_STARTED", "SESSION_CLOSED"],
-  );
+  assert.deepEqual(events.map((event) => event.type), ["ERROR"]);
 });
 
-test("adapter error is audited and rethrown", async () => {
+test("registry-only denial precedes cwd errors", async () => {
   const { root } = setup();
   const adapter = new GeminiAdapter({
     config: { dryRun: true, repoRoots: [root] },
@@ -71,7 +82,7 @@ test("adapter error is audited and rethrown", async () => {
 
   await assert.rejects(
     () => adapter.delegate({ cwd: "/no/such/path", prompt: "x", traceId: "tr-error", role: "coder" }),
-    /cwd does not exist/,
+    assertRegistryOnly,
   );
   const events = await query({ traceId: "tr-error" });
 
@@ -80,7 +91,7 @@ test("adapter error is audited and rethrown", async () => {
   assert.equal(events[0].where, "delegate");
 });
 
-test("policy deny prevents supervised spawn session start", async () => {
+test("registry-only authority prevents supervised spawn session start", async () => {
   const { root } = setup();
   const adapter = new GeminiAdapter({
     config: { dryRun: true, repoRoots: [root] },
@@ -89,7 +100,7 @@ test("policy deny prevents supervised spawn session start", async () => {
 
   await assert.rejects(
     () => adapter.spawn({ cwd: root, traceId: "tr-spawn-deny", role: "coder" }),
-    /policy denied/,
+    assertRegistryOnly,
   );
   const events = await query({ traceId: "tr-spawn-deny" });
 

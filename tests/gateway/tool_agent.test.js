@@ -121,11 +121,11 @@ test("unknown persistent agent sessions return the catalogued safe code", async 
   });
 });
 
-test("dry-run spawn ask view kill cycle works through tools", async () => {
+test("dry-run Codex spawn ask view kill cycle works through tools", async () => {
   const { reposRoot } = fresh();
   const tools = toolMap({ repoRoots: [reposRoot] });
   const { traceId, task } = await createTraceAndTask(tools, {
-    agent: "gemini-cli",
+    agent: "codex",
     role: "restricted-coder",
     action: "code.write",
     repo: "cvision",
@@ -133,7 +133,7 @@ test("dry-run spawn ask view kill cycle works through tools", async () => {
 
   const spawned = parseToolResult(
     await tools["agent.spawn"].handler({
-      agent: "gemini-cli",
+      agent: "codex",
       role: "restricted-coder",
       repo: "cvision",
       cwd: path.join(reposRoot, "cvision"),

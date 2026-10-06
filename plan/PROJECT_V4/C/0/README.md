@@ -12,4 +12,7 @@ especificación detallada, rollback y trazabilidad.
 | [C/0/03](03.md) | Inventario y recovery operables | [EP-08](../../epics/EP-08.md) | Planificada |
 | [C/0/04](04.md) | Consentimiento y perfil de orquestador YOLO | [EP-08](../../epics/EP-08.md) | Planificada |
 
+Absorción reconciliada: `C/0/04` cierra por V5 `E/0/05`, con E/0/03 para la
+superficie local y H/0/05 para la prueba protegida.
+
 [← Stage C](../README.md) · [Índice de stage](../TASKS.md) · [Catálogo global](../../SHEETS.md)

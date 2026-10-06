@@ -17,13 +17,61 @@ owner, a narrow write scope, one RED claim, and explicit evidence.
 | Stage | Materialized sheets | Current state |
 |---|---|---|
 | [B](B/README.md) | [B/0/00](B/0/00.md)–[B/0/05](B/0/05.md) | 00–02 and 05 complete; 03–04 dependency-gated |
-| [C](C/README.md) | [C/0/00](C/0/00.md)–[C/0/02](C/0/02.md), [C/1/00](C/1/00.md)–[C/1/03](C/1/03.md) | C/0/00–01 complete and reviewed; C/1/00 unblocked; remainder planned |
-| [D](D/README.md) | [D/0/00](D/0/00.md)–[D/0/06](D/0/06.md) | planned; P0 security prerequisite |
-| [E](E/README.md) | [E/0/00](E/0/00.md)–[E/0/04](E/0/04.md) | planned; E/0/04 health contract materialized, runtime pending |
+| [C](C/README.md) | [C/0/00](C/0/00.md)–[C/0/03](C/0/03.md), [C/1/00](C/1/00.md)–[C/1/03](C/1/03.md) | C/0/00–02 complete and promoted; C/1/00 Trials 1–15 and rebaseline Trial 1 remain KO evidence, while rebaseline CORE Trial 2 is independently OK and integrated; the final C/D splice reached Trial 1 `blocked_confirmed` and is ratified to the `D/0/07d` composition gate; remainder planned |
+| [D](D/README.md) | [D/0/00](D/0/00.md)–[D/0/06](D/0/06.md); [D/0/07 index](D/0/07.md); executable [07a](D/0/07a.md), [07b](D/0/07b.md), [07c](D/0/07c.md), [07d](D/0/07d.md) | 11 executable leaves plus one non-counted index: D/0/00 complete; D/0/01 core Trial 4 independently OK/integrated; `D_0_1_SPLICE` Trial 1 `blocked_confirmed`. D/0/07a Trial 3 and D/0/07b Trial 2 are reviewed OK/integrated. D/0/07c Trial 4 remains historical evidence; Trials 5 and 6 were independently KO, and the Trial 7 fail-closed correction `d79fd00` was independently reviewed OK at `7caf94b` and integrated at `c66b05f`. D/0/07c is complete but not promoted or released. D/0/07d is the next planned, unimplemented leaf |
+| [E](E/README.md) | [E/0/00](E/0/00.md)–[E/0/05](E/0/05.md) | planned; E/0/04 health contract materialized, runtime pending |
 | [F](F/README.md) | [F/0/00](F/0/00.md)–[F/0/04](F/0/04.md) | planned |
-| [G](G/README.md) | [G/0/00](G/0/00.md)–[G/0/04](G/0/04.md) | planned |
-| [H](H/README.md) | [H/0/00](H/0/00.md)–[H/0/05](H/0/05.md) | planned |
-| [I](I/README.md) | [I/0/00](I/0/00.md)–[I/0/08](I/0/08.md) | planned |
+| [G](G/README.md) | [G/0/00](G/0/00.md)–[G/0/04](G/0/04.md) | G/0/00 complete/promoted; G/0/01 complete/integrated; G/0/02 CORE Trial 4, STORE Trial 4, ACK Trial 5, OUTBOX Trial 3 (including migration `003`), and WIRING-A Trial 6 are independently reviewed OK and integrated. WIRING-B, health, inventory, and the sheet exit gate remain open; 03–04 planned |
+| [H](H/README.md) | [H/0/00](H/0/00.md)–[H/0/05](H/0/05.md) | H/0/00 complete; H/0/01 remains in progress. SAMPLE Trial 5 and DOCTOR Trial 13 are independently reviewed OK/integrated; DOCTOR Trials 1–12 remain KO evidence; PROBES Trial 4 and PORTABILITY Trial 2 are reviewed/integrated. `H_0_1_EXECUTABLE` Trial 1 is implemented/reviewed/integrated at `52705a2`/`ed3d944`/`a8a39cf`; it remains a non-counted PRP-1 subleaf, so the inventory stays at 82 sheets. The operator-ratified narrowed retirement criterion keeps [`V5-H-0-01-D01`](DEFERRED.md) assigned to `D/0/02`; full exit waits for D/0/02–03 and native release evidence remains I/0/04; 02–05 planned |
+| [I](I/README.md) | [I/0/00](I/0/00.md)–[I/0/09](I/0/09.md) | planned |
+
+Inventory: **82 total V5 executable sheets** — 25 delivered A sheets plus
+57 active B–I leaves:
+`6 + 8 + 11 + 6 + 5 + 5 + 6 + 10 = 57`. Current evidence supports
+`39 complete + 4 in progress + 39 planned = 82`; the
+`4 + 39 = 43` open sheets are implemented once in V5 and close overlapping V4
+sheets through the absorption ledger. The in-progress set is exactly
+`C/1/00`, `D/0/01`, `G/0/02`, and `H/0/01`. The `D/0/07` parent
+is an index and is not double-counted.
+
+### C/1/00 scope rebaseline and D/0/01 transfer
+
+The operator denied C/1/00 Trial 16 after the fifteenth independent KO and
+selected Option B. This reviewed plan change is binding:
+
+- `C_1_0_REBASELINE` owns only lifecycle reducer/repository/migrations,
+  server-owned transition commands, idempotency, monotonic terminals, and
+  service routing. Its coder write scope excludes every adapter, process,
+  FIFO, Python-runtime, tmux, argv, PGID/descendant, cancellation, budget,
+  shared CI, workflow, catalog, and index path.
+- `D_0_1_CORE` owns a new async supervisor plus transferred sync/FIFO/runtime
+  containment. Its coder may write only dedicated supervisor/runtime modules,
+  dedicated process fixtures/tests, its sheet, and a task-owned ADR. It may
+  not modify `agent_service`, provider adapters, H profile/policy, catalogs,
+  manifests, workflows, or shared indexes.
+- `D_0_1_SPLICE` has independent OK results for `D_0_1_CORE`,
+  `C_1_0_REBASELINE` CORE Trial 2, and `H/0/00`, but its Trial 1 blocker was
+  independently confirmed. Only after the `D/0/07a → 07b → 07c → 07d`
+  chain is implemented and independently reviewed, with `D_0_7D` as the
+  composition gate, may that serialized slice migrate provider adapters and
+  lifecycle services.
+- No C Trial 15 process commit is cherry-picked automatically. Any D salvage
+  begins with its own failing test and receives its own independent review.
+- The integrator alone owns shared catalog/contract/CI/workflow/lock/index
+  reconciliation and the combined candidate.
+
+### D/0/07 executable decomposition
+
+The shared [`D/0/07`](D/0/07.md) topology/API/wire/terminal contract is a
+non-executable index. Its four executable leaves are registered separately
+with their current evidence:
+
+| Executable leaf | Status | Scope | Depends on | Blocks |
+|---|---|---|---|---|
+| [`D/0/07a`](D/0/07a.md) | complete — Trial 3 reviewed OK and integrated at `aaf4817` | capability issuer/state, authenticated codec, binding tag | integrated `D_0_1_CORE` | `D/0/07b` |
+| [`D/0/07b`](D/0/07b.md) | complete — Trial 2 reviewed OK and integrated at `d65e9f4` | PTY lifecycle, Linux/Darwin identity, verified write | reviewed/integrated `D/0/07a` | `D/0/07c` |
+| [`D/0/07c`](D/0/07c.md) | complete — Trial 4 remains historical reviewed/integrated evidence; Trials 5 and 6 were independently KO; Trial 7 correction `d79fd00` was independently reviewed OK at `7caf94b` and integrated at `c66b05f`; not promoted or released | authenticated relay/socket, tmux observation, canonical snapshot | reviewed/integrated `D/0/07a–b` | `D/0/07d` dependency satisfied |
+| [`D/0/07d`](D/0/07d.md) | planned and unimplemented — D/0/07c dependency satisfied; next leaf | composition and isolated real-host race/acceptance gate | reviewed/integrated `D/0/07a–c` | `D_0_1_SPLICE` |
 
 ### E/0/04 health contract dependency
 
@@ -252,8 +300,9 @@ different layer without its own assertion.
 - **RED:** component aliasing, wrong group, RESP response mismatch, malformed
   JSON/stream data, unsafe group-creation error handling, or disabled queue.
 - **GREEN:** frozen key codec, group `coordination-v1`, explicit RESP behavior,
-  strict decoders, BUSYGROUP-only suppression, lazy per-operation clients, safe
-  unavailable errors.
+  strict decoders, BUSYGROUP-only suppression, and safe unavailable errors.
+  G/0/01 supersedes the original disposable-client detail with lazy
+  per-service persistent command/blocking ownership and bounded shutdown.
 - **Evidence:** fake-client command/decoder tests and disabled contract.
 
 ### E2/S01 — Atomic presence lifecycle and metadata events

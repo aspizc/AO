@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "productVersion": "3.6a-agents.1",
+  "source": {
+    "archive": "tmux-3.6a.tar.gz",
+    "sha256": "b6d8d9c76585db8ef5fa00d4931902fa4b8cbe8166f528f44fc403961a3f3759",
+    "version": "3.6a"
+  },
+  "patch": {
+    "file": "tmux-3.6a-agents.1.patch",
+    "sha256": "2526659ccfb17d3cc2a07171687379322e5a2caa79414e86ea4b6682aa98b2b3"
+  },
+  "extensionSource": {
+    "file": "cmd-agents-capture.c",
+    "sha256": "4d80a8610651a1dd304b9b0e9b45d6832e115d9827d5166f26b4f9dbcdec27e2"
+  },
+  "offlineLinuxBuilder": {
+    "image": "node@sha256:0625f79a0c9f5005e31dba1761260b9f66ea8a3293e5f645eb4550a4c7dcdbb9",
+    "platform": "linux/amd64"
+  },
+  "offlineDarwinBuilder": {
+    "source": "same-pinned-source-and-patch",
+    "platforms": [
+      "darwin/amd64",
+      "darwin/arm64"
+    ],
+    "toolchain": "preprovisioned-clang",
+    "network": "disabled",
+    "packageManager": "none",
+    "builder": "build-offline-darwin.sh",
+    "outputs": [
+      "darwin/amd64/tmux-3.6a-agents.1",
+      "darwin/arm64/tmux-3.6a-agents.1"
+    ]
+  }
+}

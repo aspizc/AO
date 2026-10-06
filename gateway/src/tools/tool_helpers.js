@@ -1,6 +1,15 @@
 import { z } from "zod";
 
 import {
+  ACTION_CATALOG_VERSION,
+} from "../core/policy_types.js";
+import {
+  applyEffectiveRequestContext,
+  bindRequestContext,
+  isRequestContextProtectedAction,
+  recordRequestContextResult,
+} from "../core/request_context.js";
+import {
   getCatalogPayloadErrorMode,
   getCatalogValidationErrorMode,
   getToolContract,
@@ -41,7 +50,16 @@ function syntheticContract({
       name,
       description,
       inputSchema: zodToJsonSchema(schema),
-      publicErrorCodes: [...new Set(["INVALID_INPUT", "TOOL_ERROR", ...allowedErrorCodes])],
+      publicErrorCodes: [
+        ...new Set([
+          "INVALID_INPUT",
+          "TOOL_ERROR",
+          ...(isRequestContextProtectedAction(name)
+            ? ["REQUEST_CONTEXT_DENIED"]
+            : []),
+          ...allowedErrorCodes,
+        ]),
+      ],
       errorMessages: { ...errorMessages },
     },
     schema,
@@ -89,13 +107,16 @@ export function defineTool({
   const validationErrorMode = catalogContract
     ? getCatalogValidationErrorMode(name)
     : "safe-envelope";
+  const requestContextBoundary = isRequestContextProtectedAction(name);
 
   return {
     name: contract.name,
     description: contract.description,
     inputSchema: contract.inputSchema,
     contract,
-    async handler(args) {
+    actionCatalogVersion: ACTION_CATALOG_VERSION,
+    requestContextBoundary,
+    async handler(args, invocation) {
       const parsed = catalogContract
         ? validateCatalogInput(name, args)
         : runtime.schema.safeParse(args);
@@ -131,7 +152,24 @@ export function defineTool({
       }
 
       try {
-        const value = await handler(parsed.data);
+        let effectiveContext = null;
+        let effectiveArgs = parsed.data;
+        if (requestContextBoundary && invocation !== undefined) {
+          effectiveContext = bindRequestContext(invocation?.requestContext, {
+            action: name,
+            actionCatalogVersion: invocation?.actionCatalogVersion,
+            audience: invocation?.audience,
+            connectionId: invocation?.connectionId,
+            assertedCapabilities: invocation?.assertedCapabilities,
+            args: parsed.data,
+            now: invocation?.now,
+          });
+          effectiveArgs = applyEffectiveRequestContext(
+            parsed.data,
+            effectiveContext,
+          );
+        }
+        const value = await handler(effectiveArgs, effectiveContext);
         if (resultIsDomainError(value)) {
           const safeBody = safeToolErrorBody(
             {
@@ -145,6 +183,13 @@ export function defineTool({
             return textToolResult({ error: safeBody.error });
           }
           return textToolResult(safeBody, true);
+        }
+        if (effectiveContext) {
+          recordRequestContextResult(
+            invocation.requestContext,
+            effectiveContext,
+            value,
+          );
         }
         return textToolResult(value);
       } catch (error) {

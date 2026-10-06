@@ -380,10 +380,14 @@ def validate_suite_contract(contract: dict[str, Any]) -> list[str]:
             )
 
         readiness = suite.get("readiness")
-        if classification == "optional-service":
+        if classification == "optional-service" and not isinstance(readiness, dict):
+            errors.append(
+                f"suite contract {suite_id}: optional suite requires readiness"
+            )
+        elif readiness is not None:
             if not isinstance(readiness, dict):
                 errors.append(
-                    f"suite contract {suite_id}: optional suite requires readiness"
+                    f"suite contract {suite_id}: readiness must be an object"
                 )
             else:
                 extra_readiness_keys = sorted(set(readiness) - READINESS_KEYS)
@@ -420,10 +424,6 @@ def validate_suite_contract(contract: dict[str, Any]) -> list[str]:
                     errors.append(
                         f"suite contract {suite_id}: readiness needs a condition"
                     )
-        elif readiness is not None:
-            errors.append(
-                f"suite contract {suite_id}: required suite cannot set readiness"
-            )
 
         timeout = suite.get("timeoutSeconds")
         if (
@@ -661,9 +661,11 @@ def validate_manifest(
                     )
 
         readiness = suite.get("readiness")
-        if classification == "optional-service":
+        if classification == "optional-service" and not isinstance(readiness, dict):
+            errors.append(f"{suite_id}: optional-service requires readiness")
+        elif readiness is not None:
             if not isinstance(readiness, dict):
-                errors.append(f"{suite_id}: optional-service requires readiness")
+                errors.append(f"{suite_id}: readiness must be an object")
             else:
                 extra_readiness_keys = sorted(set(readiness) - READINESS_KEYS)
                 if extra_readiness_keys:
@@ -696,8 +698,6 @@ def validate_manifest(
                     errors.append(
                         f"{suite_id}: readiness must declare an environment condition"
                     )
-        elif readiness is not None:
-            errors.append(f"{suite_id}: only optional-service may declare readiness")
 
         if include_valid and exclude_valid:
             files = discover_files(repo_root, suite)
@@ -2232,14 +2232,13 @@ def _run_suite(
     repo_root: Path,
     env: dict[str, str],
 ) -> dict[str, Any]:
-    if suite["classification"] == "optional-service" and not _service_is_ready(
-        suite["readiness"], env
-    ):
+    readiness = suite.get("readiness")
+    if readiness is not None and not _service_is_ready(readiness, env):
         return {
             "id": suite["id"],
             "classification": suite["classification"],
             "status": "infrastructure_unavailable",
-            "service": suite["readiness"]["service"],
+            "service": readiness["service"],
             "counts": asdict(TestCounts(0, 0, 0, 0)),
             "infrastructureUnavailable": [],
             "errors": [],
@@ -2423,7 +2422,16 @@ def run_gate(
             result for result in results if result["status"] == "cancelled"
         )
         return report, 128 + signal.Signals[cancelled["signal"]].value
-    return report, int(aggregate_status in {"failed", "timed_out"})
+    required_service_unavailable = any(
+        result["classification"] == "required"
+        and result["status"] == "infrastructure_unavailable"
+        and "service" in result
+        for result in results
+    )
+    return report, int(
+        aggregate_status in {"failed", "timed_out"}
+        or required_service_unavailable
+    )
 
 
 def refresh_inventory(manifest: dict[str, Any], repo_root: Path) -> None:

@@ -10,7 +10,7 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 
 ## Repo
 
-- Path: `/home/aspizc/git/experiments/AO`
+- Path: the current AO checkout (`git rev-parse --show-toplevel`).
 - Gateway repo id: `repo:"agents-orchestrator"` (classification **internal**; an absolute
   filesystem path is only a `cwd` and is denied as `repo.unknown`).
 - **Dogfooding:** this repo IS the `agents-gateway`. The Gateway that orchestrates this repo's own
@@ -110,8 +110,11 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 - Run the full gate **solo** per tree (turn-taking) and only after the coder settles; batch
   several reviewed-OK merges behind one gate when integrating a wave.
 - **Known hazards:** the Codex sandbox hangs the LangGraph suite — run gates on the **host**,
-  outside the sandbox. `langgraph` is pinned to `1.2.1` (`1.2.4` hangs
-  `test_implement_test_review_push_graph`); do not bump it casually. The Postgres suite is opt-in
+  outside the sandbox. `langgraph` is pinned to `1.2.5` so the lock can select
+  `langgraph-sdk` `0.4.4`, which fixes the SDK advisory affecting `0.3.15`. The isolated
+  upgrade check passed 81 tests with 3 integration skips, including
+  `test_implement_test_review_push_graph` (the historical `1.2.4` hang). See
+  `docs/ci-contract.md` for the verification limits. The Postgres suite is opt-in
   (`AGENTS_PG_INTEGRATION=1` + `docker/docker-compose.yml`) and needs a session with docker
   access. Record exact gate totals (passed/failed/deferred/N-A) in every handoff — a
   DEFERRED-as-pass lane is a finding, not a pass.
@@ -120,8 +123,8 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 
 - Python: `uv pip sync requirements.lock`; editable installs for `cli` and
   `orchestrator-langgraph`. Regenerate the lock only with
-  `uv pip compile cli/pyproject.toml orchestrator-langgraph/pyproject.toml --all-extras
-  --python-version 3.13 --output-file requirements.lock`, in its own commit.
+  `./scripts/requirements_lock.sh`, then verify with
+  `./scripts/requirements_lock.sh --check`; keep it in its own commit.
 - Node: `npm --prefix gateway install` under the version accepted by `docs/node-runtime.md`.
 - The Codex sandbox has **no network** → install deps from the **host**. Keep lockfile churn in
   its own commit, separate from any fix.

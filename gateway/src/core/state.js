@@ -3,6 +3,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
 import { PostgresDatabase } from "./postgres_db.js";
+import {
+  GENERIC_APPLICATION_SQLITE,
+  applySqliteMigrationSet,
+} from "./sqlite_migration_sets.js";
 
 let db = null;
 
@@ -17,25 +21,7 @@ function listMigrations(dir) {
 }
 
 function applyPendingSqlite(nextDb) {
-  nextDb.exec(
-    "CREATE TABLE IF NOT EXISTS schema_migrations(id TEXT PRIMARY KEY, applied_at TEXT NOT NULL)",
-  );
-  const applied = new Set(nextDb.prepare("SELECT id FROM schema_migrations").all().map((row) => row.id ?? row));
-
-  for (const file of listMigrations(MIGRATIONS_DIR)) {
-    const id = file.replace(/\.sql$/, "");
-    if (applied.has(id)) continue;
-    const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file), "utf-8");
-    const apply = nextDb.transaction(() => {
-      nextDb.exec(sql);
-      nextDb
-        .prepare(
-          "INSERT OR IGNORE INTO schema_migrations(id, applied_at) VALUES (?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))",
-        )
-        .run(id);
-    });
-    apply();
-  }
+  applySqliteMigrationSet(nextDb, GENERIC_APPLICATION_SQLITE);
 }
 
 function applyPendingPostgres(nextDb) {
@@ -69,11 +55,16 @@ export function initState({ stateDb, env = process.env, postgresExecutor } = {})
 
   if (!stateDb) throw new TypeError("stateDb path required");
   fs.mkdirSync(path.dirname(stateDb), { recursive: true });
-  db = new Database(stateDb);
-  db.backend = "sqlite";
-  db.pragma("journal_mode = WAL");
-  db.pragma("foreign_keys = ON");
-  applyPendingSqlite(db);
+  const nextDb = new Database(stateDb);
+  nextDb.backend = "sqlite";
+  try {
+    nextDb.pragma("foreign_keys = ON");
+    applyPendingSqlite(nextDb);
+  } catch (error) {
+    nextDb.close();
+    throw error;
+  }
+  db = nextDb;
   return db;
 }
 

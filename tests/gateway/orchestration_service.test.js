@@ -103,21 +103,24 @@ test("pause and resume update status and audit", async () => {
   );
 });
 
-test("cancel and complete update status and audit", async () => {
+test("cancel requires a lifecycle outcome while complete updates status and audit", async () => {
   fresh();
   const cancelled = svc.createOrchestration({ callerAgent: "claude-code", callerRole: "orchestrator" });
   const completed = svc.createOrchestration({ callerAgent: "claude-code", callerRole: "orchestrator" });
 
-  assert.equal(svc.cancelOrchestration({ traceId: cancelled.traceId }).status, "cancelled");
+  assert.throws(
+    () => svc.cancelOrchestration({ traceId: cancelled.traceId }),
+    { code: "LIFECYCLE_OUTCOME_REQUIRED" },
+  );
   assert.equal(svc.completeOrchestration({ traceId: completed.traceId }).status, "completed");
 
-  assert.equal(svc.viewOrchestration({ traceId: cancelled.traceId }).session.status, "cancelled");
+  assert.equal(svc.viewOrchestration({ traceId: cancelled.traceId }).session.status, "active");
   assert.equal(svc.viewOrchestration({ traceId: completed.traceId }).session.status, "completed");
 
   const cancelEvents = await queryAudit({ traceId: cancelled.traceId });
   assert.deepEqual(
     cancelEvents.map((event) => event.type),
-    ["ORCHESTRATION_CREATED", "ORCHESTRATION_CANCELLED"],
+    ["ORCHESTRATION_CREATED"],
   );
 
   const completeEvents = await queryAudit({ traceId: completed.traceId });

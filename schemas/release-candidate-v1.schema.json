@@ -1,0 +1,784 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents.example/schemas/release-candidate-v1.schema.json",
+  "title": "External content-addressed release candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "repository",
+    "runtimes",
+    "inputs",
+    "locks",
+    "suiteManifest",
+    "suiteContract",
+    "supplyChain",
+    "reviewEvidence",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "release-candidate/v1"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base",
+        "branch",
+        "candidate",
+        "mergeBase"
+      ],
+      "properties": {
+        "base": {
+          "$ref": "#/$defs/refIdentity"
+        },
+        "branch": {
+          "$ref": "#/$defs/refIdentity"
+        },
+        "candidate": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "mergeBase": {
+          "$ref": "#/$defs/gitId"
+        }
+      }
+    },
+    "runtimes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "constraint",
+          "source"
+        ],
+        "properties": {
+          "name": {
+            "enum": [
+              "node",
+              "python"
+            ]
+          },
+          "constraint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "$ref": "#/$defs/fileEvidence"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "name": {
+                  "const": "node"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "then": {
+              "properties": {
+                "source": {
+                  "properties": {
+                    "path": {
+                      "const": "gateway/package.json"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "name": {
+                  "const": "python"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "then": {
+              "properties": {
+                "source": {
+                  "properties": {
+                    "path": {
+                      "const": "cli/pyproject.toml"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "name": {
+                "const": "node"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "name": {
+                "const": "python"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    },
+    "inputs": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidenceArray"
+        },
+        {
+          "minItems": 14,
+          "maxItems": 14
+        },
+        {
+          "$ref": "#/$defs/governedInputs"
+        }
+      ]
+    },
+    "locks": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidenceArray"
+        },
+        {
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "gateway/package-lock.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "requirements.lock"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      ]
+    },
+    "suiteManifest": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/suites.json"
+            }
+          }
+        }
+      ]
+    },
+    "suiteContract": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/suites-contract.json"
+            }
+          }
+        }
+      ]
+    },
+    "supplyChain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sbom",
+        "licenses",
+        "licensePolicy",
+        "advisories",
+        "advisoryDatabase",
+        "waiverRegistryDigest",
+        "waivers"
+      ],
+      "properties": {
+        "sbom": {
+          "$ref": "#/$defs/sbomEvidence"
+        },
+        "licenses": {
+          "$ref": "#/$defs/licenseEvidence"
+        },
+        "licensePolicy": {
+          "$ref": "#/$defs/licensePolicyEvidence"
+        },
+        "advisories": {
+          "$ref": "#/$defs/advisoryEvidence"
+        },
+        "advisoryDatabase": {
+          "$ref": "#/$defs/advisoryDatabaseEvidence"
+        },
+        "waiverRegistryDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "waivers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/waiver"
+          }
+        }
+      }
+    },
+    "reviewEvidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "digest",
+          "verdict",
+          "reviewer",
+          "reviewerRole",
+          "keyId",
+          "subject",
+          "issuedAt",
+          "signatureAlgorithm",
+          "signature"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "release-review/v1"
+          },
+          "digest": {
+            "$ref": "#/$defs/sha256"
+          },
+          "verdict": {
+            "const": "OK"
+          },
+          "reviewer": {
+            "type": "string",
+            "pattern": "^mailto:[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$"
+          },
+          "reviewerRole": {
+            "const": "independent-reviewer"
+          },
+          "keyId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^\\S+$"
+          },
+          "subject": {
+            "$ref": "#/$defs/gitIdentity"
+          },
+          "issuedAt": {
+            "$ref": "#/$defs/utcTimestamp"
+          },
+          "signatureAlgorithm": {
+            "const": "ed25519"
+          },
+          "signature": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9+/]{86}==$"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "predicateType",
+        "subject",
+        "materials"
+      ],
+      "properties": {
+        "predicateType": {
+          "const": "https://agents.example/release-candidate/v1"
+        },
+        "subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "digest"
+          ],
+          "properties": {
+            "name": {
+              "const": "repository-tree"
+            },
+            "digest": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "gitTree"
+              ],
+              "properties": {
+                "gitTree": {
+                  "$ref": "#/$defs/gitId"
+                }
+              }
+            }
+          }
+        },
+        "materials": {
+          "$ref": "#/$defs/fileEvidenceArray"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "gitId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "safePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!\\.?(?:/|$))(?!.*//)(?!.*(?:^|/)\\.\\.?(/|$))(?!.*\\\\).+$"
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "gitIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "tree"
+      ],
+      "properties": {
+        "commit": {
+          "$ref": "#/$defs/gitId"
+        },
+        "tree": {
+          "$ref": "#/$defs/gitId"
+        }
+      }
+    },
+    "refIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "commit",
+        "tree"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^refs/heads/(?!.*(?:[~^:?*\\[\\\\]|\\.\\.|@\\{))\\S+$"
+        },
+        "commit": {
+          "$ref": "#/$defs/gitId"
+        },
+        "tree": {
+          "$ref": "#/$defs/gitId"
+        }
+      }
+    },
+    "fileEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/safePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "fileEvidenceArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/fileEvidence"
+      }
+    },
+    "governedInputs": {
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": ".github/workflows/ci.yml"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "ci/release-environments.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "ci/requirements-build.in"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "ci/reviewer-trust-roots.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "cli/pyproject.toml"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "gateway/package.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "orchestrator-langgraph/pyproject.toml"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "schemas/release-candidate-v1.schema.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "schemas/release-state-v1.schema.json"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "scripts/ci.sh"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "scripts/ci_gate.py"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "scripts/refresh_advisory_snapshot.py"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "scripts/requirements_lock.sh"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "path": {
+                "const": "scripts/release_candidate.py"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      ]
+    },
+    "sbomEvidence": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/production-sbom.json"
+            }
+          }
+        }
+      ]
+    },
+    "licenseEvidence": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/production-licenses.json"
+            }
+          }
+        }
+      ]
+    },
+    "licensePolicyEvidence": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/license-allowlist.json"
+            }
+          }
+        }
+      ]
+    },
+    "advisoryEvidence": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/production-advisories.json"
+            }
+          }
+        }
+      ]
+    },
+    "advisoryDatabaseEvidence": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fileEvidence"
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "ci/offline-advisory-database.json"
+            }
+          }
+        }
+      ]
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "advisoryId",
+        "component",
+        "severity",
+        "candidate",
+        "lockDigests",
+        "owner",
+        "reachability",
+        "compensatingControls",
+        "evidence",
+        "issuedAt",
+        "expiresAt",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^WAIVER-[A-Za-z0-9.-]+$"
+        },
+        "advisoryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component": {
+          "type": "string",
+          "pattern": "^pkg:"
+        },
+        "severity": {
+          "enum": [
+            "high",
+            "critical"
+          ]
+        },
+        "candidate": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "lockDigests": {
+          "type": "object",
+          "minProperties": 2,
+          "additionalProperties": {
+            "$ref": "#/$defs/sha256"
+          }
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reachability": {
+          "type": "string",
+          "minLength": 20
+        },
+        "compensatingControls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence": {
+          "$ref": "#/$defs/fileEvidenceArray"
+        },
+        "issuedAt": {
+          "$ref": "#/$defs/utcTimestamp"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/utcTimestamp"
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issuer",
+            "subjectDigest"
+          ],
+          "properties": {
+            "issuer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subjectDigest": {
+              "$ref": "#/$defs/gitId"
+            }
+          }
+        }
+      }
+    }
+  }
+}

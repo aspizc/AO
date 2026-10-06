@@ -76,8 +76,9 @@ test(
       socket: { reconnectStrategy: false },
     });
     await raw.connect();
+    let queue;
     try {
-      const queue = createRedisCoordinationQueue({
+      queue = createRedisCoordinationQueue({
         redisUrl,
         prefix,
         maxInboxLength: 3,
@@ -265,6 +266,7 @@ test(
         0,
       );
     } finally {
+      await queue?.close();
       await exactPrefixCleanup(raw, prefix);
       raw.destroy();
     }

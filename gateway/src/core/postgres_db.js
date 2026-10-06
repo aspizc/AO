@@ -41,8 +41,10 @@ class PostgresStatement {
     const sql = this.#materialize(params);
     const changesSql = changesQuery(sql);
     if (changesSql) {
-      const row = this.#queryRows(changesSql)[0];
-      return { changes: Number(row?.changes ?? 0) };
+      const result = this.db.executor(changesSql, this.db.url);
+      const row = Array.isArray(result) ? result[0] : result;
+      const changes = typeof row === "string" ? row.trim() : row?.changes;
+      return { changes: Number(changes ?? 0) };
     }
     const result = this.db.executor(sql, this.db.url);
     if (result && typeof result === "object" && !Array.isArray(result) && "changes" in result) {

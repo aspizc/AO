@@ -25,6 +25,7 @@ WORKFLOW_PATH = REPO / ".github" / "workflows" / "ci.yml"
 
 EXPECTED_REQUIRED = {
     "lock.python",
+    "release.candidate",
     "lint.python",
     "lint.gateway",
     "test.structure",
@@ -34,9 +35,9 @@ EXPECTED_REQUIRED = {
     "policy.registry",
     "test.cli",
     "test.langgraph",
+    "test.redis-live",
 }
 EXPECTED_OPTIONAL = {
-    "test.redis-live",
     "test.real-agents",
 }
 EXPECTED_INFRASTRUCTURE_SKIPS = {
@@ -296,6 +297,14 @@ def test_repository_manifest_is_authoritative_and_complete():
         "./scripts/requirements_lock.sh",
         "--check-inputs",
     ]
+    redis_live = suites["test.redis-live"]
+    assert redis_live["classification"] == "required"
+    assert redis_live["allowedSkips"] == []
+    assert redis_live["readiness"] == {
+        "service": "redis",
+        "environmentPresent": ["AGENTS_TEST_REDIS_URL"],
+    }
+    assert redis_live["include"] == ["tests/gateway/*_live.test.js"]
 
 
 def test_manifest_validation_rejects_missing_glob_and_stale_inventory(tmp_path):
@@ -480,6 +489,61 @@ def test_optional_service_absence_is_machine_readable_not_a_pass(tmp_path):
     assert results["check.required"]["status"] == "passed"
     assert results["check.service"]["status"] == "infrastructure_unavailable"
     assert results["check.service"]["service"] == "synthetic"
+
+
+def test_required_service_absence_is_machine_readable_and_fails_gate(tmp_path):
+    gate = load_gate()
+    marker = tmp_path / "ran"
+    source = tmp_path / "check.py"
+    source.write_text(
+        f"from pathlib import Path\nPath({str(marker)!r}).touch()\n",
+        encoding="utf-8",
+    )
+    required_service = {
+        "id": "check.required-service",
+        "classification": "required",
+        "runner": "command",
+        "argv": [sys.executable, source.name],
+        "include": [source.name],
+        "exclude": [],
+        "inventorySha256": gate.inventory_digest([source.name]),
+        "allowedSkips": [],
+        "timeoutSeconds": 30,
+        "readiness": {
+            "service": "synthetic",
+            "environmentEquals": {"RUN_SYNTHETIC_SERVICE": "1"},
+        },
+    }
+    manifest = manifest_for([required_service])
+
+    report, exit_code = gate.run_gate(tmp_path, manifest, env={})
+
+    assert exit_code == 1
+    assert report["status"] == "infrastructure_unavailable"
+    assert report["counts"] == {
+        "tests": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+    }
+    assert report["errors"] == []
+    assert report["suites"] == [
+        {
+            "id": "check.required-service",
+            "classification": "required",
+            "status": "infrastructure_unavailable",
+            "service": "synthetic",
+            "counts": {
+                "tests": 0,
+                "passed": 0,
+                "failed": 0,
+                "skipped": 0,
+            },
+            "infrastructureUnavailable": [],
+            "errors": [],
+        }
+    ]
+    assert not marker.exists()
 
 
 def test_inventory_refresh_does_not_rewrite_an_invalid_manifest(tmp_path):
@@ -2058,6 +2122,38 @@ def test_supervisor_protocol_preserves_arbitrary_stream_bytes(tmp_path):
     assert outcome.status == "completed"
     assert outcome.stdout == b"\x00\xff\n"
     assert outcome.stderr == b"\xfe\x00"
+
+
+def test_h001_bootstrap_fixture_exits_without_detached_git_maintenance():
+    gate = load_gate()
+    target = (
+        REPO
+        / "tests"
+        / "structure"
+        / "test_h001_bootstrap.py"
+    )
+
+    outcome = gate._execute_command(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            (
+                f"{target}::"
+                "test_bootstrap_is_portable_idempotent_and_clean_with_"
+                "injected_installers"
+            ),
+        ],
+        REPO,
+        gate._command_environment(REPO, dict(os.environ)),
+        timeout_seconds=30,
+    )
+
+    assert outcome.status == "completed"
+    assert outcome.returncode == 0
 
 
 def test_pid_reuse_between_validation_and_signal_cannot_redirect_signal(

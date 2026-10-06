@@ -3,7 +3,7 @@ export const DEFAULT_COORDINATION_PREFIX = "agents:coord:v1";
 export const COORDINATION_CONSUMER_GROUP = "coordination-v1";
 export const DEFAULT_COORDINATION_SCOPE_ID = "agents-orchestrator";
 export const DEFAULT_COORDINATION_LEASE_TTL_MS = 900_000;
-export const MAX_COORDINATION_LEASE_TTL_MS = 3_600_000;
+export const MAX_COORDINATION_LEASE_TTL_MS = 259_200_000;
 export const COORDINATION_SERVICE_LIMITS = Symbol(
   "agents-orchestrator.coordination.service-limits",
 );

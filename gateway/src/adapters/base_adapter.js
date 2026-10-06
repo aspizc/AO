@@ -47,12 +47,12 @@ export class BaseAdapter {
   }
 
   async delegate(_args) {
-    // args may include model, reasoningEffort, and serviceTier resolved by policy.
+    // Execution args carry the canonical effectiveSelection resolved by policy.
     throw new Error(`adapter ${this.id} must implement delegate`);
   }
 
   async spawn(_args) {
-    // args may include model, reasoningEffort, and serviceTier resolved by policy.
+    // Execution args carry the canonical effectiveSelection resolved by policy.
     throw new Error(`adapter ${this.id} must implement spawn`);
   }
 

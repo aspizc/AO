@@ -29,7 +29,7 @@ The harness cannot notify you when a file appears in `plan/reviews/`. Combine tw
 1. **Primary — `Monitor` with an `inotifywait` or `until` poll** that emits one line per new `*_to_review.md` and exits, so you wake immediately when a request appears:
 
    ```bash
-   cd /home/aspizc/git/experiments/AO
+   cd "$(git rev-parse --show-toplevel)"
    REVIEWS=plan/PROJECT_V5/reviews   # active project's reviews dir
    seen=$(ls $REVIEWS/*_to_review.md 2>/dev/null | sort)
    while true; do
@@ -132,7 +132,7 @@ One or two sentences on what was reviewed and the verdict.
 
 ```bash
 # Are there pending to_reviews without a verdict yet?
-cd /home/aspizc/git/experiments/AO
+cd "$(git rev-parse --show-toplevel)"
 REVIEWS=plan/PROJECT_V5/reviews
 for f in $REVIEWS/*_to_review.md; do
   id=$(basename "$f" _to_review.md)

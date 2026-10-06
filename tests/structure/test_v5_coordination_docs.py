@@ -225,8 +225,17 @@ def test_v5_runbook_has_isolated_no_restart_rollout_and_evidence_map():
         "tests/gateway/coordination_factory.test.js",
         "tests/gateway/coordination_audit.test.js",
         "tests/gateway/coordination_two_instance_live.test.js",
+        "tests/gateway/coordination_multi_client_race_live.test.js",
+        "tests/gateway/zz_coordination_namespace_guard_live.test.js",
     ):
         assert evidence in runbook
+    isolated_verification = _heading_section(
+        runbook,
+        "## Isolated verification and no-restart rollout",
+    )
+    assert "required" in isolated_verification.lower()
+    assert "zero tests" in isolated_verification.lower()
+    assert "leaked keys" in isolated_verification.lower()
 
 
 def test_v5_docs_have_no_stale_redis_representation_language():

@@ -23,7 +23,13 @@ test("code_apply_pending_when_scope_absent", async () => {
     traceId: "tr-code-apply-default",
     action: "code.apply",
     requestedBy: "orchestrator",
-    context: { repo: "sample-apps", agent: "codex", role: "coder" },
+    context: {
+      taskId: "ts-code-auto",
+      repo: "sample-apps",
+      classification: "unrestricted",
+      agent: "codex",
+      role: "coder",
+    },
     config: { autoApproveScopes: [] },
   });
   const autoGrants = await query({ traceId: "tr-code-apply-default", type: "APPROVAL_AUTO_GRANTED" });
@@ -39,7 +45,13 @@ test("code_apply_auto_granted_when_scope_present", async () => {
     traceId: "tr-code-apply-auto",
     action: "code.apply",
     requestedBy: "orchestrator",
-    context: { repo: "sample-apps", agent: "codex", role: "coder" },
+    context: {
+      taskId: "ts-code-auto",
+      repo: "sample-apps",
+      classification: "unrestricted",
+      agent: "codex",
+      role: "coder",
+    },
     config: { autoApproveScopes: ["code.apply"] },
   });
   const autoGrants = await query({ traceId: "tr-code-apply-auto", type: "APPROVAL_AUTO_GRANTED" });

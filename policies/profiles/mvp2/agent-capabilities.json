@@ -14,7 +14,9 @@
         "reviewer",
         "tester",
         "documenter",
-        "security_reviewer"
+        "security_reviewer",
+        "writer",
+        "editor"
       ],
       "requiresApprovalFor": [
         "git.push.protected",
@@ -23,10 +25,59 @@
       ],
       "notes": "Only agent allowed for repos classified as restricted."
     },
+    "antigravity": {
+      "binary": "agy",
+      "models": [
+        "gemini-3.8-flash-high",
+        "gemini-3.8-flash-medium",
+        "gemini-3.8-flash-low",
+        "gemini-3.7-flash-high",
+        "gemini-3.7-flash-medium",
+        "gemini-3.7-flash-low",
+        "gemini-3.6-flash-high",
+        "gemini-3.6-flash-medium",
+        "gemini-3.6-flash-low",
+        "gemini-3.5-flash-high",
+        "gemini-3.5-flash-medium",
+        "gemini-3.5-flash-low",
+        "gemini-3.1-pro-high",
+        "gemini-3.1-pro-low"
+      ],
+      "modelAliases": {
+        "gemini-3.8-flash": "gemini-3.8-flash-high",
+        "gemini-3.7-flash": "gemini-3.7-flash-high",
+        "gemini-3.6-flash": "gemini-3.6-flash-high",
+        "gemini-3.5-flash": "gemini-3.5-flash-high",
+        "gemini-3.1-pro": "gemini-3.1-pro-high"
+      },
+      "defaultModel": "gemini-3.8-flash-high",
+      "reasoningEfforts": ["low", "medium", "high"],
+      "defaultReasoningEffort": "high",
+      "allowedClassifications": ["unrestricted", "internal", "restricted"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "restricted-coder",
+        "reviewer",
+        "tester",
+        "documenter",
+        "security_reviewer",
+        "writer",
+        "editor"
+      ],
+      "requiresApprovalFor": [
+        "git.push.protected",
+        "dependency.change",
+        "code.write.protected_branch"
+      ],
+      "enabled": true,
+      "notes": "Antigravity CLI adapter (agy). Enabled."
+    },
     "claude-code": {
       "binary": "claude",
-      "models": ["claude-fable-5", "claude-opus-5", "claude-opus-4-8"],
-      "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5" },
+      "models": ["claude-sonnet-5", "claude-fable-5-1", "claude-fable-5", "claude-opus-5", "claude-opus-4-8"],
+      "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5", "sonnet": "claude-sonnet-5" },
       "defaultModel": "claude-fable-5",
       "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
       "defaultReasoningEffort": "max",
@@ -38,7 +89,9 @@
         "reviewer",
         "tester",
         "documenter",
-        "security_reviewer"
+        "security_reviewer",
+        "writer",
+        "editor"
       ],
       "requiresApprovalFor": [
         "git.push.protected",
@@ -48,14 +101,25 @@
     },
     "codex": {
       "binary": "codex",
-      "models": ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5", "gpt-5-codex"],
-      "modelAliases": { "gpt-5.6": "gpt-5.6-sol" },
+      "models": ["gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5", "gpt-5-codex"],
+      "modelAliases": {
+        "gpt-6": "gpt-6-astra",
+        "astra": "gpt-6-astra",
+        "gpt-5.6": "gpt-5.6-sol",
+        "sol": "gpt-5.6-sol",
+        "terra": "gpt-5.6-terra",
+        "luna": "gpt-5.6-luna"
+      },
       "defaultModel": "gpt-5.6-sol",
       "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
       "defaultReasoningEffort": "max",
-      "serviceTiers": ["priority"],
+      "serviceTiers": ["default", "priority"],
       "defaultServiceTier": "priority",
       "modelProfiles": {
+        "gpt-6-astra": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
         "gpt-5.6-sol": {
           "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
           "defaultReasoningEffort": "max"
@@ -89,11 +153,67 @@
         "restricted-coder",
         "reviewer",
         "tester",
-        "security_reviewer"
+        "security_reviewer",
+        "writer",
+        "editor"
       ],
       "requiresApprovalFor": ["git.push.protected", "dependency.change"],
       "enabled": true,
       "notes": "MVP2.0 operator profile. Codex may plan, read, review, and write restricted repos."
+    },
+    "pi": {
+      "binary": "pi",
+      "models": ["ollama/qwen3.8:27b", "ollama/qwen3-coder:30b", "moonshotai/kimi-k3"],
+      "modelAliases": {
+        "qwen": "ollama/qwen3.8:27b",
+        "qwen-coder": "ollama/qwen3-coder:30b",
+        "kimi": "moonshotai/kimi-k3",
+        "kimi-k3": "moonshotai/kimi-k3"
+      },
+      "defaultModel": "ollama/qwen3.8:27b",
+      "reasoningEfforts": ["off", "minimal", "low", "medium", "high", "xhigh"],
+      "defaultReasoningEffort": "medium",
+      "allowedClassifications": ["unrestricted", "internal"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "reviewer",
+        "tester",
+        "documenter",
+        "security_reviewer",
+        "writer",
+        "editor"
+      ],
+      "requiresApprovalFor": ["git.push.protected", "dependency.change"],
+      "enabled": true,
+      "notes": "pi coding agent (@earendil-works/pi-coding-agent). Model is passed as --model <provider/id> and reasoningEffort as --thinking. Local Qwen runs through Ollama at AGENTS_OLLAMA_BASE_URL; moonshotai/kimi-k3 needs MOONSHOT_API_KEY and is refused with MODEL_CREDENTIAL_MISSING until it is set."
+    },
+    "opencode": {
+      "binary": "opencode",
+      "models": ["ollama/qwen3.8:27b", "ollama/qwen3-coder:30b", "moonshotai/kimi-k3"],
+      "modelAliases": {
+        "qwen": "ollama/qwen3.8:27b",
+        "qwen-coder": "ollama/qwen3-coder:30b",
+        "kimi": "moonshotai/kimi-k3",
+        "kimi-k3": "moonshotai/kimi-k3"
+      },
+      "defaultModel": "ollama/qwen3.8:27b",
+      "allowedClassifications": ["unrestricted", "internal"],
+      "allowedRoles": [
+        "orchestrator",
+        "planner",
+        "coder",
+        "reviewer",
+        "tester",
+        "documenter",
+        "security_reviewer",
+        "writer",
+        "editor"
+      ],
+      "requiresApprovalFor": ["git.push.protected", "dependency.change"],
+      "enabled": true,
+      "notes": "opencode CLI (opencode-ai). Model is passed as -m <provider/model>; it declares no reasoning-effort dimension here because --variant is provider-specific and unverified per model. Local Qwen runs through Ollama at AGENTS_OLLAMA_BASE_URL; moonshotai/kimi-k3 needs MOONSHOT_API_KEY."
     }
   },
   "protectedBranches": ["main", "master", "release/*"]

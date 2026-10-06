@@ -61,16 +61,40 @@ function buildSubject({ repoRoot }) {
   const adapter = {
     async delegate(args) {
       calls.push({ method: "delegate", args });
-      return { stdout: "ok", stderr: "", exitCode: 0 };
+      return {
+        stdout: "ok",
+        stderr: "",
+        exitCode: 0,
+        dryRun: true,
+        model: args.effectiveSelection.model,
+        reasoningEffort: args.effectiveSelection.reasoningEffort,
+        effectiveSelection: args.effectiveSelection,
+        ...(args.effectiveSelection.provider === "codex"
+          ? {
+              serviceTier: args.effectiveSelection.serviceTier,
+              sandbox: "workspace-write",
+            }
+          : {}),
+      };
     },
     async spawn(args) {
       calls.push({ method: "spawn", args });
-      return { sessionId: "ss-fake", tmuxTarget: "tmux-fake", attachCommand: "tmux attach -t tmux-fake" };
+      return {
+        sessionId: "tmux-fake",
+        tmuxTarget: "tmux-fake",
+        attachCommand: "tmux attach -t tmux-fake",
+        launchCommand: "fake launch",
+        dryRun: true,
+        effectiveSelection: args.effectiveSelection,
+      };
     },
   };
   const adapters = createAdapterRegistry({ config: { repoRoots: [repoRoot] }, registries });
   adapters.register("codex", adapter);
   adapters.register("claude-code", adapter);
+  adapters.register("antigravity", adapter);
+  adapters.register("pi", adapter);
+  adapters.register("opencode", adapter);
   const service = createAgentService({
     adapters,
     registries,
@@ -99,7 +123,7 @@ test("agent tools expose optional model fields", () => {
   assert.equal(tools["agent.spawn"].inputSchema.properties.serviceTier.type, "string");
 });
 
-test("delegate without model uses registry defaults and audits them", async () => {
+test("delegate without model uses canonical defaults and audits them", async () => {
   const { repoRoot } = fresh();
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-default", taskId: "ts-model-default" });
@@ -118,16 +142,19 @@ test("delegate without model uses registry defaults and audits them", async () =
   const events = await query({ traceId: "tr-model-default", type: "AGENT_MODEL_RESOLVED" });
 
   assert.equal(result.exitCode, 0);
-  assert.equal(calls[0].args.model, "gpt-5.6-sol");
-  assert.equal(calls[0].args.reasoningEffort, "max");
-  assert.equal(calls[0].args.serviceTier, "priority");
+  assert.equal(Object.hasOwn(calls[0].args, "model"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
+  assert.equal(calls[0].args.effectiveSelection.model, "gpt-5.6-sol");
+  assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "max");
+  assert.equal(calls[0].args.effectiveSelection.serviceTier, "priority");
   assert.equal(events.length, 1);
   assert.equal(events[0].model, "gpt-5.6-sol");
   assert.equal(events[0].reasoningEffort, "max");
   assert.equal(events[0].serviceTier, "priority");
 });
 
-test("delegate with allowed model passes resolved model to adapter", async () => {
+test("delegate passes one resolved selection to the adapter", async () => {
   const { repoRoot } = fresh();
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-allowed", taskId: "ts-model-allowed" });
@@ -144,9 +171,12 @@ test("delegate with allowed model passes resolved model to adapter", async () =>
     reasoningEffort: "high",
   });
 
-  assert.equal(calls[0].args.model, "gpt-5-codex");
-  assert.equal(calls[0].args.reasoningEffort, "high");
-  assert.equal(calls[0].args.serviceTier, "priority");
+  assert.equal(Object.hasOwn(calls[0].args, "model"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
+  assert.equal(calls[0].args.effectiveSelection.model, "gpt-5-codex");
+  assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "high");
+  assert.equal(calls[0].args.effectiveSelection.serviceTier, "priority");
 });
 
 test("delegate with disallowed model is denied before adapter", async () => {
@@ -172,7 +202,7 @@ test("delegate with disallowed model is denied before adapter", async () => {
   assert.equal(calls.length, 0);
 });
 
-test("spawn passes model, reasoning effort, and service tier to adapter", async () => {
+test("spawn passes one resolved selection to the adapter", async () => {
   const { repoRoot } = fresh();
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-spawn", taskId: "ts-model-spawn" });
@@ -190,12 +220,62 @@ test("spawn passes model, reasoning effort, and service tier to adapter", async 
   });
 
   assert.equal(calls[0].method, "spawn");
-  assert.equal(calls[0].args.model, "gpt-5.6-terra");
-  assert.equal(calls[0].args.reasoningEffort, "low");
-  assert.equal(calls[0].args.serviceTier, "priority");
+  assert.equal(Object.hasOwn(calls[0].args, "model"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
+  assert.equal(calls[0].args.effectiveSelection.model, "gpt-5.6-terra");
+  assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "low");
+  assert.equal(calls[0].args.effectiveSelection.serviceTier, "priority");
 });
 
-test("claude defaults to fable 5 max without a codex service tier", async () => {
+test("every executable provider can spawn through the gateway", async () => {
+  for (const [agent, role, model, effort] of [
+    ["antigravity", "reviewer", "gemini-3.8-flash-high", "high"],
+    ["pi", "coder", "ollama/qwen3.8:27b", "medium"],
+    ["opencode", "coder", "ollama/qwen3.8:27b", null],
+  ]) {
+    const { repoRoot } = fresh();
+    const { calls, tools } = buildSubject({ repoRoot });
+    createTask({ traceId: `tr-spawn-${agent}`, taskId: `ts-spawn-${agent}`, agent, role });
+
+    const result = await tools["agent.spawn"].handler({
+      agent,
+      role,
+      repo: "sample-apps",
+      cwd: repoRoot,
+      traceId: `tr-spawn-${agent}`,
+      taskId: `ts-spawn-${agent}`,
+    });
+    const body = parseToolResult(result);
+
+    assert.notEqual(result.isError, true, `${agent} spawn must not be rejected`);
+    assert.equal(body.sessionId, "tmux-fake");
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].method, "spawn");
+    assert.equal(calls[0].args.effectiveSelection.model, model);
+    assert.equal(calls[0].args.effectiveSelection.reasoningEffort, effort);
+  }
+});
+
+test("a provider with no adapter result contract is rejected before the adapter runs", async () => {
+  const { repoRoot } = fresh();
+  const { calls, tools } = buildSubject({ repoRoot });
+  createTask({ traceId: "tr-spawn-gemini", taskId: "ts-spawn-gemini", agent: "gemini-cli", role: "coder" });
+
+  const result = await tools["agent.spawn"].handler({
+    agent: "gemini-cli",
+    role: "coder",
+    repo: "sample-apps",
+    cwd: repoRoot,
+    traceId: "tr-spawn-gemini",
+    taskId: "ts-spawn-gemini",
+  });
+
+  assert.equal(result.isError, true);
+  assert.equal(calls.length, 0);
+});
+
+test("claude defaults to opus 5 medium without a codex service tier", async () => {
   const { repoRoot } = fresh();
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-claude", taskId: "ts-model-claude", agent: "claude-code", role: "reviewer" });
@@ -210,7 +290,10 @@ test("claude defaults to fable 5 max without a codex service tier", async () => 
     taskId: "ts-model-claude",
   });
 
-  assert.equal(calls[0].args.model, "claude-fable-5");
-  assert.equal(calls[0].args.reasoningEffort, "max");
-  assert.equal(calls[0].args.serviceTier, undefined);
+  assert.equal(Object.hasOwn(calls[0].args, "model"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
+  assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
+  assert.equal(calls[0].args.effectiveSelection.model, "claude-fable-5");
+  assert.equal(calls[0].args.effectiveSelection.reasoningEffort, "max");
+  assert.equal(calls[0].args.effectiveSelection.serviceTier, null);
 });

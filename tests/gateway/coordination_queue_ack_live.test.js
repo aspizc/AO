@@ -95,8 +95,9 @@ test(
       socket: { reconnectStrategy: false },
     });
     await raw.connect();
+    let queue;
     try {
-      const queue = createRedisCoordinationQueue({
+      queue = createRedisCoordinationQueue({
         redisUrl,
         prefix,
         maxInboxLength: 1,
@@ -482,6 +483,7 @@ test(
         [],
       );
     } finally {
+      await queue?.close();
       await exactPrefixCleanup(raw, prefix);
       if (raw.isOpen) raw.destroy();
     }
@@ -499,8 +501,9 @@ test(
       socket: { reconnectStrategy: false },
     });
     await raw.connect();
+    let queue;
     try {
-      const queue = createRedisCoordinationQueue({ redisUrl, prefix });
+      queue = createRedisCoordinationQueue({ redisUrl, prefix });
       const generatedIds = ["unicode-sender", "unicode-recipient"];
       const service = createCoordinationService({
         queue,
@@ -564,6 +567,7 @@ test(
         },
       );
     } finally {
+      await queue?.close();
       await exactPrefixCleanup(raw, prefix);
       if (raw.isOpen) raw.destroy();
     }

@@ -1,0 +1,639 @@
+{
+  "$schema": "../../schemas/orchestrator-profile-v1.schema.json",
+  "version": 1,
+  "profileId": "canonical-orchestrator",
+  "roles": [
+    "orchestrator",
+    "planner",
+    "coder",
+    "restricted-coder",
+    "reviewer",
+    "tester",
+    "documenter",
+    "security_reviewer",
+    "writer",
+    "editor"
+  ],
+  "providers": {
+    "codex": {
+      "agent": "codex",
+      "provider": "codex",
+      "execution": "available",
+      "argvOwner": "D/0/01",
+      "aliases": {
+        "gpt-6": "gpt-6-astra",
+        "astra": "gpt-6-astra",
+        "gpt-5.6": "gpt-5.6-sol",
+        "sol": "gpt-5.6-sol",
+        "terra": "gpt-5.6-terra",
+        "luna": "gpt-5.6-luna"
+      },
+      "defaultModel": "gpt-5.6-sol",
+      "defaultReasoningEffort": "max",
+      "serviceTiers": ["default", "priority"],
+      "defaultServiceTier": "priority",
+      "models": {
+        "gpt-6-astra": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.6-sol": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.6-terra": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.6-luna": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": "max"
+        },
+        "gpt-5.5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "gpt-5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "gpt-5-codex": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        }
+      }
+    },
+    "claude-code": {
+      "agent": "claude-code",
+      "provider": "claude-code",
+      "execution": "available",
+      "argvOwner": "D/0/01",
+      "aliases": {
+        "fable": "claude-fable-5",
+        "opus": "claude-opus-5",
+        "sonnet": "claude-sonnet-5"
+      },
+      "defaultModel": "claude-fable-5",
+      "defaultReasoningEffort": "max",
+      "serviceTiers": null,
+      "defaultServiceTier": null,
+      "models": {
+        "claude-sonnet-5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": null
+        },
+        "claude-fable-5-1": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": null
+        },
+        "claude-fable-5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": null
+        },
+        "claude-opus-5": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": null
+        },
+        "claude-opus-4-8": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
+          "defaultReasoningEffort": null
+        }
+      }
+    },
+    "gemini-cli": {
+      "agent": "gemini-cli",
+      "provider": "gemini-cli",
+      "execution": "registry-only",
+      "argvOwner": "unavailable",
+      "aliases": {},
+      "defaultModel": "gemini-2.5-pro",
+      "defaultReasoningEffort": null,
+      "serviceTiers": null,
+      "defaultServiceTier": null,
+      "models": {
+        "gemini-2.5-pro": {
+          "reasoningEfforts": null,
+          "defaultReasoningEffort": null
+        },
+        "gemini-2.5-flash": {
+          "reasoningEfforts": null,
+          "defaultReasoningEffort": null
+        }
+      }
+    },
+    "antigravity": {
+      "agent": "antigravity",
+      "provider": "antigravity",
+      "execution": "available",
+      "argvOwner": "D/0/01",
+      "aliases": {
+        "gemini-3.8-flash": "gemini-3.8-flash-high",
+        "gemini-3.7-flash": "gemini-3.7-flash-high",
+        "gemini-3.6-flash": "gemini-3.6-flash-high",
+        "gemini-3.5-flash": "gemini-3.5-flash-high",
+        "gemini-3.1-pro": "gemini-3.1-pro-high"
+      },
+      "defaultModel": "gemini-3.8-flash-high",
+      "defaultReasoningEffort": "high",
+      "serviceTiers": null,
+      "defaultServiceTier": null,
+      "models": {
+        "gemini-3.8-flash-high": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.8-flash-medium": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.8-flash-low": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.7-flash-high": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.7-flash-medium": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.7-flash-low": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.6-flash-high": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.6-flash-medium": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.6-flash-low": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.5-flash-high": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.5-flash-medium": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.5-flash-low": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.1-pro-high": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        },
+        "gemini-3.1-pro-low": {
+          "reasoningEfforts": ["low", "medium", "high"],
+          "defaultReasoningEffort": "high"
+        }
+      }
+    },
+    "pi": {
+      "agent": "pi",
+      "provider": "pi",
+      "execution": "available",
+      "argvOwner": "D/0/01",
+      "aliases": {
+        "qwen": "ollama/qwen3.8:27b",
+        "qwen-coder": "ollama/qwen3-coder:30b",
+        "kimi": "moonshotai/kimi-k3",
+        "kimi-k3": "moonshotai/kimi-k3"
+      },
+      "defaultModel": "ollama/qwen3.8:27b",
+      "defaultReasoningEffort": "medium",
+      "serviceTiers": null,
+      "defaultServiceTier": null,
+      "models": {
+        "ollama/qwen3.8:27b": {
+          "reasoningEfforts": ["off", "minimal", "low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "ollama/qwen3-coder:30b": {
+          "reasoningEfforts": ["off", "minimal", "low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        },
+        "moonshotai/kimi-k3": {
+          "reasoningEfforts": ["off", "minimal", "low", "medium", "high", "xhigh"],
+          "defaultReasoningEffort": "medium"
+        }
+      }
+    },
+    "opencode": {
+      "agent": "opencode",
+      "provider": "opencode",
+      "execution": "available",
+      "argvOwner": "D/0/01",
+      "aliases": {
+        "qwen": "ollama/qwen3.8:27b",
+        "qwen-coder": "ollama/qwen3-coder:30b",
+        "kimi": "moonshotai/kimi-k3",
+        "kimi-k3": "moonshotai/kimi-k3"
+      },
+      "defaultModel": "ollama/qwen3.8:27b",
+      "defaultReasoningEffort": null,
+      "serviceTiers": null,
+      "defaultServiceTier": null,
+      "models": {
+        "ollama/qwen3.8:27b": {
+          "reasoningEfforts": null,
+          "defaultReasoningEffort": null
+        },
+        "ollama/qwen3-coder:30b": {
+          "reasoningEfforts": null,
+          "defaultReasoningEffort": null
+        },
+        "moonshotai/kimi-k3": {
+          "reasoningEfforts": null,
+          "defaultReasoningEffort": null
+        }
+      }
+    }
+  },
+  "prerequisites": {
+    "F/0/03": {
+      "availability": "unavailable",
+      "capability": "review-gate"
+    },
+    "F/0/04": {
+      "availability": "unavailable",
+      "capability": "completion-integration"
+    }
+  },
+  "workflows": {
+    "plan": {
+      "promptId": "orchestrator.plan.v1",
+      "instruction": "Create a trace, assign a planner, and persist a typed plan artifact before execution.",
+      "tools": [
+        "orchestration.create",
+        "orchestration.view",
+        "task.assign",
+        "agent.spawn",
+        "agent.ask",
+        "agent.view",
+        "artifact.put",
+        "artifact.list"
+      ],
+      "artifacts": ["plan", "summary"],
+      "prerequisites": []
+    },
+    "execute": {
+      "promptId": "orchestrator.execute.v1",
+      "instruction": "Delegate bounded implementation and testing through assigned agents and typed artifacts.",
+      "tools": [
+        "task.assign",
+        "agent.delegate",
+        "agent.spawn",
+        "agent.ask",
+        "agent.view",
+        "agent.kill",
+        "artifact.put",
+        "artifact.list",
+        "artifact.share"
+      ],
+      "artifacts": ["raw_diff", "test_report", "summary"],
+      "prerequisites": []
+    },
+    "coordinate": {
+      "promptId": "orchestrator.coordinate.v1",
+      "instruction": "Coordinate participants through typed messages while preserving trace and scope boundaries.",
+      "tools": [
+        "coordination.status",
+        "coordination.register",
+        "coordination.heartbeat",
+        "coordination.discover",
+        "coordination.unregister",
+        "coordination.send",
+        "coordination.receive",
+        "coordination.ack",
+        "message.send",
+        "message.list",
+        "message.reply"
+      ],
+      "artifacts": ["summary"],
+      "prerequisites": []
+    },
+    "review": {
+      "promptId": "orchestrator.review.v1",
+      "instruction": "Collect typed test and review artifacts without treating the unavailable review gate as implemented.",
+      "tools": [
+        "task.assign",
+        "agent.delegate",
+        "agent.spawn",
+        "agent.ask",
+        "agent.view",
+        "artifact.put",
+        "artifact.get",
+        "artifact.list",
+        "artifact.share"
+      ],
+      "artifacts": ["review_notes", "test_report", "security_finding", "summary"],
+      "prerequisites": ["F/0/03"]
+    },
+    "recovery": {
+      "promptId": "orchestrator.recovery.v1",
+      "instruction": "Inspect state, record intervention evidence, and resume or cancel without duplicating work.",
+      "tools": [
+        "orchestration.view",
+        "orchestration.pause",
+        "orchestration.resume",
+        "orchestration.cancel",
+        "agent.view",
+        "agent.kill",
+        "artifact.put",
+        "artifact.list",
+        "session.attach_info",
+        "session.intervention_note"
+      ],
+      "artifacts": ["raw_stacktrace", "test_report", "summary"],
+      "prerequisites": []
+    },
+    "completion": {
+      "promptId": "orchestrator.completion.v1",
+      "instruction": "Check typed evidence and keep completion blocked until the unavailable completion integration exists.",
+      "tools": [
+        "orchestration.view",
+        "orchestration.complete",
+        "artifact.get",
+        "artifact.list",
+        "approval.poll",
+        "approval.wait"
+      ],
+      "artifacts": ["review_notes", "test_report", "summary"],
+      "prerequisites": ["F/0/04"]
+    }
+  },
+  "toolGuidance": {
+    "orchestration.create": {
+      "effect": "mutation",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "none",
+      "retry": "never",
+      "protectedEffect": false
+    },
+    "orchestration.view": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "orchestration.pause": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": false
+    },
+    "orchestration.resume": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": false
+    },
+    "orchestration.cancel": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": true,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "orchestration.complete": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "task.assign": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": false
+    },
+    "agent.delegate": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "agent.spawn": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "agent.ask": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "none",
+      "retry": "never",
+      "protectedEffect": false
+    },
+    "agent.view": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "agent.kill": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": true,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "artifact.put": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": false
+    },
+    "artifact.get": {
+      "effect": "read",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": true
+    },
+    "artifact.list": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "artifact.share": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "approval.request": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "approval.respond": {
+      "effect": "mutation",
+      "risk": "critical",
+      "destructive": true,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "approval.poll": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "poll",
+      "protectedEffect": false
+    },
+    "approval.wait": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "poll",
+      "protectedEffect": false
+    },
+    "message.send": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "message.list": {
+      "effect": "read",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": true
+    },
+    "message.reply": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "session.attach_info": {
+      "effect": "read",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": true
+    },
+    "session.intervention_note": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": false
+    },
+    "coordination.status": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "coordination.register": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "coordination.heartbeat": {
+      "effect": "mutation",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "natural",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "coordination.discover": {
+      "effect": "read",
+      "risk": "low",
+      "destructive": false,
+      "idempotency": "read-only",
+      "retry": "safe",
+      "protectedEffect": false
+    },
+    "coordination.unregister": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": true,
+      "idempotency": "natural",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "coordination.send": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "coordination.receive": {
+      "effect": "mutation",
+      "risk": "medium",
+      "destructive": false,
+      "idempotency": "operation-key",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "coordination.ack": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": true,
+      "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    }
+  }
+}

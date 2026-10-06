@@ -45,7 +45,11 @@ test("default off keeps approval pending", async () => {
     traceId: "tr-auto-default-off",
     action: "plan.apply",
     requestedBy: "orchestrator",
-    context: { repo: "agents-orchestrator" },
+    context: {
+      taskId: "ts-plan-apply",
+      repo: "agents-orchestrator",
+      classification: "internal",
+    },
     config: { autoApproveScopes: [] },
   });
   const events = await query({ traceId: "tr-auto-default-off" });
@@ -63,7 +67,11 @@ test("scope in allowlist auto grants with audit", async () => {
     traceId: "tr-auto-grant",
     action: "plan.apply",
     requestedBy: "orchestrator",
-    context: { repo: "agents-orchestrator" },
+    context: {
+      taskId: "ts-plan-grant",
+      repo: "agents-orchestrator",
+      classification: "internal",
+    },
     config: { autoApproveScopes: ["plan.apply"] },
   });
   const events = await query({ traceId: "tr-auto-grant", type: "APPROVAL_AUTO_GRANTED" });
@@ -110,6 +118,37 @@ test("restricted context is never auto granted", async () => {
   assert.equal(events.length, 0);
 });
 
+test("repository autoapproval requires task, repository, and known classification", async () => {
+  fresh();
+
+  for (const [index, context] of [
+    null,
+    { repo: "sample-apps" },
+    { taskId: "ts-owned", repo: "sample-apps" },
+    {
+      taskId: "ts-owned",
+      repo: "sample-apps",
+      classification: "unknown",
+    },
+  ].entries()) {
+    const traceId = `tr-incomplete-authority-${index}`;
+    const result = request({
+      traceId,
+      action: "code.apply",
+      requestedBy: "orchestrator",
+      context,
+      config: { autoApproveScopes: ["code.apply"] },
+    });
+    const events = await query({
+      traceId,
+      type: "APPROVAL_AUTO_GRANTED",
+    });
+
+    assert.equal(result.status, "pending");
+    assert.equal(events.length, 0);
+  }
+});
+
 test("auto grant resolves wait immediately", async () => {
   fresh();
 
@@ -117,7 +156,11 @@ test("auto grant resolves wait immediately", async () => {
     traceId: "tr-auto-wait",
     action: "code.apply",
     requestedBy: "orchestrator",
-    context: { repo: "sample-apps" },
+    context: {
+      taskId: "ts-code-apply",
+      repo: "sample-apps",
+      classification: "unrestricted",
+    },
     config: { autoApproveScopes: ["code.apply"] },
   });
   const waited = await waitForDecision({ approvalId: result.approvalId, timeoutMs: 1000, serverMaxMs: 1000 });
@@ -137,7 +180,11 @@ test("approval request tool receives autoapprove config", async () => {
       traceId: "tr-tool-auto",
       action: "plan.apply",
       requestedBy: "orchestrator",
-      context: { repo: "agents-orchestrator" },
+      context: {
+        taskId: "ts-plan-tool",
+        repo: "agents-orchestrator",
+        classification: "internal",
+      },
     }),
   );
 

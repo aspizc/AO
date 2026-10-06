@@ -8,11 +8,17 @@ import path from "node:path";
 
 import { evaluate } from "../../gateway/src/core/policy_engine.js";
 import { POLICY_RULE } from "../../gateway/src/core/policy_rules.js";
+import { ACTION_CATALOG_VERSION } from "../../gateway/src/core/policy_types.js";
 import * as artifactStore from "../../gateway/src/core/artifact_store.js";
 import {
   _resetForTests as resetAudit,
   configureAudit,
 } from "../../gateway/src/core/audit.js";
+import {
+  bindRequestContext,
+  createRequestContext,
+} from "../../gateway/src/core/request_context.js";
+import { getDb } from "../../gateway/src/core/state.js";
 import { createTraceAccessToken } from "../../gateway/src/core/trace_access.js";
 import {
   CoordinationError,
@@ -42,13 +48,13 @@ async function createRestrictedRawArtifact(harness, content = "secret=AKIAFAKEKE
   const task = services.task.assignTask({
     traceId: orchestration.traceId,
     caller: { agent: "claude-code", role: "orchestrator" },
-    target: { agent: "gemini-cli", role: "restricted-coder", action: "code.write" },
+    target: { agent: "codex", role: "restricted-coder", action: "code.write" },
     repo: "cvision",
     brief: "bypass fixture",
     registries: services.registries,
   });
   const session = await services.agent.spawn({
-    agent: "gemini-cli",
+    agent: "codex",
     role: "restricted-coder",
     repo: "cvision",
     cwd: paths.cvisionRepo,
@@ -227,7 +233,7 @@ test("cwd_outside_allowlist_is_rejected_before_spawn", async () => {
     const task = harness.services.task.assignTask({
       traceId: orchestration.traceId,
       caller: { agent: "claude-code", role: "orchestrator" },
-      target: { agent: "gemini-cli", role: "restricted-coder", action: "code.write" },
+      target: { agent: "codex", role: "restricted-coder", action: "code.write" },
       repo: "cvision",
       brief: "cwd bypass",
       registries: harness.services.registries,
@@ -236,7 +242,7 @@ test("cwd_outside_allowlist_is_rejected_before_spawn", async () => {
     await assert.rejects(
       () =>
         harness.services.agent.spawn({
-          agent: "gemini-cli",
+          agent: "codex",
           role: "restricted-coder",
           repo: "cvision",
           cwd: "/etc",
@@ -264,7 +270,7 @@ test("cwd_symlink_escape_is_rejected", async () => {
     const task = harness.services.task.assignTask({
       traceId: orchestration.traceId,
       caller: { agent: "claude-code", role: "orchestrator" },
-      target: { agent: "gemini-cli", role: "restricted-coder", action: "code.write" },
+      target: { agent: "codex", role: "restricted-coder", action: "code.write" },
       repo: "cvision",
       brief: "symlink bypass",
       registries: harness.services.registries,
@@ -273,7 +279,7 @@ test("cwd_symlink_escape_is_rejected", async () => {
     await assert.rejects(
       () =>
         harness.services.agent.spawn({
-          agent: "gemini-cli",
+          agent: "codex",
           role: "restricted-coder",
           repo: "cvision",
           cwd: link,
@@ -281,6 +287,106 @@ test("cwd_symlink_escape_is_rejected", async () => {
           taskId: task.taskId,
         }),
       /outside allowed roots/,
+    );
+  } finally {
+    harness.cleanup();
+  }
+});
+
+// threat: TM-20
+test("execution_binding_replay_is_denied_without_lineage_side_effects", async () => {
+  const harness = startHarness();
+  try {
+    const orchestration = harness.services.orchestration.createOrchestration({
+      callerAgent: "claude-code",
+      callerRole: "orchestrator",
+      goal: "execution binding replay",
+    });
+    const task = harness.services.task.assignTask({
+      traceId: orchestration.traceId,
+      caller: { agent: "claude-code", role: "orchestrator" },
+      target: {
+        agent: "codex",
+        role: "restricted-coder",
+        action: "code.write",
+      },
+      repo: "cvision",
+      brief: "exercise the service execution boundary",
+      registries: harness.services.registries,
+    });
+    const context = createRequestContext({
+      principalId: "local-operator",
+      agent: "claude-code",
+      role: "orchestrator",
+      audience: "agents-gateway:e2e",
+      connectionId: "binding-replay-e2e",
+      capabilities: ["agent.spawn"],
+      repositoryBindings: {
+        cvision: {
+          root: harness.paths.cvisionRepo,
+          classification: "restricted",
+        },
+      },
+      lineage: {
+        traces: [{ traceId: orchestration.traceId }],
+        tasks: [{
+          taskId: task.taskId,
+          traceId: orchestration.traceId,
+          repositoryId: "cvision",
+          targetAgent: "codex",
+          targetRole: "restricted-coder",
+          targetAction: "code.write",
+        }],
+      },
+      issuedAt: "2026-07-26T08:00:00.000Z",
+      expiresAt: "2026-07-26T09:00:00.000Z",
+    });
+    const binding = bindRequestContext(context, {
+      action: "agent.spawn",
+      actionCatalogVersion: ACTION_CATALOG_VERSION,
+      audience: "agents-gateway:e2e",
+      connectionId: "binding-replay-e2e",
+      args: {
+        agent: "codex",
+        role: "restricted-coder",
+        repo: "cvision",
+        cwd: harness.paths.cvisionRepo,
+        traceId: orchestration.traceId,
+        taskId: task.taskId,
+      },
+      now: "2026-07-26T08:30:00.000Z",
+    });
+    const auditCount = (await harness.services.audit.query({ limit: 1_000 })).length;
+    const sessionCount = getDb()
+      .prepare("SELECT COUNT(*) AS count FROM sessions")
+      .get()
+      .count;
+    const baseArgs = {
+      agent: "codex",
+      role: "restricted-coder",
+      repo: "cvision",
+      cwd: harness.paths.cvisionRepo,
+      traceId: orchestration.traceId,
+      taskId: task.taskId,
+    };
+
+    for (const [args, requestBinding] of [
+      [{ ...baseArgs, traceId: "tr-replayed" }, binding],
+      [baseArgs, { ...binding }],
+    ]) {
+      await assert.rejects(
+        () => harness.services.agent.spawn(args, requestBinding),
+        (error) => error.code === "REQUEST_CONTEXT_DENIED",
+      );
+    }
+
+    assert.equal(
+      getDb().prepare("SELECT COUNT(*) AS count FROM sessions").get().count,
+      sessionCount,
+    );
+    assert.equal(
+      (await harness.services.audit.query({ limit: 1_000 })).length,
+      auditCount,
     );
   } finally {
     harness.cleanup();

@@ -1,6 +1,10 @@
 import { EventEmitter } from "node:events";
 import { append as auditAppend } from "../core/audit.js";
 import { newApprovalId } from "../core/ids.js";
+import {
+  isCanonicalAction,
+  isRepositoryAffectingAction,
+} from "../core/policy_types.js";
 import * as repo from "../core/repositories/approval_repo.js";
 
 export const approvalBus = new EventEmitter();
@@ -25,9 +29,28 @@ function restrictedContext(context) {
   return [context.classification, context.repoClassification, context.repositoryClassification].includes("restricted");
 }
 
+function hasRepositoryAuthority(action, context) {
+  if (!isRepositoryAffectingAction(action)) return true;
+  return (
+    typeof context?.taskId === "string"
+    && context.taskId.length > 0
+    && typeof context?.repo === "string"
+    && context.repo.length > 0
+    && ["unrestricted", "internal", "restricted"].includes(
+      context?.classification,
+    )
+  );
+}
+
 function isAutoApprovable(action, context, config = {}) {
   const scopes = new Set(config.autoApproveScopes || []);
-  return scopes.has(action) && !NEVER_AUTO.has(action) && !restrictedContext(context);
+  return (
+    isCanonicalAction(action)
+    && scopes.has(action)
+    && !NEVER_AUTO.has(action)
+    && hasRepositoryAuthority(action, context)
+    && !restrictedContext(context)
+  );
 }
 
 function autoGrantApproval({ approvalId, traceId, action, requestedBy, context }) {

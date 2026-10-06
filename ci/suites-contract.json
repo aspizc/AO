@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "requiredSuiteIds": [
     "lock.python",
+    "release.candidate",
     "lint.python",
     "lint.gateway",
     "test.structure",
@@ -10,10 +11,10 @@
     "smoke.mcp",
     "policy.registry",
     "test.cli",
-    "test.langgraph"
+    "test.langgraph",
+    "test.redis-live"
   ],
   "optionalSuiteIds": [
-    "test.redis-live",
     "test.real-agents"
   ],
   "suites": [
@@ -37,6 +38,47 @@
       "timeoutSeconds": 120
     },
     {
+      "id": "release.candidate",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "python",
+        "scripts/release_candidate.py",
+        "verify-repository",
+        "--repo-root",
+        "."
+      ],
+      "include": [
+        ".github/workflows/ci.yml",
+        "ci/advisory-waivers.json",
+        "ci/license-allowlist.json",
+        "ci/offline-advisory-database.json",
+        "ci/production-advisories.json",
+        "ci/production-licenses.json",
+        "ci/production-sbom.json",
+        "ci/release-environments.json",
+        "ci/requirements-build.in",
+        "ci/reviewer-trust-roots.json",
+        "ci/suites-contract.json",
+        "ci/suites.json",
+        "cli/pyproject.toml",
+        "gateway/package-lock.json",
+        "gateway/package.json",
+        "orchestrator-langgraph/pyproject.toml",
+        "requirements.lock",
+        "schemas/release-candidate-v1.schema.json",
+        "schemas/release-state-v1.schema.json",
+        "scripts/ci.sh",
+        "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/requirements_lock.sh",
+        "scripts/release_candidate.py"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
       "id": "lint.python",
       "classification": "required",
       "runner": "command",
@@ -46,12 +88,16 @@
         "cli",
         "orchestrator-langgraph",
         "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/release_candidate.py",
         "tests/structure"
       ],
       "include": [
         "cli/**/*.py",
         "orchestrator-langgraph/**/*.py",
         "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/release_candidate.py",
         "tests/structure/**/*.py"
       ],
       "exclude": [],
@@ -274,7 +320,7 @@
     },
     {
       "id": "test.redis-live",
-      "classification": "optional-service",
+      "classification": "required",
       "runner": "node-test",
       "argv": [
         "node",

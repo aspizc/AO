@@ -1,11 +1,14 @@
 # Milestone M0 — Base e intake selectivo
 
-Estado: **rebase required**. Las doce subtareas atomicas estan en
+Estado: **absorción V5 en curso**. M0/4/00 está absorbida; M0/0/00, M0/3/00,
+M0/4/01 y M0/4/02 están parciales; las demás tareas conservan su estado. Las
+doce subtareas atomicas estan en
 sus [ficheros individuales](TASKS.md), organizados bajo `M0/<stream>/<task>.md`.
 Cada una dura como maximo un dia y produce un commit/review independiente.
 Los commits/reviews preliminares M0/0/00–01 basados en `bfab1fb` deben
 preservarse como historia, pero no satisfacen estas tareas tras el cambio de
-`develop`.
+`develop`. La implementación restante pertenece a V5; no se programan ramas o
+reviews V4 duplicadas.
 
 | ID | Titulo | Depende de |
 |---|---|---|

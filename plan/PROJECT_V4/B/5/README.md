@@ -10,4 +10,7 @@ especificación detallada, rollback y trazabilidad.
 | [B/5/01](01.md) | Artifact/egress/audit MCP E2E | [EP-07](../../epics/EP-07.md) | Planificada |
 | [B/5/02](02.md) | Lifecycle/control-plane E2E | [EP-07](../../epics/EP-07.md) | Planificada |
 
+Absorción reconciliada: `B/5/02` exige conjuntamente V5 C/0/03, C/1/03,
+D/0/04 y E/0/05.
+
 [← Stage B](../README.md) · [Índice de stage](../TASKS.md) · [Catálogo global](../../SHEETS.md)

@@ -71,6 +71,18 @@ calls and Zod-valid MCP calls then share domain validation, public response
 shapes, safe `COORDINATION_*` errors, domain-audit projection, and delivery
 state.
 
+Each service instance owns two lazy persistent Redis lanes: a multiplexed
+command client with bounded in-flight/queued admission and a serialized
+blocking client with its own bounded queue. Offline queuing and automatic
+transport retry are disabled, so a dropped operation is not replayed; the next
+operation performs one coalesced reconnect. An in-flight connect remains the
+authority even while node-redis is open but not ready; dispatch begins only
+after the lane records a successful handshake. Registry/process shutdown owns
+the inverse lifecycle. At its deadline a lane-owned epoch settles every
+remaining caller as unavailable, consumes late transport outcomes, and cleans
+up each connection generation in both connecting and post-handshake phases
+when required. This bounded cancellation uses no global singleton.
+
 `createOrchestratorCoordinationClient` is an optional trusted-local lifecycle
 adapter over that same direct service, not another service or MCP surface. It
 checks readiness, owns one private registration credential, schedules
@@ -90,6 +102,13 @@ The Redis wire uses a dedicated configurable prefix and never aliases
 `agents:events`. Coordination metadata events remain in the coordination
 Stream, while coordination domain and generic MCP-call audit records are
 JSONL-only. Legacy audit and `message.*` retain their existing behavior.
+
+The Redis-specific boundary is exercised by the required `test.redis-live`
+lane. Remote CI creates a health-checked disposable Redis 7.2 standalone
+service for each Node matrix job; multiple independent clients contend on
+send, reclaim, replacement, expiry, and ACK schedules under UUID prefixes.
+Missing required infrastructure is distinct from an assertion failure, and
+skips, wrong topology, zero tests, or leaked test keys cannot report green.
 
 This is still not a standalone orchestrator. It is an additive Gateway service
 and importable factory that lets independently running orchestrators exchange

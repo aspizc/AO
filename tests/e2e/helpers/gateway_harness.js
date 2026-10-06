@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 
 import { GeminiAdapter } from "../../../gateway/src/adapters/gemini_adapter.js";
 import { ClaudeAdapter } from "../../../gateway/src/adapters/claude_adapter.js";
+import { CodexAdapter } from "../../../gateway/src/adapters/codex_adapter.js";
+import { AntigravityAdapter } from "../../../gateway/src/adapters/antigravity_adapter.js";
 import { createAdapterRegistry } from "../../../gateway/src/adapters/index.js";
 import * as artifactStore from "../../../gateway/src/core/artifact_store.js";
 import * as audit from "../../../gateway/src/core/audit.js";
@@ -47,6 +49,8 @@ export function startHarness() {
   const adapters = createAdapterRegistry({ config, registries });
   adapters.register("gemini-cli", new GeminiAdapter({ config, registries }));
   adapters.register("claude-code", new ClaudeAdapter({ config, registries }));
+  adapters.register("codex", new CodexAdapter({ config, registries }));
+  adapters.register("antigravity", new AntigravityAdapter({ config, registries }));
   const agent = createAgentService({ adapters, registries });
 
   initState({ stateDb: path.join(workspace, "state", "state.db") });

@@ -6,6 +6,7 @@ license = "MIT"
 authors = [{ name = "Carlos Asensio Pizarro" }]
 requires-python = ">=3.11"
 dependencies = [
+  "cryptography>=50,<51",
   "typer>=0.12,<1",
   "rich>=13.7,<16",
   "jsonschema>=4.21,<5",
@@ -14,7 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
-  "ruff>=0.4",
+  "ruff>=0.4,<0.16",
 ]
 
 [project.scripts]

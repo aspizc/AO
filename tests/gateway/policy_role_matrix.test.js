@@ -83,7 +83,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:allow:ok",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   planner: row([
     "agent.ask:allow:ok",
@@ -117,7 +117,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   coder: row([
     "agent.ask:allow:ok",
@@ -151,7 +151,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   "restricted-coder": row([
     "agent.ask:allow:ok",
@@ -185,7 +185,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   reviewer: row([
     "agent.ask:allow:ok",
@@ -219,7 +219,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   tester: row([
     "agent.ask:allow:ok",
@@ -253,7 +253,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   documenter: row([
     "agent.ask:allow:ok",
@@ -287,7 +287,7 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
   security_reviewer: row([
     "agent.ask:allow:ok",
@@ -321,7 +321,75 @@ const expected = {
     "session.intervention_note:allow:ok",
     "task.assign:deny:role.task_assign_only_orchestrator",
     "test.run:allow:ok",
-    "v3.unknown.action:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
+  ]),
+  writer: row([
+    "agent.ask:allow:ok",
+    "agent.delegate:allow:ok",
+    "agent.kill:allow:ok",
+    "agent.spawn:allow:ok",
+    "agent.view:allow:ok",
+    "approval.poll:allow:ok",
+    "approval.request:allow:ok",
+    "approval.respond:allow:ok",
+    "approval.wait:allow:ok",
+    "artifact.get:allow:ok",
+    "artifact.get.raw_restricted:deny:role.deny_action",
+    "artifact.get.sanitized:allow:ok",
+    "artifact.get.sanitized.raw_restricted:allow:ok",
+    "artifact.list:allow:ok",
+    "artifact.put:allow:ok",
+    "artifact.put.doc:allow:ok",
+    "artifact.put.plan:allow:ok",
+    "artifact.put.raw_restricted:allow:ok",
+    "artifact.put.review_notes:allow:ok",
+    "artifact.put.security_finding:allow:ok",
+    "artifact.put.test_report:allow:ok",
+    "artifact.share:allow:ok",
+    "artifact.share.cross_classification:allow:ok",
+    "code.read:allow:ok",
+    "code.read.raw_restricted:deny:role.deny_action",
+    "code.write:allow:ok",
+    "policy.check:allow:ok",
+    "session.attach_info:allow:ok",
+    "session.intervention_note:allow:ok",
+    "task.assign:deny:role.task_assign_only_orchestrator",
+    "test.run:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
+  ]),
+  editor: row([
+    "agent.ask:allow:ok",
+    "agent.delegate:allow:ok",
+    "agent.kill:allow:ok",
+    "agent.spawn:allow:ok",
+    "agent.view:allow:ok",
+    "approval.poll:allow:ok",
+    "approval.request:allow:ok",
+    "approval.respond:allow:ok",
+    "approval.wait:allow:ok",
+    "artifact.get:allow:ok",
+    "artifact.get.raw_restricted:deny:role.deny_action",
+    "artifact.get.sanitized:allow:ok",
+    "artifact.get.sanitized.raw_restricted:allow:ok",
+    "artifact.list:allow:ok",
+    "artifact.put:allow:ok",
+    "artifact.put.doc:allow:ok",
+    "artifact.put.plan:allow:ok",
+    "artifact.put.raw_restricted:allow:ok",
+    "artifact.put.review_notes:allow:ok",
+    "artifact.put.security_finding:allow:ok",
+    "artifact.put.test_report:allow:ok",
+    "artifact.share:allow:ok",
+    "artifact.share.cross_classification:allow:ok",
+    "code.read:allow:ok",
+    "code.read.raw_restricted:deny:role.deny_action",
+    "code.write:deny:role.deny_action",
+    "policy.check:allow:ok",
+    "session.attach_info:allow:ok",
+    "session.intervention_note:allow:ok",
+    "task.assign:deny:role.task_assign_only_orchestrator",
+    "test.run:allow:ok",
+    "v3.unknown.action:deny:action.unknown",
   ]),
 };
 
@@ -375,15 +443,21 @@ function actionUniverse() {
   return [...new Set([...roleRegistryActions(), ...actionsFromEvaluateCallSites(), UNKNOWN_ACTION])].sort();
 }
 
-function selectAgentForRole(role) {
-  const compatible = Object.entries(raw.agents).find(([, agent]) => agent.allowedRoles.includes(role));
+function selectAgentForRole(role, { executable = false } = {}) {
+  const compatible = Object.entries(raw.agents).find(
+    ([agentId, agent]) =>
+      agent.allowedRoles.includes(role)
+      && (!executable || agentId !== "gemini-cli"),
+  );
   assert.ok(compatible, `role ${role} has no compatible agent in policies/agent-capabilities.json`);
   return compatible[0];
 }
 
 function contextFor({ role, action }) {
   const context = {
-    agent: selectAgentForRole(role),
+    agent: selectAgentForRole(role, {
+      executable: action === "agent.delegate" || action === "agent.spawn",
+    }),
     role,
     repo: null,
     action,
@@ -414,10 +488,10 @@ test("role action matrix freezes current gateway decisions", () => {
   }
 });
 
-test("unknown actions currently default to allow for every real role", () => {
+test("unknown actions fail closed for every real role", () => {
   for (const role of Object.keys(raw.roles)) {
     const result = evaluate(contextFor({ role, action: UNKNOWN_ACTION }), reg);
-    assert.equal(result.decision, "allow", `${role} unknown action decision`);
-    assert.equal(result.ruleId, "ok", `${role} unknown action ruleId`);
+    assert.equal(result.decision, "deny", `${role} unknown action decision`);
+    assert.equal(result.ruleId, "action.unknown", `${role} unknown action ruleId`);
   }
 });

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 4 || "$1" != "--prefix" || "$2" != "gateway" || "$3" != "ci" || "$4" != "--ignore-scripts" ]]; then
+  printf 'unexpected fake npm invocation\n' >&2
+  exit 97
+fi
+
+: "${H001_INSTALL_LOG:?H001_INSTALL_LOG is required}"
+printf 'npm' >>"$H001_INSTALL_LOG"
+printf '\t%s' "$@" >>"$H001_INSTALL_LOG"
+printf '\n' >>"$H001_INSTALL_LOG"
+
+if [[ "${H001_FAIL_ON:-}" == "npm-ci" ]]; then
+  exit 86
+fi
+
+mkdir -p gateway/node_modules
+: >gateway/node_modules/.h001-installed

@@ -1,6 +1,7 @@
 # ADR-007 - Remote CI Safety Net
 
 Date: 2026-06-10
+Amended: 2026-07-26 (Project V5 G/0/00)
 Status: accepted
 
 ## Context
@@ -12,8 +13,9 @@ GitHub Actions workflow, a broken commit can still reach `develop` or `main`
 without the same gate running on a clean machine.
 
 Some checks remain intentionally local or opt-in. Real agent CLI execution,
-tmux-supervised paths, Temporal, Redis, and Postgres integrations require
-operator-controlled environments and are not part of the default remote gate.
+tmux-supervised paths, Temporal, and Postgres integrations require
+operator-controlled environments. Project V5 G/0/00 promotes the coordination
+Redis acceptance lane to required remote CI evidence.
 
 ## Decision
 
@@ -30,6 +32,13 @@ lint, test, smoke, policy, or E2E commands from the script.
 The workflow uses minimum repository permissions (`contents: read`) and does
 not require secrets. It does not enable real E2E execution or install
 operator-only tooling.
+
+Each matrix job provisions a disposable `redis:7.2-alpine` service on its own
+runner, publishes it only on loopback, and waits for `redis-cli ping`. The job
+sets `AGENTS_TEST_REDIS_URL` to that service before invoking the unchanged
+`scripts/ci.sh` entry point. The required Redis suite then rejects a runtime
+skip, zero tests, the wrong major version, cluster/replica topology, protocol
+race failure, or leaked `agents:test:v5:*` keys.
 
 `ci/suites.json` is the authoritative suite contract. `scripts/ci.sh` is the
 stable entry point and delegates to `scripts/ci_gate.py`, which validates the
@@ -97,10 +106,11 @@ Python dependencies are installed by hash from the universal
 is an explicit local operation described in the
 [CI contract](../ci-contract.md), never an implicit CI step. Optional service
 lanes report `infrastructure_unavailable`; they do not masquerade as required
-coverage or make Redis, Postgres, Temporal, or providers prerequisites of this
-baseline gate. The same non-passing status is used by a required suite and the
-aggregate whenever an exact allowlisted infrastructure skip is observed; its
-explicit allowlist is the only reason that state may retain exit zero.
+coverage. The required Redis readiness condition uses that same distinct
+status but returns nonzero when its URL is absent, while a protocol assertion
+remains `failed`. Exact allowlisted infrastructure skips in other required
+suites retain their existing honest status and exit policy. Postgres, Temporal,
+and providers are not prerequisites of this baseline gate.
 
 Node TAP output must contain exactly one coherent summary for each required
 field and unique observed skip IDs. Child output is decoded explicitly from
@@ -113,6 +123,8 @@ traceback that replaces stdout.
   `ci/suites-contract.json` its independently edited topology/policy baseline;
   `scripts/ci.sh` remains the stable entry point.
 - Local coder/reviewer handoff and GitHub Actions exercise the same gate.
+- Remote CI supplies one health-checked, disposable Redis 7 standalone service
+  per Node matrix job; local callers must supply their own isolated equivalent.
 - File-set changes normally refresh only `ci/suites.json`; suite topology and
   policy changes must update both manifest and baseline deliberately. The
   workflow changes only when setup requirements change.

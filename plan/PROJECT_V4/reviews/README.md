@@ -1,7 +1,21 @@
 # PROJECT_V4 — Protocolo de ejecucion y review
 
-Este directorio se usa durante implementacion. El plan actual no contiene
-reviews fabricadas ni verdicts: el siguiente gate es `plan.apply` del owner.
+Este directorio conserva el protocolo para implementación V4 no absorbida. No
+se fabrican reviews ni verdicts V4: G-1/G0 ya están autorizados y las hojas
+solapadas consumen la evidencia canónica de sus owners V5. V5 conserva la
+propiedad de implementación y no se programa una segunda rama o review V4 para
+el mismo alcance.
+
+## Reconciliación de reviews V5
+
+| Hoja V4 | Evidencia canónica | Disposición |
+|---|---|---|
+| M0/4/00 | [C/0/00 Trial 9 OK](../../PROJECT_V5/reviews/C_0_0-9_reviewed_OK.md) en `262c666`, integración `55221a5`, promoción `c10bcf3`/`7039a0b` | absorbida/entregada |
+| M0/0/00, M0/3/00, M0/4/02 | [C/0/02 Trial 4 OK](../../PROJECT_V5/reviews/C_0_2-4_review.md) en `9766979`, integración `2111f89`, promoción `c10bcf3`/`7039a0b` | parciales; I/0/04 abierta |
+| M0/4/01 | [G/0/00 Trial 1 OK](../../reviews/PROJECT_V5/G_0_0-1_review.md) en `5058a59`, integración `77cb418`, promoción `c10bcf3`/`7039a0b` | parcial; B/0/04 abierta |
+
+Los verdicts enlazados siguen siendo append-only y no se copian ni se
+reinterpretan como cierre de los owners abiertos.
 
 ## Identidad del change-set
 

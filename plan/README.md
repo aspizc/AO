@@ -12,28 +12,35 @@ separate; exact evidence and historical SHAs live in
 | Project V1 | Advanced orchestration: LangGraph, Postgres, Redis Streams, Temporal, OpenTelemetry. | Partially implemented and experimental/not supported; correctness and live-lane gaps are folded into V4 Stage E. | [`PROJECT_V1/`](PROJECT_V1/README.md) |
 | Project V2 | Advanced operator workflows: task-less sessions and advanced planning. | Backlog; not a release candidate. | [`PROJECT_V2/`](PROJECT_V2/README.md) |
 | Project V3 | Hardening from the 2026-06-10 code audit: CI gates, policy tests, license, reproducibility, release bookkeeping. | Implemented/reviewed and now integrated into the aligned local `main`/`develop`; the announced `v0.1.0` tag and remote publication still do not exist. | [`PROJECT_V3/`](PROJECT_V3/README.md) |
-| Project V4 | Trust boundary, confined/YOLO execution grants, operator control, dual review, release confidence and Temporal convergence. | The audit-derived 72-sheet plan is materialized and integrated; implementation remains planned. Preliminary M0 worktrees use a stale base and are historical evidence only. | [`PROJECT_V4/`](PROJECT_V4/README.md) |
-| Project V5 | Redis coordination plane plus the authority, operability, product and durable-release work required for inter-orchestrator coordination. | Active. The 25-sheet A foundation, reviewed B contract corrections, C/0/00 credible CI contract, and C/0/01 canonical MCP contract are integrated in the functional Wave; the remaining B–I sheets stay explicitly planned or in progress until their own implementation, review, and integration evidence exists. | [`PROJECT_V5/`](PROJECT_V5/README.md) |
+| Project V4 | Trust boundary, confined/YOLO execution grants, operator control, dual review, release confidence and Temporal convergence. | The audit-derived 72-sheet plan is materialized and integrated. V5 evidence absorbs M0/4/00 and leaves M0/0/00, M0/3/00, M0/4/01, and M0/4/02 partial; remaining implementation stays with V5. | [`PROJECT_V4/`](PROJECT_V4/README.md) |
+| Project V5 | Redis coordination plane plus the authority, operability, product and durable-release work required for inter-orchestrator coordination. | Active. The A foundation, reviewed B corrections, C/0/00–02, and G/0/00 are delivered. D/0/07c Trial 4 remains historical reviewed/integrated evidence. Trial 5 was independently KO at `9aafa77`, Trial 6 was independently KO at `43687af`, and the Trial 7 fail-closed correction `d79fd00` was independently reviewed OK at `7caf94b` and integrated at `c66b05f`. D/0/07c is complete but not promoted or released; D/0/07d is the next planned, unimplemented leaf. | [`PROJECT_V5/`](PROJECT_V5/README.md) |
 
 Use [`PROJECT_V0/README.md`](PROJECT_V0/README.md) for the completed MVP/MVP2.0
 tree and execution order.
 
 Project V5's implementation tree contains the delivered A foundation—[five
 historical epics and 25 executable sheets](PROJECT_V5/EPICS.md)—plus eight
-materialized B–I stages with [50 active sheets](PROJECT_V5/SHEETS.md). Its
+materialized B–I stages with [57 active executable leaves](PROJECT_V5/SHEETS.md),
+for 82 total. The arithmetic is
+`25 + (6 + 8 + 11 + 6 + 5 + 5 + 6 + 10) = 82`; current evidence supports
+`39 complete + 4 in progress + 39 planned = 82`, and
+`4 + 39 = 43` sheets are open. The in-progress set is exactly `C/1/00`,
+`D/0/01`, `G/0/02`, and `H/0/01`. The non-executable D/0/07
+parent index is not double-counted. Those open sheets absorb overlapping V4 work rather than
+scheduling 71 duplicate implementations. Its
 [review trail](PROJECT_V5/reviews/README.md) preserves every `OK` and `KO`
 verdict. The [independent A/0/00 final
 OK](PROJECT_V5/reviews/A_0_0-1_reviewed_OK.md) closes only that foundation;
-each B–I sheet still requires its own implementation, tests, review and
+each still-open B–I sheet requires its own implementation, tests, review, and
 integration evidence. No review alone proves promotion, live contention,
-tagging or release.
+tagging, or release.
 
 Project V4 exposes the audit-derived plan through
 [twelve detailed epic files](PROJECT_V4/epics/README.md) and
 [72 individually linked task files](PROJECT_V4/SHEETS.md) under their canonical
-stage/stream directories. The indexes and sheets are planning artifacts: they
-do not mark implementation, review, integration, promotion or release as
-complete.
+stage/stream directories. Their status is derived through the
+[V4/V5 absorption ledger](PROJECT_V5/V4_ABSORPTION.md): M0/4/00 is absorbed,
+four M0 sheets are partial, and no duplicate V4 implementation is scheduled.
 
 ## Canonical status rule
 

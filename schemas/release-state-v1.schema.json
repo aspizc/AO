@@ -1,0 +1,769 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents.example/schemas/release-state-v1.schema.json",
+  "title": "Explicit release candidate state ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "candidateDigest",
+    "subject",
+    "currentState",
+    "transitions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "release-state/v1"
+    },
+    "candidateDigest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "subject": {
+      "$ref": "#/$defs/gitIdentity"
+    },
+    "currentState": {
+      "$ref": "#/$defs/state"
+    },
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": null
+            },
+            "to": {
+              "const": "planned"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "plan"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": "planned"
+            },
+            "to": {
+              "const": "implemented"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "implementation"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": "implemented"
+            },
+            "to": {
+              "const": "reviewed"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "review"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": "reviewed"
+            },
+            "to": {
+              "const": "integrated"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "integration-ref"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": "integrated"
+            },
+            "to": {
+              "const": "promoted"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "promotion-ref"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/transition",
+          "properties": {
+            "from": {
+              "const": "promoted"
+            },
+            "to": {
+              "const": "released"
+            },
+            "evidence": {
+              "contains": {
+                "properties": {
+                  "kind": {
+                    "const": "release-tag"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "to",
+          "evidence"
+        ],
+        "properties": {
+          "from": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/state"
+              }
+            ]
+          },
+          "to": {
+            "$ref": "#/$defs/state"
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/evidence"
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "currentState": {
+              "const": "planned"
+            },
+            "transitions": {
+              "minItems": 1,
+              "maxItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "currentState": {
+              "const": "implemented"
+            },
+            "transitions": {
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        {
+          "properties": {
+            "currentState": {
+              "const": "reviewed"
+            },
+            "transitions": {
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
+        },
+        {
+          "properties": {
+            "currentState": {
+              "const": "integrated"
+            },
+            "transitions": {
+              "minItems": 4,
+              "maxItems": 4
+            }
+          }
+        },
+        {
+          "properties": {
+            "currentState": {
+              "const": "promoted"
+            },
+            "transitions": {
+              "minItems": 5,
+              "maxItems": 5
+            }
+          }
+        },
+        {
+          "properties": {
+            "currentState": {
+              "const": "released"
+            },
+            "transitions": {
+              "minItems": 6,
+              "maxItems": 6
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "gitId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "gitIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "tree"
+      ],
+      "properties": {
+        "commit": {
+          "$ref": "#/$defs/gitId"
+        },
+        "tree": {
+          "$ref": "#/$defs/gitId"
+        }
+      }
+    },
+    "state": {
+      "enum": [
+        "planned",
+        "implemented",
+        "reviewed",
+        "integrated",
+        "promoted",
+        "released"
+      ]
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "evidence"
+      ],
+      "properties": {
+        "from": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/state"
+            }
+          ]
+        },
+        "to": {
+          "$ref": "#/$defs/state"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "digest",
+        "subject",
+        "issuedAt"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "plan",
+            "implementation",
+            "review",
+            "integration-ref",
+            "promotion-ref",
+            "release-tag"
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "subject": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "issuedAt": {
+          "$ref": "#/$defs/utcTimestamp"
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^refs/(?:heads|tags)/(?!.*(?:[~^:?*\\[\\\\]|\\.\\.|@\\{))\\S+$"
+        },
+        "refIdentity": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "verdict": {
+          "const": "OK"
+        },
+        "attestationDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "checklist": {
+          "$ref": "#/$defs/releaseChecklist"
+        },
+        "checklistDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "provenance": {
+          "$ref": "#/$defs/releaseProvenance"
+        },
+        "provenanceDigest": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "review"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "verdict",
+              "attestationDigest"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "integration-ref",
+                  "promotion-ref",
+                  "release-tag"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "ref",
+              "refIdentity"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "release-tag"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "checklist",
+              "checklistDigest",
+              "provenance",
+              "provenanceDigest"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "plan",
+                  "implementation"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "ref"
+                  ]
+                },
+                {
+                  "required": [
+                    "refIdentity"
+                  ]
+                },
+                {
+                  "required": [
+                    "verdict"
+                  ]
+                },
+                {
+                  "required": [
+                    "attestationDigest"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklist"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklistDigest"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenance"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenanceDigest"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "review"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "ref"
+                  ]
+                },
+                {
+                  "required": [
+                    "refIdentity"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklist"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklistDigest"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenance"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenanceDigest"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "integration-ref",
+                  "promotion-ref"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "verdict"
+                  ]
+                },
+                {
+                  "required": [
+                    "attestationDigest"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklist"
+                  ]
+                },
+                {
+                  "required": [
+                    "checklistDigest"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenance"
+                  ]
+                },
+                {
+                  "required": [
+                    "provenanceDigest"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "release-tag"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "verdict"
+                  ]
+                },
+                {
+                  "required": [
+                    "attestationDigest"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "releaseProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "candidateDigest",
+        "technicalSubject",
+        "evidenceHead",
+        "materialsDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "release-provenance/v1"
+        },
+        "candidateDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "technicalSubject": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "evidenceHead": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "materialsDigest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "releaseChecklist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "candidateDigest",
+        "technicalSubject",
+        "evidenceHead",
+        "items"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "release-checklist/v1"
+        },
+        "candidateDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "technicalSubject": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "evidenceHead": {
+          "$ref": "#/$defs/gitIdentity"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "$ref": "#/$defs/checklistItem",
+              "properties": {
+                "id": {
+                  "const": "candidate-provenance"
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/checklistItem",
+              "properties": {
+                "id": {
+                  "const": "independent-review"
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/checklistItem",
+              "properties": {
+                "id": {
+                  "const": "integration"
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/checklistItem",
+              "properties": {
+                "id": {
+                  "const": "promotion"
+                }
+              }
+            }
+          ],
+          "items": false
+        }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "complete",
+        "evidenceDigest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "complete": {
+          "const": true
+        },
+        "evidenceDigest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  }
+}

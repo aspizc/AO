@@ -15,7 +15,7 @@ description: >-
 # agents-orchestrator Audit Orchestration
 
 You produce honest, evidence-grounded audits of this repo
-(`/home/aspizc/git/experiments/AO`) and convert their findings into action.
+(the current AO checkout) and convert their findings into action.
 **Read-only:** never build features, change code, or touch infra during an audit — analysis only.
 Read `.claude/orchestration-profile.md` first for the resolved profile.
 
@@ -74,7 +74,8 @@ non-applicable lens in the index and consolidated report without creating an emp
   locally: `bash scripts/ci.sh` (full dry-run gate), `node scripts/smoke_mvp2.mjs` (two-agent
   smoke, dry-run default), `node scripts/smoke_planning.mjs`, `agent-run policy validate`, and
   the real MCP surface via `tests/e2e/*.test.js`. Run gates on the host (the Codex sandbox hangs
-  the LangGraph suite; `langgraph` pinned 1.2.1). The Postgres suite is opt-in
+  the LangGraph suite; `langgraph` pinned 1.2.5 for the SDK 0.4.4 security fix;
+  verified upgrade and its limits are recorded in `docs/ci-contract.md`). The Postgres suite is opt-in
   (`AGENTS_PG_INTEGRATION=1` + docker) — mark it deferred if the session lacks docker, never
   "passed".
 - **Parallelize discovery, verify load-bearing findings firsthand.** Fan out read-only sub-agents

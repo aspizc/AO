@@ -81,7 +81,13 @@ export function resumeOrchestration({ traceId }) {
 }
 
 export function cancelOrchestration({ traceId }) {
-  return setStatus(traceId, "cancelled", "ORCHESTRATION_CANCELLED");
+  if (!orchestrationRepo.getOrchestrationByTraceId(traceId)) {
+    throw codedError("orchestration not found", "ORCHESTRATION_NOT_FOUND");
+  }
+  throw codedError(
+    "server-owned cancellation outcome required",
+    "LIFECYCLE_OUTCOME_REQUIRED",
+  );
 }
 
 export function completeOrchestration({ traceId }) {

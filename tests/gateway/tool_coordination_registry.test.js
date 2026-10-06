@@ -16,6 +16,7 @@ import {
   createTraceAccessToken,
 } from "../../gateway/src/core/trace_access.js";
 import {
+  closeToolRegistry,
   getToolRegistry,
 } from "../../gateway/src/tools/index.js";
 
@@ -109,6 +110,33 @@ test("registry creates exactly one lazy coordination instance shared by eight to
 test("registry construction accepts missing config without connecting to Redis", () => {
   assert.doesNotThrow(() => getToolRegistry());
   assert.equal(getToolRegistry().length, 33);
+});
+
+test("registry owns and closes its one coordination service exactly once", async () => {
+  let closeCalls = 0;
+  const coordination = Object.fromEntries(
+    OPERATIONS.map((operation) => [
+      operation,
+      async () => ({ operation }),
+    ]),
+  );
+  coordination.close = async () => {
+    closeCalls += 1;
+    return { status: "closed" };
+  };
+  const registry = getToolRegistry({
+    coordinationFactory: () => coordination,
+  });
+
+  assert.equal(closeCalls, 0);
+  assert.deepEqual(
+    await Promise.all([
+      closeToolRegistry(registry),
+      closeToolRegistry(registry),
+    ]),
+    [{ status: "closed" }, { status: "closed" }],
+  );
+  assert.equal(closeCalls, 1);
 });
 
 test("disabled coordination fails explicitly while legacy message tools remain usable", async (t) => {

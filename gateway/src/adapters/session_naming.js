@@ -14,7 +14,9 @@ function safePrefix(value) {
 
 function displayAgent(agent) {
   const raw = String(agent ?? "");
-  return safeChunk(raw === "gemini-cli" ? "gemini" : raw);
+  if (raw === "gemini-cli") return "gemini";
+  if (raw === "antigravity-cli") return "antigravity";
+  return safeChunk(raw);
 }
 
 export function buildTmuxTarget({ traceId, agent, role, prefix = "ag-" }) {

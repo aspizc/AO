@@ -7,6 +7,12 @@ topology. `scripts/ci_gate.py` validates both files and runs the manifest.
 `scripts/ci.sh` is the stable local and remote entry point; it contains no
 second copy of the suite list.
 
+The required `release.candidate` lane invokes the content-addressed release
+and supply-chain verifier. That verifier records both authoritative CI files
+as candidate materials and calls `scripts/ci_gate.py` for topology, skip,
+readiness, and inventory validation; it does not define or refresh a second
+suite inventory.
+
 ## Reproducible installation
 
 Python 3.11 is the minimum lock target. `requirements.lock` is a universal,
@@ -30,6 +36,14 @@ by `ci/requirements-build.in`; `--no-deps --no-build-isolation` prevents that
 source install from consulting an index. GitHub Actions uses the same lock
 commands and never regenerates either lockfile.
 
+The required retained-control session tests use the
+[pinned tmux runtime](tmux-runtime.md). Remote CI obtains the official source
+archive and the public builder image by its pinned digest, then invokes the
+existing offline builder. It places the resulting binary on the job's search
+path, sets `D007C_TEST_TMUX_PATH`, and enables `D007C_RUN_REAL_TMUX_PROBE=1`.
+The tmux server uses a job-local `TMUX_TMPDIR`; no system-wide tmux installation
+or pre-existing private image is required.
+
 The exact install commands are
 `uv pip sync --require-hashes requirements.lock` and
 `npm --prefix gateway ci`; lock freshness is checked with
@@ -48,6 +62,24 @@ contains no checkout-specific absolute path. `--upgrade` is an explicit
 operator action and cannot be combined with `--check`.
 
 ## Authoritative suite manifest
+
+### LangGraph security pin
+
+The current LangGraph range is `>=1.2.5,<1.2.6`, allowing the lock to select
+`langgraph-sdk==0.4.4`. The former `langgraph==1.2.1` required an SDK below
+`0.4`; its locked SDK `0.3.15` was affected by an OSV advisory fixed in
+`0.4.4`. The upgrade therefore replaces the old compatibility pin rather than
+leaving the vulnerable SDK constrained below its fixed version.
+
+On 2026-10-06, an isolated environment using LangGraph `1.2.5` and SDK
+`0.4.4` completed the LangGraph suite with **81 passed and 3 integration
+skips** in 0.79 seconds, including `test_implement_test_review_push_graph`,
+which had hung with `1.2.4`. This verifies the isolated upgrade against that
+suite; it does not exercise the skipped integrations or establish that the
+combined repository candidate passed its full gate. Record the candidate's
+own gate and exact skip identities separately.
+
+### Manifest entries
 
 Each entry in `ci/suites.json` has:
 
@@ -160,9 +192,14 @@ decode traceback or suppress the final JSON object.
 
 ## Required versus unavailable infrastructure
 
-The default gate requires lock-input freshness, lint, structure, Gateway
-unit/fake tests, dry-run E2E, MCP smoke, registry validation, CLI tests, and
-LangGraph unit/fake tests.
+The default gate requires lock-input freshness, release-candidate
+supply-chain validation, lint, structure, Gateway unit/fake tests, dry-run
+E2E, MCP smoke, registry validation, CLI tests, LangGraph unit/fake tests, and
+the isolated Redis 7 live lane.
+The release lane is offline: it verifies exact pinned lock/tree inputs,
+cross-platform hash coverage, signed-review trust roots, and the bounded raw
+plus canonical primary OSV snapshot. Network access belongs only to the
+explicit reviewed snapshot-refresh workflow, never to `scripts/ci.sh`.
 Known Postgres, Gateway-integration, and Temporal opt-ins remain in those
 suites only through their exact allowlisted IDs; the JSON report lists them as
 infrastructure unavailable rather than silently treating them as coverage.
@@ -171,13 +208,27 @@ Any suite with one of those observed allowlisted skips has status
 return exit zero only because every observed skip identity was explicitly
 allowlisted; it is never called `passed`.
 
-Redis live tests and the real Codex/Claude flow are separate
-`optional-service` lanes. With no `AGENTS_TEST_REDIS_URL` or
-`AGENTS_E2E_REAL=1`, the runner does not invoke them and reports
-`infrastructure_unavailable`. Supplying either opt-in selects that lane; a
-runtime skip, zero tests, or assertion failure then fails the gate. Later V5
-sheets promote isolated Redis, Postgres, Temporal, and provider lanes to
-required release evidence; C/0/00 does not contact or require those services.
+`test.redis-live` is a required suite with a required-service readiness
+condition. GitHub Actions supplies a disposable `redis:7.2-alpine` standalone
+service, waits for `redis-cli ping`, and passes only its loopback URL through
+`AGENTS_TEST_REDIS_URL`. Local runs must supply an independently managed,
+disposable Redis 7 standalone URL through that same variable; the lane must
+never target a shared coordination namespace. If the variable is absent, the
+runner does not invoke the suite, reports `infrastructure_unavailable`, and
+returns nonzero because required infrastructure is missing. This differs from
+an assertion failure and cannot become a skipped green result.
+
+When selected, the lane verifies Redis major version 7, standalone/non-cluster
+primary topology, repeated multi-client contention, replacement and expiry
+fences, pending-safe backpressure/reclaim, dedupe equality/conflict, atomic ACK
+and tombstones, and exact-prefix cleanup. A runtime skip, zero tests, wrong
+version or topology, protocol assertion failure, or leaked keys fails the
+gate. The lane never uses broad database cleanup.
+
+The real Codex/Claude flow remains an `optional-service` lane. With no
+`AGENTS_E2E_REAL=1`, the runner does not invoke it and reports
+`infrastructure_unavailable`. PostgreSQL, Temporal, and provider promotion
+remain owned by later V5 sheets.
 
 ## Output contract
 
@@ -190,8 +241,10 @@ Run:
 Child command output goes to stderr. Stdout contains exactly one JSON object
 with the overall status, aggregate counts, per-suite counts, exact unavailable
 infrastructure, and errors. `passed` means no suite was unavailable. Explicitly
-allowlisted `infrastructure_unavailable` may retain exit zero; failures and
-timeouts return 1, invalid manifests/contracts return 2, and cancellation
+allowlisted test skips and unselected optional services may retain exit zero
+with `infrastructure_unavailable`; a missing required-service readiness
+condition returns 1 with that same distinct status. Assertion failures and
+timeouts also return 1, invalid manifests/contracts return 2, and cancellation
 returns the signal-derived code documented above.
 
 A process-cleanup uncertainty is the deliberate exception to the one-JSON

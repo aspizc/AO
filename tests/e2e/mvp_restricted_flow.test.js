@@ -15,13 +15,13 @@ test("restricted flow end to end in dry run", async () => {
     const task = services.task.assignTask({
       traceId: orchestration.traceId,
       caller: { agent: "claude-code", role: "orchestrator" },
-      target: { agent: "gemini-cli", role: "restricted-coder", action: "code.write" },
+      target: { agent: "codex", role: "restricted-coder", action: "code.write" },
       repo: "cvision",
       brief: "Apply parser fix",
       registries: services.registries,
     });
     const session = await services.agent.spawn({
-      agent: "gemini-cli",
+      agent: "codex",
       role: "restricted-coder",
       repo: "cvision",
       cwd: paths.cvisionRepo,

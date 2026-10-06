@@ -9,12 +9,28 @@ import {
   createCoordinationLeaseFence,
   encodeCoordinationKeyPart,
 } from "./coordination_contract.js";
+import { coordinationConsumeKey } from "./coordination_consumer.js";
+import {
+  closeRedisClientLane,
+  executeRedisClientLane,
+  RedisClientLane,
+  snapshotRedisClientLane,
+} from "./redis_client_lifecycle.js";
 
 const DEFAULT_MAX_INBOX_LENGTH = 10_000;
 const DEFAULT_CONNECT_TIMEOUT_MS = 2_000;
+const DEFAULT_COMMAND_CONCURRENCY = 64;
+const DEFAULT_COMMAND_QUEUE = 256;
+const DEFAULT_BLOCKING_CONCURRENCY = 1;
+const DEFAULT_BLOCKING_QUEUE = 32;
+const DEFAULT_SHUTDOWN_TIMEOUT_MS = 2_000;
 const DISCOVERY_BATCH_SIZE = 128;
 const MAX_RECEIVE_COUNT = 100;
 const MAX_ACK_COUNT = 100;
+const CANONICAL_JSON_MAX_BYTES = 262_144;
+const CANONICAL_JSON_MAX_WORK = 196_608;
+const CANONICAL_JSON_MAX_STRING_BYTES = 131_072;
+const CANONICAL_JSON_MAX_DEPTH = 64;
 const SCAN_CURSOR = /^(?:0|[1-9][0-9]*)$/;
 const MAX_SCAN_CURSOR = (1n << 64n) - 1n;
 const DELIVERY_ID = /^((?:0|[1-9][0-9]*))-((?:0|[1-9][0-9]*))$/;
@@ -54,6 +70,19 @@ const FENCE_FIELDS = new Set([
   "scopeId",
   "leaseTokenHash",
 ]);
+const ACK_RECOVERY_IDENTITY_FIELDS = new Set([
+  "consumeKey",
+  "deliveryId",
+  "scopeId",
+  "fromParticipantId",
+  "oldParticipantId",
+  "messageId",
+]);
+const ACK_ORPHAN_FINALIZE_FIELDS = new Set([
+  ...ACK_RECOVERY_IDENTITY_FIELDS,
+  "tombstoneTtlMs",
+]);
+const ACK_RECOVERY_BUILD_FIELDS = new Set(["identity", "prefix"]);
 
 const LUA_HELPERS = `
 local function key_type(key)
@@ -109,6 +138,300 @@ local function ensure_group(inbox_key, group_name)
     return redis.error_reply('ERR invalid XGROUP reply')
   end
   return nil
+end
+`;
+
+const BOUNDED_CANONICAL_JSON_LUA = `
+local JSON_MAX_BYTES = ${CANONICAL_JSON_MAX_BYTES}
+local JSON_MAX_WORK = ${CANONICAL_JSON_MAX_WORK}
+local JSON_MAX_STRING_BYTES = ${CANONICAL_JSON_MAX_STRING_BYTES}
+local JSON_MAX_DEPTH = ${CANONICAL_JSON_MAX_DEPTH}
+
+local function consume_json_work(work, amount)
+  work.remaining = work.remaining - (amount or 1)
+  return work.remaining >= 0
+end
+
+local function skip_json_string(source, index, work)
+  if string.byte(source, index) ~= 34
+    or not consume_json_work(work) then
+    return nil
+  end
+  local start = index
+  index = index + 1
+  local length = string.len(source)
+  while index <= length do
+    if index - start > JSON_MAX_STRING_BYTES
+      or not consume_json_work(work) then
+      return nil
+    end
+    local byte = string.byte(source, index)
+    if byte == 34 then
+      return index + 1
+    end
+    if byte == 92 then
+      local escaped = string.byte(source, index + 1)
+      if not escaped then
+        return nil
+      end
+      if escaped == 117 then
+        for offset = 2, 5 do
+          local hexadecimal = string.byte(source, index + offset)
+          if not hexadecimal
+            or not (
+              (hexadecimal >= 48 and hexadecimal <= 57)
+              or (hexadecimal >= 65 and hexadecimal <= 70)
+              or (hexadecimal >= 97 and hexadecimal <= 102)
+            ) then
+            return nil
+          end
+        end
+        index = index + 6
+      elseif escaped == 34
+        or escaped == 47
+        or escaped == 92
+        or escaped == 98
+        or escaped == 102
+        or escaped == 110
+        or escaped == 114
+        or escaped == 116 then
+        index = index + 2
+      else
+        return nil
+      end
+    elseif byte < 32 then
+      return nil
+    else
+      index = index + 1
+    end
+  end
+  return nil
+end
+
+local function skip_json_whitespace(source, index, work)
+  local length = string.len(source)
+  while index <= length do
+    local byte = string.byte(source, index)
+    if byte ~= 32 and byte ~= 9 and byte ~= 10 and byte ~= 13 then
+      break
+    end
+    if not consume_json_work(work) then
+      return nil
+    end
+    index = index + 1
+  end
+  return index
+end
+
+local function skip_json_number(source, index, work)
+  local length = string.len(source)
+  local start = index
+  while index <= length do
+    local byte = string.byte(source, index)
+    if byte == 32
+      or byte == 9
+      or byte == 10
+      or byte == 13
+      or byte == 44
+      or byte == 93
+      or byte == 125 then
+      break
+    end
+    if not consume_json_work(work) then
+      return nil
+    end
+    index = index + 1
+  end
+  if index == start then
+    return nil
+  end
+  return index
+end
+
+local function skip_json_value(
+  source,
+  index,
+  depth,
+  work,
+  root_kinds,
+  is_root
+)
+  if depth > JSON_MAX_DEPTH or not consume_json_work(work) then
+    return nil
+  end
+  index = skip_json_whitespace(source, index, work)
+  if not index then
+    return nil
+  end
+  local byte = string.byte(source, index)
+  if byte == 34 then
+    return skip_json_string(source, index, work)
+  end
+  if byte == 123 then
+    index = skip_json_whitespace(source, index + 1, work)
+    if not index then
+      return nil
+    end
+    local seen_keys = {}
+    if string.byte(source, index) == 125 then
+      return index + 1
+    end
+    while true do
+      if not consume_json_work(work, 4) then
+        return nil
+      end
+      local key_start = index
+      local key_end = skip_json_string(source, key_start, work)
+      if not key_end then
+        return nil
+      end
+      local key_ok, key = pcall(
+        cjson.decode,
+        string.sub(source, key_start, key_end - 1)
+      )
+      if not key_ok or type(key) ~= 'string' then
+        return nil
+      end
+      if seen_keys[key] then
+        return nil
+      end
+      seen_keys[key] = true
+      index = skip_json_whitespace(source, key_end, work)
+      if not index or string.byte(source, index) ~= 58 then
+        return nil
+      end
+      local value_start = skip_json_whitespace(
+        source,
+        index + 1,
+        work
+      )
+      if not value_start then
+        return nil
+      end
+      local value_byte = string.byte(source, value_start)
+      local value_kind = 'scalar'
+      if value_byte == 91 then
+        value_kind = 'array'
+      elseif value_byte == 123 then
+        value_kind = 'object'
+      end
+      if is_root then
+        root_kinds[key] = value_kind
+      end
+      index = skip_json_value(
+        source,
+        value_start,
+        depth + 1,
+        work,
+        nil,
+        false
+      )
+      if not index then
+        return nil
+      end
+      index = skip_json_whitespace(source, index, work)
+      if not index then
+        return nil
+      end
+      local separator = string.byte(source, index)
+      if separator == 125 then
+        return index + 1
+      end
+      if separator ~= 44 then
+        return nil
+      end
+      index = skip_json_whitespace(source, index + 1, work)
+      if not index then
+        return nil
+      end
+    end
+  end
+  if byte == 91 then
+    index = skip_json_whitespace(source, index + 1, work)
+    if not index then
+      return nil
+    end
+    if string.byte(source, index) == 93 then
+      return index + 1
+    end
+    while true do
+      if not consume_json_work(work, 2) then
+        return nil
+      end
+      index = skip_json_value(
+        source,
+        index,
+        depth + 1,
+        work,
+        nil,
+        false
+      )
+      if not index then
+        return nil
+      end
+      index = skip_json_whitespace(source, index, work)
+      if not index then
+        return nil
+      end
+      local separator = string.byte(source, index)
+      if separator == 93 then
+        return index + 1
+      end
+      if separator ~= 44 then
+        return nil
+      end
+      index = skip_json_whitespace(source, index + 1, work)
+      if not index then
+        return nil
+      end
+    end
+  end
+  if string.sub(source, index, index + 3) == 'true'
+    or string.sub(source, index, index + 3) == 'null' then
+    if not consume_json_work(work, 4) then
+      return nil
+    end
+    return index + 4
+  end
+  if string.sub(source, index, index + 4) == 'false' then
+    if not consume_json_work(work, 5) then
+      return nil
+    end
+    return index + 5
+  end
+  if byte == 45 or (byte and byte >= 48 and byte <= 57) then
+    return skip_json_number(source, index, work)
+  end
+  return nil
+end
+
+local function parse_canonical_json(source)
+  if type(source) ~= 'string'
+    or string.len(source) > JSON_MAX_BYTES then
+    return nil
+  end
+  local work = { remaining = JSON_MAX_WORK }
+  local root_kinds = {}
+  local index = skip_json_value(
+    source,
+    1,
+    1,
+    work,
+    root_kinds,
+    true
+  )
+  if not index then
+    return nil
+  end
+  index = skip_json_whitespace(source, index, work)
+  if not index or index ~= string.len(source) + 1 then
+    return nil
+  end
+  local ok, value = pcall(cjson.decode, source)
+  if not ok then
+    return nil
+  end
+  return value, root_kinds
 end
 `;
 
@@ -731,6 +1054,7 @@ local allowed_message_fields = {
   replyToMessageId = true
 }
 
+${BOUNDED_CANONICAL_JSON_LUA}
 local function is_continuation_byte(value)
   return value and value >= 128 and value <= 191
 end
@@ -920,7 +1244,12 @@ for index = 1, count do
   seen[delivery_id] = true
 
   local tombstone = redis.call('GET', tombstone_key)
-  if tombstone and tombstone ~= '1' then
+  if tombstone == '1' then
+    local tombstone_ttl = redis.call('PTTL', tombstone_key)
+    if type(tombstone_ttl) ~= 'number' or tombstone_ttl <= 0 then
+      return {5}
+    end
+  elseif tombstone then
     return {5}
   end
 
@@ -970,11 +1299,9 @@ for index = 1, count do
       or type(stream_rows[1][2][2]) ~= 'string' then
       return {5}
     end
-    local envelope_ok, envelope = pcall(
-      cjson.decode,
-      stream_rows[1][2][2]
-    )
-    if not envelope_ok
+    local envelope_raw = stream_rows[1][2][2]
+    local envelope = parse_canonical_json(envelope_raw)
+    if not envelope
       or not valid_stored_envelope(envelope, ARGV[1], ARGV[3]) then
       return {5}
     end
@@ -1021,6 +1348,458 @@ if newly_acked > 0 then
   redis.pcall('XADD', KEYS[3], '*', 'event', event)
 end
 return {1, newly_acked}
+`;
+
+const INSPECT_ACK_TOMBSTONE_SCRIPT = `
+local reply = redis.call('TYPE', KEYS[1])
+local key_type = type(reply) == 'table' and reply.ok or reply
+if key_type == 'none' then
+  return {1}
+end
+if key_type ~= 'string' then
+  return {3}
+end
+local value = redis.call('GET', KEYS[1])
+if value == '1' then
+  local tombstone_ttl = redis.call('PTTL', KEYS[1])
+  if type(tombstone_ttl) ~= 'number' or tombstone_ttl <= 0 then
+    return {3}
+  end
+  return {2}
+end
+return {3}
+`;
+
+const FINALIZE_ORPHAN_ACK_SCRIPT = `
+local function key_type(key)
+  local reply = redis.call('TYPE', key)
+  if type(reply) == 'table' then
+    return reply.ok
+  end
+  return reply
+end
+
+local function key_type_is(key, expected)
+  local actual = key_type(key)
+  return actual == 'none' or actual == expected
+end
+
+${BOUNDED_CANONICAL_JSON_LUA}
+local function is_continuation_byte(value)
+  return value and value >= 128 and value <= 191
+end
+
+local function utf16_length(value)
+  local byte_length = string.len(value)
+  local index = 1
+  local units = 0
+  while index <= byte_length do
+    local first = string.byte(value, index)
+    if first <= 127 then
+      index = index + 1
+      units = units + 1
+    elseif first >= 194 and first <= 223 then
+      local second = string.byte(value, index + 1)
+      if not is_continuation_byte(second) then
+        return nil
+      end
+      index = index + 2
+      units = units + 1
+    elseif first >= 224 and first <= 239 then
+      local second = string.byte(value, index + 1)
+      local third = string.byte(value, index + 2)
+      if not is_continuation_byte(second)
+        or not is_continuation_byte(third)
+        or (first == 224 and second < 160)
+        or (first == 237 and second > 159) then
+        return nil
+      end
+      index = index + 3
+      units = units + 1
+    elseif first >= 240 and first <= 244 then
+      local second = string.byte(value, index + 1)
+      local third = string.byte(value, index + 2)
+      local fourth = string.byte(value, index + 3)
+      if not is_continuation_byte(second)
+        or not is_continuation_byte(third)
+        or not is_continuation_byte(fourth)
+        or (first == 240 and second < 144)
+        or (first == 244 and second > 143) then
+        return nil
+      end
+      index = index + 4
+      units = units + 2
+    else
+      return nil
+    end
+  end
+  return units
+end
+
+local function valid_nonempty_string(value, maximum)
+  if type(value) ~= 'string' then
+    return false
+  end
+  local length = utf16_length(value)
+  return length and length > 0 and length <= maximum
+end
+
+local function valid_identifier(value)
+  return valid_nonempty_string(value, 128)
+    and string.match(
+      value,
+      '^[A-Za-z0-9][A-Za-z0-9._:%-]*$'
+    ) ~= nil
+end
+
+local function valid_timestamp(value)
+  if type(value) ~= 'string' then
+    return false
+  end
+  local year, month, day, hour, minute, second, millisecond =
+    string.match(
+      value,
+      '^(%d%d%d%d)%-(%d%d)%-(%d%d)T'
+        .. '(%d%d):(%d%d):(%d%d)%.(%d%d%d)Z$'
+    )
+  if not year then
+    return false
+  end
+  year = tonumber(year)
+  month = tonumber(month)
+  day = tonumber(day)
+  hour = tonumber(hour)
+  minute = tonumber(minute)
+  second = tonumber(second)
+  millisecond = tonumber(millisecond)
+  if month < 1 or month > 12
+    or hour > 23
+    or minute > 59
+    or second > 59
+    or millisecond > 999 then
+    return false
+  end
+  local days = {
+    31, 28, 31, 30, 31, 30,
+    31, 31, 30, 31, 30, 31
+  }
+  local leap = (year % 4 == 0 and year % 100 ~= 0)
+    or year % 400 == 0
+  if leap then
+    days[2] = 29
+  end
+  return day >= 1 and day <= days[month]
+end
+
+local function valid_u64(value)
+  if type(value) ~= 'string'
+    or not string.match(value, '^%d+$')
+    or (string.len(value) > 1 and string.sub(value, 1, 1) == '0') then
+    return false
+  end
+  local max_value = '18446744073709551615'
+  return string.len(value) < 20
+    or (string.len(value) == 20 and value <= max_value)
+end
+
+local function valid_delivery_id(value)
+  if type(value) ~= 'string' then
+    return false
+  end
+  local timestamp, sequence = string.match(value, '^(%d+)%-(%d+)$')
+  if not timestamp or not valid_u64(timestamp) or not valid_u64(sequence) then
+    return false
+  end
+  return timestamp ~= '0' or sequence ~= '0'
+end
+
+local allowed_message_fields = {
+  protocolVersion = true,
+  messageId = true,
+  fromParticipantId = true,
+  toParticipantId = true,
+  scopeId = true,
+  messageType = true,
+  classification = true,
+  body = true,
+  createdAt = true,
+  traceId = true,
+  correlationId = true,
+  replyToMessageId = true
+}
+
+local function valid_stored_envelope(
+  value,
+  scope_id,
+  sender_id,
+  old_recipient_id,
+  message_id
+)
+  if type(value) ~= 'table' then
+    return false
+  end
+  for key, _ in pairs(value) do
+    if not allowed_message_fields[key] then
+      return false
+    end
+  end
+  if value.protocolVersion ~= ${COORDINATION_PROTOCOL_VERSION}
+    or value.scopeId ~= scope_id
+    or value.fromParticipantId ~= sender_id
+    or value.toParticipantId ~= old_recipient_id
+    or value.messageId ~= message_id
+    or not valid_identifier(value.scopeId)
+    or not valid_identifier(value.fromParticipantId)
+    or not valid_identifier(value.toParticipantId)
+    or not valid_identifier(value.messageId)
+    or not valid_identifier(value.messageType)
+    or (
+      value.classification ~= 'internal'
+      and value.classification ~= 'unrestricted'
+    )
+    or type(value.body) ~= 'string'
+    or not valid_timestamp(value.createdAt) then
+    return false
+  end
+  if value.traceId ~= nil
+    and not valid_nonempty_string(value.traceId, 128) then
+    return false
+  end
+  if value.correlationId ~= nil
+    and not valid_nonempty_string(value.correlationId, 128) then
+    return false
+  end
+  if value.replyToMessageId ~= nil
+    and not valid_identifier(value.replyToMessageId) then
+    return false
+  end
+  return true
+end
+
+local allowed_presence_fields = {
+  protocolVersion = true,
+  participantId = true,
+  participantType = true,
+  scopeId = true,
+  displayName = true,
+  capabilities = true,
+  metadata = true,
+  registeredAt = true,
+  lastHeartbeatAt = true,
+  leaseExpiresAt = true,
+  leaseTokenHash = true
+}
+
+local function valid_capabilities(value)
+  if type(value) ~= 'table' then
+    return false
+  end
+  local count = 0
+  for key, capability in pairs(value) do
+    if type(key) ~= 'number'
+      or key < 1
+      or key ~= math.floor(key)
+      or not valid_nonempty_string(capability, 128) then
+      return false
+    end
+    count = count + 1
+  end
+  for index = 1, count do
+    if value[index] == nil then
+      return false
+    end
+  end
+  return true
+end
+
+local function valid_metadata(value)
+  if type(value) ~= 'table' then
+    return false
+  end
+  for key, _ in pairs(value) do
+    if type(key) ~= 'string' then
+      return false
+    end
+  end
+  return true
+end
+
+local function valid_presence(
+  presence,
+  old_recipient_id,
+  scope_id
+)
+  if type(presence) ~= 'table' then
+    return false
+  end
+  for key, _ in pairs(presence) do
+    if not allowed_presence_fields[key] then
+      return false
+    end
+  end
+  if presence.protocolVersion ~= ${COORDINATION_PROTOCOL_VERSION}
+    or presence.participantId ~= old_recipient_id
+    or presence.scopeId ~= scope_id
+    or not valid_identifier(presence.participantId)
+    or not valid_identifier(presence.scopeId)
+    or not valid_nonempty_string(presence.participantType, 128)
+    or not valid_capabilities(presence.capabilities)
+    or not valid_metadata(presence.metadata)
+    or not valid_timestamp(presence.registeredAt)
+    or not valid_timestamp(presence.lastHeartbeatAt)
+    or not valid_timestamp(presence.leaseExpiresAt)
+    or type(presence.leaseTokenHash) ~= 'string'
+    or string.match(presence.leaseTokenHash, '^[a-f0-9]+$') == nil
+    or string.len(presence.leaseTokenHash) ~= 64 then
+    return false
+  end
+  if presence.displayName ~= nil
+    and not valid_nonempty_string(presence.displayName, 256) then
+    return false
+  end
+  return true
+end
+
+if #KEYS ~= 3 or #ARGV ~= 8 then
+  return {5}
+end
+if not key_type_is(KEYS[3], 'string') then
+  return {5}
+end
+
+local old_recipient_id = ARGV[1]
+local scope_id = ARGV[2]
+local sender_id = ARGV[3]
+local message_id = ARGV[4]
+local consume_key = ARGV[5]
+local delivery_id = ARGV[8]
+if not valid_identifier(old_recipient_id)
+  or not valid_identifier(scope_id)
+  or not valid_identifier(sender_id)
+  or not valid_identifier(message_id)
+  or string.len(consume_key) ~= 81
+  or string.match(
+    consume_key,
+    '^coord%-consume%-v1%-[a-f0-9]+$'
+  ) == nil
+  or not valid_delivery_id(delivery_id) then
+  return {5}
+end
+
+local tombstone_raw = redis.call('GET', KEYS[3])
+if tombstone_raw then
+  if tombstone_raw == '1' then
+    local tombstone_ttl = redis.call('PTTL', KEYS[3])
+    if type(tombstone_ttl) ~= 'number' or tombstone_ttl <= 0 then
+      return {5}
+    end
+    return {2}
+  end
+  return {5}
+end
+
+if not key_type_is(KEYS[1], 'string')
+  or key_type(KEYS[2]) ~= 'stream' then
+  return {5}
+end
+
+local presence_raw = redis.call('GET', KEYS[1])
+if presence_raw then
+  local presence_ttl = redis.call('PTTL', KEYS[1])
+  if type(presence_ttl) ~= 'number' or presence_ttl <= 0 then
+    return {5}
+  end
+  local presence, presence_kinds = parse_canonical_json(
+    presence_raw
+  )
+  if not presence
+    or presence_kinds.capabilities ~= 'array'
+    or presence_kinds.metadata ~= 'object'
+    or not valid_presence(
+      presence,
+      old_recipient_id,
+      scope_id
+    ) then
+    return {5}
+  end
+  return {3}
+end
+
+local pending = redis.pcall(
+  'XPENDING',
+  KEYS[2],
+  ARGV[6],
+  delivery_id,
+  delivery_id,
+  '1'
+)
+if type(pending) == 'table' and pending.err then
+  return {4}
+end
+if type(pending) ~= 'table'
+  or #pending ~= 1
+  or type(pending[1]) ~= 'table'
+  or #pending[1] ~= 4
+  or pending[1][1] ~= delivery_id
+  or type(pending[1][2]) ~= 'string'
+  or type(pending[1][3]) ~= 'number'
+  or type(pending[1][4]) ~= 'number' then
+  return {4}
+end
+
+local stream_rows = redis.call(
+  'XRANGE',
+  KEYS[2],
+  delivery_id,
+  delivery_id,
+  'COUNT',
+  '1'
+)
+if type(stream_rows) ~= 'table'
+  or #stream_rows ~= 1
+  or type(stream_rows[1]) ~= 'table'
+  or #stream_rows[1] ~= 2
+  or stream_rows[1][1] ~= delivery_id
+  or type(stream_rows[1][2]) ~= 'table'
+  or #stream_rows[1][2] ~= 2
+  or stream_rows[1][2][1] ~= 'envelope'
+  or type(stream_rows[1][2][2]) ~= 'string' then
+  return {4}
+end
+local envelope_raw = stream_rows[1][2][2]
+local envelope = parse_canonical_json(envelope_raw)
+if not envelope
+  or not valid_stored_envelope(
+    envelope,
+    scope_id,
+    sender_id,
+    old_recipient_id,
+    message_id
+  ) then
+  return {5}
+end
+
+local acknowledged = redis.call(
+  'XACK',
+  KEYS[2],
+  ARGV[6],
+  delivery_id
+)
+if acknowledged ~= 1 then
+  return redis.error_reply('ERR invalid XACK reply')
+end
+local deleted = redis.call('XDEL', KEYS[2], delivery_id)
+if deleted ~= 1 then
+  return redis.error_reply('ERR invalid XDEL reply')
+end
+local stored = redis.call('SET', KEYS[3], '1', 'PX', ARGV[7])
+if not (
+  stored == 'OK'
+  or (type(stored) == 'table' and stored.ok == 'OK')
+) then
+  return redis.error_reply('ERR invalid SET reply')
+end
+return {1}
 `;
 
 export { coordinationKeys };
@@ -1097,6 +1876,47 @@ function isDenseArray(value) {
   return true;
 }
 
+function invalidAckRecoveryReply(kind) {
+  return new TypeError(`coordination ${kind} is invalid`);
+}
+
+function snapshotQueueReply(value, expectedLength, kind) {
+  if (!Array.isArray(value)) throw invalidAckRecoveryReply(kind);
+  const length = Object.getOwnPropertyDescriptor(value, "length");
+  if (
+    !length
+    || !Object.hasOwn(length, "value")
+    || length.value !== expectedLength
+  ) {
+    throw invalidAckRecoveryReply(kind);
+  }
+  const expectedKeys = new Set([
+    "length",
+    ...Array.from(
+      { length: expectedLength },
+      (_, index) => String(index),
+    ),
+  ]);
+  const keys = Reflect.ownKeys(value);
+  if (
+    keys.length !== expectedKeys.size
+    || keys.some((key) => (
+      typeof key !== "string" || !expectedKeys.has(key)
+    ))
+  ) {
+    throw invalidAckRecoveryReply(kind);
+  }
+  const snapshot = new Array(expectedLength);
+  for (let index = 0; index < expectedLength; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+    if (!descriptor || !Object.hasOwn(descriptor, "value")) {
+      throw invalidAckRecoveryReply(kind);
+    }
+    snapshot[index] = descriptor.value;
+  }
+  return Object.freeze(snapshot);
+}
+
 function assertPlainObject(value, label) {
   if (
     !value
@@ -1115,6 +1935,22 @@ function assertExactKeys(value, allowed, label) {
       throw new TypeError(`${label} contains an unknown field`);
     }
   }
+}
+
+function snapshotExactOwnData(value, allowed, label) {
+  const source = assertPlainObject(value, label);
+  const snapshot = {};
+  for (const key of Reflect.ownKeys(source)) {
+    if (typeof key !== "string" || !allowed.has(key)) {
+      throw new TypeError(`${label} contains an unknown field`);
+    }
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    if (!descriptor || !Object.hasOwn(descriptor, "value")) {
+      throw new TypeError(`${label} must contain own data fields`);
+    }
+    snapshot[key] = descriptor.value;
+  }
+  return Object.freeze(snapshot);
 }
 
 function assertTimestamp(value, label) {
@@ -1290,6 +2126,139 @@ function assertAckDeliveryIds(value, keys, participantId) {
     keys.acked(participantId, deliveryId);
     return deliveryId;
   });
+}
+
+function assertAckRecoveryIdentity(value, keys, { finalize = false } = {}) {
+  const source = snapshotExactOwnData(
+    value,
+    finalize
+      ? ACK_ORPHAN_FINALIZE_FIELDS
+      : ACK_RECOVERY_IDENTITY_FIELDS,
+    "ACK recovery identity",
+  );
+  const deliveryId = source.deliveryId;
+  if (!isCanonicalDeliveryId(deliveryId)) {
+    throw new TypeError("ACK recovery deliveryId is invalid");
+  }
+  for (const field of [
+    "scopeId",
+    "fromParticipantId",
+    "oldParticipantId",
+    "messageId",
+  ]) {
+    assertNonemptyString(source[field], field, 128);
+  }
+  const expectedConsumeKey = coordinationConsumeKey({
+    protocolVersion: COORDINATION_PROTOCOL_VERSION,
+    scopeId: source.scopeId,
+    fromParticipantId: source.fromParticipantId,
+    toParticipantId: source.oldParticipantId,
+    messageId: source.messageId,
+  });
+  if (source.consumeKey !== expectedConsumeKey) {
+    throw new TypeError("ACK recovery consumeKey does not match identity");
+  }
+  keys.presence(source.oldParticipantId);
+  keys.inbox(source.oldParticipantId);
+  keys.acked(source.oldParticipantId, deliveryId);
+  return {
+    consumeKey: expectedConsumeKey,
+    deliveryId,
+    scopeId: source.scopeId,
+    fromParticipantId: source.fromParticipantId,
+    oldParticipantId: source.oldParticipantId,
+    messageId: source.messageId,
+    ...(finalize
+      ? {
+          tombstoneTtlMs: positiveSafeInteger(
+            source.tombstoneTtlMs,
+            undefined,
+            "tombstoneTtlMs",
+          ),
+        }
+      : {}),
+  };
+}
+
+function ackRecoveryBuildOptions(value, label) {
+  const source = snapshotExactOwnData(
+    value,
+    ACK_RECOVERY_BUILD_FIELDS,
+    label,
+  );
+  return {
+    identity: source.identity,
+    keys: coordinationKeys(
+      source.prefix ?? DEFAULT_COORDINATION_PREFIX,
+    ),
+  };
+}
+
+export function buildCoordinationAckTombstoneInspectionCommand(
+  options = {},
+) {
+  try {
+    const { identity: rawIdentity, keys } = ackRecoveryBuildOptions(
+      options,
+      "ACK tombstone inspection command",
+    );
+    const identity = assertAckRecoveryIdentity(rawIdentity, keys);
+    return Object.freeze([
+      "EVAL",
+      INSPECT_ACK_TOMBSTONE_SCRIPT,
+      "1",
+      keys.acked(
+        identity.oldParticipantId,
+        identity.deliveryId,
+      ),
+    ]);
+  } catch {
+    throw new TypeError(
+      "coordination ACK tombstone inspection command is invalid",
+    );
+  }
+}
+
+export function buildCoordinationOrphanAckFinalizationCommand(
+  options = {},
+) {
+  try {
+    const { identity: rawIdentity, keys } = ackRecoveryBuildOptions(
+      options,
+      "orphan ACK finalization command",
+    );
+    const identity = assertAckRecoveryIdentity(
+      rawIdentity,
+      keys,
+      { finalize: true },
+    );
+    const redisKeys = [
+      keys.presence(identity.oldParticipantId),
+      keys.inbox(identity.oldParticipantId),
+      keys.acked(
+        identity.oldParticipantId,
+        identity.deliveryId,
+      ),
+    ];
+    return Object.freeze([
+      "EVAL",
+      FINALIZE_ORPHAN_ACK_SCRIPT,
+      String(redisKeys.length),
+      ...redisKeys,
+      identity.oldParticipantId,
+      identity.scopeId,
+      identity.fromParticipantId,
+      identity.messageId,
+      identity.consumeKey,
+      COORDINATION_CONSUMER_GROUP,
+      String(identity.tombstoneTtlMs),
+      identity.deliveryId,
+    ]);
+  } catch {
+    throw new TypeError(
+      "coordination orphan ACK finalization command is invalid",
+    );
+  }
 }
 
 function sameSemanticMessage(left, right) {
@@ -1506,6 +2475,53 @@ function decodeAckResult(reply, requestedCount) {
   return { status: "acked", ackedCount: reply[1] };
 }
 
+export function decodeCoordinationOrphanAckFinalizationReply(reply) {
+  try {
+    const snapshot = snapshotQueueReply(
+      reply,
+      1,
+      "orphan ACK result",
+    );
+    if (!Number.isSafeInteger(snapshot[0])) {
+      throw invalidAckRecoveryReply("orphan ACK result");
+    }
+    const statuses = new Map([
+      [1, "orphan_acked"],
+      [2, "ack_tombstone"],
+      [3, "old_participant_present"],
+      [4, "transport_state_unknown"],
+      [5, "transport_state_unknown"],
+    ]);
+    const status = statuses.get(snapshot[0]);
+    if (!status) throw invalidAckRecoveryReply("orphan ACK result");
+    return Object.freeze({ status });
+  } catch {
+    throw invalidAckRecoveryReply("orphan ACK result");
+  }
+}
+
+export function decodeCoordinationAckTombstoneInspectionReply(reply) {
+  try {
+    const snapshot = snapshotQueueReply(
+      reply,
+      1,
+      "ACK tombstone inspection",
+    );
+    const statuses = new Map([
+      [1, "absent"],
+      [2, "ack_tombstone"],
+      [3, "transport_state_unknown"],
+    ]);
+    const status = statuses.get(snapshot[0]);
+    if (!status) {
+      throw invalidAckRecoveryReply("ACK tombstone inspection");
+    }
+    return Object.freeze({ status });
+  } catch {
+    throw invalidAckRecoveryReply("ACK tombstone inspection");
+  }
+}
+
 function parseLifecycleResult(result, statuses) {
   if (!Number.isSafeInteger(result)) throw invalidData("lifecycle result");
   if (result === 5) throw invalidData("participant state");
@@ -1586,6 +2602,16 @@ function isNoGroupError(err) {
   );
 }
 
+const redisCoordinationQueueStates = new WeakMap();
+
+function redisCoordinationQueueState(queue) {
+  const state = redisCoordinationQueueStates.get(queue);
+  if (!state) {
+    throw new TypeError("invalid Redis coordination queue receiver");
+  }
+  return state;
+}
+
 export class RedisCoordinationQueue {
   constructor({
     redisUrl = "",
@@ -1593,42 +2619,126 @@ export class RedisCoordinationQueue {
     maxInboxLength = DEFAULT_MAX_INBOX_LENGTH,
     connectTimeoutMs = DEFAULT_CONNECT_TIMEOUT_MS,
     orphanInboxTtlMs = DEFAULT_COORDINATION_ORPHAN_INBOX_TTL_MS,
+    maxCommandConcurrency = DEFAULT_COMMAND_CONCURRENCY,
+    maxCommandQueue = DEFAULT_COMMAND_QUEUE,
+    maxBlockingQueue = DEFAULT_BLOCKING_QUEUE,
+    shutdownTimeoutMs = DEFAULT_SHUTDOWN_TIMEOUT_MS,
     clientFactory = createClient,
     onError = () => {},
   } = {}) {
     if (typeof redisUrl !== "string") {
       throw new TypeError("redisUrl must be a string");
     }
-    this.redisUrl = redisUrl;
-    this.keys = coordinationKeys(prefix);
-    this.group = COORDINATION_CONSUMER_GROUP;
-    this.maxInboxLength = positiveSafeInteger(
+    const keys = coordinationKeys(prefix);
+    const maxInboxLengthValue = positiveSafeInteger(
       maxInboxLength,
       DEFAULT_MAX_INBOX_LENGTH,
       "maxInboxLength",
     );
-    this.connectTimeoutMs = positiveSafeInteger(
+    const connectTimeoutMsValue = positiveSafeInteger(
       connectTimeoutMs,
       DEFAULT_CONNECT_TIMEOUT_MS,
       "connectTimeoutMs",
     );
-    this.orphanInboxTtlMs = positiveSafeInteger(
+    const orphanInboxTtlMsValue = positiveSafeInteger(
       orphanInboxTtlMs,
       DEFAULT_COORDINATION_ORPHAN_INBOX_TTL_MS,
       "orphanInboxTtlMs",
     );
-    this.clientFactory = assertFunction(clientFactory, "clientFactory");
-    this.onError = assertFunction(onError, "onError");
-    this.enabled = redisUrl.length > 0;
+    const normalizedClientFactory = assertFunction(
+      clientFactory,
+      "clientFactory",
+    );
+    const normalizedOnError = assertFunction(onError, "onError");
+    const clientOptions = {
+      url: redisUrl,
+      RESP: 2,
+      disableOfflineQueue: true,
+      socket: {
+        connectTimeout: connectTimeoutMsValue,
+        reconnectStrategy: false,
+      },
+    };
+    const laneOptions = {
+      clientFactory: normalizedClientFactory,
+      clientOptions,
+      shutdownTimeoutMs: positiveSafeInteger(
+        shutdownTimeoutMs,
+        DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        "shutdownTimeoutMs",
+      ),
+      unavailable,
+      onError: normalizedOnError,
+    };
+    const commandLane = new RedisClientLane({
+      ...laneOptions,
+      kind: "command",
+      concurrency: positiveSafeInteger(
+        maxCommandConcurrency,
+        DEFAULT_COMMAND_CONCURRENCY,
+        "maxCommandConcurrency",
+      ),
+      queueLimit: positiveSafeInteger(
+        maxCommandQueue,
+        DEFAULT_COMMAND_QUEUE,
+        "maxCommandQueue",
+      ),
+    });
+    const blockingLane = new RedisClientLane({
+      ...laneOptions,
+      kind: "blocking",
+      concurrency: DEFAULT_BLOCKING_CONCURRENCY,
+      queueLimit: positiveSafeInteger(
+        maxBlockingQueue,
+        DEFAULT_BLOCKING_QUEUE,
+        "maxBlockingQueue",
+      ),
+    });
+    redisCoordinationQueueStates.set(this, {
+      keys,
+      group: COORDINATION_CONSUMER_GROUP,
+      maxInboxLength: maxInboxLengthValue,
+      orphanInboxTtlMs: orphanInboxTtlMsValue,
+      enabled: redisUrl.length > 0,
+      closed: false,
+      closePromise: null,
+      commandLane,
+      blockingLane,
+    });
+  }
+
+  get enabled() {
+    return redisCoordinationQueueState(this).enabled;
   }
 
   describe() {
-    return {
-      enabled: this.enabled,
-      prefix: this.keys.prefix,
-      eventsStream: this.keys.events,
-      consumerGroup: this.group,
-    };
+    const state = redisCoordinationQueueState(this);
+    return Object.freeze({
+      enabled: state.enabled,
+      prefix: state.keys.prefix,
+      eventsStream: state.keys.events,
+      consumerGroup: state.group,
+    });
+  }
+
+  lifecycle() {
+    const state = redisCoordinationQueueState(this);
+    return Object.freeze({
+      state: state.closed ? "closed" : state.enabled ? "open" : "disabled",
+      command: Object.freeze(snapshotRedisClientLane(state.commandLane)),
+      blocking: Object.freeze(snapshotRedisClientLane(state.blockingLane)),
+    });
+  }
+
+  close() {
+    const state = redisCoordinationQueueState(this);
+    if (state.closePromise) return state.closePromise;
+    state.closed = true;
+    state.closePromise = Promise.all([
+      closeRedisClientLane(state.commandLane),
+      closeRedisClientLane(state.blockingLane),
+    ]).then(() => Object.freeze({ status: "closed" }));
+    return state.closePromise;
   }
 
   async ping() {
@@ -1644,17 +2754,18 @@ export class RedisCoordinationQueue {
     ifAbsent,
     fence,
   } = {}) {
+    const state = redisCoordinationQueueState(this);
     const normalizedTtlMs = positiveSafeInteger(ttlMs, undefined, "ttlMs");
     if (typeof ifAbsent !== "boolean") {
       throw new TypeError("ifAbsent must be a boolean");
     }
-    const validated = assertParticipantRecord(record, this.keys);
+    const validated = assertParticipantRecord(record, state.keys);
     const participantId = validated.fence.participantId;
     const keys = [
-      this.keys.presence(participantId),
-      this.keys.participants,
-      this.keys.inbox(participantId),
-      this.keys.events,
+      state.keys.presence(participantId),
+      state.keys.participants,
+      state.keys.inbox(participantId),
+      state.keys.events,
     ];
 
     if (ifAbsent) {
@@ -1675,7 +2786,7 @@ export class RedisCoordinationQueue {
           validated.serialized,
           String(normalizedTtlMs),
           participantId,
-          this.group,
+          state.group,
           event,
         ]),
       );
@@ -1705,7 +2816,7 @@ export class RedisCoordinationQueue {
         participantId,
         expected.leaseTokenHash,
         expected.scopeId,
-        this.group,
+        state.group,
         event,
       ]),
     );
@@ -1716,17 +2827,25 @@ export class RedisCoordinationQueue {
     ]));
   }
 
-  async getParticipant(participantId) {
-    const presenceKey = this.keys.presence(participantId);
+  async getParticipant(participantId, { signal } = {}) {
+    const state = redisCoordinationQueueState(this);
+    const presenceKey = state.keys.presence(participantId);
     const raw = await this.#withClient((client) =>
-      client.sendCommand(["GET", presenceKey]),
-    );
+      client.sendCommand(
+        ["GET", presenceKey],
+        // MUTATION_GUARD: participant-command-abort-signal
+        { abortSignal: signal },
+      ), {
+      // MUTATION_GUARD: participant-lane-abort-signal
+      signal,
+    });
     return raw === null ? null : parseJsonObject(raw, "participant");
   }
 
   async listParticipants({ fence } = {}) {
+    const state = redisCoordinationQueueState(this);
     const expected = createCoordinationLeaseFence(fence);
-    const callerPresenceKey = this.keys.presence(expected.participantId);
+    const callerPresenceKey = state.keys.presence(expected.participantId);
     return this.#withClient(async (client) => {
       const participants = [];
       const returnedIds = new Set();
@@ -1735,12 +2854,12 @@ export class RedisCoordinationQueue {
       let cursor = "0";
 
       const evaluateBatch = async (participantIds) => {
-        const batchKeys = [callerPresenceKey, this.keys.participants];
+        const batchKeys = [callerPresenceKey, state.keys.participants];
         for (const participantId of participantIds) {
           try {
             batchKeys.push(
-              this.keys.presence(participantId),
-              this.keys.inbox(participantId),
+              state.keys.presence(participantId),
+              state.keys.inbox(participantId),
             );
           } catch {
             throw invalidData("participant registry");
@@ -1754,7 +2873,7 @@ export class RedisCoordinationQueue {
           expected.participantId,
           expected.leaseTokenHash,
           expected.scopeId,
-          String(this.orphanInboxTtlMs),
+          String(state.orphanInboxTtlMs),
           ...participantIds,
         ]);
         const decoded = decodeParticipantBatch(reply, participantIds);
@@ -1772,7 +2891,7 @@ export class RedisCoordinationQueue {
       do {
         const scan = decodeScanReply(await client.sendCommand([
           "SSCAN",
-          this.keys.participants,
+          state.keys.participants,
           cursor,
           "COUNT",
           String(DISCOVERY_BATCH_SIZE),
@@ -1817,16 +2936,17 @@ export class RedisCoordinationQueue {
     fence,
     timestamp,
   } = {}) {
+    const state = redisCoordinationQueueState(this);
     const expected = createCoordinationLeaseFence(fence);
     if (expected.participantId !== participantId) {
       throw new TypeError("participantId does not match its fence");
     }
     const normalizedTimestamp = assertTimestamp(timestamp, "timestamp");
     const keys = [
-      this.keys.presence(participantId),
-      this.keys.participants,
-      this.keys.inbox(participantId),
-      this.keys.events,
+      state.keys.presence(participantId),
+      state.keys.participants,
+      state.keys.inbox(participantId),
+      state.keys.events,
     ];
     const result = await this.#withClient((client) =>
       client.sendCommand([
@@ -1837,7 +2957,7 @@ export class RedisCoordinationQueue {
         participantId,
         expected.leaseTokenHash,
         expected.scopeId,
-        String(this.orphanInboxTtlMs),
+        String(state.orphanInboxTtlMs),
         normalizedTimestamp,
       ]),
     );
@@ -1853,7 +2973,8 @@ export class RedisCoordinationQueue {
     recipientFence,
     dedupeTtlMs,
   } = {}) {
-    const message = assertMessageEnvelope(envelope, this.keys);
+    const state = redisCoordinationQueueState(this);
+    const message = assertMessageEnvelope(envelope, state.keys);
     const sender = assertFence(senderFence, "senderFence");
     const recipient = assertFence(recipientFence, "recipientFence");
     if (
@@ -1870,11 +2991,11 @@ export class RedisCoordinationQueue {
       "dedupeTtlMs",
     );
     const keys = [
-      this.keys.presence(sender.participantId),
-      this.keys.presence(recipient.participantId),
-      this.keys.inbox(recipient.participantId),
-      this.keys.dedupe(sender.participantId, message.value.messageId),
-      this.keys.events,
+      state.keys.presence(sender.participantId),
+      state.keys.presence(recipient.participantId),
+      state.keys.inbox(recipient.participantId),
+      state.keys.dedupe(sender.participantId, message.value.messageId),
+      state.keys.events,
     ];
     const reply = await this.#withClient((client) =>
       client.sendCommand([
@@ -1891,10 +3012,10 @@ export class RedisCoordinationQueue {
         recipient.scopeId,
         message.value.messageId,
         String(normalizedDedupeTtlMs),
-        String(this.maxInboxLength),
+        String(state.maxInboxLength),
       ]),
     );
-    return decodeSendResult(reply, message.value, this.keys);
+    return decodeSendResult(reply, message.value, state.keys);
   }
 
   async readInbox({
@@ -1905,10 +3026,11 @@ export class RedisCoordinationQueue {
     blockMs = 0,
     now,
     fence,
-  } = {}) {
+  } = {}, { signal } = {}) {
+    const state = redisCoordinationQueueState(this);
     const expected = assertFence(fence, "fence");
-    const presenceKey = this.keys.presence(participantId);
-    const inboxKey = this.keys.inbox(participantId);
+    const presenceKey = state.keys.presence(participantId);
+    const inboxKey = state.keys.inbox(participantId);
     if (expected.participantId !== participantId) {
       throw new TypeError("participantId does not match its fence");
     }
@@ -1941,6 +3063,9 @@ export class RedisCoordinationQueue {
     return this.#withClient(async (client) => {
       const deliveries = [];
       const seen = new Set();
+      // MUTATION_GUARD: redis-command-abort-signal
+      const sendCommand = (command) =>
+        client.sendCommand(command, { abortSignal: signal });
 
       const decodeOptions = (remaining, recovered) => ({
         count: remaining,
@@ -1948,12 +3073,12 @@ export class RedisCoordinationQueue {
         participantId,
         scopeId: expected.scopeId,
         recovered,
-        keys: this.keys,
+        keys: state.keys,
         seen,
       });
 
       const evaluateFence = async () =>
-        parseInboxFenceResult(await client.sendCommand([
+        parseInboxFenceResult(await sendCommand([
           "EVAL",
           FENCE_INBOX_SCRIPT,
           String(redisKeys.length),
@@ -1966,18 +3091,18 @@ export class RedisCoordinationQueue {
         let pageCount = 0;
         while (deliveries.length < normalizedCount) {
           pageCount += 1;
-          if (pageCount > this.maxInboxLength + 1) {
+          if (pageCount > state.maxInboxLength + 1) {
             throw invalidData("inbox reclaim");
           }
           const remaining = normalizedCount - deliveries.length;
           const result = decodeFencedReceiveResult(
-            await client.sendCommand([
+            await sendCommand([
               "EVAL",
               FENCED_AUTOCLAIM_SCRIPT,
               String(redisKeys.length),
               ...redisKeys,
               ...fenceArgs,
-              this.group,
+              state.group,
               consumerId,
               String(normalizedReclaimIdleMs),
               cursor,
@@ -2016,13 +3141,13 @@ export class RedisCoordinationQueue {
 
       if (deliveries.length > 0 || normalizedBlockMs === 0) {
         const result = decodeFencedReceiveResult(
-          await client.sendCommand([
+          await sendCommand([
             "EVAL",
             FENCED_READ_NEW_SCRIPT,
             String(redisKeys.length),
             ...redisKeys,
             ...fenceArgs,
-            this.group,
+            state.group,
             consumerId,
             String(remaining),
           ]),
@@ -2044,10 +3169,10 @@ export class RedisCoordinationQueue {
       }
       let raw;
       try {
-        raw = await client.sendCommand([
+        raw = await sendCommand([
           "XREADGROUP",
           "GROUP",
-          this.group,
+          state.group,
           consumerId,
           "COUNT",
           String(remaining),
@@ -2070,6 +3195,10 @@ export class RedisCoordinationQueue {
         decodeOptions(remaining, false),
       ));
       return { status: "read", deliveries };
+    }, {
+      blocking: normalizedBlockMs > 0,
+      // MUTATION_GUARD: blocking-lane-abort-signal
+      signal,
     });
   }
 
@@ -2080,15 +3209,16 @@ export class RedisCoordinationQueue {
     timestamp,
     fence,
   } = {}) {
+    const state = redisCoordinationQueueState(this);
     const expected = assertFence(fence, "fence");
-    const presenceKey = this.keys.presence(participantId);
-    const inboxKey = this.keys.inbox(participantId);
+    const presenceKey = state.keys.presence(participantId);
+    const inboxKey = state.keys.inbox(participantId);
     if (expected.participantId !== participantId) {
       throw new TypeError("participantId does not match its fence");
     }
     const normalizedDeliveryIds = assertAckDeliveryIds(
       deliveryIds,
-      this.keys,
+      state.keys,
       participantId,
     );
     const normalizedTombstoneTtlMs = positiveSafeInteger(
@@ -2100,9 +3230,9 @@ export class RedisCoordinationQueue {
     const keys = [
       presenceKey,
       inboxKey,
-      this.keys.events,
+      state.keys.events,
       ...normalizedDeliveryIds.map((deliveryId) =>
-        this.keys.acked(participantId, deliveryId)),
+        state.keys.acked(participantId, deliveryId)),
     ];
     const reply = await this.#withClient((client) =>
       client.sendCommand([
@@ -2113,7 +3243,7 @@ export class RedisCoordinationQueue {
         participantId,
         expected.leaseTokenHash,
         expected.scopeId,
-        this.group,
+        state.group,
         String(normalizedTombstoneTtlMs),
         normalizedTimestamp,
         String(normalizedDeliveryIds.length),
@@ -2124,7 +3254,8 @@ export class RedisCoordinationQueue {
   }
 
   async ensureInboxGroup(participantId) {
-    const inboxKey = this.keys.inbox(participantId);
+    const state = redisCoordinationQueueState(this);
+    const inboxKey = state.keys.inbox(participantId);
     return this.#withClient(async (client) => {
       let result;
       try {
@@ -2132,7 +3263,7 @@ export class RedisCoordinationQueue {
           "XGROUP",
           "CREATE",
           inboxKey,
-          this.group,
+          state.group,
           "0",
           "MKSTREAM",
         ]);
@@ -2145,36 +3276,15 @@ export class RedisCoordinationQueue {
     });
   }
 
-  async #withClient(operation) {
-    if (!this.enabled) throw unavailable();
-    let client;
+  async #withClient(operation, { blocking = false, signal } = {}) {
+    const state = redisCoordinationQueueState(this);
+    if (!state.enabled || state.closed) throw unavailable();
+    const lane = blocking ? state.blockingLane : state.commandLane;
     try {
-      client = this.clientFactory({
-        url: this.redisUrl,
-        RESP: 2,
-        socket: {
-          connectTimeout: this.connectTimeoutMs,
-          reconnectStrategy: false,
-        },
-      });
-      client.on?.("error", (err) => {
-        try {
-          this.onError(err);
-        } catch {
-          // Observability cannot alter transport semantics.
-        }
-      });
-      if (!client.isOpen) await client.connect();
-      return await operation(client);
+      return await executeRedisClientLane(lane, operation, { signal });
     } catch (err) {
       if (err instanceof CoordinationQueueError) throw err;
       throw unavailable();
-    } finally {
-      try {
-        if (client?.isOpen) client.destroy();
-      } catch {
-        // Per-operation client cleanup is best effort.
-      }
     }
   }
 }

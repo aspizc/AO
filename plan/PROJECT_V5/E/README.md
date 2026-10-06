@@ -1,7 +1,8 @@
 # Stage E — Operator inventory and approval control
 
-Status: **planned**. This stage makes running work visible and keeps approval
-authority outside the agent-facing MCP surface. `E/0/04` consumes the D/0/05
+Status: **planned**. Six concrete sheets make running work visible, keep
+approval authority outside the agent-facing MCP surface, and turn broad
+orchestrator autonomy into an explicit grant. `E/0/04` consumes the D/0/05
 single-daemon boundary plus supervised execution, writer/reconciliation,
 global-budget, and inventory signals. Its external health-only watchdog can
 observe a dead or stalled daemon without becoming a second Gateway or gaining
@@ -25,3 +26,4 @@ and reviews exist. `absorbed_from` records specification traceability.
 | [E/0/02](0/02.md) | Signed single-use decisions | planned | P0 |
 | [E/0/03](0/03.md) | Operator CLI for status/approval/audit | planned | P1 |
 | [E/0/04](0/04.md) | Closed Gateway health, external stall/recovery evidence, and bounded observability | planned | P1 |
+| [E/0/05](0/05.md) | Scoped YOLO grants and informed control | planned | P0 |

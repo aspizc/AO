@@ -74,6 +74,10 @@ function raceClientFactory(controller, presenceKey, replacement) {
         inner.on(event, listener);
         return this;
       },
+      off(event, listener) {
+        inner.off(event, listener);
+        return this;
+      },
       async connect() {
         await inner.connect();
       },
@@ -110,8 +114,10 @@ test(
       socket: { reconnectStrategy: false },
     });
     await raw.connect();
+    let queue;
+    let raceQueue;
     try {
-      const queue = createRedisCoordinationQueue({
+      queue = createRedisCoordinationQueue({
         redisUrl,
         prefix,
         maxInboxLength: 20,
@@ -204,7 +210,7 @@ test(
       });
       assert.equal(third.status, "created");
       const replacement = participant("pt-recipient", "c".repeat(64));
-      const raceQueue = createRedisCoordinationQueue({
+      raceQueue = createRedisCoordinationQueue({
         redisUrl,
         prefix,
         maxInboxLength: 20,
@@ -268,6 +274,7 @@ test(
           && err.code === "COORDINATION_INVALID_DATA",
       );
     } finally {
+      await Promise.all([queue?.close(), raceQueue?.close()]);
       await exactPrefixCleanup(raw, prefix);
       if (raw.isOpen) raw.destroy();
     }

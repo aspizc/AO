@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "requiredSuiteIds": [
     "lock.python",
+    "release.candidate",
     "lint.python",
     "lint.gateway",
     "test.structure",
@@ -10,7 +11,8 @@
     "smoke.mcp",
     "policy.registry",
     "test.cli",
-    "test.langgraph"
+    "test.langgraph",
+    "test.redis-live"
   ],
   "suites": [
     {
@@ -34,6 +36,48 @@
       "timeoutSeconds": 120
     },
     {
+      "id": "release.candidate",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "python",
+        "scripts/release_candidate.py",
+        "verify-repository",
+        "--repo-root",
+        "."
+      ],
+      "include": [
+        ".github/workflows/ci.yml",
+        "ci/advisory-waivers.json",
+        "ci/license-allowlist.json",
+        "ci/offline-advisory-database.json",
+        "ci/production-advisories.json",
+        "ci/production-licenses.json",
+        "ci/production-sbom.json",
+        "ci/release-environments.json",
+        "ci/requirements-build.in",
+        "ci/reviewer-trust-roots.json",
+        "ci/suites-contract.json",
+        "ci/suites.json",
+        "cli/pyproject.toml",
+        "gateway/package-lock.json",
+        "gateway/package.json",
+        "orchestrator-langgraph/pyproject.toml",
+        "requirements.lock",
+        "schemas/release-candidate-v1.schema.json",
+        "schemas/release-state-v1.schema.json",
+        "scripts/ci.sh",
+        "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/requirements_lock.sh",
+        "scripts/release_candidate.py"
+      ],
+      "exclude": [],
+      "inventorySha256": "sha256:20cb664a01ba9a3074fba98eb7e43ca4f4768d66b586773a0fcd99d9f45912a5",
+      "allowedSkips": [],
+      "timeoutSeconds": 120
+    },
+    {
       "id": "lint.python",
       "classification": "required",
       "runner": "command",
@@ -43,16 +87,20 @@
         "cli",
         "orchestrator-langgraph",
         "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/release_candidate.py",
         "tests/structure"
       ],
       "include": [
         "cli/**/*.py",
         "orchestrator-langgraph/**/*.py",
         "scripts/ci_gate.py",
+        "scripts/refresh_advisory_snapshot.py",
+        "scripts/release_candidate.py",
         "tests/structure/**/*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:7d4c7256d95bf4623adfc178d2a6f9ce59fe47165ce8720f659c54a1e7317285",
+      "inventorySha256": "sha256:e0d2532fce67c585fa00c1839957a1d9fb4f7c226634afa52b4cad5eb745f65e",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -74,7 +122,7 @@
         "gateway/tests/**/*.js"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:0ec6cdd2732e6e000c544062b0353aa6f4acc86ccdb25c12eb2a0fc2de6fcba6",
+      "inventorySha256": "sha256:5e33cdcfa9f414d99425423412f8ba409002dd9ddc6998da0da801eb074af030",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -93,7 +141,7 @@
         "tests/structure/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:138197b5cd0b19dea976940de1152fe7cd36f4ea90c6dab1297e6a32ae2017a0",
+      "inventorySha256": "sha256:fc643e5fff4550cd8424b6616d38fb5ec535df8087c40e30a8733879b60962c5",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 300
@@ -115,7 +163,7 @@
       "exclude": [
         "tests/gateway/*_live.test.js"
       ],
-      "inventorySha256": "sha256:786d8b0262a63de75cf6bc0d2b777b0d46d36d576037058201966b5f8cc5be76",
+      "inventorySha256": "sha256:b19a28d7c38caadfbd49eb15e21b64ba3d8bf881708a70c970ad85c69c234525",
       "minimumTests": 1,
       "timeoutSeconds": 900,
       "allowedSkips": [
@@ -218,7 +266,7 @@
         "schemas/*.json"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:afb944c89b310253c431e31f3863604eebf2c362a071de81241d1c3db0043b06",
+      "inventorySha256": "sha256:ba7f5a4c10b15d8e7d4654d1327df6f5e80781be535a116873a647a714623388",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -237,7 +285,7 @@
         "tests/cli/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:a5bd0933d0895a1fa8bd7c64d5355418d37ca5fc94b54f3b9196a42ade013693",
+      "inventorySha256": "sha256:222c342baeeae189ceb9a4a669c4b776c6dde0a4f44f2132361946222957d7c3",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 300
@@ -280,7 +328,7 @@
     },
     {
       "id": "test.redis-live",
-      "classification": "optional-service",
+      "classification": "required",
       "runner": "node-test",
       "argv": [
         "node",
@@ -292,7 +340,7 @@
         "tests/gateway/*_live.test.js"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:e77d40c2d983c6d17cd0e325b9316835ad0528b426c1fcb0a0709933a6bb661c",
+      "inventorySha256": "sha256:41092de443884a5d1196e7177eb4c33412afd1abb427c5c43c1ba99b96504e42",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 900,

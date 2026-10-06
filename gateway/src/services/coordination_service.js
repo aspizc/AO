@@ -824,10 +824,14 @@ function validatedDelivery(raw, { participant, config }) {
   }
 }
 
-async function readParticipant(queue, participantId) {
+async function readParticipant(queue, participantId, { signal } = {}) {
   let raw;
   try {
-    raw = await queue.getParticipant(participantId);
+    raw = await queue.getParticipant(
+      participantId,
+      // MUTATION_GUARD: participant-lookup-signal
+      { signal },
+    );
   } catch (err) {
     throw mapQueueError(err);
   }
@@ -1262,10 +1266,14 @@ export function createCoordinationService({
         duplicate,
       };
     },
-    async receive(input) {
+    async receive(input, { signal } = {}) {
       ensureAvailable(queue);
       const validated = validateReceiveInput(input, config);
-      const participant = await readParticipant(queue, validated.participantId);
+      const participant = await readParticipant(
+        queue,
+        validated.participantId,
+        { signal },
+      );
       if (!participant) throw authFailed();
       const { now } = safeCurrentTime(clock);
       const fence = authenticateParticipant(
@@ -1276,15 +1284,19 @@ export function createCoordinationService({
 
       let read;
       try {
-        read = await queue.readInbox({
-          participantId: participant.participantId,
-          consumerId: validated.consumerId,
-          count: validated.count,
-          reclaimIdleMs: validated.reclaimIdleMs,
-          blockMs: validated.blockMs,
-          now,
-          fence,
-        });
+        read = await queue.readInbox(
+          {
+            participantId: participant.participantId,
+            consumerId: validated.consumerId,
+            count: validated.count,
+            reclaimIdleMs: validated.reclaimIdleMs,
+            blockMs: validated.blockMs,
+            now,
+            fence,
+          },
+          // MUTATION_GUARD: service-receive-signal
+          { signal },
+        );
       } catch (err) {
         throw mapQueueError(err);
       }

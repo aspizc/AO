@@ -44,6 +44,7 @@ pytestmark = pytest.mark.skipif(
 class RecoveryHarness:
     calls: Counter[tuple[str, str]] = field(default_factory=Counter)
     implement_checkpoint_started: asyncio.Event = field(default_factory=asyncio.Event)
+    implement_checkpoint_can_complete: asyncio.Event = field(default_factory=asyncio.Event)
     approval_requested: asyncio.Event = field(default_factory=asyncio.Event)
 
     async def delegate_activity(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -94,6 +95,7 @@ class RecoveryHarness:
         self.calls[(CHECKPOINT_ACTIVITY, node_name)] += 1
         if node_name == "checkpoint_implement":
             self.implement_checkpoint_started.set()
+            await self.implement_checkpoint_can_complete.wait()
         return {
             "activity_id": f"act-{node_name}-{payload['attempt_number']}",
             "artifact_id": f"art-{node_name}",
@@ -145,37 +147,45 @@ async def _assert_worker_restart_replays_without_duplicate_implement_or_implicit
     ]
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
+        # Keep activities alive so checkpoint completion follows the workflow-worker handoff.
         async with Worker(
             env.client,
             task_queue=task_queue,
-            workflows=[ImplementTestReviewPushWorkflow],
             activities=activities,
         ):
-            handle = await env.client.start_workflow(
-                IMPLEMENT_TEST_REVIEW_PUSH_WORKFLOW,
-                _workflow_payload(),
-                id=f"itrp-crash-recovery-{uuid.uuid4()}",
+            # Disable sticky queues so the replacement worker must replay history.
+            async with Worker(
+                env.client,
                 task_queue=task_queue,
-            )
-            await asyncio.wait_for(harness.implement_checkpoint_started.wait(), timeout=10)
+                workflows=[ImplementTestReviewPushWorkflow],
+                max_cached_workflows=0,
+            ):
+                handle = await env.client.start_workflow(
+                    IMPLEMENT_TEST_REVIEW_PUSH_WORKFLOW,
+                    _workflow_payload(),
+                    id=f"itrp-crash-recovery-{uuid.uuid4()}",
+                    task_queue=task_queue,
+                )
+                await asyncio.wait_for(harness.implement_checkpoint_started.wait(), timeout=10)
 
-        async with Worker(
-            env.client,
-            task_queue=task_queue,
-            workflows=[ImplementTestReviewPushWorkflow],
-            activities=activities,
-        ):
-            await asyncio.wait_for(harness.approval_requested.wait(), timeout=10)
+            async with Worker(
+                env.client,
+                task_queue=task_queue,
+                workflows=[ImplementTestReviewPushWorkflow],
+                max_cached_workflows=0,
+            ):
+                harness.implement_checkpoint_can_complete.set()
+                await asyncio.wait_for(harness.approval_requested.wait(), timeout=10)
 
-            with env.auto_time_skipping_disabled():
-                await asyncio.sleep(0.2)
-            assert harness.calls[(PUSH_ACTIVITY, "push_intent")] == 0
+                with env.auto_time_skipping_disabled():
+                    await asyncio.sleep(0.2)
+                assert harness.calls[(PUSH_ACTIVITY, "push_intent")] == 0
 
-            await handle.signal(
-                "approval_response",
-                {"approvalId": "apr-temporal-crash-recovery", "status": "granted"},
-            )
-            result = await asyncio.wait_for(handle.result(), timeout=10)
+                await handle.signal(
+                    "approval_response",
+                    {"approvalId": "apr-temporal-crash-recovery", "status": "granted"},
+                )
+                result = await asyncio.wait_for(handle.result(), timeout=10)
 
     assert result["status"] == "push_ready"
     assert result["approval_response"] == {
