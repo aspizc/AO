@@ -76,8 +76,8 @@
     },
     "claude-code": {
       "binary": "claude",
-      "models": ["claude-sonnet-5", "claude-fable-5-1", "claude-fable-5", "claude-opus-5", "claude-opus-4-8"],
-      "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5", "sonnet": "claude-sonnet-5" },
+      "models": ["claude-sonnet-5", "claude-sonnet-5-5", "claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-opus-4-8"],
+      "modelAliases": { "fable": "claude-fable-5", "opus": "claude-opus-5", "sonnet": "claude-sonnet-5", "opus-5": "claude-opus-5", "sonnet-5.5": "claude-sonnet-5-5", "opus-5.5": "claude-opus-5-5", "opus-5-5": "claude-opus-5-5" },
       "defaultModel": "claude-fable-5",
       "reasoningEfforts": ["low", "medium", "high", "xhigh", "max"],
       "defaultReasoningEffort": "max",
@@ -101,10 +101,11 @@
     },
     "codex": {
       "binary": "codex",
-      "models": ["gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5", "gpt-5-codex"],
+      "models": ["gpt-6-astra", "gpt-6.1-sol", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5", "gpt-5-codex"],
       "modelAliases": {
         "gpt-6": "gpt-6-astra",
         "astra": "gpt-6-astra",
+        "gpt-6.1": "gpt-6.1-sol",
         "gpt-5.6": "gpt-5.6-sol",
         "sol": "gpt-5.6-sol",
         "terra": "gpt-5.6-terra",
@@ -119,6 +120,10 @@
         "gpt-6-astra": {
           "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
           "defaultReasoningEffort": "max"
+        },
+        "gpt-6.1-sol": {
+          "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],
+          "defaultReasoningEffort": "xhigh"
         },
         "gpt-5.6-sol": {
           "reasoningEfforts": ["low", "medium", "high", "xhigh", "max", "ultra"],

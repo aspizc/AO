@@ -6,6 +6,7 @@ rewriting history.
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Portable upstream models and MCP launch settings | 1 | [to review](UPSTREAM_WORKING_2026_10_06-1_to_review.md) | [OK](UPSTREAM_WORKING_2026_10_06-1_reviewed_OK.md) |
 | Public AO upstream integration | 1 | [to review](UPSTREAM_SYNC_2026_10_06-1_to_review.md) | [OK](UPSTREAM_SYNC_2026_10_06-1_reviewed_OK.md) |
 | E0/S00 plan | 1 | [to review](E0_S00-1_to_review.md) | [KO](E0_S00-1_reviewed_KO.md) |
 | E0/S00 plan | 2 | [to review](E0_S00-2_to_review.md) | [OK](E0_S00-2_reviewed_OK.md) |

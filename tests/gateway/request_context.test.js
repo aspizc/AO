@@ -287,3 +287,25 @@ test("gateway repository discovery rejects one ID mapped to different roots", (t
     /different canonical roots/,
   );
 });
+
+test("gateway_request_context_expiry_follows_the_configured_ttl", (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "request-context-ttl-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const registries = { raw: () => ({ repositories: {} }) };
+
+  const defaulted = createGatewayRequestContext({
+    config: { repoRoot: root },
+    registries,
+    connectionId: "connection-default-ttl",
+    now: "2026-07-26T08:00:00.000Z",
+  });
+  assert.equal(defaulted.expiresAt, "2026-07-27T08:00:00.000Z");
+
+  const configured = createGatewayRequestContext({
+    config: { repoRoot: root, requestContextTtlMs: 3_600_000 },
+    registries,
+    connectionId: "connection-configured-ttl",
+    now: "2026-07-26T08:00:00.000Z",
+  });
+  assert.equal(configured.expiresAt, "2026-07-26T09:00:00.000Z");
+});

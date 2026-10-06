@@ -5,6 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Added launch-time MCP client identity and request-context lifetime settings,
+  preserving the public 24-hour lifetime and caller-impersonation rejection.
+- Added optional Sol 6.1, Claude Sonnet 5.5 and Claude Opus 5.5 registrations
+  from the upstream working tree. Public model defaults, existing aliases,
+  role permissions, and coordination timeouts remain unchanged.
+
 - Integrated reusable improvements from the committed agents-orchestrator
   upstream through `393b056`, preserving AO public defaults and excluding
   personal repository registrations and execution preferences. Updated six

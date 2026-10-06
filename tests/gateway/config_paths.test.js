@@ -269,3 +269,15 @@ test("antigravity permission bypass is opt-in with the exact environment value 1
     assert.equal(loadConfig({ AGENTS_ANTIGRAVITY_AUTO: value }).antigravityAuto, false);
   }
 });
+
+test("request_context_ttl_defaults_to_one_day_and_accepts_an_override", () => {
+  assert.equal(loadConfig({}).requestContextTtlMs, 86_400_000);
+  assert.equal(
+    loadConfig({ AGENTS_REQUEST_CONTEXT_TTL_MS: "3600000" }).requestContextTtlMs,
+    3_600_000,
+  );
+  assert.throws(
+    () => loadConfig({ AGENTS_REQUEST_CONTEXT_TTL_MS: "0" }),
+    /AGENTS_REQUEST_CONTEXT_TTL_MS must be a positive integer/,
+  );
+});

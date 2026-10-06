@@ -48,6 +48,8 @@ test("protected_branches_present", () => {
 
 test("agent_models_and_defaults_are_declared", () => {
   assert.ok(reg.agents.codex.models.includes("gpt-6-astra"));
+  assert.ok(reg.agents.codex.models.includes("gpt-6.1-sol"));
+  assert.equal(reg.agents.codex.modelAliases["gpt-6.1"], "gpt-6.1-sol");
   assert.ok(reg.agents.codex.models.includes("gpt-5.6-sol"));
   assert.ok(reg.agents.codex.models.includes("gpt-5.6-terra"));
   assert.ok(reg.agents.codex.models.includes("gpt-5.6-luna"));
@@ -79,8 +81,10 @@ test("agent_models_and_defaults_are_declared", () => {
   assert.ok(!reg.agents.codex.modelProfiles["gpt-5.6-luna"].reasoningEfforts.includes("ultra"));
   assert.deepEqual(reg.agents["claude-code"].models, [
     "claude-sonnet-5",
+    "claude-sonnet-5-5",
     "claude-fable-5-1",
     "claude-fable-5",
+    "claude-opus-5-5",
     "claude-opus-5",
     "claude-opus-4-8",
   ]);
@@ -88,6 +92,10 @@ test("agent_models_and_defaults_are_declared", () => {
     fable: "claude-fable-5",
     opus: "claude-opus-5",
     sonnet: "claude-sonnet-5",
+    "opus-5": "claude-opus-5",
+    "sonnet-5.5": "claude-sonnet-5-5",
+    "opus-5.5": "claude-opus-5-5",
+    "opus-5-5": "claude-opus-5-5",
   });
   assert.equal(reg.agents["claude-code"].defaultModel, "claude-fable-5");
   assert.equal(reg.agents["claude-code"].defaultReasoningEffort, "max");

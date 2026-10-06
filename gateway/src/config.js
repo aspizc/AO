@@ -9,6 +9,8 @@ import {
   MAX_COORDINATION_LEASE_TTL_MS,
 } from "./core/coordination_contract.js";
 
+import { DEFAULT_REQUEST_CONTEXT_TTL_MS } from "./core/request_context.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
@@ -198,6 +200,12 @@ export function loadConfig(env = process.env) {
     artifactStoreRoot: resolveUnderWorkspace(env.AGENTS_ARTIFACT_STORE, "artifacts", workspace),
     tmuxPrefix: env.AGENTS_TMUX_PREFIX || "ag-",
     approvalMaxWaitMs: parseInteger(env.AGENTS_APPROVAL_MAX_WAIT_MS, 60_000),
+    requestPrincipalAgent: env.AGENTS_REQUEST_PRINCIPAL_AGENT || "claude-code",
+    requestContextTtlMs: parsePositiveInteger(
+      env.AGENTS_REQUEST_CONTEXT_TTL_MS,
+      DEFAULT_REQUEST_CONTEXT_TTL_MS,
+      "AGENTS_REQUEST_CONTEXT_TTL_MS",
+    ),
     agentTimeoutMs: parseInteger(env.AGENTS_AGENT_TIMEOUT_MS, 600_000),
     messageAccessSecret: loadOrCreateMessageAccessSecret(env, workspace),
     codexBin: env.AGENTS_CODEX_BIN || "codex",
