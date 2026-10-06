@@ -43,8 +43,9 @@ def test_python_lockfile_and_quickstart_reproducible_install_exist():
     assert "langgraph==1.2.4" not in lock_text
 
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    assert "uv pip sync requirements.lock" in readme
-    assert "pip install --no-deps -e" in readme
+    assert "uv pip sync --require-hashes requirements.lock" in readme
+    assert "uv pip install --no-deps --no-build-isolation -e cli -e orchestrator-langgraph --offline" in readme
+    assert "npm --prefix gateway ci" in readme
 
 
 def test_metrics_consumer_mentions_redis_extra_for_lazy_import():

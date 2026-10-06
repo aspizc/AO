@@ -16,8 +16,18 @@ ADR-003, and ADR-004.
 | 8 | Orchestrator prompt describes the MVP2 two-agent flow and sanitized reviewer handoff. | X/0/1; `prompts/orchestrator_mvp2_two_agent.md`; `tests/structure/test_mvp2_orchestrator_prompt.py` | [x] |
 | 9 | Operator runbook explains dry-run, real profile, launch, observation, audit, artifacts, and troubleshooting. | X/0/2; `docs/mvp2-orchestrator-runbook.md`; `tests/structure/test_mvp2_runbook.py` | [x] |
 | 10 | A guarded real two-agent E2E exists and is opt-in only. | Y/0/0; `tests/e2e/mcp_two_agent_real.test.js`; `tests/structure/test_mvp2_real_e2e.py` | [x] |
-| 11 | A single operator smoke command validates the MVP2 flow in dry-run by default and real mode by opt-in. | Y/0/1; `scripts/smoke_mvp2.mjs`; `tests/structure/test_mvp2_smoke.py` | [x] |
-| 12 | Normal CI remains deterministic and does not require network, tmux, Codex, or Claude execution. | `scripts/ci.sh`; Y/0/0 guard; `PATH="$PWD/.venv/bin:$PATH" ./scripts/ci.sh` | [x] |
+| 11 | A single operator smoke command validates the MVP2 flow in dry-run by default and real mode by opt-in. | Y/0/1; `scripts/smoke_mvp2.mjs`; `tests/structure/test_mvp2_smoke.py`; current execution failure documented below | [ ] |
+| 12 | Normal CI uses dry-run/fake providers and requires pinned tmux plus disposable Redis 7. | `scripts/ci.sh`; Y/0/0 guard; `docs/ci-contract.md` | [x] |
+
+## Current verification note (2026-10-06)
+
+The inherited checks above record implementation coverage, not a release.
+Criterion 11 is reopened: the legacy smoke was run against the current code
+and failed at `task.assign` with `REQUEST_CONTEXT_DENIED` because each call
+starts a new Gateway process. The persistent-connection E2E test passes;
+see [project status](project-status.md#known-operator-limits). The required V5
+CI contract now includes pinned tmux and disposable Redis, while provider
+inference remains an explicit opt-in.
 
 ## Gate Result
 

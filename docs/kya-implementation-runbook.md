@@ -3,6 +3,16 @@
 Operating contract for implementing a KYA ("Know Your Agent") project through
 the Gateway. Use the operator's KYA checkout as the working repository.
 
+## Current runner limitation
+
+The legacy `scripts/kya_mcp_task_runner.mjs` starts a fresh Gateway process
+per request. Code inspection shows the same connection-lifetime mismatch as
+the failing legacy MVP2 smoke. It also sends `callerAgent: "codex"`, requiring
+`AGENTS_REQUEST_PRINCIPAL_AGENT=codex` at launch; setting that alone does not
+preserve the context between processes. End-to-end KYA runner execution is not
+verified by the current AO gate. Use a persistent MCP host for the manual task
+sequence until this runner has its own corrected integration evidence.
+
 ## Roles and models
 
 | Role | Agent | Model | Reasoning effort | Service tier |

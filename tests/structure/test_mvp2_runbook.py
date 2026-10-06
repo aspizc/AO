@@ -18,7 +18,7 @@ def test_mvp2_runbook_exists():
 def test_mvp2_runbook_covers_prereqs_install_and_dry_run():
     text = _text()
 
-    for token in ("node", "tmux", "codex", "claude", "pip install -e", "npm --prefix gateway install"):
+    for token in ("node", "tmux", "codex", "claude", "uv pip sync --require-hashes requirements.lock", "npm --prefix gateway ci"):
         assert token in text
     assert "AGENTS_DRY_RUN=1" in text
     assert "node scripts/smoke_mcp.mjs" in text

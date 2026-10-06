@@ -6,6 +6,7 @@ rewriting history.
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Public project documentation refresh | 1 | [to review](DOCS_REFRESH_2026_10_06-1_to_review.md) | [OK](DOCS_REFRESH_2026_10_06-1_reviewed_OK.md) |
 | Portable upstream models and MCP launch settings | 1 | [to review](UPSTREAM_WORKING_2026_10_06-1_to_review.md) | [OK](UPSTREAM_WORKING_2026_10_06-1_reviewed_OK.md) |
 | Public AO upstream integration | 1 | [to review](UPSTREAM_SYNC_2026_10_06-1_to_review.md) | [OK](UPSTREAM_SYNC_2026_10_06-1_reviewed_OK.md) |
 | E0/S00 plan | 1 | [to review](E0_S00-1_to_review.md) | [KO](E0_S00-1_reviewed_KO.md) |
@@ -151,7 +152,7 @@ rewriting history.
 | D/0/07d authority lifecycle and frozen-input correction design | 9 | [to review](../../reviews/PROJECT_V5/D_0_7D_DESIGN-9_to_review.md) | [OK](../../reviews/PROJECT_V5/D_0_7D_DESIGN-9_result.md) |
 | D/0/07d candidate identity, handler, and byte-TAP correction design | 10 | [to review](../../reviews/PROJECT_V5/D_0_7D_DESIGN-10_to_review.md) | [OK](../../reviews/PROJECT_V5/D_0_7D_DESIGN-10_result.md) |
 | D/0/07d checkpoint 1 implementation | 1 | [to review](../../reviews/PROJECT_V5/D_0_7D_CHECKPOINT_1-1_to_review.md) | [KO](../../reviews/PROJECT_V5/D_0_7D_CHECKPOINT_1-1_result.md) |
-| D/0/07d checkpoint 1 correction | 2 | [to review](../../reviews/PROJECT_V5/D_0_7D_CHECKPOINT_1-2_to_review.md) | pending |
+| D/0/07d checkpoint 1 correction | 2 | [to review](../../reviews/PROJECT_V5/D_0_7D_CHECKPOINT_1-2_to_review.md) | [KO](../../reviews/PROJECT_V5/D_0_7D_CHECKPOINT_1-2_result.md) |
 
 ## Previously unindexed Wave 2 review series
 

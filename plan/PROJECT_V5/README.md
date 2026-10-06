@@ -1,5 +1,10 @@
 # Project V5 — Coordination plane
 
+For AO publication, executable capabilities, and current gate evidence, see
+[project status](../../docs/project-status.md). The source SHAs, trial history,
+and planning counts below belong to the imported V5 ledger. Publication of
+AO main does not promote or release the open V5 work.
+
 Status: **active — A/0/00, the reviewed B/0 corrections, C/0/00–02, and
 G/0/00 are delivered. The functional Wave 2 tree also contains independently
 reviewed and integrated G/0/01, D/0/00, H/0/00, the D/0/01 standalone core,
@@ -156,7 +161,10 @@ DOCTOR Trials 1–12 remain KO evidence; Trial 13 is independently reviewed OK
 and integrated at `616a4de` under the operator-ratified narrowed retirement
 criterion. The unavoidable pure-Python dunder reflection residual is recorded
 as [`V5-H-0-01-D01`](DEFERRED.md) and assigned to D/0/02. H/0/01 remains in
-progress: PROBES, portability, and the sheet exit gate remain open. The PROBES
+progress. PROBES Trial 4 (`6fecc59`), PORTABILITY Trial 2 (`900007a`), and
+EXECUTABLE Trial 1 (`52705a2` implementation, `ed3d944` OK, `a8a39cf`
+integration) are recorded in the imported review trail. The full sheet exit
+still waits for D/0/02–03; native release evidence remains owned by I/0/04. The PROBES
 contract forbids the state-creating general config loader and managed
 coordination registration; it uses a pure config projection, one direct
 `status({})` snapshot, and D/0/02–03 attestations as the only future source of

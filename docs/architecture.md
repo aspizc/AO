@@ -10,9 +10,9 @@ Gateway adapters and state repositories directly.
 ```text
 tools/      -> expose MCP tools, validate input, delegate to services/
 services/   -> use cases plus the eight-operation coordination service
-core/       -> policy, state, audit, sanitizer, coordination contract/Redis queue
+core/       -> policy, state/SQLite/PostgreSQL, audit, sanitizer, Redis queue
 adapters/   -> spawn CLI subprocesses and tmux; no MCP awareness
-infra/      -> SQLite driver, filesystem helpers, env config
+config.js   -> launch environment and validated configuration
 coordination.js -> importable direct factory over the same service and Redis queue
 coordination_client.js -> private-credential orchestrator lease lifecycle
 ```
@@ -26,6 +26,21 @@ Forbidden imports and bypasses:
 - Coordination tools do not use the spawn/artifact policy engine. They enforce
   their own strict schema, participant lease token, scope, and Redis mutation
   fence in the common coordination service.
+
+## Request identity and execution profile
+
+The stdio connection receives a server-owned request context at startup.
+`AGENTS_REQUEST_PRINCIPAL_AGENT` selects the host identity (`claude-code` by
+default); its role remains `orchestrator`. The context expires after 24 hours
+unless `AGENTS_REQUEST_CONTEXT_TTL_MS` is explicitly configured. Protected
+calls enforce expiry, task/trace lineage, and canonical repository bindings;
+public caller fields are assertions, not a way to grant authority.
+
+The canonical provider profile is validated against all capability registries.
+It marks Codex, Claude Code, Antigravity CLI, pi and OpenCode executable;
+Gemini CLI remains registry-only. Adapters consume the resolved selection.
+The [project status](project-status.md) separates implemented paths from the
+live integrations that have not been exercised.
 
 ## MCP Call Lifecycle
 
@@ -125,7 +140,7 @@ hosts require bounded clock skew.
 - Special policy bypass for the orchestrator role.
 - Cursor or Antigravity IDE specific configuration.
 
-## Mapping With gemini-orchestrator (V4 Annex C)
+## Historical mapping with gemini-orchestrator (V4 Annex C)
 
 | Source (gemini-orchestrator) | Destination (this repo) | Stage |
 |---|---|---|

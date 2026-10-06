@@ -47,7 +47,7 @@ as before. Validation failures return:
   "content": [
     {
       "type": "text",
-      "text": "{\"error\":\"INVALID_INPUT\",\"code\":\"INVALID_INPUT\",\"message\":\"invalid input\",\"issues\":[{\"path\":\"leaseTtlMs\",\"code\":\"too_big\",\"maximum\":3600000}]}"
+      "text": "{\"error\":\"INVALID_INPUT\",\"code\":\"INVALID_INPUT\",\"message\":\"invalid input\",\"issues\":[{\"path\":\"leaseTtlMs\",\"code\":\"too_big\",\"maximum\":259200000}]}"
     }
   ]
 }
@@ -59,7 +59,7 @@ Coordination lease validation has a deliberately more specific safe message:
 {
   "error": "COORDINATION_INVALID_INPUT",
   "code": "COORDINATION_INVALID_INPUT",
-  "message": "leaseTtlMs exceeds maximum 3600000"
+  "message": "leaseTtlMs exceeds maximum 259200000"
 }
 ```
 

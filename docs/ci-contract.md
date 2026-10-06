@@ -13,11 +13,14 @@ as candidate materials and calls `scripts/ci_gate.py` for topology, skip,
 readiness, and inventory validation; it does not define or refresh a second
 suite inventory.
 
+See [project status](project-status.md) for the latest published implementation
+SHA, exact local gate totals, and unavailable integration lanes.
+
 ## Reproducible installation
 
 Python 3.11 is the minimum lock target. `requirements.lock` is a universal,
 hash-checked resolution of both Python project manifests and all of their
-extras. Regeneration is pinned to uv 0.11.21 and the 2026-07-26 index cutoff;
+extras. Regeneration is pinned to uv 0.11.21 and the 2026-10-06 index cutoff;
 installation does not invoke the resolver. Install a clean environment without
 resolving new versions:
 

@@ -6,7 +6,8 @@ IDE.
 
 ## 1. Prerequisites
 
-- Linux, macOS, or WSL.
+- Linux or WSL2 for the complete CI gate (Linux process supervision is required).
+  Gateway portability and native macOS preparation have separate verification limits.
 - A Node.js version accepted by the
   [runtime contract](node-runtime.md) (`node --version`).
 - Python 3.11 or newer (`python3 --version`).
@@ -18,8 +19,8 @@ IDE.
 ## 2. Clone and install
 
 ```bash
-git clone <this repo>
-cd agents-orchestrator
+git clone https://github.com/aspizc/AO.git
+cd AO
 uv venv --python 3.11 .venv
 source .venv/bin/activate
 uv pip sync --require-hashes requirements.lock
@@ -39,11 +40,28 @@ command.
 
 ## 4. Run local CI
 
+In a separate terminal, start a disposable instance and wait for its ready
+message (stop it with Ctrl-C after testing):
+
 ```bash
-AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
+docker run --rm --name ao-ci-redis -p 127.0.0.1:6380:6379 redis:7.2-alpine
 ```
 
-All checks must pass before running orchestrations.
+With the [tmux build's environment](tmux-runtime.md#linux-build) still exported:
+
+```bash
+(
+  export TMUX_TMPDIR="$(mktemp -d)"
+  trap 'tmux kill-server 2>/dev/null || true' EXIT
+  tmux new-session -d -s ao-ci-bootstrap
+  AGENTS_TEST_REDIS_URL=redis://127.0.0.1:6380/0 ./scripts/ci.sh
+)
+```
+
+Prepare the [pinned tmux runtime](tmux-runtime.md), including the exported
+probe variables and an isolated tmux server, before this command. The Redis
+URL must refer to an independently managed disposable Redis 7 instance.
+For a lighter first check, use the dry-run smoke commands below.
 The suite list, skip policy, dependency regeneration, and machine-readable
 result are defined by the [CI contract](ci-contract.md). The default gate
 contacts only the disposable Redis 7 endpoint supplied through
@@ -53,8 +71,8 @@ Its final status can be `infrastructure_unavailable` with exit zero when every
 unavailable case is explicitly allowlisted; only `passed` means that no suite
 reported unavailable infrastructure. Missing required Redis readiness also
 uses `infrastructure_unavailable`, but returns nonzero. Suite timeouts and
-SIGINT/SIGTERM stop the owned child process group and still produce one JSON
-result.
+SIGINT/SIGTERM clean the owned process domain. A process-cleanup uncertainty
+raises an error without publishing a gate result, as specified by the CI contract.
 
 Optional local infrastructure for V1 experimental Postgres and Redis Streams
 work lives in [`../docker/docker-compose.yml`](../docker/docker-compose.yml).
@@ -71,7 +89,15 @@ This starts the Gateway over stdio in dry-run mode and verifies that
 `coordination.*` tools. Tool discovery is lazy and does not require a
 reachable Redis service.
 
-For the real MVP2.0 two-agent flow with Codex coder and Claude reviewer, follow
+For the persistent-connection two-agent rehearsal, run:
+
+```bash
+node --test tests/e2e/mcp_two_agent_workflow.test.js
+```
+
+The legacy `smoke_mvp2.mjs` script restarts the Gateway per call and currently
+fails request-context validation. For the manual two-agent flow with Codex
+coder and Claude reviewer, follow
 [`mvp2-orchestrator-runbook.md`](mvp2-orchestrator-runbook.md).
 
 For assisted planning with a Claude planner and apply-coder, follow
@@ -94,6 +120,18 @@ node ./gateway/src/mcp_server.js
 Use `agents-gateway` as the MCP server name. See
 [`../client-config/mcp.json.example`](../client-config/mcp.json.example) for
 the generic configuration example.
+
+Set `AGENTS_REQUEST_PRINCIPAL_AGENT` to the MCP host's agent identity:
+`claude-code` by default, or `codex` for a Codex host. Caller fields must match
+this identity and the `orchestrator` role. This setting does not select the
+child agent or model. `AGENTS_REQUEST_CONTEXT_TTL_MS` defaults to `86400000`
+(24 hours from connection creation); restart the connection after expiry.
+
+Repository IDs are policy handles, not paths. Register each repository in the
+operator-owned registry, allow the selected agent, and configure an absolute
+`AGENTS_REPO_ROOTS` parent containing directories named for those IDs. A checkout
+named `AO` does not automatically bind the sample `agents-orchestrator` ID;
+matching the registered ID and canonical directory is part of host setup.
 
 The process owns its coordination command/blocking Redis clients. End stdin or
 send `SIGINT`/`SIGTERM` for an orderly stop; the Gateway stops admission,
@@ -124,11 +162,11 @@ From any MCP client, call the tools in this shape:
 ```
 
 ```json mcp-tool-call
-{"tool":"task.assign","arguments":{"traceId":"<traceId from orchestration.create>","caller":{"agent":"claude-code","role":"orchestrator"},"target":{"agent":"gemini-cli","role":"restricted-coder","action":"code.write"},"repo":"cvision","brief":"Apply parser fix"}}
+{"tool":"task.assign","arguments":{"traceId":"<traceId from orchestration.create>","caller":{"agent":"claude-code","role":"orchestrator"},"target":{"agent":"codex","role":"restricted-coder","action":"code.write"},"repo":"cvision","brief":"Apply parser fix"}}
 ```
 
 ```json mcp-tool-call
-{"tool":"agent.spawn","arguments":{"agent":"gemini-cli","role":"restricted-coder","repo":"cvision","cwd":"<allowed repo path>","traceId":"<traceId>","taskId":"<taskId from task.assign>"}}
+{"tool":"agent.spawn","arguments":{"agent":"codex","role":"restricted-coder","repo":"cvision","cwd":"<allowed repo path>","traceId":"<traceId>","taskId":"<taskId from task.assign>"}}
 ```
 
 ```json mcp-tool-call
@@ -140,7 +178,7 @@ From any MCP client, call the tools in this shape:
 ```
 
 ```json mcp-tool-call
-{"tool":"task.assign","arguments":{"traceId":"<traceId>","caller":{"agent":"claude-code","role":"orchestrator"},"target":{"agent":"claude-code","role":"reviewer","action":"artifact.put"},"repo":"sample-apps","brief":"Review sanitized diff"}}
+{"tool":"task.assign","arguments":{"traceId":"<traceId>","caller":{"agent":"claude-code","role":"orchestrator"},"target":{"agent":"claude-code","role":"reviewer","action":"artifact.put.review_notes"},"repo":"sample-apps","brief":"Review sanitized diff"}}
 ```
 
 ```json mcp-tool-call
@@ -163,7 +201,8 @@ Inspect the audit:
 agent-run audit show --trace-id <traceId> --limit 50
 ```
 
-You should see events such as `ORCHESTRATION_CREATED`, `TASK_CREATED`,
+After explicitly closing the supervised session with `agent.kill`, you should
+see events such as `ORCHESTRATION_CREATED`, `TASK_CREATED`,
 `SESSION_STARTED`, `ARTIFACT_CREATED`, `SANITIZATION_APPLIED`,
 `ARTIFACT_SHARED`, and `SESSION_CLOSED`.
 
@@ -196,7 +235,8 @@ ambiguous, or caller-invented lineage never becomes authority.
 | MCP host reports no tools | Gateway crashed at boot. | Check Gateway stderr and rerun `./scripts/ci.sh`. |
 | Tool calls fail with policy errors | The requested agent, role, repo, or action is denied. | Run `agent-run policy check` with the same context. |
 | stdout looks corrupted | Some code wrote logs to stdout. | Open a bug; Gateway stdout is reserved for MCP only. |
-| Supervised mode fails | tmux is missing or unavailable. | Install tmux or use `AGENTS_DRY_RUN=1`. |
+| Supervised mode fails | tmux is missing or incompatible. | Follow `tmux-runtime.md` or rehearse with `AGENTS_DRY_RUN=1`. |
+| `REQUEST_CONTEXT_DENIED` | Host identity, canonical repository binding, task lineage, or context expiry does not match. | Check the launch principal, registered repository ID and roots, task/trace association, and connection lifetime. |
 | Audit appears empty | Wrong trace id or audit path. | Check runtime config and use `agent-run audit show --limit 50`. |
 | Coordination returns `COORDINATION_UNAVAILABLE` | No coordination Redis URL is configured, or its Redis endpoint is unreachable. | Existing tools are unaffected; configure and diagnose the isolated coordination endpoint using `coordination-bus.md`. |
 

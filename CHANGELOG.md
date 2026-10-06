@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Refreshed the public README, implementation status, operator setup, adapter
+  catalogs, diagnostics and CI guidance against the published AO candidate.
+  Corrected historical release claims, lock-install commands, and coordination
+  limits; distinguished imported plan history from current verification.
+
 - Added launch-time MCP client identity and request-context lifetime settings,
   preserving the public 24-hour lifetime and caller-impersonation rejection.
 - Added optional Sol 6.1, Claude Sonnet 5.5 and Claude Opus 5.5 registrations
