@@ -1,0 +1,228 @@
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -80,0 +81,2 @@
++	cmd-agents-submit.c \
++	cmd-agents-capture.c \
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -163 +163 @@
+-	client.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
++	client.c cmd-agents-submit.c cmd-agents-capture.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
+@@ -200 +200 @@
+-	cmd-attach-session.$(OBJEXT) cmd-bind-key.$(OBJEXT) \
++	cmd-agents-submit.$(OBJEXT) cmd-agents-capture.$(OBJEXT) cmd-attach-session.$(OBJEXT) cmd-bind-key.$(OBJEXT) \
+@@ -531 +531 @@
+-	cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
++	cmd-agents-submit.c cmd-agents-capture.c cmd-attach-session.c cmd-bind-key.c cmd-break-pane.c \
+@@ -692,0 +693,2 @@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd-agents-submit.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd-agents-capture.Po@am__quote@
+diff --git a/cmd.c b/cmd.c
+--- a/cmd.c
++++ b/cmd.c
+@@ -29,0 +30,2 @@
++extern const struct cmd_entry cmd_agents_submit_entry;
++extern const struct cmd_entry cmd_agents_capture_entry;
+@@ -121,0 +124,2 @@
++	&cmd_agents_submit_entry,
++	&cmd_agents_capture_entry,
+diff --git a/options-table.c b/options-table.c
+--- a/options-table.c
++++ b/options-table.c
+@@ -372 +372 @@
+-	  .default_num = 1,
++	  .default_num = 0,
+diff --git a/tmux.c b/tmux.c
+--- a/tmux.c
++++ b/tmux.c
+@@ -346 +346 @@
+-	return (TMUX_VERSION);
++	return (TMUX_VERSION "-agents.3");
+diff --git a/cmd-paste-buffer.c b/cmd-paste-buffer.c
+--- a/cmd-paste-buffer.c
++++ b/cmd-paste-buffer.c
+@@ -36,2 +36,2 @@
+-	.args = { "db:prs:t:", 0, 0, NULL },
+-	.usage = "[-dpr] [-s separator] " CMD_BUFFER_USAGE " "
++	.args = { "db:Gprs:t:", 0, 0, NULL },
++	.usage = "[-dGpr] [-s separator] " CMD_BUFFER_USAGE " "
+@@ -55,0 +56,11 @@
++
++	/* Guard framing and enqueue in this same server command execution. */
++	if (args_has(args, 'G') &&
++	    (!bracket || !args_has(args, 'r') || args_has(args, 's') ||
++	    window_pane_exited(wp) || wp->fd == -1 ||
++	    (wp->flags & PANE_INPUTOFF) || !TAILQ_EMPTY(&wp->modes) ||
++	    options_get_number(wp->options, "synchronize-panes") ||
++	    !(wp->screen->mode & MODE_BRACKETPASTE))) {
++		cmdq_error(item, "agents: bracketed paste unavailable");
++		return (CMD_RETURN_ERROR);
++	}
+diff --git a/cmd-agents-submit.c b/cmd-agents-submit.c
+--- a/cmd-agents-submit.c
++++ b/cmd-agents-submit.c
+@@ -0,0 +1,162 @@
++/*
++ * Copyright (c) 2026 agents-orchestrator contributors
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include <sys/types.h>
++#include <sys/ioctl.h>
++
++#include <limits.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include "tmux.h"
++
++static enum cmd_retval cmd_agents_submit_exec(struct cmd *, struct cmdq_item *);
++
++const struct cmd_entry cmd_agents_submit_entry = {
++	.name = "agents-submit-v1",
++	.alias = NULL,
++	.args = { "b:c:l:p:r:t:x:y:", 0, 0, NULL },
++	.usage = "-b evidence-buffer -r server-pid -p pane-pid -x width "
++		 "-y height -c cursor-x -l cursor-y " CMD_TARGET_PANE_USAGE,
++	.target = { 't', CMD_FIND_PANE, 0 },
++	.flags = 0,
++	.exec = cmd_agents_submit_exec
++};
++
++static int
++cmd_agents_submit_name(const char *name)
++{
++	const char *uuid;
++	size_t i;
++
++	if (name == NULL || strlen(name) != 50 ||
++	    strncmp(name, "agents-submit-", 14) != 0)
++		return (0);
++	uuid = name + 14;
++	for (i = 0; i < 36; i++) {
++		if (i == 8 || i == 13 || i == 18 || i == 23) {
++			if (uuid[i] != '-')
++				return (0);
++		} else if (!((uuid[i] >= '0' && uuid[i] <= '9') ||
++		    (uuid[i] >= 'a' && uuid[i] <= 'f')))
++			return (0);
++	}
++	return (uuid[14] == '4' && strchr("89ab", uuid[19]) != NULL);
++}
++
++static int
++cmd_agents_submit_target(const char *value, u_int id)
++{
++	char canonical[32];
++
++	if (value == NULL)
++		return (0);
++	xsnprintf(canonical, sizeof canonical, "%%%u", id);
++	return (strcmp(value, canonical) == 0);
++}
++
++static enum cmd_retval
++cmd_agents_submit_exec(struct cmd *self, struct cmdq_item *item)
++{
++	struct args *args = cmd_get_args(self);
++	struct window_pane *wp = cmdq_get_target(item)->wp;
++	struct paste_buffer *pb;
++	struct screen *s;
++	struct grid *gd;
++	struct grid_cell *gc = NULL;
++	const char *data;
++	const char *name = args_get(args, 'b');
++	char *evidence = NULL, *line, *cause = NULL;
++	size_t len = 0, used = 0, linelen, unparsed;
++	long long server_pid, pane_pid, width, height, cx, cy;
++	u_int row;
++	int pending;
++
++	/* Consume before every exec check, including a malformed existing name. */
++	if (name != NULL && (pb = paste_get_name(name)) != NULL) {
++		data = paste_buffer_data(pb, &len);
++		evidence = xmalloc(len == 0 ? 1 : len);
++		memcpy(evidence, data, len);
++		paste_free(pb);
++	}
++	if (evidence == NULL || !cmd_agents_submit_name(name) || wp == NULL ||
++	    !cmd_agents_submit_target(args_get(args, 't'), wp->id) ||
++	    !args_has(args, 'r') || !args_has(args, 'p') ||
++	    !args_has(args, 'x') || !args_has(args, 'y') ||
++	    !args_has(args, 'c') || !args_has(args, 'l'))
++		goto refused;
++
++	server_pid = args_strtonum(args, 'r', 2, LLONG_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++	pane_pid = args_strtonum(args, 'p', 2, LLONG_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++	width = args_strtonum(args, 'x', 1, INT_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++	height = args_strtonum(args, 'y', 1, INT_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++	cx = args_strtonum(args, 'c', 0, INT_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++	cy = args_strtonum(args, 'l', 0, INT_MAX, &cause);
++	if (cause != NULL)
++		goto refused;
++
++	s = &wp->base;
++	if (server_pid != getpid() || pane_pid != wp->pid ||
++	    width != screen_size_x(s) || height != screen_size_y(s) ||
++	    cx >= width || cy >= height || cx != s->cx || cy != s->cy ||
++	    window_pane_exited(wp) || wp->fd == -1 || wp->event == NULL ||
++	    (wp->flags & PANE_INPUTOFF) || !TAILQ_EMPTY(&wp->modes) ||
++	    options_get_number(wp->options, "synchronize-panes") ||
++	    !(wp->screen->mode & MODE_BRACKETPASTE))
++		goto refused;
++
++	gd = s->grid;
++	for (row = gd->hsize; row < gd->hsize + gd->sy; row++) {
++		line = grid_string_cells(gd, 0, row, screen_size_x(s), &gc, 0, s);
++		linelen = strlen(line);
++		if (used > len || linelen >= len - used ||
++		    memcmp(evidence + used, line, linelen) != 0 ||
++		    evidence[used + linelen] != '\n') {
++			free(line);
++			goto refused;
++		}
++		used += linelen + 1;
++		free(line);
++	}
++	if (used != len)
++		goto refused;
++
++	window_pane_get_new_data(wp, &wp->offset, &unparsed);
++	if (unparsed != 0 || ioctl(wp->fd, FIONREAD, &pending) != 0 || pending != 0)
++		goto refused;
++	/* Direct enqueue deliberately bypasses ordinary key/sibling dispatch. */
++	if (bufferevent_write(wp->event, "\r", 1) != 0)
++		goto refused;
++	free(evidence);
++	return (CMD_RETURN_NORMAL);
++
++refused:
++	free(cause);
++	free(evidence);
++	cmdq_error(item, "agents: guarded submit refused");
++	return (CMD_RETURN_ERROR);
++}

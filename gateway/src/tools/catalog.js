@@ -20,6 +20,7 @@ const COORDINATION_BASE_CODES = [
 
 const ERROR_MESSAGES = Object.freeze({
   ADAPTER_DISABLED: "adapter disabled",
+  AGENT_PROMPT_NOT_SUBMITTED: "prompt submission not confirmed",
   COORDINATION_AUTH_FAILED: "coordination authentication failed",
   COORDINATION_CLASSIFICATION_DENIED: "coordination classification is denied",
   COORDINATION_DELIVERY_NOT_FOUND: "coordination delivery was not found",
@@ -340,6 +341,7 @@ const specs = [
       "NOT_FOUND",
       "POLICY_DENIED",
       "ADAPTER_DISABLED",
+      "AGENT_PROMPT_NOT_SUBMITTED",
       "TIMEOUT",
     ],
   }),

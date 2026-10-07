@@ -28,6 +28,79 @@ alternative `claude-sonnet-5-5` (`sonnet-5.5`). Existing aliases keep their
 previous targets. Registration does not establish provider availability;
 real execution still requires a compatible authenticated provider CLI.
 
+## Supervised prompt submission
+
+The five executable adapters share a composer submission guard. It delivers text
+in an owned tmux buffer, preserves LF bytes, checks the current composer before
+each separate Enter, and confirms a new busy indicator before returning success.
+One extra Enter is permitted only for an unchanged, positively identified draft.
+Menus, unknown layouts, ambiguous delivery, and concurrent asks to the same pane
+receive a bounded `AGENT_PROMPT_NOT_SUBMITTED` failure. Submission audit records
+contain prompt length and confirmation, without prompt or pane content.
+
+`AGENTS_TMUX_SUBMIT_DELAY_MS` controls the settle interval between paste and the
+first composer check: default 150 ms, accepted range 1–1000 ms. This conservative
+default is exercised in simulated TUI tests; no live provider timing measurement
+is claimed. Acceptance observations use the existing 1500 ms delay, at most
+twice, and never replay the prompt text. Shell launch commands use literal
+single-line text followed by a separate Enter; newline/control bytes are refused.
+
+Framed delivery requires the agents tmux runtime's atomic `paste-buffer -G -p -r`
+guard and the consuming `agents-submit-v1` command for the final CR. Every
+operation probes the same server for exact `.3` and both commands before
+creating any buffer. Older runtimes, including `.2`, refuse with
+`paste_unavailable` before input. Raw captured screen evidence and pane metadata
+are checked again inside submit before enqueue; nondiagnostic failures are
+`acceptance_uncertain` and never replay input. Runtime `3.6a-agents.3` supplies these guards;
+the real emitted-byte fixture covers framing and refusals. See
+[`docs/tmux-runtime.md`](../docs/tmux-runtime.md) for the isolated build/test
+instructions. Terminal byte proof does not establish provider acceptance.
+
+Source-backed classifier fixtures currently cover Codex `0.160.1` composer
+glyphs, placeholder/cursor, context footer and Working interrupt indicator
+([pinned composer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/bottom_pane/chat_composer.rs),
+[pinned snapshots](https://github.com/openai/codex/tree/rust-v0.160.1/codex-rs/tui/src/bottom_pane/snapshots),
+[pinned status indicator](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)).
+Pi `0.73.1` fixtures follow its installed `interactive-mode.js` working loader
+and `pi-tui` editor borders. Custom themes, shortened footers, large-paste
+placeholders and layouts that cannot positively identify the exact draft fail
+closed. OpenCode `1.18.20` source fixtures cover the default left border,
+Build/Plan metadata, placeholder/cursor and active interrupt footer
+([pinned prompt](https://github.com/anomalyco/opencode/blob/v1.18.20/packages/tui/src/component/prompt/index.tsx),
+[pinned borders](https://github.com/anomalyco/opencode/blob/v1.18.20/packages/tui/src/ui/border.ts)).
+Shell mode, paste summaries and overlays refuse; custom agents/themes/layouts
+remain unverified. Claude Code `2.1.292` source fixtures use the installed
+binary's embedded default Unicode composer: two plain horizontal borders,
+`❯` with a U+00A0 separator, a visible `Try "..."` placeholder at the input-start
+cursor, and the adjacent shortcut or loading interrupt footer. Only small
+fully visible ASCII single-line drafts with the cursor at the end can submit;
+summaries, wrapped text, ghost text, alternate layouts and blank idle inputs
+refuse. The binary hash and source byte/line anchors are retained in
+[`claude_2_1_292_composer.json`](../tests/gateway/fixtures/claude_2_1_292_composer.json).
+These fixtures were derived by reading the binary as data; Claude was never
+invoked, including version/help commands. This is a source-backed profile,
+not measured pane rendering or live acceptance evidence.
+
+Current composer observations use `capture-pane -N -T` to preserve rendered
+row-end spaces. Owned raw-terminal tests cover exact leading/trailing spaces
+and Codex blank/multiline endings; they are transport simulations, not live
+provider evidence. Decision classification uses focused numbered panels or
+the OpenCode permission overlay, keeping ordinary history and draft words
+separate from active menu evidence. The candidate implements the server-side evidence-bound `agents-submit-v1`
+guard; independent source review is pending. Provider-internal state changes
+remain a residual that terminal evidence cannot exclude. No provider acceptance
+is claimed.
+
+Antigravity's `agy` executable is installed, but its isolated static help
+strings do not establish a composer/acceptance renderer. Its profile continues
+to refuse `unknown_state` until source or an operator-coordinated capture
+establishes those markers. No live provider prompt acceptance has been verified;
+the required operator Codex/Claude checks and timing measurement remain pending.
+Claude invocation is now operator-authorized, with installed version `2.1.293`;
+the retained `2.1.292` source fixture does not establish live compatibility.
+Root coordinates live provider launches, including Antigravity `1.3.0`.
+V6 A/0/04 is not closed.
+
 ## Gateway Telemetry
 
 Gateway MCP tool calls can emit one OTel-inspired span per `tools/call` request.

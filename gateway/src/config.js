@@ -199,6 +199,7 @@ export function loadConfig(env = process.env) {
     ),
     artifactStoreRoot: resolveUnderWorkspace(env.AGENTS_ARTIFACT_STORE, "artifacts", workspace),
     tmuxPrefix: env.AGENTS_TMUX_PREFIX || "ag-",
+    tmuxSubmitDelayMs: parseBoundedPositiveInteger(env.AGENTS_TMUX_SUBMIT_DELAY_MS, 150, "AGENTS_TMUX_SUBMIT_DELAY_MS", 1000),
     approvalMaxWaitMs: parseInteger(env.AGENTS_APPROVAL_MAX_WAIT_MS, 60_000),
     requestPrincipalAgent: env.AGENTS_REQUEST_PRINCIPAL_AGENT || "claude-code",
     requestContextTtlMs: parsePositiveInteger(

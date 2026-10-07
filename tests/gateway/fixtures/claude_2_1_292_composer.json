@@ -1,0 +1,22 @@
+{
+  "sourceKind": "static embedded renderer, not a live pane capture",
+  "binarySha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+  "anchors": [
+    { "module": "chunk-2ctmhw7t.js", "line": 94, "byte": 233087613, "symbol": "nE: default round horizontal borders" },
+    { "module": "chunk-2ctmhw7t.js", "line": 94, "byte": 233088395, "symbol": "RC: default pointer plus Hms" },
+    { "module": "chunk-gjgee2e6.js", "line": 12, "byte": 204157671, "symbol": "Hms: U+00A0" },
+    { "module": "chunk-2ctmhw7t.js", "line": 90, "byte": 233044973, "symbol": "OWt: interrupt only while loading" },
+    { "module": "chunk-wwzrqz7n.js", "line": 11, "byte": 222141406, "symbol": "z: chord to action" },
+    { "moduleStartByte": 221099663, "line": 28, "byte": 221168370, "symbol": "axo: Try example placeholder" },
+    { "moduleStartByte": 211390985, "line": 11, "byte": 211397732, "symbol": "ee.pointer: U+276F on Unicode terminals" },
+    { "module": "chunk-xpkb3d7v.js", "line": 12, "byte": 227410880, "symbol": "Xe: placeholder only for empty value" },
+    { "module": "chunk-2ctmhw7t.js", "line": 96, "byte": 233111147, "symbol": "wv: multiline/large/link paste summaries" }
+  ],
+  "width": 40,
+  "height": 24,
+  "pointer": "❯",
+  "separator": " ",
+  "placeholder": "Try \"fix lint errors\"",
+  "idleFooter": "  ? for shortcuts",
+  "busyFooter": "  esc to interrupt"
+}

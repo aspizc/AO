@@ -5,7 +5,6 @@ import {
   buildCapturePaneCmd,
   buildKillSessionCmd,
   buildNewSessionCmd,
-  buildSendKeysCmd,
   isTmuxAvailable,
   tmuxSync,
 } from "./tmux_client.js";
@@ -147,10 +146,6 @@ function assertTmuxOk(result, action) {
   if (result.status !== 0) {
     throw new Error(`tmux ${action} failed: ${result.stderr || result.error?.message || "unknown error"}`);
   }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class ClaudeAdapter extends BaseAdapter {
@@ -342,7 +337,7 @@ export class ClaudeAdapter extends BaseAdapter {
       if (!dryRun) {
         if (!isTmuxAvailable()) throw new Error("tmux is required for claude supervised mode");
         assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
-        assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: launchCommand })), "send-keys");
+        await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
       auditSessionStarted({ traceId, role, mode: "supervised", tmuxTarget });
@@ -373,12 +368,9 @@ export class ClaudeAdapter extends BaseAdapter {
         return { snapshot: `[dry-run claude ask]\n${prompt}\n[ok]`, dryRun: true };
       }
 
-      assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: prompt })), "send-keys");
-      await sleep(this.config.tmuxAskDelayMs || 1500);
-      const captured = tmuxSync(buildCapturePaneCmd({ target: tmuxTarget, lines: 400 }));
-      assertTmuxOk(captured, "capture-pane");
-      auditSessionInput({ traceId, role, tmuxTarget, prompt });
-      return { snapshot: captured.stdout || "", dryRun: false };
+      const result = await this.submitPrompt({ tmuxTarget, prompt });
+      this.auditPromptSubmission({ traceId, role, tmuxTarget, prompt });
+      return result;
     } catch (err) {
       auditAdapterError({ traceId, role, where: "ask", err });
       throw err;

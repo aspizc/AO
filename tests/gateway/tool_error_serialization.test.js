@@ -8,10 +8,28 @@ import {
 import {
   buildCoordinationTools,
 } from "../../gateway/src/tools/coordination.js";
+import { buildAgentTools } from "../../gateway/src/tools/agent.js";
 
 function parse(result) {
   return JSON.parse(result.content[0].text);
 }
+
+test("agent.ask emits the public submission code and allowlisted reason without private data", async () => {
+  for (const reason of ["busy", "decision_required", "unknown_state", "paste_unavailable", "invalid_text", "not_submitted", "acceptance_uncertain", "concurrent_ask", "transport_failed", "private prompt"]) {
+    const tools = buildAgentTools({ agentService: { ask: async () => {
+      const err = new Error("private pane snapshot");
+      Object.assign(err, { code: "AGENT_PROMPT_NOT_SUBMITTED", reason, prompt: "private prompt", snapshot: "private pane" });
+      throw err;
+    } } });
+    const result = await tools.find((tool) => tool.name === "agent.ask").handler({ sessionId: "sess", traceId: "tr", prompt: "private prompt" });
+    assert.equal(result.isError, true);
+    assert.deepEqual(parse(result), {
+      error: "AGENT_PROMPT_NOT_SUBMITTED", code: "AGENT_PROMPT_NOT_SUBMITTED", message: "prompt submission not confirmed",
+      ...(reason === "private prompt" ? {} : { reason }),
+    });
+    assert.doesNotMatch(result.content[0].text, /private/);
+  }
+});
 
 test("unknown exceptions never expose messages, details, decisions, or credentials", async () => {
   const tool = defineTool({

@@ -512,6 +512,7 @@ for candidate evidence and supply-chain verification.
 | `AGENTS_COORDINATION_ACK_TOMBSTONE_TTL_MS` | `86400000` | Exact ACK retry window. |
 | `AGENTS_COORDINATION_ORPHAN_INBOX_TTL_MS` | `86400000` | Retention applied when stale inbox cleanup is scheduled. |
 | `AGENTS_TMUX_PREFIX` | `ag-` | tmux session prefix. |
+| `AGENTS_TMUX_SUBMIT_DELAY_MS` | `150` | Settle interval in milliseconds after prompt paste, accepted range 1–1000. |
 | `AGENTS_REPO_ROOTS` | empty | Colon-separated cwd allowlist. |
 | `AGENTS_REQUEST_PRINCIPAL_AGENT` | `claude-code` | Agent identity of the MCP host, set at Gateway launch (for example `codex`). Caller arguments must match it. |
 | `AGENTS_REQUEST_CONTEXT_TTL_MS` | `86400000` | Positive integer lifetime of the connection request context in milliseconds; expired contexts deny protected actions. |
