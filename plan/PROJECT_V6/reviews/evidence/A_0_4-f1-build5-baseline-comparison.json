@@ -1,0 +1,41 @@
+{
+  "changed": [
+    "gateway/vendor/tmux-agents/tmux-3.6a-agents.2.patch",
+    "tests/gateway/prompt_submission.test.js",
+    "tests/gateway/prompt_submission_capture.test.js",
+    ".github/workflows/ci.yml",
+    "docs/tmux-runtime.md",
+    "gateway/README.md",
+    "gateway/src/adapters/base_adapter.js",
+    "gateway/src/adapters/process_supervisor_helper.py",
+    "gateway/src/adapters/tmux_client.js",
+    "gateway/vendor/tmux-agents/README.md",
+    "gateway/vendor/tmux-agents/build-offline-darwin.sh",
+    "gateway/vendor/tmux-agents/build-offline.sh",
+    "gateway/vendor/tmux-agents/manifest.json",
+    "tests/gateway/process_supervisor_session_port_fixture.py",
+    "tests/gateway/process_supervisor_session_port_relay.test.js"
+  ],
+  "unchanged": [
+    "tests/gateway/fixtures/claude_2_1_292_composer.json",
+    "tests/gateway/fixtures/owned_tmux_server.js",
+    "tests/gateway/guarded_paste.test.js",
+    "tests/gateway/guarded_paste_fixture.py",
+    "tests/gateway/prompt_submission_terminal_fixture.py",
+    "README.md",
+    "ci/suites.json",
+    "gateway/contracts/mcp-tools-v1.json",
+    "gateway/src/adapters/antigravity_adapter.js",
+    "gateway/src/adapters/claude_adapter.js",
+    "gateway/src/adapters/codex_adapter.js",
+    "gateway/src/adapters/opencode_adapter.js",
+    "gateway/src/adapters/pi_adapter.js",
+    "gateway/src/config.js",
+    "gateway/src/tools/catalog.js",
+    "gateway/src/tools/tool_errors.js",
+    "tests/gateway/codex_supervised.test.js",
+    "tests/gateway/tmux_client.test.js",
+    "tests/gateway/tool_catalog.test.js",
+    "tests/gateway/tool_error_serialization.test.js"
+  ]
+}

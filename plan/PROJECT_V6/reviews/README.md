@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 prompt submission implementation | 2 | [request](A_0_4-2_to_review.md) | [KO, partial source review](A_0_4-2_reviewed_KO.md) |
 | A/0/04 guarded final submit design | 6 | [request](A_0_4-final-submit-plan-6_to_review.md) | [OK](A_0_4-final-submit-plan-6_reviewed_OK.md) |
 | A/0/04 guarded final submit design | 5 | [transport addendum request](A_0_4-final-submit-plan-5_transport-addendum_to_review.md); [supporting proposal](A_0_4-final-submit-plan-5_to_review.md) | [KO](A_0_4-final-submit-plan-5_reviewed_KO.md) |
 | A/0/04 guarded final submit design | 4 | [request](A_0_4-final-submit-plan-4_to_review.md) | [KO](A_0_4-final-submit-plan-4_reviewed_KO.md) |
