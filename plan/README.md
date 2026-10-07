@@ -24,9 +24,9 @@ separate active delivery track. No `1.1.0` release is claimed.
 
 [Project V7](PROJECT_V7/README.md) separately plans validated project profiles,
 persistent wave execution, shared capacity for cooperating local runners,
-checkpoints/recovery and two-project/two-orchestrator acceptance. Its five
-sheets remain **planned** and consume V6's prompt/restart foundations where
-specified. V7 does not enlarge the seven-sheet V6 release scope or close the
+checkpoints/recovery and two-project/two-orchestrator acceptance. A/0/00 and
+A/0/01 are reviewed and integrated; the remaining three sheets consume V6's
+prompt/restart foundations where specified. V7 does not enlarge the seven-sheet V6 release scope or close the
 open V5 authority and process-control gates.
 
 ## Imported delivery tracks

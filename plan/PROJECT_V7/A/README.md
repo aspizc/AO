@@ -1,11 +1,11 @@
 # Stage A — Generic execution foundation and acceptance
 
-Status: **A/0/01 integrated on the release branch; four leaves planned**.
+Status: **A/0/00 and A/0/01 integrated on the release branch; three leaves planned**.
 Automatic wave dispatch and release remain pending.
 
 | Sheet | Outcome | Status | Priority |
 |---|---|---|---|
-| [A/0/00](0/00.md) | Project schema, deterministic preflight and generic examples | planned | P0 |
+| [A/0/00](0/00.md) | Project schema, deterministic preflight and generic examples | integrated | P0 |
 | [A/0/01](0/01.md) | Shared local count/declared-RAM capacity after host headroom | integrated | P0 |
 | [A/0/02](0/02.md) | One persistent SDK connection per wave, supervised phases and authorized-parent review control | planned | P0 |
 | [A/0/03](0/03.md) | Durable checkpoint/status and explicit recovery | planned | P0 |

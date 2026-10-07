@@ -1,6 +1,6 @@
 # AO project status
 
-As of **2026-10-07**. This is the current public project overview. Package
+As of **2026-10-08**. This is the current public project overview. Package
 versions and imported plan generations do not establish a release.
 
 ## Published implementation and evidence
@@ -48,6 +48,21 @@ The integration adds only planning/review documents beyond that tested code.
 See the [verdict](../plan/PROJECT_V6/reviews/A_0_2-2_reviewed_OK.md) and
 [checkpoint](../plan/PROJECT_V6/reviews/A_0_2_integration_checkpoint.md).
 This is not promotion to main or a 1.1.0 release.
+
+## Unreleased V7 integration
+
+A/0/00 (generic project profiles and deterministic preflight) and A/0/01
+(cooperative capacity) are reviewed and integrated on `release/1.1.0`.
+A/0/00 integration commit: `76a0dd4b2b24d6caf6ee7d971f3b0069f195fe2f`,
+tree `98cf7b766c4aa80e958875c2f884575794a8a60c`. The reviewed source
+candidate is `0fc59cf35fedee7f89044cc0e425dea0e608982a`. Its Redis 7 backed
+repository gate exited 0: **2,753 passed, 0 failed, 12 skipped**, including
+22/22 required Redis tests. The report remains `infrastructure_unavailable`
+for nine PostgreSQL and three Gateway/Temporal integration skips; optional
+real provider execution was not run. See the [independent verdict](../plan/PROJECT_V7/reviews/A_0_0-1_reviewed_OK.md)
+and [exact gate evidence](../plan/PROJECT_V7/reviews/A_0_0-1-root-gate-redis7.md).
+Persistent wave dispatch, checkpoint recovery and external two-project
+acceptance remain planned. This is not promotion or a `1.1.0` release.
 
 ## Implemented capabilities and limits
 

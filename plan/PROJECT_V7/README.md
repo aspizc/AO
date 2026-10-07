@@ -1,11 +1,12 @@
 # Project V7 — Generic project and wave execution
 
-Status: **A/0/01 reviewed and integrated on the release branch; four leaves planned**.
-The cooperative capacity ledger is built. Automated wave dispatch, generic
-preflight and checkpoint recovery remain planned; no promotion or release is
-claimed. V6 retains its seven-sheet AO 1.1.0 scope.
-See the [implementation verdict](reviews/A_0_1-1_reviewed_OK.md) and
-[integration evidence](reviews/A_0_1_integration_checkpoint.md).
+Status: **A/0/00 and A/0/01 reviewed and integrated on the release branch; three leaves planned**.
+The validated project profile, deterministic preflight and cooperative capacity
+ledger are built. Automated wave dispatch and checkpoint recovery remain planned;
+no promotion or release is claimed. V6 retains its seven-sheet AO 1.1.0 scope.
+See the [profile implementation verdict](reviews/A_0_0-1_reviewed_OK.md),
+[profile gate evidence](reviews/A_0_0-1-root-gate-redis7.md), and
+[capacity implementation verdict](reviews/A_0_1-1_reviewed_OK.md).
 
 Goal / risk retired: execute dependency-ready work for different projects
 through persistent Gateway sessions, coordinate capacity across cooperating
