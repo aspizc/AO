@@ -4,6 +4,13 @@ Status: **planned product requirements and extraction inventory**, recorded
 from the operator's 2026-10-07 clarification. This is not runtime verification
 or a claim that the legacy KYA runner implements wave execution.
 
+The operator subsequently authorized implementation of these improvements.
+[PROJECT_V7](../PROJECT_V7/README.md) registers the separate generic execution
+track: profile/preflight, shared cooperating-runner capacity, persistent wave
+dispatch, checkpoint recovery and external acceptance. Those sheets remain
+planned until their own reviews and gates complete. V6 retains its existing
+seven-sheet release scope; registration does not establish runtime delivery.
+
 ## Product direction
 
 AO is a general tool for different repositories, domains, languages and
@@ -66,15 +73,16 @@ useful behavior. Conversely, changing a KYA name does not implement waves.
 - Generic examples obtain repository IDs, paths and commands from explicit
   inputs. They do not grant KYA's reviewer write permissions globally.
 - Guide labels distinguish existing AO mechanisms from planned automation.
-- Before scheduling automated wave-runner implementation, create a separate
-  registered sheet with its concrete input/error/lifecycle contract, TDD and
-  affected dependencies. This runtime work must not be hidden inside cleanup
-  or counted complete by documentation. It remains a tracked requirement here
-  until that sheet exists; no release inclusion is silently assumed.
+- Before scheduling automated wave-runner implementation, independently
+  review the registered [V7 wave sheet](../PROJECT_V7/A/0/02.md) and its
+  profile/capacity prerequisites. This runtime work must not be hidden inside
+  cleanup or counted complete by documentation; no V6 release inclusion is
+  silently assumed.
 - That sheet must verify multiple tasks using the same wave Gateway/connection,
   dependency/concurrency rules, separate task authority, failed-task isolation
   and owned-resource cleanup. A live or integration test must observe process
   lifetime and emitted behavior, not just a configuration fixture.
 
-Historical evidence retention is a separate unanswered publication choice;
-it does not block extracting generic workflows or defining these requirements.
+The operator selected [intact historical evidence with an explicit scanner
+exception](reviews/A_0_2_history_decision.md); current code and examples must
+still be cleaned. This is separate from generic workflow implementation.

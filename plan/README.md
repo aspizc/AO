@@ -19,6 +19,15 @@ approval, and release assembly. All implementation sheets remain **planned**.
 [baseline checks](PROJECT_V6/BASELINE.md) govern preparation. V5 remains a
 separate active delivery track. No `1.1.0` release is claimed.
 
+## Generic execution planning
+
+[Project V7](PROJECT_V7/README.md) separately plans validated project profiles,
+persistent wave execution, shared capacity for cooperating local runners,
+checkpoints/recovery and two-project/two-orchestrator acceptance. Its five
+sheets remain **planned** and consume V6's prompt/restart foundations where
+specified. V7 does not enlarge the seven-sheet V6 release scope or close the
+open V5 authority and process-control gates.
+
 ## Imported delivery tracks
 
 The implementation plan is split by project generation. Project numbers identify
