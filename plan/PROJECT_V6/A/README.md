@@ -25,3 +25,8 @@ projection and derived catalog evidence. Its composer-only helper refuses
 decision menus; A/0/06 uses a separate approval-bound answer operation.
 Serialize catalog/contract reconciliation with A/0/05 and A/0/06. These
 shared paths do not add a functional dependency or change the wave order.
+
+The build-discovered [A/0/04 transport prerequisite](0/04-transport.md)
+requires an atomic guarded paste in the pinned tmux runtime. Vendor/runtime
+pin changes and their real-input tests stay inside A/0/04; no eighth leaf or
+permission scope is introduced.

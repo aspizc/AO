@@ -23,6 +23,10 @@ Inventory: **7 executable sheets**, `0 complete + 0 in progress + 7 planned`.
 Parallel work requires isolated worktrees and serial integration, including
 explicit conflict review of the shared `gateway/src/config.js` wave-1 edits.
 
+A/0/04 also owns the [guarded-paste runtime prerequisite](A/0/04-transport.md)
+and its narrowly scoped vendor/runtime pin updates. It remains one executable
+sheet with two implementation checkpoints, not an additional release leaf.
+
 A/0/02 preserves reusable workflow behavior as specified in
 [GENERIC_WORKFLOWS.md](GENERIC_WORKFLOWS.md). Automated wave execution is a
 tracked runtime gap requiring its own registered sheet before scheduling;
