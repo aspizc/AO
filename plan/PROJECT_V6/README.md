@@ -41,8 +41,9 @@ The three operator decisions are recorded in
 [HUMAN_DECISIONS.md](HUMAN_DECISIONS.md). Claude is temporarily unavailable:
 use Codex for authoring and independent review; do not invoke Claude or claim
 its required live checks passed. A/0/02's generic direction is answered: preserve reusable KYA practices as
-[generic AO workflows](GENERIC_WORKFLOWS.md). Historical-publication handling
-remains open only for that step; workflow extraction can proceed.
+[generic AO workflows](GENERIC_WORKFLOWS.md). The operator also selected
+[intact historical documents with an explicit scanner exception](reviews/A_0_2_history_decision.md);
+current code and examples must be cleaned.
 
 ## Gap register
 
