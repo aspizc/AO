@@ -27,3 +27,7 @@ does not accept runtime code, integrate a candidate, or release anything.
 
 This index records the verdict after the candidate freeze. It changes no bound
 runtime/test bytes and grants no integration, promotion or release authority.
+
+A/0/00 has an independent implementation OK, but its full gate exited 1 with
+`infrastructure_unavailable` (2,731 passed, 0 failed, 12 skipped; required
+Redis lane did not run). The candidate is not yet integrated or released.
