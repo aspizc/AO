@@ -35,6 +35,20 @@ at [`b3aed7c9365e54587dc4f847f82edff272955bfb`](https://github.com/aspizc/AO/com
 on `release/1.1.0`. Documentation publication does not establish new runtime
 verification or a `1.1.0` release.
 
+## Unreleased V6 integration
+
+A/0/02 adds operator-local additive repository overlays, generic workflow
+examples and a required public hygiene gate. Integration commit:
+`7df29bda06aa3a139903dbb0cfc61860029f8159` on `release/1.1.0`. Its independently
+reviewed candidate tree is `a8671d91db77d77237623c0b91fda90f270a69e2`: full gate
+exit 0, **2,651 passed, 0 failed, 12 infrastructure skips; 2,663 total**.
+The nine PostgreSQL and three Gateway/Temporal skips remain unavailable;
+optional real providers, Darwin and other Node versions were not verified.
+The integration adds only planning/review documents beyond that tested code.
+See the [verdict](../plan/PROJECT_V6/reviews/A_0_2-2_reviewed_OK.md) and
+[checkpoint](../plan/PROJECT_V6/reviews/A_0_2_integration_checkpoint.md).
+This is not promotion to main or a 1.1.0 release.
+
 ## Implemented capabilities and limits
 
 | Area | Built in this tree | Limit or next boundary |
@@ -80,7 +94,8 @@ with their components.
 ## Planning and release boundary
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
-branch descending from `1.0.0`; all seven implementation sheets remain **planned**.
+branch descending from `1.0.0`; A/0/02 is reviewed and integrated on the
+release branch, and the other six sheets remain unfinished.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains

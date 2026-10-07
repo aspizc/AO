@@ -1,7 +1,10 @@
 # Project V6 — Worker confinement, worker identity, and AO 1.1.0
 
-Status: **planned**. No sheet in this project is implemented, reviewed,
-integrated, promoted, or released.
+Status: **in progress**. A/0/02 is reviewed and integrated on
+`release/1.1.0` at `7df29bda06aa3a139903dbb0cfc61860029f8159`. The other six sheets
+remain unfinished; no V6 feature is promoted to main or released as 1.1.0.
+See the [A/0/02 verdict](reviews/A_0_2-2_reviewed_OK.md) and
+[integration checkpoint](reviews/A_0_2_integration_checkpoint.md).
 
 Goal / risk retired: child CLIs receive sandbox/tool restrictions derived
 from their resolved `code.write` policy and an informational worker marker, and the public AO snapshot stops
@@ -45,7 +48,7 @@ its required live checks passed. A/0/02's generic direction is answered: preserv
 [intact historical documents with an explicit scanner exception](reviews/A_0_2_history_decision.md);
 current code and examples must be cleaned.
 
-## Gap register
+## Gaps at the original planning base
 
 | Gap | Evidence | Owning sheet |
 |---|---|---|

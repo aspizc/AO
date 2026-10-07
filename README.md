@@ -20,7 +20,8 @@ AO `1.0.0` is published at
 with an annotated [1.0.0 tag](https://github.com/aspizc/AO/releases/tag/1.0.0).
 The development tag `1.1.0-dev.1` identifies reviewed planning and documentation
 at [`b3aed7c`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82edff272955bfb)
-on `release/1.1.0`; all seven V6 implementation sheets remain **planned**.
+on `release/1.1.0`. A/0/02 (generic setup and public hygiene) is now reviewed
+and integrated on that branch; the other six V6 sheets remain unfinished.
 `main` can advance with reviewed documentation independently of the `1.0.0`
 tag. Package version `0.1.0` remains development metadata.
 
@@ -136,8 +137,8 @@ A useful task brief names the base commit, files/contracts to read, intended
 behavior, failing tests to create, commands to run and required handoff. A
 wave manifest names its tasks, dependencies, Gateway ownership, workers,
 worktrees and exit criteria. Adapt the storage layout to the project; AO's own
-[PROJECT_V6](plan/PROJECT_V6/README.md) is a planning example with explicit
-**planned** statuses, not evidence that those features are delivered.
+[PROJECT_V6](plan/PROJECT_V6/README.md) demonstrates explicit per-sheet
+statuses and evidence; a planned sheet does not establish delivered behavior.
 
 Example schedule for a small web service:
 

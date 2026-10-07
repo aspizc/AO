@@ -1,8 +1,9 @@
 # Project V7 — Generic project and wave execution
 
-Status: **planned; Trial 1 independently KO, R1–R3 corrected for fresh Trial 2
-review**. No plan acceptance or V7 runtime, implementation verdict, integration,
-promotion, or release is claimed. V6 retains its seven-sheet AO 1.1.0 scope.
+Status: **planned runtime; independent plan Trial 2 OK**. No V7 runtime
+implementation, implementation verdict, integration, promotion, or release is
+claimed. V6 retains its seven-sheet AO 1.1.0 scope.
+See the [plan verdict](reviews/V7_GENERIC_EXECUTION-plan-2_reviewed_OK.md).
 
 Goal / risk retired: execute dependency-ready work for different projects
 through persistent Gateway sessions, coordinate capacity across cooperating

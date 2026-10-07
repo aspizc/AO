@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Integration status documentation | 1 | [request](INTEGRATION_STATUS-1_to_review.md) | [OK](INTEGRATION_STATUS-1_reviewed_OK.md) |
 | A/0/02 implementation | 2 | [request](A_0_2-2_to_review.md) | [OK](A_0_2-2_reviewed_OK.md) |
 | A/0/02 history retention decision | 1 | [request](HISTORY_DECISION_2026_10_07-1_to_review.md) | [OK](HISTORY_DECISION_2026_10_07-1_reviewed_OK.md) |
 | A/0/04 guarded runtime prerequisite | 3 | [request](A_0_4-plan-3_to_review.md) | [OK](A_0_4-plan-3_reviewed_OK.md) |
@@ -32,3 +33,9 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 The operator temporarily prohibits Claude execution. This preparation uses
 Codex authoring and a distinct Codex reviewer under the already-authorized
 session-agent fallback; it is not cross-vendor or Gateway-spawned review.
+
+## Implementation checkpoints
+
+- [A/0/02 integration and gate limits](A_0_2_integration_checkpoint.md)
+- [A/0/04 adapter checkpoint, unreviewed](A_0_4-build-1_checkpoint.md)
+- [A/0/04 guarded runtime checkpoint, unreviewed](A_0_4-build-2_checkpoint.md)
