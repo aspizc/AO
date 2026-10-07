@@ -2,12 +2,21 @@
 
 ## AO publication and inherited planning baseline
 
-AO main is published through implementation commit `ea18f4e` (2026-10-06).
-See [current project status](../docs/project-status.md) for the verified tree,
-gate results, and remaining integration limits. No release tag exists at this
-cut. The generation table, counts, and source SHAs below describe the imported
-planning baseline; source-local `main`/`develop` and publication statements
-are historical provenance, not the current AO remote state.
+AO `1.0.0` is published at `41f9ce28aa59673283a7c5494200e0ec7b56e2f6`
+(2026-10-06); its annotated tag and public `main` were verified at that object.
+See [current project status](../docs/project-status.md) for runtime verification
+limits. The imported generation table below preserves historical provenance.
+
+## Current release planning
+
+[Project V6](PROJECT_V6/README.md) plans seven sheets for AO `1.1.0`:
+role-derived CLI restrictions, worker markers, public snapshot hygiene,
+reliable prompt submission, explicit restart reattachment, bounded prompt
+approval, and release assembly. All implementation sheets remain **planned**.
+`release/1.1.0` starts from `1.0.0`; the recorded
+[operator decisions](PROJECT_V6/HUMAN_DECISIONS.md) and
+[baseline checks](PROJECT_V6/BASELINE.md) govern preparation. V5 remains a
+separate active delivery track. No `1.1.0` release is claimed.
 
 ## Imported delivery tracks
 

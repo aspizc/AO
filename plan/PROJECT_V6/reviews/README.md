@@ -1,0 +1,22 @@
+# Project V6 review trail
+
+Review submissions and independent verdicts, indexed as they are produced. A
+KO is preserved; corrections use the next trial number. Stop and page the human after
+15 KO trials on one task, as required by AGENTS.md Rule 13.
+
+| Scope | Trial | Submission | Verdict |
+|---|---:|---|---|
+| AO V6 preparation | 2 | [request](PREPARATION_2026_10_07-2_to_review.md) | [OK](PREPARATION_2026_10_07-2_reviewed_OK.md) |
+| AO V6 preparation | 1 | [request](PREPARATION_2026_10_07-1_to_review.md) | [KO](PREPARATION_2026_10_07-1_reviewed_KO.md) |
+
+## Operator decisions and baseline
+
+- [A_0_5: reattachment](A_0_5_human_decision.md)
+- [A_0_6: command scopes](A_0_6_human_decision.md)
+- [A_0_3: release lineage](A_0_3_human_decision.md)
+- [A_0_2: pending snapshot choices](A_0_2_to_check_by_human.md)
+- [AO baseline](../BASELINE.md)
+
+The operator temporarily prohibits Claude execution. This preparation uses
+Codex authoring and a distinct Codex reviewer under the already-authorized
+session-agent fallback; it is not cross-vendor or Gateway-spawned review.
