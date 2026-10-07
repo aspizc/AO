@@ -173,10 +173,14 @@ empty modes, target `synchronize-panes` off, and `MODE_BRACKETPASTE` on
 
 ### 4. Pending-output refusal and residual
 
-Before enqueue, require zero bytes in the bufferevent input and successful
-`ioctl(wp->fd, FIONREAD, &pending)` with `pending == 0`. Errors, unsupported
-ioctl and positive pending counts refuse with the fixed diagnostic. These
-checks close known parsed-versus-unread output gaps at the command boundary.
+Before enqueue, call `window_pane_get_new_data(wp, &wp->offset, &unparsed)`
+and require `unparsed == 0`, alongside successful
+`ioctl(wp->fd, FIONREAD, &pending)` with `pending == 0`. Unparsed bytes,
+errors, unsupported ioctl and positive pending counts refuse with the fixed
+diagnostic. Bytes retained only for pipe-pane or control-client delivery
+are already reflected in the grid and must not cause a refusal; raw
+bufferevent input length is not the unparsed-byte predicate. These checks
+close known parsed-versus-unread output gaps at the command boundary.
 Use deterministic fault injection where available for input/pending output;
 if not deterministically exercised, record SOURCE-REVIEWED / NOT EXECUTED
 explicitly, never a fixture pass. A provider can change its internal state
@@ -198,10 +202,20 @@ or replay input after cleanup failures.
 
 ### 6. Capability before paste
 
-Before creating any buffer or delivering any prompt byte, require exact
-`tmux 3.6a-agents.3` and advertised `agents-submit-v1` plus guarded paste
-capability. Unsupported or `.2` runtime returns `paste_unavailable` with
-zero input. There is no ordinary-key fallback. Launch-command submission
+Before the first buffer of each operation, and before delivering any prompt
+byte, the adapter's tmux client probes the same target server used by that
+operation, using the retained supervisor handshake pattern at
+`gateway/src/adapters/process_supervisor_helper.py:4329-4338`. Run
+`display-message -p '#{version}'`; require status 0, empty stderr and stdout
+that, after stripping surrounding whitespace and strict ASCII decoding,
+equals exactly `3.6a-agents.3`. Run `list-commands`; require status 0,
+empty stderr and stdout advertising the exact `agents-submit-v1` command
+and the `paste-buffer` usage carrying `-G`. Match command names and their
+own usage lines, not unrelated substrings. Probe anew for each operation;
+no result cached across operations or server generations grants capability.
+Unsupported or `.2` runtime, missing capabilities or failed probes return
+`paste_unavailable` with zero input and no buffer creation. There is no
+ordinary-key fallback. Launch-command submission
 remains its distinct literal single-line shell contract; this operation
 applies only to the classified running-provider composer.
 
@@ -222,12 +236,19 @@ message and allowlisted reasons without private bytes.
 
 Bump the active runtime to `3.6a-agents.3`, using one active `.3` patch in the
 manifest and updating builders, pins, workflow and exact-version fixtures
-serially with root. Preserve the exact uncommitted `.2` patch as named review
-evidence outside the build input set, hash
+serially with root, including the retained supervisor handshake's hard-coded
+`3.6a-agents.2` in `gateway/src/adapters/process_supervisor_helper.py` to `.3`.
+After independent plan approval, preserve the exact uncommitted `.2` patch at
+`plan/PROJECT_V6/reviews/evidence/A_0_4-trial1-tmux-3.6a-agents.2.patch`,
+outside `gateway/vendor/tmux-agents/` and the active build input set. Record
+its SHA-256 alongside it in
+`plan/PROJECT_V6/reviews/evidence/A_0_4-trial1-tmux-3.6a-agents.2.patch.sha256`:
 `c488dccadb08db45c00d7a935f9cfd00735d744d0a68286ef683869e152a74c2`.
-Retain the historical binary at
-`/tmp/ao-a04-runtime-build-vl_1pgz1/bin/tmux`, SHA-256
+The trial-1 binary at `/tmp/ao-a04-runtime-build-vl_1pgz1/bin/tmux` is volatile,
+not durable retained evidence. Its recorded SHA-256 is
 `3d37a94099286f1284373271ed7da3dac69e04fb1dba88bdb6068cfb66ed1428`.
+Durable historical evidence is that recorded hash plus a reproducible rebuild
+from the manifest-pinned tmux 3.6a archive and the preserved exact `.2` patch.
 `cmd-agents-capture.c` stays byte-identical, SHA-256
 `4d80a8610651a1dd304b9b0e9b45d6832e115d9827d5166f26b4f9dbcdec27e2`.
 Build only into fresh isolated output; never restart a serving Gateway or
@@ -246,15 +267,28 @@ is not a successful guarded write. First-submit and retry matrices cover:
 - `guarded_submit_consumes_evidence_on_success_and_refusal`
 - `guarded_submit_refuses_reused_or_missing_evidence`
 - `guarded_submit_refuses_pending_output` (state execution limits above)
+- `guarded_submit_ignores_parsed_bytes_pending_control_client_delivery`:
+  attach a control client to the target session and stall or pause delivery;
+  with matching grid and evidence, no unparsed bytes and `FIONREAD == 0`,
+  expect exactly one target CR and no refusal despite retained parsed bytes.
+- `guarded_submit_refuses_unparsed_pane_input`: inject unparsed bytes ahead
+  of `wp->offset`; expect zero CR.
 - `guarded_submit_writes_one_cr_only_to_target_with_sibling_sync_option`
-- `ordinary_send_keys_preserves_upstream_sibling_fanout`
+- `ordinary_send_keys_preserves_upstream_sibling_fanout` (preservation test,
+  expected to pass on `.2`; exempt from the new-regression RED requirement)
 - `dot2_runtime_refuses_before_prompt_paste`
+- `capability_probe_rejects_missing_submit_command_before_buffer`: a probe
+  reports `.3` and guarded paste but omits `agents-submit-v1`; expect
+  `paste_unavailable`, no buffer creation and zero prompt or CR bytes.
 - `submit_nondiagnostic_failure_is_uncertain_without_retry`
 - `submit_fixed_refusal_maps_first_and_retry_public_envelopes`
 - `submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant`
 
 Confirm state changes after evidence capture have been parsed before executing
-submit; pending-output injection deliberately exercises the unread exception.
+submit; pending-output and unparsed-input injection deliberately exercise
+unread/unparsed exceptions. For the stalled-control-client and unparsed-input
+cases, use deterministic injection; if not deterministically exercised, record
+SOURCE-REVIEWED / NOT EXECUTED explicitly, never a fixture pass.
 Repeat unchanged retained-capture/runtime and existing guarded-paste checks.
 Keep live Codex/Claude/Antigravity acceptance, measured versions/settle timing,
 the solo full gate and unchanged skip budgets in the root-owned matrix. This
