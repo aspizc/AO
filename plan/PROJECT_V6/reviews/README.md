@@ -6,6 +6,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/05 append-only recovery migrations | 2 | [request](A_0_5-plan-2_to_review.md) | [OK](A_0_5-plan-2_reviewed_OK.md) |
+| A/0/05 local recovery contract | 1 | [request](A_0_5-plan-1_to_review.md) | [KO](A_0_5-plan-1_reviewed_KO.md) |
 | Integration status documentation | 1 | [request](INTEGRATION_STATUS-1_to_review.md) | [OK](INTEGRATION_STATUS-1_reviewed_OK.md) |
 | A/0/02 implementation | 2 | [request](A_0_2-2_to_review.md) | [OK](A_0_2-2_reviewed_OK.md) |
 | A/0/02 history retention decision | 1 | [request](HISTORY_DECISION_2026_10_07-1_to_review.md) | [OK](HISTORY_DECISION_2026_10_07-1_reviewed_OK.md) |
@@ -39,3 +41,5 @@ session-agent fallback; it is not cross-vendor or Gateway-spawned review.
 - [A/0/02 integration and gate limits](A_0_2_integration_checkpoint.md)
 - [A/0/04 adapter checkpoint, unreviewed](A_0_4-build-1_checkpoint.md)
 - [A/0/04 guarded runtime checkpoint, unreviewed](A_0_4-build-2_checkpoint.md)
+
+- [A/0/05 discovery checkpoint, implementation pending](A_0_5-1_implementation_checkpoint.md)

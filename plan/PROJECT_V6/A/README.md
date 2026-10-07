@@ -30,3 +30,8 @@ The build-discovered [A/0/04 transport prerequisite](0/04-transport.md)
 requires an atomic guarded paste in the pinned tmux runtime. Vendor/runtime
 pin changes and their real-input tests stay inside A/0/04; no eighth leaf or
 permission scope is introduced.
+
+A/0/05 recovery is scoped to verified Linux local stdio/SQLite identity and
+state, with all repository bindings and prior-owner liveness checked before
+explicit reattachment. Unsupported recovery backends fail closed while
+ordinary calls keep working; no extra approval or new leaf is introduced.
