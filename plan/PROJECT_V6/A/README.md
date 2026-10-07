@@ -19,3 +19,9 @@ Registered in [`../SHEETS.md`](../SHEETS.md).
 
 Parallel sheets use isolated worktrees and serial integration; shared
 `config.js` edits in wave 1 require explicit conflict review (project README).
+
+A/0/04's reliability refinement also owns its public `agent.ask` error
+projection and derived catalog evidence. Its composer-only helper refuses
+decision menus; A/0/06 uses a separate approval-bound answer operation.
+Serialize catalog/contract reconciliation with A/0/05 and A/0/06. These
+shared paths do not add a functional dependency or change the wave order.
