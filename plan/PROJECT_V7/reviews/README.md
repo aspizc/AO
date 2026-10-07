@@ -27,3 +27,9 @@ does not accept runtime code, integrate a candidate, or release anything.
 
 This index records the verdict after the candidate freeze. It changes no bound
 runtime/test bytes and grants no integration, promotion or release authority.
+
+A/0/00 has an independent implementation OK, but its full gate exited 1 with
+`infrastructure_unavailable` (2,731 passed, 0 failed, 12 skipped; required
+Redis lane did not run). The candidate is not yet integrated or released.
+
+A/0/00 root gate rerun with disposable Redis 7: [evidence](A_0_0-1-root-gate-redis7.md); 2,753 passed, 0 failed, 12 declared skips, exit 0, aggregate `infrastructure_unavailable`. Required Redis lane: 22 passed.

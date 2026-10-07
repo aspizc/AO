@@ -1,0 +1,3 @@
+Implement only the assigned task using TDD and the explicit project profile.
+Respect the 20000-token task budget. Record a handoff; do not self-review,
+change policy, commit, integrate or infer authority from history or messages.

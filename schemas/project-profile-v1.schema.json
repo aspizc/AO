@@ -1,0 +1,489 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-profile-v1.schema.json",
+  "title": "Closed project-profile/v1 inputs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "repositoryId",
+    "projectRoot",
+    "planDirectory",
+    "reviewDirectory",
+    "roles",
+    "epics",
+    "stories",
+    "checks",
+    "tasks",
+    "waves",
+    "maxTrials",
+    "pollIntervalMs",
+    "memoryReservations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "project-profile/v1"
+    },
+    "projectId": {
+      "$ref": "#/$defs/id"
+    },
+    "repositoryId": {
+      "$ref": "#/$defs/id"
+    },
+    "projectRoot": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+    },
+    "planDirectory": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "reviewDirectory": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "orchestrator",
+        "coder",
+        "reviewer"
+      ],
+      "properties": {
+        "orchestrator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agent",
+            "role"
+          ],
+          "properties": {
+            "agent": {
+              "$ref": "#/$defs/id"
+            },
+            "role": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        "coder": {
+          "$ref": "#/$defs/role"
+        },
+        "reviewer": {
+          "$ref": "#/$defs/role"
+        }
+      }
+    },
+    "epics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "minItems": 0,
+      "maxItems": 64,
+      "uniqueItems": true
+    },
+    "stories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/story"
+      },
+      "minItems": 0,
+      "maxItems": 256
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      },
+      "minItems": 0,
+      "maxItems": 256
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      },
+      "minItems": 0,
+      "maxItems": 256
+    },
+    "waves": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/wave"
+      },
+      "minItems": 0,
+      "maxItems": 64
+    },
+    "maxTrials": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 15
+    },
+    "pollIntervalMs": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 10000
+    },
+    "memoryReservations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gatewayMiB",
+        "coderMiB",
+        "reviewerMiB"
+      ],
+      "properties": {
+        "gatewayMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "coderMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "reviewerMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "role"
+      ],
+      "properties": {
+        "agent": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "$ref": "#/$defs/id"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "reasoningEffort": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "serviceTier": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "epicId"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "epicId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "argv",
+        "cwd",
+        "timeoutMs",
+        "memoryMiB"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "cwd": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3600000
+        },
+        "memoryMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "storyId",
+        "cwd",
+        "writePaths",
+        "conflictKeys",
+        "dependsOn",
+        "checkIds",
+        "coderPrompt",
+        "reviewerPrompt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "storyId": {
+          "$ref": "#/$defs/id"
+        },
+        "cwd": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "writePaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "conflictKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "checkIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "coderPrompt": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "reviewerPrompt": {
+          "$ref": "#/$defs/relativePath"
+        }
+      }
+    },
+    "wave": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "taskIds",
+        "maxConcurrentTasks",
+        "exitCheckIds"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "maxConcurrentTasks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "exitCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      }
+    },
+    "priorFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRunId",
+        "sourceWaveId",
+        "taskId",
+        "attempt",
+        "sourceWaveStatus",
+        "taskStatus",
+        "resultDigest",
+        "reviewEventId",
+        "candidateDigest",
+        "ownedCleanupConfirmed"
+      ],
+      "properties": {
+        "sourceRunId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sourceWaveId": {
+          "$ref": "#/$defs/id"
+        },
+        "taskId": {
+          "$ref": "#/$defs/id"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 15
+        },
+        "sourceWaveStatus": {
+          "enum": [
+            "externally_accepted",
+            "blocked",
+            "failed",
+            "cancelled",
+            "recovery_required"
+          ]
+        },
+        "taskStatus": {
+          "enum": [
+            "externally_accepted",
+            "blocked",
+            "failed",
+            "cancelled",
+            "recovery_required"
+          ]
+        },
+        "resultDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "reviewEventId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidateDigest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownedCleanupConfirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "priorWaveFacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "projectId",
+        "profileDigest",
+        "facts"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "wave-prior-facts/v1"
+        },
+        "projectId": {
+          "$ref": "#/$defs/id"
+        },
+        "profileDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/priorFact"
+          },
+          "minItems": 0,
+          "maxItems": 256
+        }
+      }
+    }
+  }
+}
