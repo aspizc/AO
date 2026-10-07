@@ -110,6 +110,19 @@ provider or policy inference. Changed footers, cursor drift and focused
 decisions remain closed. These captures show readiness only: the root's asks
 were refused before input, and successful live submission, busy rendering and
 acceptance timing for these layouts still require root-operated verification.
+A subsequent root capture shows Codex's warning label varies between singular
+and plural with padded alignment. Claude's post-paste composer can instead show
+an ASCII `user@host:/absolute/path` status row immediately after the bottom
+border, followed by the shorter `⏵⏵ auto mode on (shift+tab to cycle)` footer.
+The classifier accepts this measured status/footer pair at 120x40 while keeping
+exact draft and cursor checks. The
+[trial 2 sanitized fixtures](../tests/gateway/fixtures/a04_live_profiles_trial2.json)
+retain the observed pre-ask and post-paste rendering. The root recorded only
+pre-ask cursor metadata; post-paste fixture cursor values are derived test
+values, not measured metadata. Paths and status identities are redacted, and
+the prompt marker is replaced with benign ASCII of the same length. The local
+status line is rendering evidence only and grants no path, account or approval
+authority. No successful live acceptance was observed in this capture either.
 Root coordinates live provider launches, including Antigravity `1.3.0`.
 V6 A/0/04 is not closed.
 

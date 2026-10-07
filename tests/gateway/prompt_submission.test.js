@@ -713,3 +713,125 @@ for (const observed of liveReadyProfiles) {
     }
   });
 }
+
+const trial2Profiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial2.json", import.meta.url), "utf8"));
+const trial2Codex = trial2Profiles.find((profile) => profile.provider === "codex");
+const trial2Claude = trial2Profiles.find((profile) => profile.provider === "claude-code");
+function trial2Fixture(profile, screens, prompt = "Enter") {
+  return fixture({ provider: profile.provider, screens, prompt, paneFor: (screen) => {
+    const pane = profile.preAsk.pane;
+    const row = screen.split("\n")[pane.cursor] || "";
+    // The root recorded only pre-ask metadata. Draft cursor positions are
+    // derived test values, never claimed as observed post-paste metadata.
+    const x = screen === profile.preAsk.snapshot ? pane.cursorX : row.slice(2).length + 2;
+    return `${pane.cursor}|${pane.height}|${pane.width}|${x}`;
+  } });
+}
+
+test("trial2 Codex observed singular warning and variable padding preserve readiness", () => {
+  const { snapshot, pane } = trial2Codex.preAsk;
+  for (const footer of ["? for shortcuts ⚠ 1 warning · f2 to view",
+    "? for shortcuts                  ⚠ 2 warnings · f2 to view",
+    "? for shortcuts                                       ⚠ 12 warnings · f2 to view"]) {
+    const rows = snapshot.split("\n");
+    rows[39] = "  " + footer;
+    assert.equal(base.classifyProviderPane("codex", rows.join("\n"), pane).state, "composer");
+    assert.equal(base.classifyProviderPane("codex", rows.join("\n"), pane).text, "");
+  }
+  assert.equal(base.classifyProviderPane("codex", snapshot, pane).state, "composer");
+});
+
+test("trial2 Claude observed pre-ask and post-paste layouts retain exact draft and composer identity", () => {
+  const before = base.classifyProviderPane("claude-code", trial2Claude.preAsk.snapshot, trial2Claude.preAsk.pane);
+  const after = base.classifyProviderPane("claude-code", trial2Claude.postPaste.snapshot, trial2Claude.postPaste.pane);
+  assert.equal(before.state, "composer");
+  assert.equal(before.text, "");
+  assert.equal(after.state, "composer");
+  assert.equal(after.text, trial2Claude.postPaste.prompt);
+  assert.equal(after.identity, before.identity);
+});
+
+test("trial2 Claude status row allows guarded Enter on the unchanged draft without false acceptance", async () => {
+  const { snapshot: draft, prompt } = trial2Claude.postPaste;
+  const fx = trial2Fixture(trial2Claude, [trial2Claude.preAsk.snapshot, ...Array(5).fill(draft)], prompt);
+  await assert.rejects(fx.ask, reason("not_submitted"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`, "\r", "\r"]);
+  assert.equal(fx.buffers.size, 0);
+  const disappearance = trial2Fixture(trial2Claude,
+    [trial2Claude.preAsk.snapshot, draft, draft, trial2Claude.preAsk.snapshot], prompt);
+  await assert.rejects(disappearance.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(disappearance.inputs, [`\x1b[200~${prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial2 observed layouts keep menus trust busy and unknown states closed before input", async () => {
+  for (const profile of trial2Profiles) {
+    const prefix = profile.provider === "codex" ? "›" : "❯";
+    const titles = profile.provider === "codex"
+      ? ["Retry with a faster model?", "Do you trust this directory?"]
+      : ["Select model", "Do you trust this folder?"];
+    for (const title of titles) {
+      const screen = `${title}\n${prefix} 1. Confirm\n  2. Cancel`;
+      const fx = fixture({ provider: profile.provider, screens: [screen], paneFor: () => "1|40|120|2" });
+      await assert.rejects(fx.ask, reason("decision_required"));
+      assert.deepEqual(fx.inputs, []);
+      assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+    }
+    const rows = profile.preAsk.snapshot.split("\n");
+    if (profile.provider === "codex") rows[34] = "• Working (0s • esc to interrupt)";
+    else {
+      rows[36] = "❯\u00a0";
+      rows.splice(38, rows.length, "  esc to interrupt");
+    }
+    for (const [screen, expected] of [[rows.join("\n"), "busy"], ["unrecognized pane", "unknown_state"]]) {
+      const fx = trial2Fixture(profile, [screen]);
+      await assert.rejects(fx.ask, reason(expected));
+      assert.deepEqual(fx.inputs, []);
+      assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+    }
+    assert.equal(base.classifyProviderPane("antigravity", profile.preAsk.snapshot, profile.preAsk.pane).state, "unknown_state");
+  }
+});
+
+test("trial2 measured footer changes do not open near misses unknown status or cursor drift", () => {
+  const codex = trial2Codex.preAsk;
+  for (const screen of [codex.snapshot.replace("1 warning", "warning"),
+    codex.snapshot.replace("1 warning", "1 warningz"),
+    codex.snapshot.replace("f2 to view", "f3 to view"),
+    codex.snapshot.replace("GPT-6.1-Sol medium fast", "unrecognized status")]) {
+    assert.equal(base.classifyProviderPane("codex", screen, codex.pane).state, "unknown_state");
+  }
+  const claude = trial2Claude.postPaste;
+  for (const screen of [claude.snapshot.replace("user@host:/workspace/project", "unrecognized status"),
+    claude.snapshot.replace("user@host:/workspace/project", "user@host:relative/path"),
+    claude.snapshot.replace("user@host:/workspace/project", ""),
+    claude.snapshot.replace("(shift+tab to cycle)", "(shift+tab to cycle) · ← for agents"),
+    claude.snapshot.replace("shift+tab to cycle", "shift+tab to confirm"),
+    claude.snapshot.replace("⏵⏵ auto mode on", "⏵⏵ auto mode off"),
+    claude.snapshot + "unknown overlay\n"]) {
+    assert.equal(base.classifyProviderPane("claude-code", screen, claude.pane).state, "unknown_state");
+  }
+  for (const pane of [{ ...claude.pane, cursorX: claude.pane.cursorX - 1 },
+    { ...claude.pane, cursor: 35 }, { ...claude.pane, height: 41 },
+    ...["mode", "inputOff", "synchronized"].map((key) => ({ ...claude.pane, [key]: "1" }))]) {
+    assert.equal(base.classifyProviderPane("claude-code", claude.snapshot, pane).state, "unknown_state");
+  }
+});
+
+test("trial2 Claude post-paste decision or unknown status prevents the first Enter", async () => {
+  const { snapshot: draft, prompt } = trial2Claude.postPaste;
+  for (const [screen, cursor, expected] of [["Select model\n❯ 1. Confirm\n  2. Cancel", 1, "decision_required"],
+    [draft.replace("user@host:/workspace/project", "unrecognized status"), 36, "unknown_state"]]) {
+    const fx = trial2Fixture(trial2Claude, [trial2Claude.preAsk.snapshot, screen], prompt);
+    const run = (args, options) => {
+      if (args[0] === "display-message" && !args.at(-1).includes("version") && fx.inputs.length) {
+        const x = cursor === 1 ? 2 : trial2Claude.postPaste.pane.cursorX;
+        return { status: 0, stdout: args.at(-1).startsWith("#{pid}|")
+          ? `100|%12|200|120|40|${x}|${cursor}\n` : `%12|0|0|0|${cursor}|40|120|${x}\n` };
+      }
+      return fx.run(args, options);
+    };
+    await assert.rejects(() => base.submitPrompt({ provider: "claude-code", target: "%12", prompt, run, wait: async () => {} }), reason(expected));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`]);
+    assert.equal(fx.buffers.size, 0);
+  }
+});

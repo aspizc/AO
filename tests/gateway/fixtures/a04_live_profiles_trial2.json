@@ -1,0 +1,50 @@
+[
+  {
+    "provider": "codex",
+    "version": "codex-cli 0.160.1",
+    "provenance": "root operator observation; pre-ask metadata measured; no post-paste metadata was recorded",
+    "preAsk": {
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 2,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      },
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /workspace/project\n  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view\n"
+    }
+  },
+  {
+    "provider": "claude-code",
+    "version": "2.1.293 (Claude Code)",
+    "provenance": "root operator observation; pre-ask metadata measured; no post-paste metadata was recorded",
+    "preAsk": {
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 2,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      },
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Try \"write a test for <filepath>\"\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+    },
+    "postPaste": {
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Reply exactly samplesamplesamplesamplesamp. Do not use tools.\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  user@host:/workspace/project\n  ⏵⏵ auto mode on (shift+tab to cycle)\n",
+      "prompt": "Reply exactly samplesamplesamplesamplesamp. Do not use tools.",
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 63,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      },
+      "metadataBoundary": "cursorX derived from sanitized ASCII draft; no post-paste cursor observation exists"
+    }
+  }
+]

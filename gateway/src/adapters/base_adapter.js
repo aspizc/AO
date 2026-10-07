@@ -9,7 +9,7 @@ import {
 
 const activeSubmissions = new Set();
 const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
-const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings · f2 to view\s*$/;
+const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
 // Measured 0.160.1 status row; this is rendering evidence, not model selection.
 const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
 function codexGap(rows, cursor, footer) {
@@ -152,9 +152,12 @@ export function classifyProviderPane(provider, snapshot, pane) {
       || !rows[top + 1].startsWith("❯\u00a0") || pane.cursorX < 2 || pane.cursorX >= pane.width) return { state: "unknown_state" };
     const footer = rows[bottom + 1]?.trim();
     const busy = footer === "esc to interrupt";
-    // 2.1.293 observed 120x40 ready pane: a blank row then auto-mode status.
-    const liveIdle = pane.width === 120 && pane.height === 40 && footer === ""
-      && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"
+    // 2.1.293 measured idle layouts: blank gap with agents hint, or a local
+    // status row with the shorter footer after paste. Neither proves acceptance.
+    const liveIdle = pane.width === 120 && pane.height === 40
+      && ((footer === "" && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents")
+        || (/^  [A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\/[A-Za-z0-9_./-]+\s*$/.test(rows[bottom + 1] || "")
+          && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle)"))
       && rows.slice(bottom + 3).every((row) => row.trim() === "");
     if ((!busy && footer !== "? for shortcuts" && !liveIdle)
       || (!liveIdle && rows.slice(bottom + 2).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
