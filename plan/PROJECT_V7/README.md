@@ -1,8 +1,9 @@
 # Project V7 — Generic project and wave execution
 
-Status: **planned runtime; independent plan Trial 2 OK**. No V7 runtime
-implementation, implementation verdict, integration, promotion, or release is
-claimed. V6 retains its seven-sheet AO 1.1.0 scope.
+Status: **A/0/01 implemented; independent implementation review pending**.
+The capacity foundation is a candidate in its isolated worktree. The other
+four runtime leaves remain planned; no V7 integration, promotion or release
+is claimed. V6 retains its seven-sheet AO 1.1.0 scope.
 See the [plan verdict](reviews/V7_GENERIC_EXECUTION-plan-2_reviewed_OK.md).
 
 Goal / risk retired: execute dependency-ready work for different projects
@@ -92,7 +93,8 @@ tested before A/0/05, but neither its restart acceptance nor A/0/04's exit is
 closed by deferral. Each sheet has one independent review and scoped branch;
 root owns serial integration and shared gate inventory updates.
 
-Five executable sheets: `0 implemented + 0 reviewed + 5 planned`.
+Five executable sheets: `1 implemented (review pending) + 4 planned`;
+`0 reviewed, 0 integrated, 0 released` at this candidate.
 See [epics](EPICS.md), [sheet registry](SHEETS.md),
 [coverage/overlap ledger](COVERAGE_MATRIX.md), and [reviews](reviews/README.md).
 

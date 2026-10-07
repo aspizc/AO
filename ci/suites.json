@@ -101,7 +101,7 @@
         "tests/structure/**/*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:b0af61414f41e0e5cfa283dc500f442453caaa656b8f66810c0e8ec124902d61",
+      "inventorySha256": "sha256:d917eb303eec767fc573da09f4b3cd6636d4cbea1675cef5159cbc72975e54ad",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -287,7 +287,7 @@
         "schemas/*.json"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:ba7f5a4c10b15d8e7d4654d1327df6f5e80781be535a116873a647a714623388",
+      "inventorySha256": "sha256:2d509ae852390677eb93eeacceb6bb5de80bd27dedccf3748d5533e7d0e5fe44",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -306,7 +306,7 @@
         "tests/cli/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:8370fed31bd4f0c2a2ab3ba770db12dafbc8e90eb5d85691d6bccec263c0c26f",
+      "inventorySha256": "sha256:d75d1395c79b29915585141965e632b6987c9ca6aa95eb7bea68f9dbc9eeaf5d",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 300
@@ -326,7 +326,7 @@
         "orchestrator-langgraph/tests/**/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:eeb386bcb94567f44d5f4bd18d1ff8a47c2c61afc0f129d7eb41385b847a62dd",
+      "inventorySha256": "sha256:3cfd8380ed071db5269ce6d385377df8ea5f00a2cd04be110ee47abcc9dcfb3d",
       "minimumTests": 1,
       "timeoutSeconds": 600,
       "allowedSkips": [

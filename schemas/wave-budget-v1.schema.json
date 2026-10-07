@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-orchestrator.local/schemas/wave-budget-v1.schema.json",
+  "title": "Cooperating local wave capacity budget",
+  "$comment": "Structural DTO contract. Runtime additionally checks headroom below its host ceiling, unique reservation IDs, aggregate held vectors against all limits, and integer lexical decoding. Provider IDs are projected from orchestrator-profile-v1.schema.json; parity tests reject drift.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "budgetId",
+    "revision",
+    "limits",
+    "reservations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "wave-budget/v1"
+    },
+    "budgetId": {
+      "$ref": "#/$defs/uuid"
+    },
+    "revision": {
+      "$ref": "#/$defs/unitCount"
+    },
+    "limits": {
+      "$ref": "#/$defs/limits"
+    },
+    "reservations": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "$ref": "#/$defs/reservation"
+      }
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?![\\s\\S])"
+    },
+    "localId": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}(?![\\s\\S])"
+    },
+    "providerId": {
+      "type": "string",
+      "enum": [
+        "codex",
+        "claude-code",
+        "gemini-cli",
+        "antigravity",
+        "pi",
+        "opencode"
+      ]
+    },
+    "unitCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "limitCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 128
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gatewayInstances",
+        "agentSessions",
+        "checkProcesses",
+        "providerSessions",
+        "memoryMiB",
+        "memoryHeadroomMiB"
+      ],
+      "properties": {
+        "gatewayInstances": {
+          "$ref": "#/$defs/limitCount"
+        },
+        "agentSessions": {
+          "$ref": "#/$defs/limitCount"
+        },
+        "checkProcesses": {
+          "$ref": "#/$defs/limitCount"
+        },
+        "providerSessions": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/providerId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/limitCount"
+          }
+        },
+        "memoryMiB": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 1048576
+        },
+        "memoryHeadroomMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048575
+        }
+      }
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gatewayInstances",
+        "agentSessions",
+        "checkProcesses",
+        "providerSessions",
+        "memoryMiB"
+      ],
+      "properties": {
+        "gatewayInstances": {
+          "$ref": "#/$defs/unitCount"
+        },
+        "agentSessions": {
+          "$ref": "#/$defs/unitCount"
+        },
+        "checkProcesses": {
+          "$ref": "#/$defs/unitCount"
+        },
+        "providerSessions": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/providerId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/unitCount"
+          }
+        },
+        "memoryMiB": {
+          "$ref": "#/$defs/unitCount"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "memoryMiB": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "gatewayInstances": {
+                "const": 0
+              },
+              "agentSessions": {
+                "const": 0
+              },
+              "checkProcesses": {
+                "const": 0
+              },
+              "providerSessions": {
+                "additionalProperties": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "gatewayId": {
+          "$ref": "#/$defs/localId"
+        },
+        "traceId": {
+          "$ref": "#/$defs/localId"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/localId"
+        },
+        "checkId": {
+          "$ref": "#/$defs/localId"
+        }
+      }
+    },
+    "reservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reservationId",
+        "ownerRunId",
+        "taskId",
+        "attempt",
+        "units",
+        "effectState",
+        "effects"
+      ],
+      "properties": {
+        "reservationId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerRunId": {
+          "$ref": "#/$defs/localId"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/localId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempt": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 15
+        },
+        "units": {
+          "$ref": "#/$defs/units"
+        },
+        "effectState": {
+          "enum": [
+            "reserved",
+            "possible",
+            "active",
+            "closed"
+          ]
+        },
+        "effects": {
+          "$ref": "#/$defs/effects"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "effectState": {
+                "const": "reserved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effects": {
+                "maxProperties": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effectState": {
+                "const": "active"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effects": {
+                "minProperties": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effects": {
+                "required": [
+                  "gatewayId"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "units": {
+                "properties": {
+                  "gatewayInstances": {
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effects": {
+                "required": [
+                  "sessionId"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "units": {
+                "properties": {
+                  "agentSessions": {
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effects": {
+                "required": [
+                  "checkId"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "units": {
+                "properties": {
+                  "checkProcesses": {
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

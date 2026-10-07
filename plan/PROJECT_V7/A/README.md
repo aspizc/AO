@@ -1,11 +1,12 @@
 # Stage A — Generic execution foundation and acceptance
 
-Status: **planned**. Five independently testable leaves; no runtime claim.
+Status: **A/0/01 implemented, review pending; four leaves planned**.
+No integration, automatic wave dispatch or release is claimed.
 
 | Sheet | Outcome | Status | Priority |
 |---|---|---|---|
 | [A/0/00](0/00.md) | Project schema, deterministic preflight and generic examples | planned | P0 |
-| [A/0/01](0/01.md) | Shared local count/declared-RAM capacity after host headroom | planned | P0 |
+| [A/0/01](0/01.md) | Shared local count/declared-RAM capacity after host headroom | implemented; review pending | P0 |
 | [A/0/02](0/02.md) | One persistent SDK connection per wave, supervised phases and authorized-parent review control | planned | P0 |
 | [A/0/03](0/03.md) | Durable checkpoint/status and explicit recovery | planned | P0 |
 | [A/0/04](0/04.md) | External two-shape/two-orchestrator proof | planned | P1 |
