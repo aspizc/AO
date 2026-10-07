@@ -98,6 +98,18 @@ establishes those markers. No live provider prompt acceptance has been verified;
 the required operator Codex/Claude checks and timing measurement remain pending.
 Claude invocation is now operator-authorized, with installed version `2.1.293`;
 the retained `2.1.292` source fixture does not establish live compatibility.
+A root-operated ready-pane capture now establishes two additional narrow
+`120x40` ready layouts: Codex `0.160.1` with its measured model/status row
+and shortcuts/warnings footer, and Claude Code `2.1.293` with a blank row
+between the bottom composer border and the auto-mode footer. The
+[sanitized ready fixtures](../tests/gateway/fixtures/a04_live_ready_profiles.json)
+preserve cursor and pane-mode metadata and the relevant rendered rows; history,
+account information, quota data and local paths are removed. These profiles
+use the explicit provider argument; the displayed model/status row is not
+provider or policy inference. Changed footers, cursor drift and focused
+decisions remain closed. These captures show readiness only: the root's asks
+were refused before input, and successful live submission, busy rendering and
+acceptance timing for these layouts still require root-operated verification.
 Root coordinates live provider launches, including Antigravity `1.3.0`.
 V6 A/0/04 is not closed.
 

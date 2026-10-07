@@ -642,3 +642,74 @@ for (const cleanupFails of [false, true]) {
     assert.equal(fx.buffers.size, cleanupFails ? 3 : 0);
   });
 }
+
+const liveReadyProfiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_ready_profiles.json", import.meta.url), "utf8"));
+for (const observed of liveReadyProfiles) {
+  test(`${observed.provider} observed 120x40 ready profile preserves the empty composer`, () => {
+    assert.equal(observed.pane.width, 120);
+    assert.equal(observed.pane.height, 40);
+    const result = base.classifyProviderPane(observed.provider, observed.snapshot, observed.pane);
+    assert.equal(result.state, "composer");
+    assert.equal(result.text, "");
+    assert.equal(base.classifyProviderPane("antigravity", observed.snapshot, observed.pane).state, "unknown_state");
+    const other = observed.provider === "codex" ? "claude-code" : "codex";
+    assert.equal(base.classifyProviderPane(other, observed.snapshot, observed.pane).state, "unknown_state");
+  });
+
+  test(`${observed.provider} observed ready layout retains exact draft checks without claiming live acceptance`, async () => {
+    const rows = observed.snapshot.split("\n");
+    const prefix = observed.provider === "codex" ? "› " : "❯\u00a0";
+    rows[observed.pane.cursor] = prefix + "Enter";
+    const draft = rows.join("\n");
+    const fx = fixture({ provider: observed.provider, screens: [observed.snapshot, ...Array(5).fill(draft)],
+      paneFor: (screen) => `${observed.pane.cursor}|40|120|${screen === observed.snapshot ? 2 : 7}` });
+    await assert.rejects(fx.ask, reason("not_submitted"));
+    assert.deepEqual(fx.inputs, ["\x1b[200~Enter\x1b[201~", "\r", "\r"]);
+    assert.equal(fx.buffers.size, 0);
+  });
+
+  test(`${observed.provider} observed profile still refuses focused menu trust busy and unknown states before input`, async () => {
+    const rows = observed.snapshot.split("\n");
+    const prefix = observed.provider === "codex" ? "›" : "❯";
+    const titles = observed.provider === "codex"
+      ? ["Retry with a faster model?", "Do you trust this directory?"]
+      : ["Select model", "Do you trust this folder?"];
+    const busyRows = [...rows];
+    if (observed.provider === "codex") busyRows[observed.pane.cursor - 2] = "• Working (0s • esc to interrupt)";
+    else {
+      busyRows[observed.pane.cursor] = prefix + "\u00a0";
+      busyRows.splice(observed.pane.cursor + 2, busyRows.length, "  esc to interrupt");
+    }
+    const cases = [
+      ...titles.map((title) => [title + `\n${prefix} 1. Confirm\n  2. Cancel`, 1, "decision_required"]),
+      [busyRows.join("\n"), observed.pane.cursor, "busy"],
+      [observed.snapshot.replace(observed.provider === "codex" ? "? for shortcuts" : "auto mode on", "unrecognized footer"), observed.pane.cursor, "unknown_state"],
+      [observed.snapshot, observed.pane.cursor - 1, "unknown_state"],
+    ];
+    for (const [screen, cursor, expected] of cases) {
+      const fx = fixture({ provider: observed.provider, screens: [screen], paneFor: () => `${cursor}|40|120|2` });
+      await assert.rejects(fx.ask, reason(expected));
+      assert.deepEqual(fx.inputs, []);
+      assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+    }
+  });
+}
+
+for (const observed of liveReadyProfiles) {
+  test(`${observed.provider} measured footer profile rejects near misses and unmeasured geometry`, () => {
+    const variants = observed.provider === "codex"
+      ? [observed.snapshot.replace("GPT-6.1-Sol medium fast", "unrecognized status"),
+        observed.snapshot.replace("GPT-6.1-Sol medium fast · /workspace/project", ""),
+        observed.snapshot.replace("f2 to view", "f3 to view")]
+      : [observed.snapshot.replace("shift+tab to cycle", "shift+tab to confirm"),
+        observed.snapshot.replace("\n\n  ⏵⏵", "\nnonempty gap\n  ⏵⏵"),
+        observed.snapshot + "unrecognized overlay\n"];
+    for (const snapshot of variants) {
+      assert.equal(base.classifyProviderPane(observed.provider, snapshot, observed.pane).state, "unknown_state");
+    }
+    assert.equal(base.classifyProviderPane(observed.provider, observed.snapshot, { ...observed.pane, height: 41 }).state, "unknown_state");
+    for (const field of ["mode", "inputOff", "synchronized"]) {
+      assert.equal(base.classifyProviderPane(observed.provider, observed.snapshot, { ...observed.pane, [field]: "1" }).state, "unknown_state");
+    }
+  });
+}

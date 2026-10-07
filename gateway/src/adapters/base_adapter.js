@@ -8,6 +8,16 @@ import {
 } from "./tmux_client.js";
 
 const activeSubmissions = new Set();
+const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
+const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings · f2 to view\s*$/;
+// Measured 0.160.1 status row; this is rendering evidence, not model selection.
+const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
+function codexGap(rows, cursor, footer) {
+  if (codexWarningsFooter.test(rows[footer]) && !codexLiveStatus.test(rows[footer - 1])) return false;
+  return rows.slice(cursor + 1, footer).every((row, index) => row.trim() === ""
+    || (cursor + 1 + index === footer - 1 && codexWarningsFooter.test(rows[footer])
+      && codexLiveStatus.test(row)));
+}
 function invalidText(text, allowNewlines) {
   return typeof text !== "string" || !text || !text.isWellFormed()
     || Array.from(text).some((character) => {
@@ -17,10 +27,10 @@ function invalidText(text, allowNewlines) {
 }
 function activeDecision(provider, rows, pane) {
   if (provider === "codex") {
-    const footer = rows.findLastIndex((row) => /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/.test(row));
+    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
     if (start >= 0 && pane.cursor >= start && pane.cursor < footer
-      && rows.slice(pane.cursor + 1, footer).every((row) => row.trim() === "")) return false;
+      && codexGap(rows, pane.cursor, footer)) return false;
   }
   if (provider === "claude-code") {
     const borders = rows.map((row, index) => row === "─".repeat(pane.width) ? index : -1)
@@ -82,18 +92,19 @@ function paneState(run, target) {
     cursor: Number(fields[4]), height: Number(fields[5]), width: Number(fields[6]), cursorX: Number(fields[7]) };
 }
 
-// Deliberately narrow source-backed profiles. Unknown layouts/providers stay closed.
+// Deliberately narrow source-backed and observed profiles. Unknown layouts/providers stay closed.
 // Evidence and the unverified live/version boundary are recorded in gateway/README.md.
 export function classifyProviderPane(provider, snapshot, pane) {
   if (pane.mode !== "0" || pane.inputOff !== "0" || pane.synchronized !== "0") return { state: "unknown_state" };
   const rows = snapshot.split("\n");
   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
   if (provider === "codex") {
-    const footer = rows.findLastIndex((row) => /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/.test(row));
+    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
-    if (start < 0 || footer - start < 2 || footer - start > 12
+    if ((codexWarningsFooter.test(rows[footer]) && (pane.width !== 120 || pane.height !== 40))
+      || start < 0 || footer - start < 2 || footer - start > 12
       || pane.cursor < start || pane.cursor >= footer
-      || rows.slice(pane.cursor + 1, footer).some((row) => row.trim() !== "")) return { state: "unknown_state" };
+      || !codexGap(rows, pane.cursor, footer)) return { state: "unknown_state" };
     const textRows = rows.slice(start, pane.cursor + 1);
     if (textRows.slice(1).some((row) => !row.startsWith("  "))) return { state: "unknown_state" };
     let text = [textRows[0].replace(/^\s*[›»] ?/, ""), ...textRows.slice(1).map((row) => row.slice(2))].join("\n");
@@ -138,11 +149,15 @@ export function classifyProviderPane(provider, snapshot, pane) {
       .filter((index) => index >= 0);
     const [top, bottom] = borders.slice(-2);
     if (top === undefined || bottom !== top + 2 || pane.cursor !== top + 1
-      || !rows[top + 1].startsWith("❯\u00a0") || pane.cursorX < 2 || pane.cursorX >= pane.width
-      || rows.slice(bottom + 2).some((row) => row.trim() !== "")) return { state: "unknown_state" };
+      || !rows[top + 1].startsWith("❯\u00a0") || pane.cursorX < 2 || pane.cursorX >= pane.width) return { state: "unknown_state" };
     const footer = rows[bottom + 1]?.trim();
     const busy = footer === "esc to interrupt";
-    if (!busy && footer !== "? for shortcuts") return { state: "unknown_state" };
+    // 2.1.293 observed 120x40 ready pane: a blank row then auto-mode status.
+    const liveIdle = pane.width === 120 && pane.height === 40 && footer === ""
+      && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"
+      && rows.slice(bottom + 3).every((row) => row.trim() === "");
+    if ((!busy && footer !== "? for shortcuts" && !liveIdle)
+      || (!liveIdle && rows.slice(bottom + 2).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
     let text = rows[top + 1].slice(2);
     // No inferred text from summaries, viewport clipping, ghost text or wide glyphs.
     if (text.length >= 800 || /[^\x20-\x7e]/.test(text) || /^\[Pasted /.test(text)) return { state: "unknown_state" };
