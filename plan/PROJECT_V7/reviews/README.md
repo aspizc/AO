@@ -1,17 +1,19 @@
 # PROJECT_V7 review trail
 
-Status: **A/0/01 implementation Trial 1 independently OK; integration pending**.
+Status: **A/0/01 implementation Trial 1 independently OK and integrated**.
 The Trial 1 KO is preserved. Keep trials append-only; root assigns distinct
 reviewer sessions. No verdict was issued by the plan author.
 
 | Subject | Trial | Request | Verdict |
 |---|---|---|---|
+| Capacity integration status | 1 | [Request](INTEGRATION_STATUS-1_to_review.md) | [OK](INTEGRATION_STATUS-1_reviewed_OK.md) |
 | Shared capacity implementation | 1 | [Request](A_0_1-1_to_review.md), [root binding](A_0_1-1_root_binding.md), [supplement](A_0_1-1_root_binding_supplement.md) | [OK](A_0_1-1_reviewed_OK.md) |
 | Generic execution plan | 1 | [Request](V7_GENERIC_EXECUTION-plan-1_to_review.md) | [KO](V7_GENERIC_EXECUTION-plan-1_reviewed_KO.md) |
 | Generic execution plan, R1–R3 correction | 2 | [Request](V7_GENERIC_EXECUTION-plan-2_to_review.md) | [OK](V7_GENERIC_EXECUTION-plan-2_reviewed_OK.md) |
 
-A/0/01 is accepted for its exact file manifest; .git is currently read-only,
-so candidate tree binding, commit and integration remain pending. The other
+A/0/01 was bound to an exact Git tree and integrated through an isolated
+checkout; the original checkout was not updated by the integration commands. See the
+[integration checkpoint](A_0_1_integration_checkpoint.md). The other
 four implementation reviews remain unstarted. Each sheet uses its canonical
 `A_0_<nn>-<trial>_to_review.md` and independent verdict pair; an OK plan review
 does not accept runtime code, integrate a candidate, or release anything.

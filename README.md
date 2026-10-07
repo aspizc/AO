@@ -22,6 +22,8 @@ The development tag `1.1.0-dev.1` identifies reviewed planning and documentation
 at [`b3aed7c`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82edff272955bfb)
 on `release/1.1.0`. A/0/02 (generic setup and public hygiene) is now reviewed
 and integrated on that branch; the other six V6 sheets remain unfinished.
+V7 A/0/01 adds the reviewed [cooperative capacity ledger](docs/wave-capacity.md)
+on the release branch; automated wave dispatch and recovery remain planned.
 `main` can advance with reviewed documentation independently of the `1.0.0`
 tag. Package version `0.1.0` remains development metadata.
 
