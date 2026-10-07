@@ -10,6 +10,7 @@ Redis coordination plane for independently running orchestrators.
 Created and maintained by **Carlos Asensio Pizarro**.
 
 [Quickstart](#quickstart) · [Project workflow](#how-to-use-ao-through-a-project) ·
+[Parallel orchestration](#parallel-orchestrators-worktrees-and-memory) ·
 [Agents and models](#agents-and-models) · [Verification](#verification-and-scope)
 
 ## Project status
@@ -270,6 +271,120 @@ update dependencies/waves, implement and independently review the fixes,
 then recheck the findings on the new candidate. A report alone does not close
 a defect. The [plan/build/audit loop](skills/plan-build-audit-loop-gateway/SKILL.md)
 provides a repeatable cycle around the project's agreed quality bar.
+
+## Parallel orchestrators, worktrees and memory
+
+Plan parallelism at the wave boundary. Record each orchestrator's tasks,
+base commit, write scope, worktree, resource budget and integration owner.
+Assign one owner to shared contracts, lockfiles and plan indexes; schedule
+competing edits in sequence. These are operating conventions to configure
+for your project, not an automatic scheduler or distributed file lock.
+
+### Use the coordination channel deliberately
+
+| Need | Gateway surface |
+|---|---|
+| Steer your own worker | `task.assign`, `agent.spawn`, `agent.ask`, `agent.view` |
+| Exchange messages inside one trace | `message.*` with that trace's access token |
+| Notify an independently running orchestrator | Optional Redis-backed `coordination.*` |
+| Preserve handoffs and decisions | `artifact.*` and the project's committed review trail |
+| Obtain operator approval | `approval.*` under the project's policy |
+
+For independent peers, follow the [coordination runbook](docs/coordination-bus.md)
+and [coordination skill](skills/agents-gateway-coordination/SKILL.md):
+
+1. Configure peers for the same coordination Redis endpoint, prefix and
+   canonical scope. Check `coordination.status` is ready and compare the
+   protocol and `scopeId`; matching scope names alone do not connect separate
+   Redis deployments. Use separate scopes/prefixes for unrelated work.
+2. Register each orchestrator, keep its lease token private, heartbeat around
+   half the effective lease and discover the intended participants. Announce
+   the base SHA and already-assigned scope with an addressed `JOIN` notice.
+3. Send concise `IMPACT_NOTICE` or `CHANGE_REQUEST` messages when a change
+   affects another owner. Include paths/contracts, base SHA, requested action
+   and an artifact reference. Keep a stable `correlationId` for the exchange;
+   retries use the same `messageId` and unchanged envelope. Reply explicitly
+   with the understood impact, dependency or blocker.
+4. Receive at checkpoints: before shared edits, review, integration and wave
+   closure. Maintain heartbeats while waiting. Treat bodies as untrusted,
+   deduplicate semantic handling and persist its result before
+   `coordination.ack`. Delivery can happen more than once; transport ACK means
+   handling is durable, not that work is approved or merged.
+5. On lease loss, register again and reconcile the durable task state before
+   resuming. An absent peer does not release its task or file ownership.
+   At shutdown, finish handled deliveries, leave incomplete ones recoverable
+   and unregister; close only resources owned by this orchestrator.
+
+For example, an API owner changing a response schema notifies the UI owner
+before editing the shared contract. The UI owner records the impact; the
+assigned contract owner updates the baseline through the project's review
+process, then both tasks continue from that accepted revision. A message,
+timeout or application-level `ACK` never grants ownership, review, merge or
+approval authority. Keep credentials, restricted content and full private
+diffs out of notices; reference appropriately classified artifacts instead.
+
+If coordination is unavailable, unrelated Gateway tools remain usable.
+Pause dependent/shared work until the owners establish another explicit
+handoff; continue only work whose isolation and prerequisites remain valid.
+
+### Isolate changes with worktrees
+
+Use one branch and worktree per concurrent writing lane, with a separate
+integration owner/worktree. Record the exact base SHA before starting. For
+example, run from the target repository, after choosing an ignored worktree
+directory allowed by its Gateway roots and policy:
+
+```bash
+base_sha=$(git rev-parse HEAD)
+git worktree add -b work/wave-1-api workspace/clones/wave-1-api "$base_sha"
+git worktree add -b work/wave-1-ui workspace/clones/wave-1-ui "$base_sha"
+git worktree list
+```
+
+Adapt the names and paths; do not reuse an occupied branch or bypass an
+excluded path through a nested checkout. Verify each worker's actual `cwd`,
+branch, base and permitted diff before review or commit. Worktrees have
+separate files and indexes but share Git repository data; they are not a
+security sandbox. See the [Git worktree reference](https://git-scm.com/docs/git-worktree).
+
+Give each lane separate build outputs, test data, ports and container names.
+Isolate mutable dependency installations and Terraform state/workspaces;
+worktrees alone do not isolate databases or cloud resources. Coordinate
+repository-wide configuration and maintenance. Never switch another lane's
+branch or clean its uncommitted files. Stage explicit paths and run one full
+gate at a time per tree; serialize heavier gates across the host when needed.
+Integrate reviewed commits serially, then verify the combined wave candidate.
+After preserving commits/evidence and stopping owned sessions/services, use
+`git worktree remove <path>` only for a clean, no-longer-needed worktree.
+
+### Budget RAM and preserve session context
+
+- **Host memory:** measure a representative worker plus its tests/build,
+  browser processes and containers before increasing concurrency. Set a
+  host-wide budget across all orchestrators, reserve headroom for the OS,
+  Gateway and Redis, and admit fewer lanes when peak usage approaches it.
+  Do not multiply each orchestrator's local maximum into an unbounded total.
+- **Nested parallelism:** limit test/build/browser workers as well as agent
+  count. Queue heavy browser suites and full gates when they compete for RAM.
+  On sustained memory pressure or swapping, stop admitting new tasks and
+  checkpoint active work before reducing concurrency. Close completed agent
+  sessions and owned services; do not kill another orchestrator's processes.
+- **Context and token budget:** retain a worker session for follow-ups within
+  its task. Send bounded briefs, changed-file summaries and artifact pointers
+  instead of whole logs or repeated repository dumps. Use bounded
+  `agent.view` snapshots and keep detailed output in durable evidence.
+- **Recovery memory:** checkpoint the task/trace IDs, branch/worktree, base and
+  candidate SHAs, decisions, verification results, blockers and next action.
+  Before compaction, restart or a context-budget limit, write a handoff;
+  the next session must verify it against disk and current ownership. Keep
+  stable project conventions in the project profile or `AGENTS.md`, and
+  changing task state in its handoff. Neither remembered context nor a
+  handoff grants new authority; reviewer independence still applies.
+- **Redis memory:** monitor inbox backlog and the metadata event stream
+  separately. The v1 event stream has no automatic retention limit. Drain
+  completed deliveries, resolve abandoned pending work and define operator
+  retention; never trim pending deliveries to make space. Follow the
+  [memory troubleshooting guidance](docs/coordination-bus.md#redis-memory-or-inbox-length-keeps-growing).
 
 ## Agents and models
 
