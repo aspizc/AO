@@ -1,0 +1,2 @@
+Review the assigned candidate independently using the bounded handoff
+and declared checks. Record evidence and a verdict; do not modify the candidate.

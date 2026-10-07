@@ -915,6 +915,11 @@ function configuredRepositoryBindings(config, registries) {
   return bindings;
 }
 
+export function resolveRegisteredRepositoryCwd({ config, registries, repositoryId, cwd }) {
+  const repositories = normalizeRepositoryBindings(configuredRepositoryBindings(config, registries));
+  return repositoryFor({ repositories }, { repositoryId, cwd, required: true });
+}
+
 export function createGatewayRequestContext({
   config = {},
   registries,

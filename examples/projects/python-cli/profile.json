@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "project-profile/v1",
+  "projectId": "python-cli",
+  "repositoryId": "sample-apps",
+  "projectRoot": "/ABSOLUTE/OPERATOR/PROJECT/sample-apps",
+  "planDirectory": "docs/work-items",
+  "reviewDirectory": "reviews",
+  "roles": {
+    "orchestrator": {
+      "agent": "codex",
+      "role": "orchestrator"
+    },
+    "coder": {
+      "agent": "codex",
+      "role": "coder",
+      "model": "gpt-6.1",
+      "reasoningEffort": "max",
+      "serviceTier": "priority"
+    },
+    "reviewer": {
+      "agent": "codex",
+      "role": "reviewer",
+      "model": "gpt-6.1-sol",
+      "reasoningEffort": "max",
+      "serviceTier": "priority"
+    }
+  },
+  "epics": [
+    "foundation"
+  ],
+  "stories": [
+    {
+      "id": "greeting",
+      "epicId": "foundation"
+    }
+  ],
+  "checks": [
+    {
+      "id": "unit",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "memoryMiB": 64
+    }
+  ],
+  "tasks": [
+    {
+      "id": "greeting",
+      "storyId": "greeting",
+      "cwd": ".",
+      "writePaths": [
+        "src/tool.py",
+        "shared.txt"
+      ],
+      "conflictKeys": [
+        "shared-file"
+      ],
+      "dependsOn": [],
+      "checkIds": [
+        "unit"
+      ],
+      "coderPrompt": "prompts/coder.txt",
+      "reviewerPrompt": "prompts/reviewer.txt"
+    },
+    {
+      "id": "usage",
+      "storyId": "greeting",
+      "cwd": ".",
+      "writePaths": [
+        "src/tool.py",
+        "shared.txt"
+      ],
+      "conflictKeys": [
+        "shared-file"
+      ],
+      "dependsOn": [
+        "greeting"
+      ],
+      "checkIds": [
+        "unit"
+      ],
+      "coderPrompt": "prompts/coder.txt",
+      "reviewerPrompt": "prompts/reviewer.txt"
+    }
+  ],
+  "waves": [
+    {
+      "id": "foundation",
+      "taskIds": [
+        "greeting"
+      ],
+      "maxConcurrentTasks": 1,
+      "exitCheckIds": [
+        "unit"
+      ]
+    },
+    {
+      "id": "usage",
+      "taskIds": [
+        "usage"
+      ],
+      "maxConcurrentTasks": 1,
+      "exitCheckIds": [
+        "unit"
+      ]
+    }
+  ],
+  "maxTrials": 3,
+  "pollIntervalMs": 1000,
+  "memoryReservations": {
+    "gatewayMiB": 256,
+    "coderMiB": 1024,
+    "reviewerMiB": 1024
+  }
+}

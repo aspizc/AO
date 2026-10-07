@@ -18,6 +18,7 @@ from .output import (
     render_decision,
     render_validate_result,
 )
+from .project_command import project_app
 from .wave_budget_command import wave_app
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -39,6 +40,7 @@ audit_app = typer.Typer(help="Inspect the local audit log.")
 app.add_typer(policy_app, name="policy")
 app.add_typer(audit_app, name="audit")
 app.add_typer(wave_app, name="wave")
+app.add_typer(project_app, name="project")
 app.command("doctor")(doctor)
 
 
