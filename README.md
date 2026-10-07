@@ -9,18 +9,23 @@ Redis coordination plane for independently running orchestrators.
 
 Created and maintained by **Carlos Asensio Pizarro**.
 
+[Quickstart](#quickstart) · [Project workflow](#how-to-use-ao-through-a-project) ·
+[Agents and models](#agents-and-models) · [Verification](#verification-and-scope)
+
 ## Project status
 
-AO is under active development. `main` contains reviewed integrations; there
-is no tagged release as of 2026-10-06. Package version `0.1.0` is development
-metadata, not a published release.
+AO `1.0.0` is published at
+[`41f9ce2`](https://github.com/aspizc/AO/commit/41f9ce28aa59673283a7c5494200e0ec7b56e2f6),
+with an annotated [1.0.0 tag](https://github.com/aspizc/AO/releases/tag/1.0.0).
+`1.1.0` work is planned on its descendant release branch. Package version
+`0.1.0` remains development metadata.
 
-The latest verified implementation is [`ea18f4e`](https://github.com/aspizc/AO/commit/ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3):
-**2,625 passed, 0 failed, 12 declared integration skips**. The full local gate
-exited zero with `infrastructure_unavailable`, because PostgreSQL,
-Gateway/Temporal integration, and optional live providers were unavailable.
-See [current capabilities and evidence](docs/project-status.md) for the exact
-candidate, verification limits, and remaining work.
+The 1.0.0 candidate's recorded gate has **2,626 passed, 0 failed and 12
+declared integration skips**. It exited zero with `infrastructure_unavailable`:
+PostgreSQL and Gateway/Temporal checks were skipped, and optional live
+providers were not run. See [current capabilities and evidence](docs/project-status.md)
+for the exact tested tree and limits. Documentation changes do not establish
+new runtime verification.
 
 Important: there is no privileged standalone orchestrator inside the Gateway.
 A human-facing LLM can take the orchestrator role, and optional peer clients
@@ -65,6 +70,206 @@ The legacy `node scripts/smoke_mvp2.mjs` currently fails at `task.assign`
 with `REQUEST_CONTEXT_DENIED` because it creates a new Gateway connection
 for each call. Use the persistent-connection test above for the dry-run flow;
 see [known limits](docs/project-status.md#known-operator-limits).
+
+## How to use AO through a project
+
+AO can support a service, web application, library, CLI, infrastructure project
+or documentation effort. Configure it for your repository's language, checks
+and delivery conventions. KYA is one source of practical experience behind
+these workflows; its paths, domain and build commands are optional examples.
+
+The orchestrator is your human-facing agent session. Install the
+[generic skills](skills/README.md) in the client connected to `agents-gateway`
+and give it the target project's configuration. The `ao-*` variants under
+this checkout's `.codex/skills/` and `.claude/skills/` describe development of
+AO itself. For another project, start with the generic skills below.
+
+| Phase | Start with | Produce | Ready to move on when |
+|---|---|---|---|
+| [Ideation](#1-ideation-and-drafts) | Problem, users, constraints and evidence | Versioned concept draft and decision log | The owner accepts the scope and unresolved questions are visible |
+| [Planning](#2-planning-epics-stories-tasks-and-waves) | Accepted draft or audit findings | Epics, stories, executable tasks and dependency waves | Each task has an observable outcome, owner, checks and prerequisites |
+| [Environment preparation](#3-prepare-the-project-environment) | Project stack and first wave | Reproducible setup, test harness, CI and optional infrastructure tooling | A fresh checkout can build and run its initial checks |
+| [Implementation](#4-implementation-and-independent-review) | A ready task in an admitted wave | Tested change, independent review and integration evidence | Acceptance criteria and the combined wave gate pass |
+| [Audit](#5-audit-and-feed-findings-back-into-the-plan) | A named candidate and running surfaces | Evidence-based findings and prioritized follow-up tasks | Findings have owners and fixes are verified against the agreed quality bar |
+
+### 1. Ideation and drafts
+
+Use [ideation-orchestration-gateway](skills/ideation-orchestration-gateway/SKILL.md)
+to turn an idea into a draft before scheduling implementation. Record the
+problem, intended users, important journeys, scope, alternatives, assumptions,
+evidence gaps and the smallest useful experiment. Ask the facilitator to
+challenge the idea and show tradeoffs; simulated personas provide hypotheses
+that still need evidence from real users.
+
+Keep a current draft and its version history, for example
+`drafts/concept-v1.md`, plus a decision log. Update the draft after meaningful
+feedback and make the accepted revision explicit. Existing projects can start
+with a feature brief or audit finding instead of repeating product discovery.
+
+Example brief to your orchestrator:
+
+> Use the ideation workflow to develop this concept. Keep a versioned draft,
+> distinguish evidence from assumptions, compare alternatives, and record my
+> decisions before handing the accepted scope to planning.
+
+### 2. Planning: epics, stories, tasks and waves
+
+Use [plan-orchestration-gateway](skills/plan-orchestration-gateway/SKILL.md)
+with the accepted draft and the repository's conventions:
+
+1. **Epics** describe outcomes and their boundaries. Define shared contracts
+   and prerequisites early so independent work can use them consistently.
+2. **Stories** describe a user or domain outcome with observable acceptance
+   criteria. Keep links to the owning epic and the source draft or finding.
+3. **Tasks** are bounded, reviewable changes with exact read/write scope,
+   dependencies, an owner, test-first expectations and verification commands.
+   A small story can be one task; larger stories split into several tasks.
+4. **Waves** group dependency-ready tasks that can safely overlap. Record
+   concurrency limits, separate worktrees, shared-file owners, integration
+   order, resource requirements and the gate that closes the wave.
+
+A useful task brief names the base commit, files/contracts to read, intended
+behavior, failing tests to create, commands to run and required handoff. A
+wave manifest names its tasks, dependencies, Gateway ownership, workers,
+worktrees and exit criteria. Adapt the storage layout to the project; AO's own
+[PROJECT_V6](plan/PROJECT_V6/README.md) is a planning example with explicit
+**planned** statuses, not evidence that those features are delivered.
+
+Example schedule for a small web service:
+
+| Wave | Work | Why this order |
+|---|---|---|
+| 0 | Environment, initial tests, CI, API contract and test data | Establish reproducible checks and shared interfaces |
+| 1 | API implementation **in parallel with** UI work against the agreed contract/mocks | Separate owners and worktrees; no competing edits to the shared contract |
+| 2 | Connect UI to API and exercise critical Playwright journeys | Requires both wave-1 outputs |
+| 3 | Audit, fixes and release evidence | Assess the integrated candidate |
+
+For a CLI or library, replace browser work with command/API compatibility
+checks. An infrastructure project can use module contracts, validation and
+an isolated infrastructure test environment. Choose waves from actual
+dependencies and file/resource conflicts, rather than a fixed template.
+
+**Gateway lifetime:** use a persistent MCP host connection across the tasks
+in a wave. Configure any additional Gateways deliberately at wave setup,
+retain them while their tasks run, and close resources owned by the wave at
+completion. Keep separate task/trace/session bindings and independent review
+for each task; reuse of a Gateway process does not reuse another task's
+permissions. Redis coordination is optional when independent peers need it.
+
+The existing skills support supervised sessions, parallel worktrees and batch
+integration under orchestrator control. **An automatic wave launcher is
+planned**, as recorded in the [generic workflow requirements](plan/PROJECT_V6/GENERIC_WORKFLOWS.md).
+The legacy KYA/MVP2 scripts start a fresh Gateway per call and have the
+[documented connection-lifetime limitation](docs/project-status.md#known-operator-limits).
+Use the persistent host workflow for current operation; keep that limitation
+visible when assessing readiness.
+
+### 3. Prepare the project environment
+
+Complete AO's [Quickstart](#quickstart), then prepare the **target project**
+as the first implementation wave:
+
+1. Register its repository and allowed roots using the
+   [operator guide](docs/operator-guide.md). Configure the host principal,
+   provider CLI authentication and the project's writable/read-only roles.
+   Rehearse with dry-run adapters before assigning real work.
+2. Record the project profile: repository ID/path, draft/plan/review locations,
+   stack and runtime versions, install/build/test/lint commands, service
+   dependencies, provider choices and concurrency budget. The generic skills
+   read the target's orchestration profile; see their
+   [setup instructions](skills/README.md#prerequisites).
+3. Commit reproducible dependency locks, an example environment file without
+   credentials, test fixtures and a bootstrap procedure. Give concurrent
+   workers separate worktrees, test databases, ports and output directories.
+4. Add an initial test and CI job before feature work. Demonstrate that the
+   test catches an intentional failure, then restore it and record a passing
+   baseline. Document which checks need browsers, containers or credentials.
+
+Choose tools for the work being built:
+
+| Project need | Suggested checks and tooling |
+|---|---|
+| Domain logic, API or CLI | Use the project's existing unit runner; examples include `node --test` and `python -m pytest`. Add contract/integration tests around real boundaries and fixtures for failure paths. |
+| Browser UI | Use [Playwright](https://playwright.dev/docs/intro) for critical user journeys and browser regressions; keep fast logic tests below the browser layer. Configure a test web server, isolated data and reports/traces. |
+| Databases or local services | Use disposable containers and isolated test data when integration behavior matters. Document startup, readiness, migrations and cleanup. |
+| Infrastructure as code | Use [Terraform initialization](https://developer.hashicorp.com/terraform/cli/commands/init), formatting, [validation](https://developer.hashicorp.com/terraform/cli/commands/validate), tests and a reviewed plan when the project actually owns infrastructure. |
+| Every codebase | Run its formatter/linter, type checks where applicable, relevant dependency/secret checks and build in CI. Keep the gate command in the project profile. |
+
+For a JavaScript project that has selected and locked Playwright, run in that
+project's directory:
+
+```bash
+npm ci
+npx playwright install --with-deps
+npx playwright test
+```
+
+The [installation guide](https://playwright.dev/docs/intro) covers adding it to
+a project; [CI guidance](https://playwright.dev/docs/ci) covers browser/system
+dependencies and reports. Pin the chosen package version through the project
+lockfile. These commands prepare the target application, not AO itself.
+
+For a Terraform project with configuration under `infra/`, basic validation is:
+
+```bash
+terraform -chdir=infra init -backend=false
+terraform -chdir=infra fmt -check
+terraform -chdir=infra validate
+```
+
+Validation checks configuration consistency. A real
+[Terraform plan](https://developer.hashicorp.com/terraform/cli/commands/plan)
+needs the intended backend, workspace and provider configuration; initialize
+that environment separately and review its changes before applying them.
+[`terraform test`](https://developer.hashicorp.com/terraform/cli/commands/test)
+can create and destroy resources, so configure mocks or plan-mode tests for
+routine checks and isolate provider-backed tests. Keep credentials and state
+outside committed examples. Terraform is optional for projects without
+infrastructure to provision.
+
+### 4. Implementation and independent review
+
+Use [build-orchestration-gateway](skills/build-orchestration-gateway/SKILL.md)
+for a task whose prerequisites are met:
+
+1. Assign the task through the Gateway before spawning its worker. For
+   iterative work, retain the supervised session and send follow-ups using
+   `agent.ask`; inspect progress with `agent.view`.
+2. Follow **RED → GREEN → refactor**: write the smallest meaningful failing
+   test, implement enough to pass, then improve structure with the checks
+   green. For UI changes include browser evidence; for infrastructure use the
+   applicable validation, tests and reviewed plan.
+3. Produce a handoff naming the candidate, diff, acceptance results, commands
+   and failures/skips. A separately assigned reviewer checks that evidence
+   and the actual change. Use a distinct reviewer even when both seats use
+   the same provider; never count the coder's own verdict as independent.
+4. Resolve findings in bounded trials. Integrate accepted changes serially,
+   resolve shared-file conflicts explicitly and run the project's combined
+   wave gate before starting dependent work.
+5. Record task and wave results, close completed worker sessions and release
+   owned resources. Commit, deployment and publication follow the project's
+   operator authorization and release process.
+
+Start with a single worker/reviewer pair until the environment is repeatable.
+Increase parallelism for independent work when the project can support its
+provider budget, test isolation and integration load. Keep approval scopes
+explicit in operator policy; a task prompt does not grant permissions.
+
+### 5. Audit and feed findings back into the plan
+
+Use [audit-project](skills/audit-project/SKILL.md) to select useful lenses:
+product, architecture, code, security, data/privacy, tests and rendered UX.
+Run a focused audit after a risky change and a broader audit at a milestone
+or before release. Name the commit/tree and environment so findings are
+reproducible; inspect running behavior when the claim requires it.
+
+The audit output should include an index, a consolidated report, supporting
+reports per lens, severity, evidence and concrete acceptance for each fix.
+Audit work is read-only. Convert accepted findings into owned plan tasks,
+update dependencies/waves, implement and independently review the fixes,
+then recheck the findings on the new candidate. A report alone does not close
+a defect. The [plan/build/audit loop](skills/plan-build-audit-loop-gateway/SKILL.md)
+provides a repeatable cycle around the project's agreed quality bar.
 
 ## Agents and models
 

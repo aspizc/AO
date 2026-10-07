@@ -1,40 +1,36 @@
 # AO project status
 
-As of **2026-10-06**. This is the current public project overview. Package
+As of **2026-10-07**. This is the current public project overview. Package
 versions and imported plan generations do not establish a release.
 
 ## Published implementation and evidence
 
-The preceding verified implementation is
-[`ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3`](https://github.com/aspizc/AO/commit/ea18f4e01e76bfe2cd087ae8ffb06ea3975202e3),
-published on AO's `main`. Its implementation/checkpoint tree
-`4a61ac6bb9854a41840e7aee57d31f0ba574761b` passed the full local gate;
-the published commit adds the independent verdict, handoff, gate JSON, and
-review index. The model-default update in this tree has a separate
-[verification and review trail](../plan/PROJECT_V5/reviews/README.md#current-model-defaults-2026-10-06);
-its evidence does not constitute a release.
+AO's annotated `1.0.0` tag and public `main` resolve to
+[`41f9ce28aa59673283a7c5494200e0ec7b56e2f6`](https://github.com/aspizc/AO/commit/41f9ce28aa59673283a7c5494200e0ec7b56e2f6),
+verified again on 2026-10-07. The tag was published on 2026-10-06. The exact
+implementation/checkpoint tree tested before adding final review evidence was
+`d3548ed7d6900dc5fc97a284576e624ab6a9c1b9`.
 
 - Full command: `bash scripts/ci.sh`, exit **0**.
-- **2,625 passed, 0 failed, 12 skipped; 2,637 total**, `errors: []`.
-- Aggregate: `infrastructure_unavailable`, because the declared external
-  integrations were unavailable. This is not an all-infrastructure pass.
-- Available lanes: 447 structure tests, 1,620 Gateway passes, 25 E2E passes,
+- **2,626 passed, 0 failed, 12 skipped; 2,638 total**, `errors: []`.
+- Aggregate: `infrastructure_unavailable`, reflecting the declared external
+  integrations that were unavailable.
+- Available lanes: 447 structure tests, 1,621 Gateway passes, 25 E2E passes,
   424 CLI tests, 81 LangGraph passes, and 22 live Redis tests. Lock freshness,
   release/supply-chain verification, lint, MCP smoke, and policy validation
   also passed.
 - Unverified lanes: nine PostgreSQL tests, three Gateway/Temporal integration
   tests, and optional live provider execution. No local Darwin or Node 24
-  execution is claimed. The CI workflow defines Node 22.13.0 and Node 24 jobs;
-  their remote results are separate from this local evidence.
+  execution is claimed. Remote CI results are separate evidence.
 - Verified local tools: Node 22.22.1, Python 3.11.15,
   tmux 3.6a-agents.1, Redis 7.2.
 
-See the [independent review](../plan/PROJECT_V5/reviews/UPSTREAM_WORKING_2026_10_06-1_reviewed_OK.md),
-[gate report](../plan/PROJECT_V5/reviews/UPSTREAM_WORKING_2026_10_06-1_gate.json),
-and [integration checkpoint](../plan/PROJECT_V5/reviews/UPSTREAM_WORKING_2026_10_06_checkpoint.md).
-The preceding [large upstream integration](../plan/PROJECT_V5/reviews/UPSTREAM_SYNC_2026_10_06-1_reviewed_OK.md)
-has its own evidence. Both integrations are published; neither is a tagged
-release. Local and remote tag inventories were empty at this documentation cut.
+See the [independent review](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_06-1_reviewed_OK.md),
+[gate report](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_06-1_gate.json),
+and [candidate handoff](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_06-1_to_review.md).
+The earlier upstream integrations retain their own historical evidence.
+Current documentation/plan changes on `release/1.1.0` do not establish a new
+runtime verification or a `1.1.0` release.
 
 ## Implemented capabilities and limits
 
@@ -80,9 +76,12 @@ with their components.
 
 ## Planning and release boundary
 
-[Project V5](../plan/PROJECT_V5/README.md) is the active inherited delivery
-track. Its historical sheet statuses, source SHAs, and trial verdicts remain
-provenance; they are not AO release identifiers. An imported implementation
+[Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
+branch descending from `1.0.0`; generic workflow requirements include
+epic/story/task decomposition and persistent wave execution. Automatic wave
+launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains
+an active inherited delivery track. Its historical sheet statuses, source
+SHAs, and trial verdicts remain provenance; they are not AO release identifiers. An imported implementation
 may represent a completed slice of an otherwise open sheet. In particular,
 Doctor's executable composition does not close the full H/0/01 sheet, and
 D/0/07d design acceptance does not establish its CP1 implementation or splice.
@@ -96,5 +95,4 @@ criteria complete.
 
 `implemented`, `reviewed`, `integrated`, `published`, `promoted`, and `released`
 are separate claims. A release still requires a named candidate, its required
-gates and skip budget, and an aligned release tag. No tag is created by this
-status update.
+gates and skip budget, and an aligned release tag. This documentation update creates no new tag.
