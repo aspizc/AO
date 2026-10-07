@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/05 local recovery implementation | 1 | [request](A_0_5-1_to_review.md) | [source-only OK](A_0_5-1_reviewed_OK.md); [full gate failed](A_0_5-1-root-gate-failure.md), trial 2 needed |
 | A/0/05 append-only recovery migrations | 2 | [request](A_0_5-plan-2_to_review.md) | [OK](A_0_5-plan-2_reviewed_OK.md) |
 | A/0/05 local recovery contract | 1 | [request](A_0_5-plan-1_to_review.md) | [KO](A_0_5-plan-1_reviewed_KO.md) |
 | Integration status documentation | 1 | [request](INTEGRATION_STATUS-1_to_review.md) | [OK](INTEGRATION_STATUS-1_reviewed_OK.md) |
