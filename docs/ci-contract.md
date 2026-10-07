@@ -13,6 +13,12 @@ as candidate materials and calls `scripts/ci_gate.py` for topology, skip,
 readiness, and inventory validation; it does not define or refresh a second
 suite inventory.
 
+The required `public.hygiene` lane scans tracked publication inputs for personal
+paths and private repository registrations. Historical plan and audit evidence
+is preserved under explicit path exemptions; fixture exceptions bind an exact
+path and literal in `ci/public-hygiene-fixtures.json`. Active registrations are
+never exempted.
+
 See [project status](project-status.md) for the latest published implementation
 SHA, exact local gate totals, and unavailable integration lanes.
 

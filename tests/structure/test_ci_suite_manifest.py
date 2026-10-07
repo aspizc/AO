@@ -28,6 +28,7 @@ EXPECTED_REQUIRED = {
     "release.candidate",
     "lint.python",
     "lint.gateway",
+    "public.hygiene",
     "test.structure",
     "test.gateway",
     "test.e2e",

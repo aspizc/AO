@@ -1,0 +1,12 @@
+{
+  "projectName": "Example Python CLI and library",
+  "repositoryId": "cli-library",
+  "repositoryPath": ".",
+  "repositoryRegistration": { "classification": "internal", "allowedAgents": ["codex"] },
+  "planLayout": "docs/roadmap/{epic}/{story}/{task}.md",
+  "reviewLayout": "reviews/{task}-{trial}.md",
+  "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]],
+  "verificationWitness": "test_cli_uses_library_greeting",
+  "gatewayTopology": "operator-owned persistent MCP host",
+  "waveAutomation": "planned in PROJECT_V7"
+}

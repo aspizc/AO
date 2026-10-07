@@ -63,12 +63,13 @@ test("codex_reviewer_is_allowed_on_restricted_repo", () => {
   assert.equal(result.decision, "allow");
 });
 
-test("codex_planner_is_allowed_on_internal_planning_repo", () => {
+test("codex_planner_is_allowed_on_internal_repo", () => {
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const result = evaluate(
     {
       agent: "codex",
       role: "planner",
-      repo: "engineering_graph",
+      repo: "developer-tools",
       action: "agent.delegate",
     },
     reg,

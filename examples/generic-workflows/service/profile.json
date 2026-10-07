@@ -1,0 +1,12 @@
+{
+  "projectName": "Example HTTP service",
+  "repositoryId": "service",
+  "repositoryPath": ".",
+  "repositoryRegistration": { "classification": "internal", "allowedAgents": ["codex"] },
+  "planLayout": "planning/epics/{epic}/stories/{story}/tasks/{task}.md",
+  "reviewLayout": "planning/reviews/{task}-{trial}.md",
+  "verificationCommands": [["node", "--test", "health.test.mjs"]],
+  "verificationWitness": "health endpoint reports readiness",
+  "gatewayTopology": "operator-owned persistent MCP host",
+  "waveAutomation": "planned in PROJECT_V7"
+}

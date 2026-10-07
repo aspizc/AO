@@ -28,6 +28,9 @@ const ctx = {
 const policiesDir = process.env.AGENTS_POLICIES_DIR
   ? path.resolve(process.env.AGENTS_POLICIES_DIR)
   : path.join(REPO_ROOT, "policies");
-const registries = loadRegistries({ policiesDir });
+const registries = loadRegistries({
+  policiesDir,
+  repositoriesOverlay: process.env.AGENTS_REPOSITORIES_OVERLAY,
+});
 const decision = explain(ctx, registries);
 process.stdout.write(JSON.stringify(decision));

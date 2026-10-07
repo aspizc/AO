@@ -221,7 +221,10 @@ export function createCallToolHandler({
 
 async function main() {
   const config = loadConfig();
-  const registries = loadRegistries({ policiesDir: config.policiesDir });
+  const registries = loadRegistries({
+    policiesDir: config.policiesDir,
+    repositoriesOverlay: config.repositoriesOverlay,
+  });
   initState({ stateDb: config.stateDb });
   configureAudit({
     auditLog: config.auditLog,

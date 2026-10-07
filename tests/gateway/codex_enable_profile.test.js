@@ -73,7 +73,7 @@ test("mvp2 profile denies codex writes to self policy files", () => {
     "policies/profiles/mvp2/repositories.json",
     "./policies/profiles/mvp2/repositories.json",
     "agents-orchestrator/policies/profiles/mvp2/repositories.json",
-    "/home/carase/git/personal/agents-orchestrator/policies/profiles/mvp2/repositories.json",
+    "/srv/example/agents-orchestrator/policies/profiles/mvp2/repositories.json",
     "policies\\profiles\\mvp2\\repositories.json",
     "tmp/../policies/profiles/mvp2/repositories.json",
   ]) {
@@ -100,7 +100,7 @@ test("base registry denies codex writes to self policy files", () => {
     "policies/repositories.json",
     "./policies/repositories.json",
     "agents-orchestrator/policies/repositories.json",
-    "/home/carase/git/personal/agents-orchestrator/policies/repositories.json",
+    "/srv/example/agents-orchestrator/policies/repositories.json",
     "policies\\repositories.json",
     "tmp/../policies/repositories.json",
   ]) {
@@ -187,8 +187,9 @@ test("mvp2 profile preserves public sol max priority defaults", () => {
 
 test("kya profile preserves the public priority default", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const decision = evaluate(
-    { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate" },
+    { agent: "codex", role: "coder", repo: "developer-tools", action: "agent.delegate" },
     reg,
   );
 
@@ -199,11 +200,12 @@ test("kya profile preserves the public priority default", () => {
 
 test("kya profile still grants the priority (Fast) tier when it is asked for", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const decision = evaluate(
     {
       agent: "codex",
       role: "coder",
-      repo: "kya",
+      repo: "developer-tools",
       action: "agent.delegate",
       serviceTier: "priority",
     },
@@ -216,11 +218,12 @@ test("kya profile still grants the priority (Fast) tier when it is asked for", (
 
 test("kya profile denies a service tier that is not declared", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const decision = evaluate(
     {
       agent: "codex",
       role: "coder",
-      repo: "kya",
+      repo: "developer-tools",
       action: "agent.delegate",
       serviceTier: "turbo",
     },
@@ -233,8 +236,9 @@ test("kya profile denies a service tier that is not declared", () => {
 
 test("kya profile codex coder defaults to sol at max", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const decision = evaluate(
-    { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate" },
+    { agent: "codex", role: "coder", repo: "developer-tools", action: "agent.delegate" },
     reg,
   );
 
@@ -245,9 +249,10 @@ test("kya profile codex coder defaults to sol at max", () => {
 
 test("kya profile resolves the sol, terra and luna aliases", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const resolve = (model) =>
     evaluate(
-      { agent: "codex", role: "coder", repo: "kya", action: "agent.delegate", model },
+      { agent: "codex", role: "coder", repo: "developer-tools", action: "agent.delegate", model },
       reg,
     );
 
@@ -259,12 +264,13 @@ test("kya profile resolves the sol, terra and luna aliases", () => {
 
 test("ultra is granted on sol and terra but denied on luna", () => {
   const reg = loadRegistries({ policiesDir: KYA });
+  assert.equal(reg.getRepo("developer-tools").classification, "internal");
   const withUltra = (model) =>
     evaluate(
       {
         agent: "codex",
         role: "coder",
-        repo: "kya",
+        repo: "developer-tools",
         action: "agent.delegate",
         model,
         reasoningEffort: "ultra",

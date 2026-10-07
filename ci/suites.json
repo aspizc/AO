@@ -5,6 +5,7 @@
     "release.candidate",
     "lint.python",
     "lint.gateway",
+    "public.hygiene",
     "test.structure",
     "test.gateway",
     "test.e2e",
@@ -100,7 +101,7 @@
         "tests/structure/**/*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:e0d2532fce67c585fa00c1839957a1d9fb4f7c226634afa52b4cad5eb745f65e",
+      "inventorySha256": "sha256:b0af61414f41e0e5cfa283dc500f442453caaa656b8f66810c0e8ec124902d61",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -127,6 +128,26 @@
       "timeoutSeconds": 120
     },
     {
+      "id": "public.hygiene",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "python",
+        "scripts/check_public_hygiene.py",
+        "--repo-root",
+        "."
+      ],
+      "include": [
+        "ci/public-hygiene-fixtures.json",
+        "policies/repositories.json",
+        "scripts/check_public_hygiene.py"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 30,
+      "inventorySha256": "sha256:69dd6795e47948d81462beb881bc73887f3cb9869051f691b2a48c44855c92bf"
+    },
+    {
       "id": "test.structure",
       "classification": "required",
       "runner": "pytest",
@@ -141,7 +162,7 @@
         "tests/structure/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:fc643e5fff4550cd8424b6616d38fb5ec535df8087c40e30a8733879b60962c5",
+      "inventorySha256": "sha256:8de393d74a61bb100be6d9b0412f2478399a0ea9ba4a758eda3f8b6a327c0f14",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 300
@@ -163,7 +184,7 @@
       "exclude": [
         "tests/gateway/*_live.test.js"
       ],
-      "inventorySha256": "sha256:b19a28d7c38caadfbd49eb15e21b64ba3d8bf881708a70c970ad85c69c234525",
+      "inventorySha256": "sha256:b30c10b9cbba879b9ce2cadcc5c0382da5cadebe89a7ec77c7fdeb38fc5dc091",
       "minimumTests": 1,
       "timeoutSeconds": 900,
       "allowedSkips": [
@@ -285,7 +306,7 @@
         "tests/cli/test_*.py"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:222c342baeeae189ceb9a4a669c4b776c6dde0a4f44f2132361946222957d7c3",
+      "inventorySha256": "sha256:8370fed31bd4f0c2a2ab3ba770db12dafbc8e90eb5d85691d6bccec263c0c26f",
       "minimumTests": 1,
       "allowedSkips": [],
       "timeoutSeconds": 300

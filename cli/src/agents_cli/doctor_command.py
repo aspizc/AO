@@ -29,7 +29,6 @@ ORCHESTRATOR_PROFILE_SCHEMA = (
     REPO_ROOT / "schemas" / "orchestrator-profile-v1.schema.json"
 )
 POLICY_VALIDATOR = REPO_ROOT / "gateway" / "scripts" / "validate-registries.mjs"
-REPOSITORIES = REPO_ROOT / "policies" / "repositories.json"
 PACKAGE = REPO_ROOT / "gateway" / "package.json"
 REQUIRED_LOCKS = (
     REPO_ROOT / "requirements.lock",
@@ -142,10 +141,30 @@ def _policy_valid() -> bool:
     return result.returncode == 0
 
 
-def _repository_canonical() -> bool:
-    registry = _load_json(REPOSITORIES)
+def _load_repositories() -> object:
+    """Read the effective registry through the Gateway's fail-closed loader."""
     try:
-        repositories = dict.__getitem__(registry, "repositories")
+        result = subprocess.run(
+            ("node", str(POLICY_VALIDATOR), "--repositories"),
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            env=os.environ.copy(),
+            timeout=5.0,
+            check=False,
+        )
+        data = json.loads(result.stdout)
+        if result.returncode == 0 and type(data) is dict:
+            repositories = data.get("repositories")
+            return repositories if type(repositories) is dict else None
+    except (OSError, subprocess.TimeoutExpired, UnicodeError, json.JSONDecodeError):
+        pass
+    return None
+
+
+def _repository_canonical() -> bool:
+    repositories = _load_repositories()
+    try:
         entry = dict.__getitem__(repositories, "agents-orchestrator")
         cwd = Path.cwd().resolve(strict=True)
         root = REPO_ROOT.resolve(strict=True)

@@ -5,6 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Added additive operator-local repository overlays shared by the Gateway,
+  doctor and policy CLI; removed personal registrations from public profiles.
+- Added the required public hygiene check, generic planning/coding/review
+  prompts, and two runnable project examples. Automated wave scheduling
+  remains planned in PROJECT_V7.
+
 - Changed the public defaults to Codex `gpt-6.1-sol` / `max` / `priority`
   and Claude `claude-opus-5-5` / `max`, including the model-specific Codex
   effort, capability profiles, execution examples, and orchestration guides.
