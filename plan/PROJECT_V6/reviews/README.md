@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 prompt submission implementation | 1 | [request](A_0_4-1_to_review.md) | [KO](A_0_4-1_reviewed_KO.md); [context correction](A_0_4-1_review_context_correction.md) |
 | A/0/02 history retention decision | 1 | [request](HISTORY_DECISION_2026_10_07-1_to_review.md) | [OK](HISTORY_DECISION_2026_10_07-1_reviewed_OK.md) |
 | A/0/04 guarded runtime prerequisite | 3 | [request](A_0_4-plan-3_to_review.md) | [OK](A_0_4-plan-3_reviewed_OK.md) |
 | A/0/04 safe submission plan | 2 | [request](A_0_4-plan-2_to_review.md) | [OK](A_0_4-plan-2_reviewed_OK.md) |
@@ -30,3 +31,10 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 The operator temporarily prohibits Claude execution. This preparation uses
 Codex authoring and a distinct Codex reviewer under the already-authorized
 session-agent fallback; it is not cross-vendor or Gateway-spawned review.
+
+## Current build checkpoint
+
+A/0/04 implementation trial 1 is independently KO; no candidate code is integrated.
+The operator re-enabled Claude and selected Opus 5.5 medium for new reviews,
+and GPT-6.1 medium priority for coders. Historical preparation attribution above
+remains historical. See the immutable trial-1 context correction.
