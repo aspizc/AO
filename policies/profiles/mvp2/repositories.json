@@ -26,11 +26,6 @@
       "allowedAgents": ["antigravity", "claude-code", "codex", "gemini-cli", "opencode", "pi"],
       "excludedPaths": ["policies/"],
       "tags": ["self", "planning"]
-    },
-    "engineering_graph": {
-      "classification": "internal",
-      "allowedAgents": ["antigravity", "claude-code", "codex", "opencode", "pi"],
-      "tags": ["planning", "external-plan-target"]
     }
   }
 }
