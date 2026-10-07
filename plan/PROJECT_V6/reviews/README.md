@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Generic AO workflow direction | 1 | [request](GENERIC_DIRECTION_2026_10_07-1_to_review.md) | [OK](GENERIC_DIRECTION_2026_10_07-1_reviewed_OK.md) |
 | AO V6 preparation | 2 | [request](PREPARATION_2026_10_07-2_to_review.md) | [OK](PREPARATION_2026_10_07-2_reviewed_OK.md) |
 | AO V6 preparation | 1 | [request](PREPARATION_2026_10_07-1_to_review.md) | [KO](PREPARATION_2026_10_07-1_reviewed_KO.md) |
 
@@ -14,7 +15,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 - [A_0_5: reattachment](A_0_5_human_decision.md)
 - [A_0_6: command scopes](A_0_6_human_decision.md)
 - [A_0_3: release lineage](A_0_3_human_decision.md)
-- [A_0_2: pending snapshot choices](A_0_2_to_check_by_human.md)
+- [A_0_2: original snapshot questions](A_0_2_to_check_by_human.md)
+- [A_0_2: generic workflow direction answered; history choice open](A_0_2_human_decision.md)
 - [AO baseline](../BASELINE.md)
 
 The operator temporarily prohibits Claude execution. This preparation uses

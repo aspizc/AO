@@ -40,8 +40,9 @@ observations; they require verification in the implementation environment.
 The three operator decisions are recorded in
 [HUMAN_DECISIONS.md](HUMAN_DECISIONS.md). Claude is temporarily unavailable:
 use Codex for authoring and independent review; do not invoke Claude or claim
-its required live checks passed. A/0/02's additional snapshot choices remain
-pending and block dependent implementation, not this plan-preparation commit.
+its required live checks passed. A/0/02's generic direction is answered: preserve reusable KYA practices as
+[generic AO workflows](GENERIC_WORKFLOWS.md). Historical-publication handling
+remains open only for that step; workflow extraction can proceed.
 
 ## Gap register
 
@@ -65,7 +66,7 @@ See [`SHEETS.md`](SHEETS.md) and the [stage A README](A/README.md).
 |---|---|---|---|
 | [A/0/00](A/0/00.md) | Role-derived child CLI permissions | — | M |
 | [A/0/01](A/0/01.md) | Worker environment marker | A/0/00 | S |
-| [A/0/02](A/0/02.md) | Public-snapshot hygiene | — | S |
+| [A/0/02](A/0/02.md) | Generic public setup and reusable workflows | — | S |
 | [A/0/04](A/0/04.md) | `agent_ask` submits the prompt | — | S |
 | [A/0/05](A/0/05.md) | Supervised sessions survive a gateway restart | — | M |
 | [A/0/06](A/0/06.md) | The Gateway handles children's trust and permission prompts | A/0/00, A/0/04 | M |
@@ -87,6 +88,17 @@ Shared files are scheduling constraints, not functional dependencies.
 
 A/0/00 records residual shell-write capability for some providers; this plan
 does not promise universal OS-level write confinement.
+
+## Generic workflow direction
+
+The [operator clarification](reviews/A_0_2_human_decision.md) requires AO
+to support different project types while preserving useful KYA experience.
+[GENERIC_WORKFLOWS.md](GENERIC_WORKFLOWS.md) records epic/story/task planning,
+parallel waves and Gateway lifetime across a wave. Existing skills already
+cover parts of the method; automated wave execution remains a runtime gap
+that needs a separate registered implementation sheet before scheduling.
+This plan update does not silently add unscoped runtime work to A/0/02 or
+claim a release contains it.
 
 ## Exit criteria (observable)
 

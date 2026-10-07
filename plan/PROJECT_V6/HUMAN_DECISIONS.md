@@ -7,7 +7,7 @@ Recorded from the operator's direct instructions on 2026-10-07.
 | A/0/05 | Same user and canonical repo may explicitly reattach; no extra approval | [Decision](reviews/A_0_5_human_decision.md) |
 | A/0/06 | No automatic command scopes by default; operator adds bounded scopes in policies/; never persistent approval | [Decision](reviews/A_0_6_human_decision.md) |
 | A/0/03 | Option (a): release/1.1.0 descends from 1.0.0 at 41f9ce2 | [Decision](reviews/A_0_3_human_decision.md) |
-| A/0/02 | Snapshot example/history choices pending | [Question](reviews/A_0_2_to_check_by_human.md) |
+| A/0/02 | Preserve KYA-derived practices as generic AO workflows; historical-publication choice remains open | [Decision](reviews/A_0_2_human_decision.md) |
 
 ## Temporary execution constraint
 
