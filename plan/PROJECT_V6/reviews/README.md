@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| Main documentation publication | 1 | [request](MAIN_DOCS_2026_10_07-1_to_review.md) | [OK](MAIN_DOCS_2026_10_07-1_reviewed_OK.md) |
 | README parallel operation | 1 | [request](README_PARALLEL_2026_10_07-1_to_review.md) | [OK](README_PARALLEL_2026_10_07-1_reviewed_OK.md) |
 | README lifecycle guide | 1 | [request](README_LIFECYCLE_2026_10_07-1_to_review.md) | [OK](README_LIFECYCLE_2026_10_07-1_reviewed_OK.md) |
 | Generic AO workflow direction | 1 | [request](GENERIC_DIRECTION_2026_10_07-1_to_review.md) | [OK](GENERIC_DIRECTION_2026_10_07-1_reviewed_OK.md) |

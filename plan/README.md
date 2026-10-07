@@ -3,7 +3,8 @@
 ## AO publication and inherited planning baseline
 
 AO `1.0.0` is published at `41f9ce28aa59673283a7c5494200e0ec7b56e2f6`
-(2026-10-06); its annotated tag and public `main` were verified at that object.
+(2026-10-06); its annotated tag remains at that historical release object.
+`main` can advance with reviewed documentation independently of the tag.
 See [current project status](../docs/project-status.md) for runtime verification
 limits. The imported generation table below preserves historical provenance.
 

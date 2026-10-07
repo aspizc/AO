@@ -5,11 +5,12 @@ versions and imported plan generations do not establish a release.
 
 ## Published implementation and evidence
 
-AO's annotated `1.0.0` tag and public `main` resolve to
+AO's annotated `1.0.0` tag resolves to
 [`41f9ce28aa59673283a7c5494200e0ec7b56e2f6`](https://github.com/aspizc/AO/commit/41f9ce28aa59673283a7c5494200e0ec7b56e2f6),
 verified again on 2026-10-07. The tag was published on 2026-10-06. The exact
 implementation/checkpoint tree tested before adding final review evidence was
 `d3548ed7d6900dc5fc97a284576e624ab6a9c1b9`.
+`main` can advance with reviewed documentation independently of that release tag.
 
 - Full command: `bash scripts/ci.sh`, exit **0**.
 - **2,626 passed, 0 failed, 12 skipped; 2,638 total**, `errors: []`.
@@ -29,8 +30,10 @@ See the [independent review](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_0
 [gate report](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_06-1_gate.json),
 and [candidate handoff](../plan/PROJECT_V5/reviews/MODEL_DEFAULTS_2026_10_06-1_to_review.md).
 The earlier upstream integrations retain their own historical evidence.
-Current documentation/plan changes on `release/1.1.0` do not establish a new
-runtime verification or a `1.1.0` release.
+The development tag `1.1.0-dev.1` identifies reviewed planning and documentation
+at [`b3aed7c9365e54587dc4f847f82edff272955bfb`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82edff272955bfb)
+on `release/1.1.0`. Documentation publication does not establish new runtime
+verification or a `1.1.0` release.
 
 ## Implemented capabilities and limits
 
@@ -77,7 +80,8 @@ with their components.
 ## Planning and release boundary
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
-branch descending from `1.0.0`; generic workflow requirements include
+branch descending from `1.0.0`; all seven implementation sheets remain **planned**.
+Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains
 an active inherited delivery track. Its historical sheet statuses, source
@@ -94,5 +98,6 @@ before implementing a task; this overview does not mark their unchecked
 criteria complete.
 
 `implemented`, `reviewed`, `integrated`, `published`, `promoted`, and `released`
-are separate claims. A release still requires a named candidate, its required
-gates and skip budget, and an aligned release tag. This documentation update creates no new tag.
+are separate claims. A new runtime release still requires a named candidate,
+its required gates and skip budget, and an aligned release tag. Documentation
+publication and development tags do not establish that release.

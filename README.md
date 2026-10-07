@@ -18,8 +18,11 @@ Created and maintained by **Carlos Asensio Pizarro**.
 AO `1.0.0` is published at
 [`41f9ce2`](https://github.com/aspizc/AO/commit/41f9ce28aa59673283a7c5494200e0ec7b56e2f6),
 with an annotated [1.0.0 tag](https://github.com/aspizc/AO/releases/tag/1.0.0).
-`1.1.0` work is planned on its descendant release branch. Package version
-`0.1.0` remains development metadata.
+The development tag `1.1.0-dev.1` identifies reviewed planning and documentation
+at [`b3aed7c`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82edff272955bfb)
+on `release/1.1.0`; all seven V6 implementation sheets remain **planned**.
+`main` can advance with reviewed documentation independently of the `1.0.0`
+tag. Package version `0.1.0` remains development metadata.
 
 The 1.0.0 candidate's recorded gate has **2,626 passed, 0 failed and 12
 declared integration skips**. It exited zero with `infrastructure_unavailable`:
