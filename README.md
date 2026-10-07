@@ -486,6 +486,10 @@ Python dependency update, use `./scripts/requirements_lock.sh` followed by
 versions is the intended change. See the [release contract](docs/release-candidate.md)
 for candidate evidence and supply-chain verification.
 
+The [local capacity ledger](docs/wave-capacity.md) provides
+`agent-run wave budget-init` and cooperative reservation APIs. Automated wave
+dispatch remains planned; existing agents do not use a new ledger automatically.
+
 ## Runtime Environment
 
 | Variable | Default | Description |

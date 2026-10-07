@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+- Added cooperative local wave capacity accounting and `agent-run wave
+  budget-init`: atomic count/provider/declared-memory reservations, immutable
+  host headroom, and retained charges for uncertain effects. This V7 foundation
+  does not implement automated wave dispatch or enforce OS memory limits.
+
 - Added additive operator-local repository overlays shared by the Gateway,
   doctor and policy CLI; removed personal registrations from public profiles.
 - Added the required public hygiene check, generic planning/coding/review
