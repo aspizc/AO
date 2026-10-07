@@ -3,6 +3,11 @@
 Operating contract for implementing a KYA ("Know Your Agent") project through
 the Gateway. Use the operator's KYA checkout as the working repository.
 
+This is an optional compatibility example. Use the
+[generic project workflow](generic-project-workflows.md) and generic prompts
+for new projects. KYA-specific reviewer write permissions are local profile
+choices and do not apply to generic review sessions.
+
 ## Current runner limitation
 
 The legacy `scripts/kya_mcp_task_runner.mjs` starts a fresh Gateway process
@@ -46,11 +51,14 @@ it delegates through the Gateway.
    rules (think-before-coding, simplicity first, surgical changes, read before
    write, surface conflicts, convention over novelty, intent-verifying tests,
    fail loud).
-3. Planner runs `scripts/kya_run_task_mcp.sh` with a task config file
+3. The legacy recipe runs `scripts/kya_run_task_mcp.sh` with a task config file
    (`KYA_TASK_CONFIG`, see below). The script drives one Gateway orchestration:
    `orchestration.create` → `task.assign` + `agent.delegate` (coder) →
    `artifact.put` → `task.assign` + `agent.delegate` (reviewer) →
    `artifact.put` → `orchestration.complete`.
+   This fresh-process-per-call sequence remains unverified and cannot preserve
+   current request context. For actual iterative work use the persistent MCP
+   host and supervised spawn/ask/view workflow described in the generic guide.
 4. Planner reads the review artifact. Only a `*_reviewed_OK.md` closes the
    slice. On KO, the next trial fixes only the KO points.
 5. On OK, the planner:
@@ -75,6 +83,8 @@ KYA_TASK_SLUG='v0-1-02b'
 KYA_TASK_TITLE='<slice title>'
 KYA_CODER_PROMPT='/tmp/kya_impl_v0_1_02b_coder_prompt.md'
 KYA_REVIEW_PROMPT='/tmp/kya_impl_v0_1_02b_reviewer_prompt.md'
+KYA_REPO_CWD='<absolute-kya-checkout-path>'
+AGENTS_REPO_ROOTS='<absolute-repositories-root>'
 ```
 
 Optional overrides: `KYA_CODEX_MODEL` (default `gpt-6.1-sol`),
@@ -83,6 +93,12 @@ Optional overrides: `KYA_CODEX_MODEL` (default `gpt-6.1-sol`),
 `KYA_REVIEWER_EFFORT`, `KYA_REVIEWER_SERVICE_TIER`, `AGENTS_WORKSPACE` (default
 `/tmp/kya-agents-workspace`), `AGENTS_POLICIES_DIR` (default this repository's
 `policies/profiles/kya/`).
+`KYA_REPO_CWD` and `AGENTS_REPO_ROOTS` are required; there is no personal
+checkout default. `KYA_REPO` selects the registered ID for a compatibility
+run. After operator migration, launch the optional profile with
+`AGENTS_REPOSITORIES_OVERLAY` pointing to the operator-local registrations.
+The `--check` wrapper option checks availability only and never proves task
+execution, persistent connection lifetime or automated waves.
 
 ## Policy requirements
 

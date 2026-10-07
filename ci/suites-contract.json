@@ -5,6 +5,7 @@
     "release.candidate",
     "lint.python",
     "lint.gateway",
+    "public.hygiene",
     "test.structure",
     "test.gateway",
     "test.e2e",
@@ -124,6 +125,25 @@
       "exclude": [],
       "allowedSkips": [],
       "timeoutSeconds": 120
+    },
+    {
+      "id": "public.hygiene",
+      "classification": "required",
+      "runner": "command",
+      "argv": [
+        "python",
+        "scripts/check_public_hygiene.py",
+        "--repo-root",
+        "."
+      ],
+      "include": [
+        "ci/public-hygiene-fixtures.json",
+        "policies/repositories.json",
+        "scripts/check_public_hygiene.py"
+      ],
+      "exclude": [],
+      "allowedSkips": [],
+      "timeoutSeconds": 30
     },
     {
       "id": "test.structure",

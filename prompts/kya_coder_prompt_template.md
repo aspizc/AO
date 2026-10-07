@@ -9,7 +9,7 @@ scope, and Test requirements.
 
 You are the coder agent for the KYA repository.
 
-Repository: `/home/carase/git/experiments/kya`
+Repository: `<absolute-project-path>`
 Task: `<version>/<stream>/<slice> - <slice title>`
 
 Global project rule:

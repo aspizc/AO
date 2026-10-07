@@ -38,6 +38,48 @@ Expected result: the command reports that the policies directory is valid. If
 it reports `FAIL`, fix the referenced `policies/*.json` file and rerun the
 command.
 
+### Operator-local repositories
+
+Keep machine-specific registrations in an operator-owned JSON file outside
+the published checkout. Set `AGENTS_REPOSITORIES_OVERLAY` to its absolute
+path in the local MCP launcher and CLI environment. The file uses the same
+`version` and `repositories` shape as the base registry:
+
+```json
+{
+  "version": 1,
+  "repositories": {
+    "local-project": {
+      "classification": "internal",
+      "allowedAgents": ["codex"]
+    }
+  }
+}
+```
+
+```bash
+export AGENTS_REPOSITORIES_OVERLAY=/srv/operator-config/repositories.json
+export AGENTS_REPO_ROOTS=/srv/projects
+agent-run policy validate
+agent-run policy check --agent codex --role coder --repo local-project --action code.write
+agent-run doctor --json
+```
+
+The named checkout must exist at `/srv/projects/local-project` to bind task
+authority. Entries are additive: a shipped ID collision, unknown agent,
+invalid entry, relative overlay path or missing overlay file fails validation
+and Gateway startup. Unset means the shipped registry alone. The doctor uses
+the same validated effective registry and policy status; its sanitized output
+does not publish repository paths or registrations. Restart the configured
+Gateway after changing its launch environment. Keep `.mcp.json` untracked;
+portable launcher examples remain under `client-config/`.
+
+Only the operator moves personal registrations from the base and profile
+registries into this file. Agents never edit `policies/`. The public hygiene
+scan deliberately fails until that operator migration is complete. Generic
+project setup and workflow examples are in
+[generic-project-workflows.md](generic-project-workflows.md).
+
 ## 4. Run local CI
 
 In a separate terminal, start a disposable instance and wait for its ready

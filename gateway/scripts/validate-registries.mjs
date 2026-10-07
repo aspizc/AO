@@ -10,7 +10,10 @@ const policiesDir = process.env.AGENTS_POLICIES_DIR
   : path.join(REPO_ROOT, "policies");
 
 try {
-  const registries = loadRegistries({ policiesDir });
+  const registries = loadRegistries({
+    policiesDir,
+    repositoriesOverlay: process.env.AGENTS_REPOSITORIES_OVERLAY,
+  });
   const raw = registries.raw();
   process.stdout.write(
     JSON.stringify({
@@ -21,6 +24,7 @@ try {
         repositories: Object.keys(raw.repositories).length,
         roles: Object.keys(raw.roles).length,
       },
+      ...(process.argv.includes("--repositories") ? { repositories: raw.repositories } : {}),
     }),
   );
   process.exit(0);

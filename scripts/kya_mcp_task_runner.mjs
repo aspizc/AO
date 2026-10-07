@@ -7,12 +7,19 @@ import { fileURLToPath } from "node:url";
 
 const orchestratorRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const server = path.join(orchestratorRoot, "gateway", "src", "mcp_server.js");
+for (const variable of ["AGENTS_REPO_ROOTS", "KYA_REPO_CWD"]) {
+  if (!process.env[variable]) {
+    console.error(`Missing required ${variable}; the legacy runner has no project path default.`);
+    process.exit(2);
+  }
+}
+console.error("Legacy runner: fresh Gateway per request; persistent task authority and wave execution are not verified. Use a persistent MCP host.");
 const workspace = process.env.AGENTS_WORKSPACE || fs.mkdtempSync(path.join(os.tmpdir(), "kya-agents-"));
 const policiesDir = process.env.AGENTS_POLICIES_DIR || path.join(orchestratorRoot, "policies");
-const repoRoots = process.env.AGENTS_REPO_ROOTS || "/home/carase/git/experiments/kya";
+const repoRoots = process.env.AGENTS_REPO_ROOTS;
 const dryRun = process.env.AGENTS_DRY_RUN || "1";
 const repo = process.env.KYA_REPO || "kya";
-const cwd = process.env.KYA_REPO_CWD || "/home/carase/git/experiments/kya";
+const cwd = process.env.KYA_REPO_CWD;
 const model = process.env.KYA_CODEX_MODEL || "gpt-6.1-sol";
 const reasoningEffort = process.env.KYA_CODEX_EFFORT || "max";
 const serviceTier = process.env.KYA_CODEX_SERVICE_TIER || "priority";

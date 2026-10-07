@@ -260,6 +260,11 @@ function validateRepos(repositories) {
 
   const validClassifications = new Set(["unrestricted", "internal", "restricted"]);
   for (const [id, repo] of Object.entries(repositories)) {
+    if (typeof repo !== "object" || repo === null || Array.isArray(repo)) {
+      throw new RegistryError("REGISTRY_INVALID_REPO", `repo ${id}: entry must be an object`, {
+        field: `repositories.${id}`,
+      });
+    }
     if (!validClassifications.has(repo.classification)) {
       throw new RegistryError(
         "REGISTRY_INVALID_REPO",
@@ -315,17 +320,15 @@ function validateRoles(roles) {
 
 function validateCross(registry) {
   for (const [repoId, repo] of Object.entries(registry.repositories)) {
-    if (repo.classification !== "restricted") continue;
-
     for (const agentId of repo.allowedAgents) {
-      const agent = registry.agents[agentId];
+      const agent = Object.hasOwn(registry.agents, agentId) ? registry.agents[agentId] : null;
       if (!agent) {
         throw new RegistryError("REGISTRY_INVARIANT", `repo ${repoId} allows unknown agent ${agentId}`, {
           field: `repositories.${repoId}.allowedAgents`,
           agentId,
         });
       }
-      if (!agent.allowedClassifications.includes("restricted")) {
+      if (repo.classification === "restricted" && !agent.allowedClassifications.includes("restricted")) {
         throw new RegistryError(
           "REGISTRY_INVARIANT",
           `repo ${repoId} (restricted) allows agent ${agentId} that lacks 'restricted'`,
@@ -340,7 +343,7 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-export function loadRegistries({ policiesDir }) {
+export function loadRegistries({ policiesDir, repositoriesOverlay }) {
   const agentsFile = path.join(policiesDir, "agent-capabilities.json");
   const repositoriesFile = path.join(policiesDir, "repositories.json");
   const rolesFile = path.join(policiesDir, "roles.json");
@@ -353,9 +356,29 @@ export function loadRegistries({ policiesDir }) {
   validateRepos(repositories.repositories);
   validateRoles(roles.roles);
 
+  const effectiveRepositories = { ...repositories.repositories };
+  if (repositoriesOverlay) {
+    if (!path.isAbsolute(repositoriesOverlay)) {
+      throw new RegistryError("REGISTRY_INVALID_OVERLAY", "repositories overlay path must be absolute");
+    }
+    const overlay = readJson(repositoriesOverlay, "repositories overlay");
+    if (!overlay || !Number.isInteger(overlay.version) || overlay.version < 1) {
+      throw new RegistryError("REGISTRY_INVALID_OVERLAY", "repositories overlay requires a positive integer version");
+    }
+    validateRepos(overlay.repositories);
+    for (const [id, entry] of Object.entries(overlay.repositories)) {
+      if (Object.hasOwn(effectiveRepositories, id)) {
+        throw new RegistryError("REGISTRY_OVERLAY_COLLISION", `repositories overlay collides with base id ${id}`, {
+          field: `repositories.${id}`,
+        });
+      }
+      Object.defineProperty(effectiveRepositories, id, { value: entry, enumerable: true });
+    }
+  }
+
   const registry = {
     agents: agentCapabilities.agents,
-    repositories: repositories.repositories,
+    repositories: effectiveRepositories,
     roles: roles.roles,
     protectedBranches: agentCapabilities.protectedBranches || [],
   };

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ "${1:-}" == "--check" ]]; then
-  echo "kya_run_task_mcp wrapper ready"
+  echo "kya_run_task_mcp wrapper ready; legacy fresh Gateway per request, wave execution unverified"
   exit 0
 fi
 
@@ -22,13 +22,16 @@ set +a
 : "${KYA_TASK_TITLE:?missing KYA_TASK_TITLE}"
 : "${KYA_CODER_PROMPT:?missing KYA_CODER_PROMPT}"
 : "${KYA_REVIEW_PROMPT:?missing KYA_REVIEW_PROMPT}"
+: "${AGENTS_REPO_ROOTS:?missing AGENTS_REPO_ROOTS}"
+: "${KYA_REPO_CWD:?missing KYA_REPO_CWD}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 export AGENTS_WORKSPACE="${AGENTS_WORKSPACE:-/tmp/kya-agents-workspace}"
 export AGENTS_POLICIES_DIR="${AGENTS_POLICIES_DIR:-$REPO_ROOT/policies/profiles/kya}"
-export AGENTS_REPO_ROOTS="${AGENTS_REPO_ROOTS:-/home/carase/git/experiments/kya}"
+export AGENTS_REPO_ROOTS
+export KYA_REPO_CWD
 export AGENTS_DRY_RUN="${AGENTS_DRY_RUN:-0}"
 export AGENTS_CODEX_SANDBOX="${AGENTS_CODEX_SANDBOX:-workspace-write}"
 export KYA_CODEX_MODEL="${KYA_CODEX_MODEL:-gpt-6.1-sol}"

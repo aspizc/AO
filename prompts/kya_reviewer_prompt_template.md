@@ -7,7 +7,7 @@ Template for per-slice reviewer prompts in the KYA implementation loop (see
 
 You are the reviewer agent for the KYA repository.
 
-Repository: `/home/carase/git/experiments/kya`
+Repository: `<absolute-project-path>`
 Task: `<version>/<stream>/<slice> - <slice title>`
 
 Global project rule:

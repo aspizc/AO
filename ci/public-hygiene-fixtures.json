@@ -1,0 +1,54 @@
+[
+  {
+    "path": "tests\/cli\/test_doctor.py",
+    "literal": "\/home\/doctor-owner\/private\/bindings"
+  },
+  {
+    "path": "tests\/cli\/test_doctor.py",
+    "literal": "\/home\/doctor-owner\/private\/config.json"
+  },
+  {
+    "path": "tests\/cli\/test_doctor.py",
+    "literal": "\/home\/doctor-owner\/private\/probe.py:71"
+  },
+  {
+    "path": "tests\/cli\/test_doctor.py",
+    "literal": "\/home\/doctor-owner\/tok_profile_secret"
+  },
+  {
+    "path": "tests\/cli\/test_doctor.py",
+    "literal": "\/home\/owner\/profile"
+  },
+  {
+    "path": "tests\/cli\/test_doctor_authority_probes.py",
+    "literal": "\/home\/authority-owner\/private\/state.pid"
+  },
+  {
+    "path": "tests\/cli\/test_doctor_command.py",
+    "literal": "\/home\/doctor-owner\/private\/config.json"
+  },
+  {
+    "path": "tests\/cli\/test_doctor_coordination_probes.py",
+    "literal": "\/home\/coordination-owner\/.config\/private"
+  },
+  {
+    "path": "tests\/cli\/test_doctor_provider_probes.py",
+    "literal": "\/home\/provider-owner\/.config\/private"
+  },
+  {
+    "path": "tests\/gateway\/doctor_coordination_probe.test.js",
+    "literal": "\/home\/coordination-owner\/.config\/private"
+  },
+  {
+    "path": "tests\/gateway\/sanitizer.test.js",
+    "literal": "\/home\/dev\/project\/private\/key.pem"
+  },
+  {
+    "path": "tests\/gateway\/sanitizer_composition.test.js",
+    "literal": "\/home\/dev\/project\/private\/key.pem"
+  },
+  {
+    "path": "client-config\/profiles\/planner-assisted\/.env.example",
+    "literal": "\/home\/me\/git\/agents-orchestrator"
+  }
+]

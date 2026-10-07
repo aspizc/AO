@@ -9,8 +9,7 @@ const requireFromGateway = createRequire(
 );
 const { createClient } = requireFromGateway("redis");
 
-const DEFAULT_REDIS_SERVER =
-  "/home/carase/miniconda3/bin/redis-server";
+const DEFAULT_REDIS_SERVER = "redis-server";
 const START_ATTEMPTS = 200;
 const START_RETRY_MS = 10;
 const STOP_TIMEOUT_MS = 2_000;

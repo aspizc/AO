@@ -109,6 +109,10 @@ function loadOrCreateMessageAccessSecret(env, workspace) {
 }
 
 export function loadConfig(env = process.env) {
+  const repositoriesOverlay = env.AGENTS_REPOSITORIES_OVERLAY || undefined;
+  if (repositoriesOverlay && !path.isAbsolute(repositoriesOverlay)) {
+    throw new TypeError("AGENTS_REPOSITORIES_OVERLAY must be an absolute path");
+  }
   const workspace = env.AGENTS_WORKSPACE
     ? path.resolve(env.AGENTS_WORKSPACE)
     : path.resolve(REPO_ROOT, "workspace");
@@ -132,6 +136,7 @@ export function loadConfig(env = process.env) {
   return {
     repoRoot: REPO_ROOT,
     workspace,
+    repositoriesOverlay,
     policiesDir: env.AGENTS_POLICIES_DIR
       ? path.resolve(env.AGENTS_POLICIES_DIR)
       : path.resolve(REPO_ROOT, "policies"),
