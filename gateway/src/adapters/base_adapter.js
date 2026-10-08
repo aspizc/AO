@@ -30,6 +30,160 @@ const codexLiveStatus = /^ {2}GPT-6\.1-Sol medium fast · \S+\s*$/;
 // Codex 0.160.1 status_surfaces.rs: explicit spinner frames, never acceptance alone.
 const codexSpinnerStatus = /^ {2}GPT-6\.1-Sol medium fast · \S+ · [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] *$/;
 const codexWorking = /^• Working \([0-9hms .]+• esc to interrupt\) *$/;
+// Codex rust-v0.160.1 history_cell/notices.rs and empty_state_animation/greetings.rs.
+// The greeting varies between fresh threads, but is retained within one thread.
+const codexStartupGreetings = new Set([
+  "  Whoa, fancy meeting you here!",
+  "  Look who’s at the keyboard.",
+  "  Hello, you. Got an idea?",
+  "  Nice to see you in these parts.",
+  "  Pull up a prompt.",
+  "  What brings you to this corner of the terminal?",
+  "  Hey there. Big plans or little fixes?",
+  "  What are we getting into today?",
+  "  Got something you want to try?",
+  "  What’s today’s little adventure?",
+  "  Anything interesting on the docket?",
+  "  Take your time. The cursor can wait.",
+  "  A half-formed idea will do.",
+  "  Come on in. There’s room for an idea.",
+  "  You, me, and a blinking cursor.",
+  "  It takes two to tango. What’s our first step?",
+  "  You bring the idea. I’ll bring the brackets.",
+  "  Your move, teammate.",
+  "  What are we cooking up?",
+  "  Shall we turn “what if” into something?",
+  "  What’s the first thing on our napkin sketch?",
+  "  Bring your unfinished thoughts.",
+  "  You set the direction. We’ll work out the steps.",
+  "  Ah, the terminal. A classic meeting spot.",
+  "  Nice place you’ve got here. Very monospace.",
+  "  Welcome to our little rectangle of possibility.",
+  "  A cursor blinks. The plot thickens.",
+  "  The prompt is yours.",
+  "  Fancy a little quality terminal time?",
+  "  How’s life between the brackets?",
+  "  Shall we give this cursor a purpose?",
+  "  A fresh prompt. An open question.",
+  "  Your keyboard has entered the chat.",
+  "  Hello, world. Hello, you.",
+  "  Welcome to the blinking edge of possibility.",
+  "  Any loose ends? Semicolons count.",
+  "  Shall we make this terminal earn its keep?",
+  "  Got an itch to fix a thing?",
+  "  Show me the bit that’s being weird.",
+  "  Greetings, fellow tinkerer.",
+  "  Well, well, well. An idea approaches.",
+  "  What’s today’s side quest?",
+  "  Is this a plan day or a poke-around day?",
+  "  Practical, peculiar, or a little of both?",
+  "  Rough sketches welcome.",
+  "  Shall we see where this goes?",
+  "  All right. What have you got?",
+  "  Back for another round?",
+  "  Same terminal, new possibilities.",
+  "  Welcome back. Familiar territory or a fresh adventure?",
+  "  Follow the white cursor.",
+  "  Welcome to the command line, Neo.",
+  "  A glitch in the Matrix, or just a missing semicolon?",
+  "  How deep does this codebase go?",
+  "  Speak, friend, and enter a prompt.",
+  "  One prompt to begin the journey.",
+  "  May the source be with you.",
+  "  These might be the bugs you’re looking for.",
+  "  A new prompt awakens.",
+  "  Forty-two is an answer. What’s the question?",
+  "  It’s dangerous to code alone. Take a prompt.",
+  "  The code must flow.",
+  "  You rang? Metaphorically. You typed.",
+  "  Hello again, carbon-based collaborator.",
+  "  This looks like the start of a perfectly reasonable rabbit hole.",
+  "  Shall we turn “huh?” into “aha!”?",
+  "  Well, this terminal just got interesting.",
+  "  The source is strong with this one.",
+  "  There’s a perfectly good prompt with your name on it.",
+  "  Here for a quick fix or the extended edition?",
+  "  What’s the latest from your side of the keyboard?",
+  "  Got a minute and a mildly unreasonable idea?",
+  "  A hunch is a perfectly respectable starting point.",
+  "  Hello again. What’s the plot this time?",
+  "  Shall we make a little something out of nothing?",
+  "  Welcome to the neighborhood. Lots of characters here.",
+  "  Nice terminal. Does it come in widescreen?",
+  "  Your cursor called. It wants a plot.",
+  "  Shall we put some verbs after that cursor?",
+  "  Welcome. There’s no dress code, just code.",
+  "  This terminal has excellent conversational potential.",
+  "  Got an idea that won’t stay on the napkin?",
+  "  What are we building in this episode?",
+  "  Bring a question. Bonus points if it’s a weird one.",
+  "  What are we poking with a metaphorical stick?",
+  "  Shall we make the thing that makes the other thing easier?",
+  "  Welcome to the part where the idea gets interesting.",
+  "  A long time ago, in a directory not so far away…"
+]);
+// Exact observed static notice; the interactive update picker is not this cell.
+const codexStartupNotice = [
+  "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮",
+  "│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │",
+  "│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │",
+  "│                                                                                                     │",
+  "│ See full release notes:                                                                             │",
+  "│ https://github.com/openai/codex/releases/latest                                                     │",
+  "╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯",
+  "",
+  "",
+  "  >_ OpenAI Codex (v0.160.1)"
+];
+function codexUpdateWelcomeHeader(rows, width) {
+  const greeting = rows[12]?.trimEnd();
+  return [11, 12].every((index) => typeof rows[index] === "string" && rows[index].length <= width)
+    && codexStartupNotice.every((row, index) => rows[index] === row)
+    && /^ {5}(?:\/|~\/)[A-Za-z0-9_./-]+$/.test(rows[10])
+    && /^ *$/.test(rows[11]) && codexStartupGreetings.has(greeting)
+    && /^ *$/.test(rows[12].slice(greeting.length));
+}
+function codexUpdateWelcomeDraft(rows, width) {
+  const status = `  GPT-6.1-Sol medium fast · ${rows[10]?.slice(5)}`;
+  return codexUpdateWelcomeHeader(rows, width)
+    && typeof rows[38] === "string" && rows[38].length <= width
+    && rows[38].trimEnd() === status && /^ *$/.test(rows[38].slice(status.length))
+    && rows[39] === " ".repeat(94) + "⚠ 2 warnings · f2 to view";
+}
+function codexUpdateWelcomeWork(rows, pane) {
+  const status = `  GPT-6.1-Sol medium fast · ${rows[10]?.slice(5)} · `;
+  return pane.width === 120 && pane.height === 40 && pane.cursor === 36 && pane.cursorX === 2
+    && rows.length === 41 && rows[40] === "" && rows.every((row) => row.length <= pane.width)
+    && codexUpdateWelcomeHeader(rows, pane.width)
+    && rows.slice(13, 36).every((row, index) => index + 13 === 15
+      ? /^› [\x20-\x7e]+$/.test(row) : index + 13 === 33 ? codexWorking.test(row) : /^ *$/.test(row))
+    && /^› Ask Codex to do anything *$/.test(rows[36]) && /^ *$/.test(rows[37])
+    && codexSpinnerStatus.test(rows[38]) && rows[38].startsWith(status)
+    && rows[39] === "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view";
+}
+// Measured post-turn 0.160.1 Ready label clipped after an 87-column ASCII cwd.
+function codexPostTurnPane(rows, pane, phase) {
+  if (pane.width !== 120 || pane.height !== 40 || pane.cursor !== 36
+    || rows.length !== 41 || rows[40] !== "" || rows.some((row) => row.length > pane.width)
+    || !codexUpdateWelcomeHeader(rows, pane.width) || rows[10].slice(5).length !== 87
+    || rows[38] !== `  GPT-6.1-Sol medium fast · ${rows[10].slice(5)} · R…`
+    || !rows.slice(13, 36).every((row, index) => index + 13 === 15
+      ? /^› [\x21-\x7e][\x20-\x7e]*$/.test(row) : index + 13 === 18
+        ? /^• [\x21-\x7e][\x20-\x7e]*$/.test(row) : index + 13 === 20
+          ? /^ {2}Worked for [0-9]{1,5}s • (?:[01][0-9]|2[0-3]):[0-5][0-9] *$/.test(row) : /^ *$/.test(row))
+    || !/^ *$/.test(rows[37])) return null;
+  let text = "";
+  if (phase === "ready") {
+    if (pane.cursorX !== 2 || !/^› Ask Codex to do anything *$/.test(rows[36])
+      || rows[39] !== "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view") return null;
+  } else if (phase === "draft") {
+    text = rows[36].startsWith("› ") ? rows[36].slice(2) : "";
+    if (!text || text === "Ask Codex to do anything" || /[^\x20-\x7e]/.test(text)
+      || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
+      || rows[39] !== " ".repeat(94) + "⚠ 2 warnings · f2 to view") return null;
+  } else return null;
+  return { state: "composer", text, warningDraft: phase === "draft", identity: "36:39:120:40" };
+}
 function codexGap(rows, cursor, footer) {
   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
     && !(codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))) return false;
@@ -119,17 +273,29 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
   const rows = snapshot.split("\n");
   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
   if (provider === "codex") {
+    // Raw 0.160.1 update-notice viewport: use the existing first-Enter freshness proof.
+    if (codexUpdateWelcomeWork(rows, pane)) {
+      return { state: "busy", text: "", modernWork: true, welcomeWork: true,
+        workRow: 33, identity: "36:39:120:40" };
+    }
+    const postTurn = codexPostTurnPane(rows, pane, phase);
+    if (postTurn) return postTurn;
+    // The shifted startup header cannot borrow a generic draft/footer profile.
+    if (phase === "draft" && rows[9]?.trim() === ">_ OpenAI Codex (v0.160.1)"
+      && !codexUpdateWelcomeDraft(rows, pane.width)) return { state: "unknown_state" };
     // One measured post-paste footer variant, never initial input or acceptance evidence.
     if (/^ +⚠ 2 warnings · f2 to view *$/.test(rows[39])) {
       const text = rows[36]?.startsWith("› ") ? rows[36].slice(2) : "";
+      const updateWelcomeDraft = codexUpdateWelcomeDraft(rows, pane.width);
       if (phase !== "draft" || pane.width !== 120 || pane.height !== 40 || pane.cursor !== 36
-        || rows.length !== 41 || rows[40] !== "" || rows[1]?.trim() !== ">_ OpenAI Codex (v0.160.1)"
+        || rows.length !== 41 || rows[40] !== ""
+        || !(rows[1]?.trim() === ">_ OpenAI Codex (v0.160.1)" || updateWelcomeDraft)
         || !codexLiveStatus.test(rows[38]) || rows[37]?.trim() !== ""
         || rows.slice(13, 36).some((row) => row.trim() !== "")
         || rows.slice(0, 36).some((row) => codexWorking.test(row))
         || !text || text === "Ask Codex to do anything" || text.length >= 800 || /[^\x20-\x7e]/.test(text)
         || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width) return { state: "unknown_state" };
-      return { state: "composer", text, warningDraft: true, identity: "36:39:120:40" };
+      return { state: "composer", text, warningDraft: true, updateWelcomeDraft, identity: "36:39:120:40" };
     }
     const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
@@ -307,6 +473,33 @@ function requireComposer(observation, text, identity) {
   }
 }
 
+function freshCodexSecondTurn(ready, pending, guard, after, prompt, attempt) {
+  // Measured second-turn witness only; never grants readiness or another Enter.
+  if (attempt !== 0 || !pending.warningDraft || !guard.warningDraft
+    || [ready, pending, after].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
+      .some((key) => frame[key] !== guard[key]))
+    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+    || after.cursorY !== "36" || after.cursorX !== "2"
+    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
+  const rows = after.snapshot.split("\n");
+  if (!codexPostTurnPane(prior[0], { width: Number(ready.width), height: Number(ready.height),
+    cursor: Number(ready.cursorY), cursorX: Number(ready.cursorX) }, "ready")
+    || rows.length !== 41 || rows[40] !== "" || rows.some((row) => row.length > 120)
+    || prior.some((before) => rows.slice(0, 23).some((row, index) => row !== before[index]))
+    || rows[23].replace(/ +$/, "") !== `› ${prompt}`
+    || rows.filter((row) => row.replace(/ +$/, "") === `› ${prompt}`).length !== 1
+    || prior.some((before) => before.slice(0, 36).some((row) => row.replace(/ +$/, "") === `› ${prompt}`))
+    || rows.slice(36).some((row, index) => row !== prior[0][index + 36])) return false;
+  // Completion is a newly inserted assistant cell AND separator, not the old reply.
+  const working = codexWorking.test(rows[33]);
+  const completed = /^• [\x21-\x7e][\x20-\x7e]*$/.test(rows[26])
+    && /^ {2}Worked for [0-9]{1,5}s • (?:[01][0-9]|2[0-3]):[0-5][0-9] *$/.test(rows[28]);
+  return (working || completed) && rows.slice(24, 36).every((row, index) => working
+    ? index + 24 === 33 || /^ *$/.test(row)
+    : [26, 28].includes(index + 24) || /^ *$/.test(row));
+}
+
 function freshCodexWork(ready, pending, guard, after, prompt, attempt) {
   if (after.workRow === null || after.workRow === undefined
     || ["serverPid", "target", "panePid", "width", "height"].some((key) => after[key] !== guard[key])) return false;
@@ -432,6 +625,12 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
       else if (guard.state !== "composer" || guard.text !== prompt || guard.identity !== pending.identity) {
         throw submissionError("acceptance_uncertain");
       }
+      if (pending.updateWelcomeDraft || guard.updateWelcomeDraft) {
+        // Ready's footer is measured separately; a warning transition stays closed.
+        if (ready.snapshot.split("\n")[39] !== "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view") {
+          throw submissionError("unknown_state");
+        }
+      }
       if (pending.warningDraft || guard.warningDraft) {
         // No footer transition or process drift can authorize this variant's first Enter.
         if (attempt !== 0 || !pending.warningDraft || !guard.warningDraft || guard.snapshot !== pending.snapshot
@@ -464,6 +663,9 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
           }
           throw submissionError("acceptance_uncertain");
         }
+      }
+      if (provider === "codex" && freshCodexSecondTurn(ready, pending, guard, after, prompt, attempt)) {
+        return { snapshot: after.snapshot, dryRun: false };
       }
       if (after.state === "busy" && after.text === ""
         && (provider !== "codex" || freshCodexWork(ready, pending, guard, after, prompt, attempt))) {

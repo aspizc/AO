@@ -1,0 +1,26 @@
+{
+  "baseline": "b4506d26950ce7b9a6af92fc63c8c56db4daea09",
+  "codexTag": "rust-v0.160.1",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/history_cell/notices.rs",
+      "sha256": "39e443b9069bd7f66a6db17194e4e70fcf62a669a39912548ca0ad86a6b78efe"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/history_cell/session.rs",
+      "sha256": "15574118f8af477b9ba2072459aaed8baf6b9d7569dd5cf84d9bde29a61acad4"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/empty_state_animation/greetings.rs",
+      "sha256": "8220519b97c3bb8b85e3048b2626bdc1d5e9a9e66d1efa8e5c4e33e2c724bb57"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/empty_state_animation.rs",
+      "sha256": "13005bb690811469c293014bdcfc8506dbacf53c0703052575240119f60a8baa"
+    }
+  ],
+  "privateEvidenceSha256": "8de7b48381e28e0c7bf928913bf609761dc0226a515122c2c1d5220daafc90ce",
+  "frameLimits": "Only ready/draft transcript strings recorded. Cursor and capture LF reconstructed; synthetic IDs preserve equal binding. No atomic guard or acceptance observation recorded.",
+  "baselineSourceSha256": "8bd66d3b8d95bf1a14ce85b368c2b9796bd63cf75982b5f60bd01ac3be18ed2b",
+  "greetingCount": 88
+}

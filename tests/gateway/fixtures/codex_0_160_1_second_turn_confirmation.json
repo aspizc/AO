@@ -1,0 +1,133 @@
+{
+  "sourceKind": "Five operator raw tmux capture-pane -p -N -T captures. All raw rows retain exact lengths, padding, row positions and final LF; cwd and challenge prompts/replies are equal-length synthetic replacements. Cursor36/2, modes and server/pane/process identity are reconstructed metadata, not attested by raw files. Draft and repeated guard are hypothetical reconstructions (composer36, warning-only footer39, cursorX86). Operator reports exactly one guarded Enter and same process after explicit reattach; coder did not reproduce live execution. Partial response row26 is the literal six-character prefix plus raw padding; no completion, so it is deliberately unsupported.",
+  "baseCommit": "3504b498b58c8ba98d3321da57ad77a305a4e65f",
+  "privateRawSha256": [
+    "130e7035d0f1e6ba20439143e094fccd371204deb41acbd6ba471674e850859e",
+    "582f8ca9f1b4b68cd8e5029a944292ce408ec1c9ad93ac3c35e0b3ae44e98bfb",
+    "518c26dce319a1d4f90436fcb3c98955383d42610be3291ea2b010f99e12b2f1",
+    "a2f49122401f41882ebce2b63a90c71d2df5f56e8469a5e813ba6c2aa4b98959",
+    "a2f49122401f41882ebce2b63a90c71d2df5f56e8469a5e813ba6c2aa4b98959"
+  ],
+  "priorPrompt": "Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.",
+  "prompt": "Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.",
+  "ready": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n                                 \n\n\n› Ask Codex to do anything                                                            \n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "draft": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n                                 \n\n\n› Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.\n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n                                                                                              ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 86
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "working": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n› Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.\n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n• Working (1s • esc to interrupt)\n\n\n› Ask Codex to do anything                                                            \n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "partial": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n› Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.\n                                                                         \n                                                                      \n• ACK:                                                               \n                                                                   \n\n\n\n\n\n                                 \n\n\n› Ask Codex to do anything                                                            \n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "completed": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n› Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.\n                                                                         \n                                                                      \n• ACK:0123456789abcdef0123456789abcdef                               \n                                                                   \n  Worked for 2s • 14:46                                                                                                 \n\n\n\n\n                                 \n\n\n› Ask Codex to do anything                                                            \n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "completedRepeat": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Well, well, well. An idea approaches.                               \n                                                                        \n                                                                         \n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n                                                                          \n                                                                           \n• ACK:fedcba9876543210fedcba9876543210                                      \n                                                                            \n  Worked for 4s • 14:45                                                                                                 \n                                                                            \n                                                                            \n› Reverse fedcba9876543210fedcba9876543210. Reply ACK:<reversed nonce> only. No tools.\n                                                                         \n                                                                      \n• ACK:0123456789abcdef0123456789abcdef                               \n                                                                   \n  Worked for 2s • 14:46                                                                                                 \n\n\n\n\n                                 \n\n\n› Ask Codex to do anything                                                            \n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd · R…\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  }
+}

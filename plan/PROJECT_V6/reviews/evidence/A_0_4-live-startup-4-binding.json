@@ -1,0 +1,30 @@
+{
+  "baseCommit": "fecc3e510f8aa40ada1b11c69c96df329d46d960",
+  "baseAdapterSha256": "9636c4986b18a3e5f2275a697be48753c9fde446880ef34b68f4fe1a5c56afaf",
+  "candidateBaseAdapterSha256": "7cd947a4d860a78a56ef846b7c23d1ed48b955a23482c0bef21366e513681278",
+  "privateRawSha256": [
+    "f41f05153df5056ff095b66de4842dd75274e49cd4cd32e4413460f6d711898f",
+    "f41f05153df5056ff095b66de4842dd75274e49cd4cd32e4413460f6d711898f"
+  ],
+  "rawReadyAndRefusalByteIdentical": true,
+  "priorReviewFilesUnchanged": true,
+  "submitPromptGuardedSubmitFreshCodexWorkByteIdenticalToBase": true,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs",
+      "sha256": "e96ac7db77866266a5b146b885f03487bf801511295bd35474877783537e6200",
+      "retrieval": "pinned cached source"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/bottom_pane/chat_composer/status_surface.rs",
+      "sha256": "454cabfa863caef1bb9c081aaaa0161b3958c67ebc42c48b8fda4b09a08ea315",
+      "retrieval": "pinned cached source"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/line_truncation.rs",
+      "sha256": "f0561006d5adebccf47f47776a6c65e6eef72ebd672c7ce6599560d5b915176c",
+      "retrieval": "fetched in trial 4"
+    }
+  ],
+  "limits": "Raw ready/refusal only. Cursor/process metadata and draft/guard reconstructed. No second Enter acceptance observation, new live run or executable attestation."
+}

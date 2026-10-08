@@ -1,0 +1,18 @@
+{
+  "gateway/src/adapters/base_adapter.js": "9636c4986b18a3e5f2275a697be48753c9fde446880ef34b68f4fe1a5c56afaf",
+  "gateway/README.md": "4e44a282af85191ab03ea9bb8a093a123125e2d6a5f32bbcb9b22bb2274f98ac",
+  "tests/gateway/prompt_submission.test.js": "0e09b539032c6a25024fb723b4fce9d489f995875fddcce320401f3993613fd1",
+  "tests/gateway/fixtures/codex_0_160_1_update_welcome_draft.json": "aa6bba7cf5974791cd23d4be597d436c4e20bc91ee24faaf462450b5be43a9db",
+  "tests/gateway/fixtures/codex_0_160_1_update_welcome_working.json": "84f2862c3b31d547658a78f67682d991407f11d7652d610606af392f2ac88e1d",
+  "plan/PROJECT_V6/reviews/A_0_4-live-startup-3_to_review.md": "35a51c9cbf64aaef992bad3105698e535962f019c4052d5706c92bbd9d0d315f",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-binding.json": "d0bf4704bcf775b827a9f492e86653c1daec983b5f34cb4525308bcca8cd688e",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-checks-runner.py": "bfa93ea057be5450adadd54bb698c25a11550a217cda4214db16b0cbf0667804",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-checks.json": "7eb4ab1749f45997cbe8a666a39490905a188bbcc73fe06bf6f1b420021ab7cb",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-docs-final.log.gz": "ee2c7e0885b0a1dbe2f728836e314e493717ecb829b2c27e7f54ed0df202f217",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-entry-hashes.json": "57beb2c06c712c569ddce959ae6ddaed67bc09ea5cffb2b599e037445afc6bf5",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-green-final.log.gz": "283ee04fffd77badce5749299560c8e64ae33a8a8aadcd84e898d0f5a1c4c221",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-lint.log.gz": "7c9eebc9c9bb5f7c9f3531b4c1e845c12334af2f22fce5667e8a66ea34f30dbd",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-mutation-initial.log.gz": "ef7e6c25cd814dbc0e5821832046b207d7d2662655f7a70782b3ef010458790d",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-mutations.json": "723b2131e26442e25333049c07b7cbb5f490f26770c1e97fbe1e6999774fb1f4",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-3-red-final.log.gz": "2992344dcc90b3381d8db4e14388f485a40b7631ef806e91cd101642904a008b"
+}

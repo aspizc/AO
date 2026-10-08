@@ -1,0 +1,7 @@
+{
+  "baseCommit": "3504b498b58c8ba98d3321da57ad77a305a4e65f",
+  "handoffSha256": "4a68f0c80ce81f3bcae2792eda251981f524cad70d6d1ba5080c2e21ea13f474",
+  "filesMapSha256": "7cf1e46117f149df0db5654d687cd50bab942975bbe7a21124ba25944bc6070d",
+  "candidateBaseAdapterSha256": "bc039cb5fbdbb29dc6bd90cba66c0596043acc70a934201b04184dd10b3699e7",
+  "manifestExcludesItselfAndSeal": true
+}

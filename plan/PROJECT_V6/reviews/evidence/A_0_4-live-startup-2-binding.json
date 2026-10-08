@@ -1,0 +1,9 @@
+{
+  "baseCommit": "71425f1667316c1dc1da60960dcfa7e424d18992",
+  "trial1CandidateSourceSha256": "911dd14451566a7edea0868b5c2403cc45fa72896e423b4f1f3ad9b8127e4e07",
+  "candidateSourceSha256": "a470283858303e7e4fdd3b21515d4c7ea495662ba3b3399915de34993a05da62",
+  "privateDiagnosticEvidenceSha256": "59ccb93f4611897c04c4fff4b55a165bf2432d9d55a51667a96185b5fa4527ba",
+  "priorTrialFilesUnchanged": true,
+  "guardedSubmitAndFreshCodexWorkByteIdenticalToEntry": true,
+  "upstreamGreetingCount": 88
+}

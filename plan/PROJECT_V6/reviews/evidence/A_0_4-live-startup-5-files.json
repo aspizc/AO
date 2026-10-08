@@ -1,0 +1,20 @@
+{
+  "gateway/README.md": "30c088c13949d02fbbc7a259485e154d34201580adeb39afb90561bca2390977",
+  "gateway/src/adapters/base_adapter.js": "bc039cb5fbdbb29dc6bd90cba66c0596043acc70a934201b04184dd10b3699e7",
+  "tests/gateway/prompt_submission.test.js": "6d534b1d34ee10a39edf7cf8d713aaf41385b3d3da89f8bba584cec4ca23ad47",
+  "tests/gateway/fixtures/codex_0_160_1_second_turn_confirmation.json": "345ebc099514d498adfdc136d55f71c8ea96ce541693b87b4e6ea17f66c6f7ee",
+  "plan/PROJECT_V6/reviews/A_0_4-live-startup-5_to_review.md": "4a68f0c80ce81f3bcae2792eda251981f524cad70d6d1ba5080c2e21ea13f474",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-binding.json": "494d1077bf7781ecbf474535a0c70a183db27be978a2aa6a5d84ad8f330291a0",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-checks-runner.py": "3ad09ef1f3151d3c350962d2c1264c49893237136d4738b41cd2283d5bb0f3f5",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-checks.json": "1ef41f11b698b902c6c68f64ba6f70022bd8fb62ff2b1433ca2425b1d93e6642",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-diff-check.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-entry-hashes.json": "4a7280f3474a8ab72f55fe995d737136ff9a7e46faabdeeabbe8f0dc24df0717",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-green-complete.log.gz": "4b2a3590fb770643f228cb1472884e37fa0d229ccb0ec439a62e8098d17dc9cf",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-hygiene.log.gz": "1204f30c415b43b38689e96e1e82f1f9dc6cef1c56138586fd5708d8980d36d3",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-inventory-refresh.log.gz": "6e58ca42987ee2c303acb6482ab7582c2bbf690617ad3c50cc956e0d51023d14",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-inventory-validate.log.gz": "6e58ca42987ee2c303acb6482ab7582c2bbf690617ad3c50cc956e0d51023d14",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-lint.log.gz": "7c9eebc9c9bb5f7c9f3531b4c1e845c12334af2f22fce5667e8a66ea34f30dbd",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-mutation-logs.json.gz": "25b5fb7a647ade04b63da3a6b30bfa749db168a205a0a7eba8fb60b674fcf5af",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-mutations.json": "a9950fec1044fc43061778680d222f2616b3f9255b02b0813e1fa6022f6e32bb",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-red-final.log.gz": "9c3acbfe3cc1d8f7244b112745577e0548936aee5386a10d234008a135b4f513"
+}

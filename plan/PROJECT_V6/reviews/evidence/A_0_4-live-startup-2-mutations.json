@@ -1,0 +1,150 @@
+{
+  "red": {
+    "exitCode": 1,
+    "sourceSha256": "911dd14451566a7edea0868b5c2403cc45fa72896e423b4f1f3ad9b8127e4e07",
+    "failures": [
+      "not ok 15 - startup2 raw padded rows permit only the guarded first Enter with acceptance uncertain",
+      "not ok 16 - startup2 each raw padding predicate accepts spaces through the pane width"
+    ]
+  },
+  "notice": {
+    "exitCode": 1,
+    "sourceSha256": "cf75d9760574b868cb85ec6eb92392c12022731e760996f0616f9b9db85540d5",
+    "failures": [
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed"
+    ]
+  },
+  "cwd": {
+    "exitCode": 1,
+    "sourceSha256": "910f1887336c8b88cd79ad131327d9c677de33f132b3dc13c7fc14d9aa8bc827",
+    "failures": [
+      "not ok 18 - startup2 matching non-path cwd cannot borrow status equality"
+    ]
+  },
+  "width": {
+    "exitCode": 1,
+    "sourceSha256": "9743d98a96fd64e36ac3d3ef9f4936f8d367f0792ab875082bf4ee4d5364e912",
+    "failures": [
+      "not ok 17 - startup2 non-space tab and beyond-width padding refuses without Enter"
+    ]
+  },
+  "blank-padding": {
+    "exitCode": 1,
+    "sourceSha256": "7cdcde6cb257ccc1fb328ddb983a16427e05ac60bbc4b91374036bbfa1cfc368",
+    "failures": [
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed",
+      "not ok 17 - startup2 non-space tab and beyond-width padding refuses without Enter"
+    ]
+  },
+  "greeting": {
+    "exitCode": 1,
+    "sourceSha256": "a8a84dd34acc349bc0dff6c808973197aedc857a8ae1ba582b2f8ade2fe40998",
+    "failures": [
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed",
+      "not ok 13 - startup greeting slot cannot carry a menu history or a different greeting between captures",
+      "not ok 17 - startup2 non-space tab and beyond-width padding refuses without Enter"
+    ]
+  },
+  "greeting-padding": {
+    "exitCode": 1,
+    "sourceSha256": "1b6b726df63297b9a9f29e1a8df7d27d12439cbe6e31e875dd59dec763667919",
+    "failures": [
+      "not ok 17 - startup2 non-space tab and beyond-width padding refuses without Enter"
+    ]
+  },
+  "status-padding": {
+    "exitCode": 1,
+    "sourceSha256": "e60acc6e577ef4894696dcd341d55adc4d089551648629400f4a2bcbf6db3fb0",
+    "failures": [
+      "not ok 17 - startup2 non-space tab and beyond-width padding refuses without Enter"
+    ]
+  },
+  "cwd-status": {
+    "exitCode": 1,
+    "sourceSha256": "8e8a566f6bbf9ca89714d5adadbf9740288ea59e89fbe2771ade20d7780ad9e6",
+    "failures": [
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed"
+    ]
+  },
+  "exact-footer": {
+    "exitCode": 1,
+    "sourceSha256": "edd6102bbed9860c92787943f41c25bb352f7f9e0c453d35214e5303a834caa0",
+    "failures": [
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed"
+    ]
+  },
+  "ready-footer": {
+    "exitCode": 1,
+    "sourceSha256": "dae3a48564d55079d2da2078dc7fbc74676f0e9720cc38f5e46fe61839d85517",
+    "failures": [
+      "not ok 13 - startup greeting slot cannot carry a menu history or a different greeting between captures"
+    ]
+  },
+  "phase": {
+    "exitCode": 1,
+    "sourceSha256": "e7f07153c5847b999b2ff9dcd433dd58fb9f434e8fd0c3103632db6477dffc65",
+    "failures": [
+      "not ok 2 - trial17 warning-only draft is phase-bound and cannot authorize initial input",
+      "not ok 10 - startup exact update draft is phase bound and never authorizes a retry"
+    ]
+  },
+  "cursor": {
+    "exitCode": 1,
+    "sourceSha256": "29b336dc0d17f7541a43cd27e1e8c92a87620312edb3f5c2ddcfcd00abdc9fba",
+    "failures": [
+      "not ok 3 - trial17 warning-only draft requires measured version footer status history text and exact cursor",
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed"
+    ]
+  },
+  "history": {
+    "exitCode": 1,
+    "sourceSha256": "55907515cfa7d8e35e513aff15b9faa61b2229dab50fd93423644ab0b8f2695d",
+    "failures": [
+      "not ok 3 - trial17 warning-only draft requires measured version footer status history text and exact cursor",
+      "not ok 11 - startup spoofed notice history footer version status and cursor variants remain closed",
+      "not ok 14 - startup duplicate notice wrapped payload trailing data and non-ASCII drafts stay closed"
+    ]
+  },
+  "ascii": {
+    "exitCode": 1,
+    "sourceSha256": "fddab30634e1fb85b3ab27a4e4aee3f32c1367dc4e1ca6ea747b0066d06bb3a7",
+    "failures": [
+      "not ok 14 - startup duplicate notice wrapped payload trailing data and non-ASCII drafts stay closed"
+    ]
+  },
+  "first-enter": {
+    "exitCode": 1,
+    "sourceSha256": "7bcfb83e0813bdfe4147ebe605cc3a7112c6c31ce21114d48a06714c7007bf26",
+    "failures": [
+      "not ok 8 - trial17 warning-only draft does not authorize a retry Enter when submission remains pending",
+      "not ok 10 - startup exact update draft is phase bound and never authorizes a retry"
+    ]
+  },
+  "stable-capture": {
+    "exitCode": 1,
+    "sourceSha256": "1907499f7119d158f769fdcdb32f491d1dcd1bc64d6423b8906df4859f5d94aa",
+    "failures": [
+      "not ok 4 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 13 - startup greeting slot cannot carry a menu history or a different greeting between captures",
+      "not ok 19 - startup2 changed raw padded bytes across ready pending and guard cannot authorize Enter"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "sourceSha256": "2993b128549c975dc0cb0f329390cc8621c3c908a3ae6a621e1e671efcece6e7",
+    "failures": [
+      "not ok 4 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 12 - startup changed payload pane server prefix warning transitions or menu prevent Enter"
+    ]
+  },
+  "ready-prefix": {
+    "exitCode": 1,
+    "sourceSha256": "a1fcf6bd2e324f1d1ab8c7a7b9f8db5973af3b2f3758784e65f6647756073292",
+    "failures": [
+      "not ok 4 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 12 - startup changed payload pane server prefix warning transitions or menu prevent Enter",
+      "not ok 13 - startup greeting slot cannot carry a menu history or a different greeting between captures",
+      "not ok 19 - startup2 changed raw padded bytes across ready pending and guard cannot authorize Enter"
+    ]
+  }
+}

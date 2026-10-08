@@ -1,0 +1,21 @@
+{
+  "baseCommit": "82f8e7455faec213edf054f70e3e47ffab1406a4",
+  "baseAdapterSha256": "a470283858303e7e4fdd3b21515d4c7ea495662ba3b3399915de34993a05da62",
+  "candidateBaseAdapterSha256": "9636c4986b18a3e5f2275a697be48753c9fde446880ef34b68f4fe1a5c56afaf",
+  "privateRawSha256": [
+    "b810ecc94432868663cc94bd1f42f5763a862a39c8e364118216e51f2032e0f3",
+    "7cc60a1e2697e20afbd44ab801f5e00fc357b185efd6305624cb95d017ee6fd6",
+    "0905825c19369c2a1f077b082ef38f1d2edc19cb22b02fdd561f3635aa1f6269",
+    "c5dd1ae20fe10dff91d567c644182f3851f1b5c217d6cac03a04c875ee2b296a"
+  ],
+  "rawProvenance": "Four supplied delayed post-failure raw captures; current candidate not live-run by coder. Equal-length synthetic replacements. Cursor/process metadata and pre-Enter frames reconstructed.",
+  "submitPromptGuardedSubmitFreshCodexWorkByteIdenticalToBase": true,
+  "immutableTrial1And2ReviewFilesUnchanged": true,
+  "mutations": {
+    "detected": 17,
+    "survivingInheritedConjunct": [
+      "new-echo"
+    ],
+    "limit": "Not claimed independently covered or globally redundant. The conjunct remains unchanged; strict startup pre-Enter blank history and blank insertion/prefix guards overlap its effect."
+  }
+}

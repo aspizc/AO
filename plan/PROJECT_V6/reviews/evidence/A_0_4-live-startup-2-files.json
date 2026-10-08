@@ -1,0 +1,19 @@
+{
+  "gateway/src/adapters/base_adapter.js": "a470283858303e7e4fdd3b21515d4c7ea495662ba3b3399915de34993a05da62",
+  "gateway/README.md": "7603d713ee0801cb5cfd7e90e5c1843d3a2dd95d1c3b3a214418f3c53a4742f7",
+  "tests/gateway/prompt_submission.test.js": "881c2a4e6b994ba5e78464873dddc5f42b3c3efe636ca264a65102e14b8c87ff",
+  "tests/gateway/fixtures/codex_0_160_1_update_welcome_draft.json": "cba43486a059316f88ab4df9135b0dfc84e382d90b386526ef8359210bbead29",
+  "tests/gateway/fixtures/codex_0_160_1_update_welcome_raw_padding.json": "ca1b0fcd82c8fd28fef2898bc7fb01d497f8c5dd7dcecfd0a9d4b4d479a9cf24",
+  "plan/PROJECT_V6/reviews/A_0_4-live-startup-2_to_review.md": "adf25b1ea24d138632a889cefa3bc5bb449c461d1eb8efe27e3259c725688d22",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-binding.json": "d3023da61f7f1c9a0db5847a8a82e67cbf873cb3864fd64b45297747fc8d2686",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-checks-runner.py": "1720d6f2922fc6b42334a383e72c3aa1287b0c24e8a704e93652e9046e413a1b",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-checks.json": "51cd94db5aed09eea7a07b0e5799de30348620bffb957188486ce67af7ff663c",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-entry-hashes.json": "05fd5de50f5bb0fd4bb8c9e45ee02329ba0eb057d0835a57dd7fba0fd1a64d93",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-entry-source.js.gz": "938d39ee8b285af81aecdc6be63bfa377f46624b3dc0b5dc76a32a82397be627",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-green-doc-failure.log.gz": "a586021d13a196b54b6a8e2b7067c4c1eb3e31455d38fa0b3c55a36caff5e5da",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-green-final.log.gz": "83c7cc1c1a8d6cb50d18159a3545f1327732a74bfc4b53174c51bfcbcdc45c4a",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-lint.log.gz": "7c9eebc9c9bb5f7c9f3531b4c1e845c12334af2f22fce5667e8a66ea34f30dbd",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-mutations.json": "e866d3974e8652a8904ddb8e16aab24ea30c80aebd5338fe45082085d6cd3c40",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-operator-post-enter.json": "92ba983e9304e4c411a5d6797af4cdcba72f1252924cedc1f5edf388bea4b569",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-2-red-final.log.gz": "076afa5c5b91f78ce2addee3b4e8d9fc212110fe5a7ed5869ae14e818f1e6267"
+}

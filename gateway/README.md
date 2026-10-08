@@ -245,6 +245,77 @@ refuses without Enter. The variant cannot authorize a retry Enter. Existing
 queue/warnings profiles and positive acceptance checks are unchanged. Live
 reproduction of a stable rare draft, refined-candidate acceptance and fresh
 independent review remain outstanding; reliability is not claimed from fixtures.
+The startup-notice draft profile additionally covers the exact Codex 0.160.1
+→ 0.161.0 static notice and welcome header at rows 0–12 in a 120×40 pane.
+The pinned [notice history cell](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/notices.rs)
+and [session header renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/session%2Ers)
+separate this layout from an interactive update picker. Row 12 varies only
+among the 88 pinned [greetings](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/empty_state_animation/greetings.rs);
+the [fresh-thread OnceLock](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/empty_state_animation.rs)
+retains that selection. Rows 11, 12 and 38 tolerate trailing U+0020 spaces
+only, within pane width. All other pins and exact ready-prefix/status and
+pending/guard byte equality remain required before the first guarded Enter.
+The original transcript fixture reconstructed cursor/LF and omitted raw
+padding; the separate trial-2 fixture records diagnostic cursor/LF metadata
+and raw values for selected padded rows, and labels every reconstruction.
+Neither fixture is a complete raw ready/draft/guard sequence. Draft-only
+submission checks end in `acceptance_uncertain`; no post-Enter frame was
+available when this draft profile was designed. The operator subsequently
+reported one guarded Enter and delayed prompt history/Working output on the
+padding correction. Acceptance of that shifted-header layout requires a
+separate tested profile and remains unverified by this candidate. Other versions
+or update commands, a YOLO permissions row, truncated or space-containing cwd,
+wrapped notice, menus and changed warning footers remain unsupported. This
+profile never authorizes a retry or infers acceptance from a draft.
+
+The separate startup-notice Working profile recognizes the raw 0.160.1
+header-at-row-9 viewport at 120×40: one user echo at row 15, `• Working` at
+row 33, empty placeholder composer at row 36, matching cwd/spinner status at
+row 38 and the exact shortcuts/warnings footer at row 39. All rows fit pane
+width; gaps accept only U+0020 spaces. It reuses the first-Enter freshness proof:
+unique new exact prompt echo, unchanged preceding rows, no prior Working and
+the same server/pane/PID/geometry in every frame. A matching busy pane refuses
+initial input. The four delayed raw captures are sanitized with equal-length
+cwd/prompt replacements; pre-Enter frames and pane metadata are reconstructed
+and labelled. They establish the rendered shape, not visibility during the
+Gateway's acceptance observation. `◦ Working`, completed-only output, other
+layouts, menus, changed prefixes and stale evidence remain unconfirmed. No
+new polling, timing or retry is added. Independent review and live A05
+acceptance on this candidate remain operator-owned.
+
+The separate post-turn Ready profile covers one measured completed-turn
+viewport after explicit Gateway reattach: the same notice/header, a single
+ASCII prompt at row 15, single ASCII assistant cell at row 18, `Worked for`
+completion at row 20, empty composer at row 36 and exact 2-warning footer.
+The 87-character ASCII cwd leaves only `R…` visible from idle `Ready` at
+120×40. This pin is grounded in the [idle-status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs)
+and [ellipsis clipping](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/line_truncation.rs).
+It is readiness only. Ready/refusal raw panes were identical, with synthetic
+path/prompt/reply replacements in the fixture; cursor/process metadata and
+post-paste drafts are reconstructed. A hypothetical unchanged single-line
+draft can receive one guarded Enter only through the existing warning-draft
+bindings. Busy/menu states, incomplete or extra history, changed bytes and
+other clipping/geometry/footer variants stay closed. There is no new retry,
+transport or recovery authority. The old response and completion never confirm
+the second ask. Independent review and live A05 verification of the bounded
+confirmation profile below remain operator-owned.
+
+The separate second-turn confirmation witness runs only after the existing
+single guarded Enter. It binds the same server, pane, process and geometry,
+unchanged old history through row 22, and one new exact prompt echo at row 23.
+At 120×40 with cursor 36/2, unchanged empty composer/status/footer, it accepts
+only the measured Working row 33 with otherwise blank new history, or a new
+single-line ASCII assistant cell at row 26 plus a new completion at row 28.
+The [assistant/user cells](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs)
+and [completion separator](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/separators.rs)
+provide the markers; the fixture pins their measured row placement. This
+confirms submission, not reply semantics or screen-text authenticity. The
+partial response without completion, old reply, changed payload/history,
+menu, extra turn, drift and unknown layouts remain uncertain. These frames
+never grant initial readiness. Raw rows retain padding and final LF with
+equal-length synthetic private fields; metadata and pre-Enter drafts are
+explicit reconstructions. There is no extra observation, Enter or retry.
+
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
 and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).
