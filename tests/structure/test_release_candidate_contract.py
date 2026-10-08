@@ -1221,8 +1221,20 @@ def transition_evidence(validator, kind, subject, **extra):
     return {**material, "digest": validator.document_digest(material)}
 
 
+@pytest.mark.parametrize(
+    "release_ref, accepted",
+    [
+        ("refs/tags/1.1.0", True),
+        ("refs/tags/v1.0.0", True),
+        ("refs/tags/1.1", False),
+        ("refs/tags/01.1.0", False),
+        ("refs/tags/1.1.0.0", False),
+        ("refs/tags/vv1.1.0", False),
+        ("refs/heads/1.1.0", False),
+    ],
+)
 def test_real_state_ledger_verifies_each_ref_review_tag_and_release_provenance(
-    candidate_repository,
+    candidate_repository, release_ref, accepted,
 ):
     validator, repo, candidate, _ = candidate_repository
     subject = candidate["repository"]["candidate"]
@@ -1236,7 +1248,7 @@ def test_real_state_ledger_verifies_each_ref_review_tag_and_release_provenance(
         "tree": git(repo, "rev-parse", "HEAD^{tree}"),
     }
     git(repo, "branch", "main", integration_identity["commit"])
-    git(repo, "tag", "v1.0.0", integration_identity["commit"])
+    git(repo, "update-ref", release_ref, integration_identity["commit"])
     git(repo, "switch", "candidate")
     review_transition = transition_evidence(
         validator,
@@ -1309,7 +1321,7 @@ def test_real_state_ledger_verifies_each_ref_review_tag_and_release_provenance(
                         validator,
                         "release-tag",
                         subject,
-                        ref="refs/tags/v1.0.0",
+                        ref=release_ref,
                         refIdentity=integration_identity,
                         checklist=checklist,
                         checklistDigest=validator.document_digest(checklist),
@@ -1321,17 +1333,53 @@ def test_real_state_ledger_verifies_each_ref_review_tag_and_release_provenance(
         ],
     }
 
-    assert validator.validate_state_ledger_repository(
+    errors = validator.validate_state_ledger_repository(
         repo,
         ledger,
         candidate,
         now="2026-07-26T12:00:00Z",
-    ) == []
+    )
+    if not accepted:
+        # Existing refs with otherwise valid evidence must still obey tag syntax.
+        assert any("canonical SemVer tag" in error for error in errors)
+        return
+    assert errors == []
+
+    wrong_commit = copy.deepcopy(ledger)
+    wrong_evidence = wrong_commit["transitions"][-1]["evidence"][0]
+    git(repo, "update-ref", release_ref, subject["commit"])
+    wrong_evidence["refIdentity"] = copy.deepcopy(subject)
+    wrong_evidence["digest"] = validator.document_digest(
+        {key: value for key, value in wrong_evidence.items() if key != "digest"}
+    )
+    errors = validator.validate_state_ledger_repository(
+        repo,
+        wrong_commit,
+        candidate,
+        now="2026-07-26T12:00:00Z",
+    )
+    # Containing the candidate is insufficient: the tag must equal promotion.
+    assert any(
+        "release tag does not identify the promoted commit" in error
+        for error in errors
+    )
+    errors = validator.validate_state_ledger_repository(
+        repo,
+        ledger,
+        candidate,
+        now="2026-07-26T12:00:00Z",
+    )
+    assert any(
+        "ref moved or differs from its evidence identity" in error
+        for error in errors
+    )
+    git(repo, "update-ref", release_ref, integration_identity["commit"])
 
     outside = copy.deepcopy(ledger)
-    git(repo, "tag", "v1.0.1", candidate["repository"]["base"]["commit"])
+    outside_ref = release_ref + "-outside"
+    git(repo, "update-ref", outside_ref, candidate["repository"]["base"]["commit"])
     outside_evidence = outside["transitions"][-1]["evidence"][0]
-    outside_evidence["ref"] = "refs/tags/v1.0.1"
+    outside_evidence["ref"] = outside_ref
     outside_evidence["refIdentity"] = copy.deepcopy(
         candidate["repository"]["base"]
     )
