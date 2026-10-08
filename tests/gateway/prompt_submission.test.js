@@ -1955,3 +1955,110 @@ test("startup4 wrong draft end cursor prevents guarded submit", async () => {
   assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
   const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
 });
+
+const startup5Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_second_turn_confirmation.json", import.meta.url), "utf8"));
+const startup5Records = (after = startup5Codex.working) => [startup5Codex.ready, startup5Codex.draft, startup5Codex.draft, after].map((frame) => structuredClone(frame));
+const startup5Fixture = (records = startup5Records()) => startupFixture(records, startup5Codex.prompt);
+
+const startup5OneEnter = (fx) => {
+  assert.deepEqual(fx.inputs, [`\x1b[200~${startup5Codex.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
+  assert.equal(fx.buffers.size, 0);
+};
+
+test("startup5 fresh second echo with measured Working or new completed reply confirms one guarded Enter", async () => {
+  for (const after of [startup5Codex.working, startup5Codex.completed, startup5Codex.completedRepeat]) {
+    const fx = startup5Fixture(startup5Records(after));
+    assert.equal((await fx.ask()).snapshot, after.snapshot); startup5OneEnter(fx);
+    assert.deepEqual(fx.inputs, [`\x1b[200~${startup5Codex.prompt}\x1b[201~`, "\r"]);
+  }
+});
+
+test("startup5 old reply partial reply unchanged draft and unknown history cannot confirm or retry", async () => {
+  for (const after of [startup5Codex.ready, startup5Codex.draft, startup5Codex.partial,
+    trial16Rows(startup5Codex.working, { 23: " ".repeat(75) }),
+    trial16Rows(startup5Codex.working, { 33: "" }),
+    trial16Rows(startup5Codex.working, { 33: "• Working" }),
+    trial16Rows(startup5Codex.completed, { 28: "" }),
+    trial16Rows(startup5Codex.completed, { 26: "" })]) {
+    const fx = startup5Fixture([...startup5Records(after), startup5Codex.working]);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+  }
+});
+
+test("startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed", async () => {
+  const rows = startup5Codex.completed.snapshot.split("\n");
+  for (const after of [startup5Codex.working, startup5Codex.completed]) {
+    for (const edits of [{ 0: "Update available!" }, { 12: "  An arbitrary welcome" },
+      { 15: "› old history changed" }, { 18: "• old reply changed" }, { 20: "  Worked for 4s • 14:44" },
+      { 23: "› " + "x".repeat(84) }, { 23: "› " + startup5Codex.priorPrompt },
+      { 24: "› " + startup5Codex.prompt }, { 24: "  1. Allow", 25: "  2. Cancel" },
+      { 32: "• Working (1s • esc to interrupt)" }, { 36: "› stale draft" }, { 37: "\t" },
+      { 38: rows[38].replace("R…", "W…") }, { 39: rows[39].replace("2 warnings", "3 warnings") },
+      { 40: " " }, { 24: "x".repeat(121) }, { 24: "\t" }]) {
+      const fx = startup5Fixture(startup5Records(trial16Rows(after, edits)));
+      await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+    }
+  }
+  for (const edits of [{ 26: "› spoofed reply" }, { 28: "  Worked for 2s • 25:46" },
+    { 28: "  Worked for 2s • 14:46\t" }, { 33: "• Working (1s • esc to interrupt)" },
+    { 27: rows[28], 28: "" }, { 26: "• " }, { 26: "• é" }]) {
+    const fx = startup5Fixture(startup5Records(trial16Rows(startup5Codex.completed, edits)));
+    await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+  }
+  const fx = startup5Fixture(startup5Records(trial16Rows(startup5Codex.working, { 26: rows[26] })));
+  await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+});
+
+test("startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness", async () => {
+  for (const after of [startup5Codex.working, startup5Codex.completed]) {
+    for (const key of ["serverPid", "panePid", "target"]) {
+      const records = startup5Records(after); records[3].submitState[key] = key === "target" ? "%13" : "999";
+      if (key === "target") records[3].pane.target = "%13";
+      const fx = startup5Fixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+    }
+    for (const key of ["cursor", "cursorX", "width", "height", "mode", "inputOff", "synchronized"]) {
+      const records = startup5Records(after); const pane = records[3].pane;
+      pane[key] = typeof pane[key] === "number" ? pane[key] + 1 : "1";
+      const fx = startup5Fixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+    }
+    const records = startup5Records(after); records[3].snapshot += "\n";
+    const fx = startup5Fixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+  }
+});
+
+test("startup5 confirmation frames alone never authorize a new paste", async () => {
+  for (const frame of [startup5Codex.working, startup5Codex.partial, startup5Codex.completed]) {
+    const fx = startup5Fixture([frame]);
+    await assert.rejects(fx.ask, reason("unknown_state")); assert.deepEqual(fx.inputs, []);
+  }
+});
+
+test("startup5 first welcome cannot borrow second-turn confirmation and clocks remain source bounded", async () => {
+  const records = startupRecords();
+  const rows = records[0].snapshot.split("\n"), after = startup5Codex.working.snapshot.split("\n");
+  after.splice(0, 23, ...rows.slice(0, 23)); after.splice(36, 5, ...rows.slice(36, 41));
+  after[23] = "› " + startupCodex.prompt;
+  records[3] = structuredClone(startup5Codex.working); records[3].snapshot = after.join("\n");
+  const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); assert.equal(fx.buffers.size, 0);
+  assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
+  const completed = trial16Rows(startup5Codex.completed, { 28: "  Worked for 9s • 23:59".padEnd(120, " ") });
+  const variant = startup5Fixture(startup5Records(completed));
+  assert.equal((await variant.ask()).snapshot, completed.snapshot); startup5OneEnter(variant);
+});
+
+
+test("startup5 old identical prompt echo prevents new witness from laundering stale history", async () => {
+  const records = startup5Records().map((frame) => trial16Rows(frame, { 15: "› " + startup5Codex.prompt }));
+  const fx = startup5Fixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+});
+
+test("startup5 raw space padding cannot exceed width or hide non-space suffixes", async () => {
+  for (const after of [startup5Codex.working, startup5Codex.completed]) {
+    for (const edits of [{ 24: " ".repeat(121) }, { 23: "› " + startup5Codex.prompt + " ".repeat(35) },
+      { 24: " \t" }, { 23: "› " + startup5Codex.prompt + "\t" }, { 33: "• Working (1s • esc to interrupt)\t" }]) {
+      const fx = startup5Fixture(startup5Records(trial16Rows(after, edits)));
+      await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup5OneEnter(fx);
+    }
+  }
+});

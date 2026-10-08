@@ -1,0 +1,50 @@
+{
+  "baseCommit": "3504b498b58c8ba98d3321da57ad77a305a4e65f",
+  "baseAdapterSha256": "7cd947a4d860a78a56ef846b7c23d1ed48b955a23482c0bef21366e513681278",
+  "candidateBaseAdapterSha256": "bc039cb5fbdbb29dc6bd90cba66c0596043acc70a934201b04184dd10b3699e7",
+  "privateRawSha256": [
+    "130e7035d0f1e6ba20439143e094fccd371204deb41acbd6ba471674e850859e",
+    "582f8ca9f1b4b68cd8e5029a944292ce408ec1c9ad93ac3c35e0b3ae44e98bfb",
+    "518c26dce319a1d4f90436fcb3c98955383d42610be3291ea2b010f99e12b2f1",
+    "a2f49122401f41882ebce2b63a90c71d2df5f56e8469a5e813ba6c2aa4b98959",
+    "a2f49122401f41882ebce2b63a90c71d2df5f56e8469a5e813ba6c2aa4b98959"
+  ],
+  "rawCompletedCapturesByteIdentical": true,
+  "candidateMinusOnlyNewHelperAndConfirmationBranchMatchesBase": true,
+  "preEnterReadinessAtomicGuardsTransportFreshCodexWorkUnchanged": true,
+  "priorReviewFilesUnchanged": true,
+  "priorReviewFileCount": 54,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs",
+      "sha256": "df4e0da0e784207b0abc6580f7919222fdb54d4186d30a5de29c337769370994",
+      "retrieval": "fetched pinned source during trial 5"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/history_cell/separators.rs",
+      "sha256": "403e09b76efaee6e505bce90b104476f6401086fed76f0edbf99ba7180becd98",
+      "retrieval": "fetched pinned source during trial 5"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/chatwidget/completion.rs",
+      "sha256": "64b0b4c90fbf0ee90a37bf125351a5f79eb42c644e05650f3fbe748eb69a7899",
+      "retrieval": "fetched pinned source during trial 5"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs",
+      "sha256": "e96ac7db77866266a5b146b885f03487bf801511295bd35474877783537e6200",
+      "retrieval": "pinned cached source"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/bottom_pane/chat_composer/status_surface.rs",
+      "sha256": "454cabfa863caef1bb9c081aaaa0161b3958c67ebc42c48b8fda4b09a08ea315",
+      "retrieval": "pinned cached source"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.1/codex-rs/tui/src/line_truncation.rs",
+      "sha256": "f0561006d5adebccf47f47776a6c65e6eef72ebd672c7ce6599560d5b915176c",
+      "retrieval": "fetched in trial 4"
+    }
+  ],
+  "limits": "Raw rows and equal-length sanitization verified by coder; modes, cursor/process metadata and pre-Enter frames are reconstructed. Operator live assertions not independently reproduced. Response contents are lexical ASCII; no ACK semantic validation, screen-text authenticity or binary attestation. Partial replies and other layouts remain uncertain."
+}

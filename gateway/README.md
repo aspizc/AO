@@ -297,8 +297,24 @@ draft can receive one guarded Enter only through the existing warning-draft
 bindings. Busy/menu states, incomplete or extra history, changed bytes and
 other clipping/geometry/footer variants stay closed. There is no new retry,
 transport or recovery authority. The old response and completion never confirm
-the second ask; actual post-paste shape, second-turn acceptance, independent
-review and live A05 verification remain outstanding.
+the second ask. Independent review and live A05 verification of the bounded
+confirmation profile below remain operator-owned.
+
+The separate second-turn confirmation witness runs only after the existing
+single guarded Enter. It binds the same server, pane, process and geometry,
+unchanged old history through row 22, and one new exact prompt echo at row 23.
+At 120×40 with cursor 36/2, unchanged empty composer/status/footer, it accepts
+only the measured Working row 33 with otherwise blank new history, or a new
+single-line ASCII assistant cell at row 26 plus a new completion at row 28.
+The [assistant/user cells](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs)
+and [completion separator](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/separators.rs)
+provide the markers; the fixture pins their measured row placement. This
+confirms submission, not reply semantics or screen-text authenticity. The
+partial response without completion, old reply, changed payload/history,
+menu, extra turn, drift and unknown layouts remain uncertain. These frames
+never grant initial readiness. Raw rows retain padding and final LF with
+equal-length synthetic private fields; metadata and pre-Enter drafts are
+explicit reconstructions. There is no extra observation, Enter or retry.
 
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)

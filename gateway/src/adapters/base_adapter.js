@@ -473,6 +473,33 @@ function requireComposer(observation, text, identity) {
   }
 }
 
+function freshCodexSecondTurn(ready, pending, guard, after, prompt, attempt) {
+  // Measured second-turn witness only; never grants readiness or another Enter.
+  if (attempt !== 0 || !pending.warningDraft || !guard.warningDraft
+    || [ready, pending, after].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
+      .some((key) => frame[key] !== guard[key]))
+    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+    || after.cursorY !== "36" || after.cursorX !== "2"
+    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
+  const rows = after.snapshot.split("\n");
+  if (!codexPostTurnPane(prior[0], { width: Number(ready.width), height: Number(ready.height),
+    cursor: Number(ready.cursorY), cursorX: Number(ready.cursorX) }, "ready")
+    || rows.length !== 41 || rows[40] !== "" || rows.some((row) => row.length > 120)
+    || prior.some((before) => rows.slice(0, 23).some((row, index) => row !== before[index]))
+    || rows[23].replace(/ +$/, "") !== `› ${prompt}`
+    || rows.filter((row) => row.replace(/ +$/, "") === `› ${prompt}`).length !== 1
+    || prior.some((before) => before.slice(0, 36).some((row) => row.replace(/ +$/, "") === `› ${prompt}`))
+    || rows.slice(36).some((row, index) => row !== prior[0][index + 36])) return false;
+  // Completion is a newly inserted assistant cell AND separator, not the old reply.
+  const working = codexWorking.test(rows[33]);
+  const completed = /^• [\x21-\x7e][\x20-\x7e]*$/.test(rows[26])
+    && /^ {2}Worked for [0-9]{1,5}s • (?:[01][0-9]|2[0-3]):[0-5][0-9] *$/.test(rows[28]);
+  return (working || completed) && rows.slice(24, 36).every((row, index) => working
+    ? index + 24 === 33 || /^ *$/.test(row)
+    : [26, 28].includes(index + 24) || /^ *$/.test(row));
+}
+
 function freshCodexWork(ready, pending, guard, after, prompt, attempt) {
   if (after.workRow === null || after.workRow === undefined
     || ["serverPid", "target", "panePid", "width", "height"].some((key) => after[key] !== guard[key])) return false;
@@ -636,6 +663,9 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
           }
           throw submissionError("acceptance_uncertain");
         }
+      }
+      if (provider === "codex" && freshCodexSecondTurn(ready, pending, guard, after, prompt, attempt)) {
+        return { snapshot: after.snapshot, dryRun: false };
       }
       if (after.state === "busy" && after.text === ""
         && (provider !== "codex" || freshCodexWork(ready, pending, guard, after, prompt, attempt))) {

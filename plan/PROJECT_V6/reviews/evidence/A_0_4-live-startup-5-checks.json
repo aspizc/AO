@@ -1,0 +1,87 @@
+{
+  "focused": {
+    "command": "A04_TEST_TMUX=/tmp/ao-a04-f1-impl/build2/bin/tmux node --test tests/gateway/tmux_client.test.js tests/gateway/guarded_paste.test.js tests/gateway/guarded_submit.test.js tests/gateway/codex_supervised.test.js tests/gateway/*_adapter.test.js tests/gateway/pi_opencode_adapters.test.js tests/gateway/prompt_submission.test.js tests/gateway/prompt_submission_capture.test.js tests/gateway/claude_first_prompt.test.js tests/gateway/tool_error_serialization.test.js tests/gateway/tool_projection_contract.test.js",
+    "exitCode": 0,
+    "tests": 315,
+    "passed": 315,
+    "failed": 0,
+    "skipped": 0
+  },
+  "red": {
+    "base": "3504b49",
+    "command": "python3 plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-5-checks-runner.py",
+    "tests": 166,
+    "passed": 164,
+    "failed": 2,
+    "skipped": 0,
+    "failures": [
+      "not ok 159 - startup5 fresh second echo with measured Working or new completed reply confirms one guarded Enter",
+      "not ok 164 - startup5 first welcome cannot borrow second-turn confirmation and clocks remain source bounded"
+    ]
+  },
+  "mutations": {
+    "killed": [
+      "process",
+      "mode",
+      "input-off",
+      "synchronized",
+      "cursor-row",
+      "cursor-column",
+      "ready-profile",
+      "width",
+      "old-history-prefix",
+      "new-echo-and-unique",
+      "prior-echo-and-unique",
+      "composer-status-footer",
+      "capture-and-tail",
+      "Working",
+      "assistant",
+      "completion",
+      "blank-history"
+    ],
+    "survivors": [
+      "capture",
+      "new-echo",
+      "unique-echo",
+      "prior-echo",
+      "attempt",
+      "warning-binding",
+      "prompt-ascii"
+    ],
+    "limit": "Single-removal survivors retained. Compound echo/capture removals distinguish overlapping checks; independent review must assess the overlap, not infer global redundancy."
+  },
+  "static": {
+    "npm --prefix gateway run lint": {
+      "exitCode": 0,
+      "suiteTestsExecuted": 0
+    },
+    "python3 scripts/ci_gate.py --refresh-inventory": {
+      "exitCode": 0,
+      "suiteTestsExecuted": 0
+    },
+    "python3 scripts/ci_gate.py --validate-only": {
+      "exitCode": 0,
+      "suiteTestsExecuted": 0
+    },
+    "python3 scripts/check_public_hygiene.py": {
+      "exitCode": 0,
+      "suiteTestsExecuted": 0
+    },
+    "git diff --check": {
+      "exitCode": 0,
+      "suiteTestsExecuted": 0
+    }
+  },
+  "nodeVersion": "v22.22.1",
+  "notRun": [
+    "full root-owned ci.sh gate",
+    "live provider/A05 restart/reattach acceptance",
+    "independent review"
+  ],
+  "sanitization": {
+    "rawRowsEqualExceptDeclaredSyntheticFields": true,
+    "rawRowLengthsAndNonPaddingBodyLengthsPreserved": true,
+    "privateExactLiteralScanIncludingDecompressedLogs": "passed",
+    "priorTrailHashCount": 54
+  }
+}

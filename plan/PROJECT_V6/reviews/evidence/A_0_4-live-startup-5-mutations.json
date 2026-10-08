@@ -1,0 +1,173 @@
+{
+  "red": {
+    "exitCode": 1,
+    "sourceSha256": "7cd947a4d860a78a56ef846b7c23d1ed48b955a23482c0bef21366e513681278",
+    "failures": [
+      "not ok 159 - startup5 fresh second echo with measured Working or new completed reply confirms one guarded Enter",
+      "not ok 164 - startup5 first welcome cannot borrow second-turn confirmation and clocks remain source bounded"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "sourceSha256": "76d8a43ce551b9863686dda2821f0b18c3f2b835d1dd61686413ea2a3ea7c18b",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "mode": {
+    "exitCode": 1,
+    "sourceSha256": "81aeb41bf9ddd4cb4427948a420293026c149b522cf43ac89c527869288fa3fb",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "input-off": {
+    "exitCode": 1,
+    "sourceSha256": "23c1532e791513e27e585484ea4f4e5573c796b4c1026f2c67ca040f566b2177",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "synchronized": {
+    "exitCode": 1,
+    "sourceSha256": "81a5099afcf2c1559f0dcfd0889545a938cb7df9c4c0432b7c2090a130a639dd",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "cursor-row": {
+    "exitCode": 1,
+    "sourceSha256": "d039e7d20b78055d7de9e3f4db7c1c3d048ec0dae4d45c96ad93948a5e5dde68",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "cursor-column": {
+    "exitCode": 1,
+    "sourceSha256": "547d1579d503bc94565bbdfa1acc80e89a42179fd1b96b25be076a52a7fd221d",
+    "failures": [
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "ready-profile": {
+    "exitCode": 1,
+    "sourceSha256": "c48ef20d1ab49d3d5f841a0c754279d7260f1fa1b5a437cb289b3455ddc0dadc",
+    "failures": [
+      "not ok 164 - startup5 first welcome cannot borrow second-turn confirmation and clocks remain source bounded"
+    ]
+  },
+  "capture": {
+    "exitCode": 0,
+    "sourceSha256": "2f3531a051cd64a452669523ea9e3a8cccac0699586e5c654e7848b157705256",
+    "failures": []
+  },
+  "width": {
+    "exitCode": 1,
+    "sourceSha256": "644302cb0aa93f189ae03dcc882d9d62aaa963e41ead6241e4466813cf53975f",
+    "failures": [
+      "not ok 166 - startup5 raw space padding cannot exceed width or hide non-space suffixes"
+    ]
+  },
+  "old-history-prefix": {
+    "exitCode": 1,
+    "sourceSha256": "c170c096f036b930e8cea58cd5f6348a38c87fd872e745d71ed0670a5df8298b",
+    "failures": [
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed"
+    ]
+  },
+  "new-echo": {
+    "exitCode": 0,
+    "sourceSha256": "2876748f26c333c83ce5c07870b2530f14f8e4941a2b646f5a6434806b11db62",
+    "failures": []
+  },
+  "unique-echo": {
+    "exitCode": 0,
+    "sourceSha256": "d1e6943eeb0777ebc8bc90e320d40e235b438352818289c74f96f52ca103d92a",
+    "failures": []
+  },
+  "prior-echo": {
+    "exitCode": 0,
+    "sourceSha256": "1e672a87d5dcc4b7e7aaf740c39562a5106ada52a58af42bb68cb7bb211a93bb",
+    "failures": []
+  },
+  "new-echo-and-unique": {
+    "exitCode": 1,
+    "sourceSha256": "aa79dbb8746de80a89d1613a4fead9471821abf8cc49b915f45bbbec4050bd6d",
+    "failures": [
+      "not ok 160 - startup5 old reply partial reply unchanged draft and unknown history cannot confirm or retry",
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed",
+      "not ok 166 - startup5 raw space padding cannot exceed width or hide non-space suffixes"
+    ]
+  },
+  "prior-echo-and-unique": {
+    "exitCode": 1,
+    "sourceSha256": "84f1577a1cdf78db1066a9b656835d09f9233c9628370f3d03d908ad5df1d76f",
+    "failures": [
+      "not ok 165 - startup5 old identical prompt echo prevents new witness from laundering stale history"
+    ]
+  },
+  "composer-status-footer": {
+    "exitCode": 1,
+    "sourceSha256": "4f5869afce70c92ecbaae471b86f96d9a967ce227c43f9b6106144d9ed1164f4",
+    "failures": [
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed"
+    ]
+  },
+  "capture-and-tail": {
+    "exitCode": 1,
+    "sourceSha256": "d50dea01e8df0bc1004647c418cff48db208e62a099e3e9aa0684b1856e33379",
+    "failures": [
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed",
+      "not ok 162 - startup5 post Enter process pane modes cursor and geometry drift cannot borrow a witness"
+    ]
+  },
+  "Working": {
+    "exitCode": 1,
+    "sourceSha256": "04c29f57f7486199ec230f3ba89f86c2a91ca7b7879cdcca308f67e3708875d9",
+    "failures": [
+      "not ok 159 - startup5 fresh second echo with measured Working or new completed reply confirms one guarded Enter",
+      "not ok 160 - startup5 old reply partial reply unchanged draft and unknown history cannot confirm or retry",
+      "not ok 164 - startup5 first welcome cannot borrow second-turn confirmation and clocks remain source bounded",
+      "not ok 166 - startup5 raw space padding cannot exceed width or hide non-space suffixes"
+    ]
+  },
+  "assistant": {
+    "exitCode": 1,
+    "sourceSha256": "e7dc397912585b4f83e72e2f117a35f76fa0902c0dd52431e2decdbe152f6c25",
+    "failures": [
+      "not ok 160 - startup5 old reply partial reply unchanged draft and unknown history cannot confirm or retry",
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed"
+    ]
+  },
+  "completion": {
+    "exitCode": 1,
+    "sourceSha256": "897c752524071c4d2346c1a96ea63aae1ae79db2770ee9c6edabd5fd1ee708ad",
+    "failures": [
+      "not ok 160 - startup5 old reply partial reply unchanged draft and unknown history cannot confirm or retry",
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed"
+    ]
+  },
+  "blank-history": {
+    "exitCode": 1,
+    "sourceSha256": "7626f941874c805a85f75fc7c375056e035f326e3a723277cc81b30b914188d3",
+    "failures": [
+      "not ok 161 - startup5 changed old history new payload duplicates spoofed menus and misplaced completion fail closed",
+      "not ok 166 - startup5 raw space padding cannot exceed width or hide non-space suffixes"
+    ]
+  },
+  "attempt": {
+    "exitCode": 0,
+    "sourceSha256": "29cf3f2350fb7d5b4303b47e7577440701bfb81b46751de5f57f906237d2869e",
+    "failures": []
+  },
+  "warning-binding": {
+    "exitCode": 0,
+    "sourceSha256": "56aa07641ddd68c8fc6ece7e5f02f3b6e1a2762d6e92f1795e19bd74c32d775a",
+    "failures": []
+  },
+  "prompt-ascii": {
+    "exitCode": 0,
+    "sourceSha256": "9d1f2aac27ba3aa5b17628c3ee91346e45867a655ffddf02f8a6df0571fa2903",
+    "failures": []
+  }
+}
