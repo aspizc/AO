@@ -1,8 +1,11 @@
 # Project V6 — Worker confinement, worker identity, and AO 1.1.0
 
-Status: **in progress**. A/0/02 is reviewed and integrated on
-`release/1.1.0` at `7df29bda06aa3a139903dbb0cfc61860029f8159`. The other six sheets
-remain unfinished; no V6 feature is promoted to main or released as 1.1.0.
+Status: **in progress**. A/0/02 is reviewed and integrated at
+`7df29bda06aa3a139903dbb0cfc61860029f8159`; A/0/04 is reviewed and
+integrated at `343222e869e02b1860a384e52788378e7bb74734` on
+`release/1.1.0`. The other five sheets remain unfinished; no V6 feature is
+promoted to main or released as 1.1.0.
+See the [A/0/04 integration verdict](reviews/A_0_4-integration-1_reviewed_OK.md) and [merge gate](reviews/A_0_4-integration-1-root-gate.md).
 See the [A/0/02 verdict](reviews/A_0_2-2_reviewed_OK.md) and
 [integration checkpoint](reviews/A_0_2_integration_checkpoint.md).
 
@@ -40,10 +43,10 @@ and record its full SHA and corrections in the sheet's review handoff.
 Provider CLI versions/flag observations in the imported plan are source
 observations; they require verification in the implementation environment.
 
-The three operator decisions are recorded in
-[HUMAN_DECISIONS.md](HUMAN_DECISIONS.md). Claude is temporarily unavailable:
-use Codex for authoring and independent review; do not invoke Claude or claim
-its required live checks passed. A/0/02's generic direction is answered: preserve reusable KYA practices as
+The operator decisions are recorded in
+[HUMAN_DECISIONS.md](HUMAN_DECISIONS.md). The temporary Claude restriction was
+lifted on 2026-10-08; use the current model selection and live evidence for
+new work. A/0/02's generic direction is answered: preserve reusable KYA practices as
 [generic AO workflows](GENERIC_WORKFLOWS.md). The operator also selected
 [intact historical documents with an explicit scanner exception](reviews/A_0_2_history_decision.md);
 current code and examples must be cleaned.

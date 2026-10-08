@@ -49,6 +49,20 @@ See the [verdict](../plan/PROJECT_V6/reviews/A_0_2-2_reviewed_OK.md) and
 [checkpoint](../plan/PROJECT_V6/reviews/A_0_2_integration_checkpoint.md).
 This is not promotion to main or a 1.1.0 release.
 
+A/0/04 adds guarded supervised prompt submission, including the pinned tmux
+transport and bounded Codex/Claude acceptance checks. Its independently
+reviewed implementation was merged as `343222e` on `release/1.1.0`. The full
+gate on that merge exited 0: **2,949 passed, 0 failed, 12 allowed
+infrastructure skips; 2,961 total**; public hygiene found 0 issues. A
+separate hash-bound live check observed one guarded submit and no plain Enter
+for each of Codex and Claude. Its source hash predates the independently reviewed
+syntax-only regex correction in trial 18; that correction preserved behavior. The rare Codex warning-only draft branch has
+fixture coverage but was not observed stable live; it remains a fail-closed
+intermittent limitation. See the [integration verdict](../plan/PROJECT_V6/reviews/A_0_4-integration-1_reviewed_OK.md),
+[merge gate](../plan/PROJECT_V6/reviews/A_0_4-integration-1-root-gate.md) and
+[bound live evidence](../plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-17-bound-live.json).
+This is integration on the release branch, not promotion or release.
+
 ## Unreleased V7 integration
 
 A/0/00 (generic project profiles and deterministic preflight) and A/0/01
@@ -109,8 +123,8 @@ with their components.
 ## Planning and release boundary
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
-branch descending from `1.0.0`; A/0/02 is reviewed and integrated on the
-release branch, and the other six sheets remain unfinished.
+branch descending from `1.0.0`; A/0/02 and A/0/04 are reviewed and integrated on the
+release branch, and the other five sheets remain unfinished.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains

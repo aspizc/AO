@@ -9,14 +9,14 @@ Recorded from the operator's direct instructions on 2026-10-07.
 | A/0/03 | Option (a): release/1.1.0 descends from 1.0.0 at 41f9ce2 | [Decision](reviews/A_0_3_human_decision.md) |
 | A/0/02 | Preserve KYA-derived practices as generic AO workflows; keep historical documents intact with an explicit history allowlist | [Workflow decision](reviews/A_0_2_human_decision.md), [history decision](reviews/A_0_2_history_decision.md) |
 
-## Temporary execution constraint
+## Claude execution constraint (historical, lifted)
 
-Do not invoke Claude while the operator's no-Claude instruction is active.
-Use Codex for authoring and a separately assigned Codex reviewer. This is a
-temporary vendor exception, not a global default-model change. Offline
-Claude-adapter tests using fixtures/fake binaries may run. Required live
-Claude checks remain deferred until the operator lifts the restriction;
-do not count them as passed or substitute Codex evidence for them.
+The operator temporarily prohibited Claude execution while tokens were unavailable.
+On 2026-10-08 the operator said "claude ya funciona" and instructed the team
+to use Claude Opus 5.5 with medium effort. That lifted the temporary restriction
+for new reviews and live checks. Historical Codex-only review exceptions remain
+historical; they do not substitute for the later independent Claude reviews or
+live Claude evidence.
 
 ## Schedule
 
