@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 lint correction | 1 | [request](A_0_4-lint-1_to_review.md) | [OK, four regex-space substitutions; lint + affected suites; full gate not run](A_0_4-lint-1_reviewed_OK.md) |
 | A/0/04 bounded live ready-profile correction | 7 | [request](A_0_4-live-profile-7_to_review.md) | [OK, two witness-guard tests; scoped to trial 6 blockers](A_0_4-live-profile-7_reviewed_OK.md) |
 | A/0/04 bounded live ready-profile correction | 6 | [request](A_0_4-live-profile-6_to_review.md) | [KO, frame fix accepted; two untested witness guards](A_0_4-live-profile-6_reviewed_KO.md) |
 | A/0/04 bounded live ready-profile correction | 5 | [request](A_0_4-live-profile-5_to_review.md) | [KO, real spinner-frame variant blocker; partial review](A_0_4-live-profile-5_reviewed_KO.md) |

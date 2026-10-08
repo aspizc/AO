@@ -9,12 +9,12 @@ import {
 
 const activeSubmissions = new Set();
 const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
-const codexQueueFooter = /^  tab to queue message *$/;
+const codexQueueFooter = /^ {2}tab to queue message *$/;
 const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
 // Measured 0.160.1 status row; this is rendering evidence, not model selection.
-const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
+const codexLiveStatus = /^ {2}GPT-6\.1-Sol medium fast · \S+\s*$/;
 // Codex 0.160.1 status_surfaces.rs: explicit spinner frames, never acceptance alone.
-const codexSpinnerStatus = /^  GPT-6\.1-Sol medium fast · \S+ · [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] *$/;
+const codexSpinnerStatus = /^ {2}GPT-6\.1-Sol medium fast · \S+ · [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] *$/;
 const codexWorking = /^• Working \([0-9hms .]+• esc to interrupt\) *$/;
 function codexGap(rows, cursor, footer) {
   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
@@ -175,7 +175,7 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
     // status row with either observed auto-mode footer. Neither proves acceptance.
     const liveIdle = pane.width === 120 && pane.height === 40
       && ((footer === "" && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents")
-        || (/^  [A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\/[A-Za-z0-9_./-]+\s*$/.test(rows[bottom + 1] || "")
+        || (/^ {2}[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\/[A-Za-z0-9_./-]+\s*$/.test(rows[bottom + 1] || "")
           && ["⏵⏵ auto mode on (shift+tab to cycle)", "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"]
             .includes(rows[bottom + 2]?.trim())))
       && rows.slice(bottom + 3).every((row) => row.trim() === "");
