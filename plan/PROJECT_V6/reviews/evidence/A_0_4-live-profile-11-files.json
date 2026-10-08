@@ -1,0 +1,32 @@
+{
+  "baseHEAD": "4e0441e05d2175d5a5903c2e6d4fa9222dd79d73",
+  "branch": "feat/V6-A-0-04-safe-submit",
+  "productionSourceUnchangedFromEntry": true,
+  "trial10ArtifactsUnchanged": true,
+  "status": "implemented tests-only correction; fresh independent review pending",
+  "sha256": {
+    "gateway/src/adapters/base_adapter.js": "ebfa9f4c7c054bf8ab31d7f083f23bc3f74f1a1d2acd38aa24ae2096116e583c",
+    "gateway/src/adapters/claude_adapter.js": "51886842c68cf4bc83bce81ea723f38912f50ce5b19e97a96def8195c14c36f9",
+    "gateway/README.md": "bdf635dde713842d556c6d97948262df67b881937d43c5220c59471e0f42af2e",
+    "tests/gateway/claude_first_prompt.test.js": "646020ff28e56741e118df53ed49667372d9bd01e694f84e181c662ef5f417bd",
+    "tests/gateway/fixtures/a04_live_profiles_trial9.json": "a76fc9f8416b42c8d34cf63d8c53c17870e9d5d4b16e10dc10414c45ade0e1de",
+    "ci/suites.json": "03d2d2ddca4942961ec3415b734408ed094b591535cccc101415242a59bebec5",
+    "plan/PROJECT_V6/reviews/README.md": "5f3edc83451f8e99f72a067f3146fe0ab91cc930aa311fcb81bc56c31b731b0e",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-11_to_review.md": "074996a7c7b5c40d72e80f50275dbd77c181555ae23a5343b271157bf0251bba",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-10_reviewed_KO.md": "dfd447880a97499f30148203e83761f522d8b8a9034ed098f0a7c67c37c799b4",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-entry-test.js": "3b22ec564ff858d13427e97e9fed3fc624438a8b2475ab6ba46d140de68ff575",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-entry.json": "4387ccecf709e054ba80e1672e4c02d71253c91a455ad0fe6ab16dfa1ca84bce",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-green-host.log.gz": "3cf43d00af1e8b10939ae059c664c0ec838556078b5ed8c1711c1f54e1443c5d",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-inventory-refresh.log.gz": "6e58ca42987ee2c303acb6482ab7582c2bbf690617ad3c50cc956e0d51023d14",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-inventory.json": "4c956f59d2ecca0cea25ec02ec20ed7c6bcbe2830e4c1049dc8da55eb49a2729",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-manifest-tests.log.gz": "167f03842af932d51c296a795d8546be282fb218314db423f40655b1ffd30180",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-manifest-validation.log.gz": "6e58ca42987ee2c303acb6482ab7582c2bbf690617ad3c50cc956e0d51023d14",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-mutation-setup-failure.log.gz": "2b69b8071e87cb5ef31e81a1cd4f708b87b8586cea20f0f2fb1d32fe97e24f35",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-mutations.json": "38b6e20df2474e210eb4a2bc16b2c5331893ab98cc2afc98f2b56003fd5177e0",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-mutations.py": "289e02889df5fb8fbd4d2c29d9ccc8a2942354bf7762701a44d3b20aecb57992",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-red-attempt.log.gz": "c52975a17aa6a73e5ee62392c010b36a220badee77637323337243e46302fb47",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-red-kill.log.gz": "34c3a4e102c9af15c1c108a394620a8d448558b6010742fd9bdc0597b55069d3",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-red-stale.log.gz": "facb491f93078e13378f01b4ce7a669e983b4186955f08eefa0d49d9bd71b108",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-tests.patch": "9d6b82df2c882ee015d758d2c6824d308fa1575f0076c8f73185e8e7a8fd9cf5"
+  }
+}
