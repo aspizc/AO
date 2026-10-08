@@ -1,0 +1,9 @@
+{
+  "inventory": "{\"counts\": {\"failed\": 0, \"passed\": 0, \"skipped\": 0, \"tests\": 0}, \"errors\": [], \"schemaVersion\": 1, \"status\": \"passed\", \"suites\": []}\n",
+  "validate": "{\"counts\": {\"failed\": 0, \"passed\": 0, \"skipped\": 0, \"tests\": 0}, \"errors\": [], \"schemaVersion\": 1, \"status\": \"passed\", \"suites\": []}\n",
+  "hygiene": "public hygiene: 0 finding(s)\n",
+  "diffCheckExit": 0,
+  "manifestUnchanged": true,
+  "protectedPathsUnchanged": true,
+  "newArtifactsPrivateLiteralFindings": 0
+}

@@ -1,0 +1,13 @@
+{
+  "gateway/src/adapters/base_adapter.js": "911dd14451566a7edea0868b5c2403cc45fa72896e423b4f1f3ad9b8127e4e07",
+  "tests/gateway/prompt_submission.test.js": "f1690d6066055e71dca1bfe1ce079d74b336399fdd5d6881223708f1a2785f00",
+  "tests/gateway/fixtures/codex_0_160_1_update_welcome_draft.json": "cba43486a059316f88ab4df9135b0dfc84e382d90b386526ef8359210bbead29",
+  "plan/PROJECT_V6/reviews/A_0_4-live-startup-1_to_review.md": "b8ba2be6e59a7c6ce8042648ae4902ed56f63104b9316e05d5fc0b1768fe0b1d",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-checks-runner.py": "7f2bc1964b7a1dee536d88275a85b2939a94dcb28ccab7f9d3ea703879ce2c27",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-checks.json": "ee0e2bde486e42d81099a910b2e91d71023564ff5d7799325bada8a3b93d962f",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-green-final.log.gz": "49928977209249f79cf72293a7fab0520f133dcaa3edddd6087c3a45a6f57e54",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-lint-final.log.gz": "7c9eebc9c9bb5f7c9f3531b4c1e845c12334af2f22fce5667e8a66ea34f30dbd",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-mutations.json": "480d4e5f2be03e5014ee937d314e823bbabdb217d88b4485f89ff8f31cf02b8a",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-red-final.log.gz": "d2d3ca5f2dc4091032c4125c2c7558d528c70d008630ff40b5adf512a06b83a3",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-startup-1-source-binding.json": "390b8afbe52a88265107f1999b8d90d3dc1574defddb131ca617b833606e3d3d"
+}
