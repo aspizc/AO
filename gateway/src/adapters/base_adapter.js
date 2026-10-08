@@ -366,7 +366,7 @@ function freshClaude294Response(spawn, ready, pending, guard, after, prompt, wor
   const header = prior[0].slice(0, 4);
   if (header[0] !== "" || header[1] !== " ▐▛███▛█   Claude Code v2.1.294"
     || header[2] !== "▝▜██████▀  Opus 5.5 with medium effort · Claude Max"
-    || !/^ ▝▝   ▝▝   \/[A-Za-z0-9_./-]+$/.test(header[3])
+    || !/^ ▝▝ {3}▝▝ {3}\/[A-Za-z0-9_./-]+$/.test(header[3])
     || [...prior, rows].some((lines) => lines.length !== 41 || lines[40] !== ""
       || header.some((row, index) => lines[index] !== row)
       || lines[34] !== " ".repeat(100) + "◐ medium · /effort")
