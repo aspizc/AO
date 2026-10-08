@@ -1,0 +1,6 @@
+{
+  "ready": "composer",
+  "postPaste": "composer",
+  "guard": "composer",
+  "after": "unknown_state"
+}
