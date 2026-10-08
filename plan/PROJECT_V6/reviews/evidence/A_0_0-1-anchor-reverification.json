@@ -1,0 +1,279 @@
+[
+  {
+    "file": "gateway/src/config.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 212,
+        "end": 212,
+        "baseText": "212:       DEFAULT_REQUEST_CONTEXT_TTL_MS,"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/services/agent_service.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 263,
+        "end": 270,
+        "baseText": "263: const SPAWN_RESULT_FIELDS = Object.freeze([\n264:   \"sessionId\",\n265:   \"tmuxTarget\",\n266:   \"attachCommand\",\n267:   \"launchCommand\",\n268:   \"dryRun\",\n269:   \"effectiveSelection\",\n270: ]);"
+      },
+      {
+        "start": 272,
+        "end": 344,
+        "baseText": "272: const ADAPTER_RESULT_FIELDS = Object.freeze({\n273:   codex: Object.freeze({\n274:     delegate: Object.freeze([\n275:       \"stdout\",\n276:       \"stderr\",\n277:       \"exitCode\",\n278:       \"dryRun\",\n279:       \"model\",\n280:       \"reasoningEffort\",\n281:       \"serviceTier\",\n282:       \"effectiveSelection\",\n283:       \"sandbox\",\n284:     ]),\n285:     spawn: SPAWN_RESULT_FIELDS,\n286:   }),\n287:   \"claude-code\": Object.freeze({\n288:     delegate: Object.freeze([\n289:       \"stdout\",\n290:       \"stderr\",\n291:       \"exitCode\",\n292:       \"dryRun\",\n293:       \"model\",\n294:       \"reasoningEffort\",\n295:       \"effectiveSelection\",\n296:     ]),\n297:     spawn: SPAWN_RESULT_FIELDS,\n298:   }),\n299:   antigravity: Object.freeze({\n300:     delegate: Object.freeze([\n301:       \"stdout\",\n302:       \"stderr\",\n303:       \"exitCode\",\n304:       \"dryRun\",\n305:       \"model\",\n306:       \"reasoningEffort\",\n307:       \"effectiveSelection\",\n308:     ]),\n309:     spawn: SPAWN_RESULT_FIELDS,\n310:   }),\n311:   pi: Object.freeze({\n312:     delegate: Object.freeze([\n313:       \"stdout\",\n314:       \"stderr\",\n315:       \"exitCode\",\n316:       \"dryRun\",\n317:       \"model\",\n318:       \"reasoningEffort\",\n319:       \"effectiveSelection\",\n320:     ]),\n321:     spawn: SPAWN_RESULT_FIELDS,\n322:   }),\n323:   opencode: Object.freeze({\n324:     delegate: Object.freeze([\n325:       \"stdout\",\n326:       \"stderr\",\n327:       \"exitCode\",\n328:       \"dryRun\",\n329:       \"model\",\n330:       \"reasoningEffort\",\n331:       \"effectiveSelection\",\n332:     ]),\n333:     spawn: SPAWN_RESULT_FIELDS,\n334:   }),\n335: });\n336: \n337: const CODEX_SANDBOXES = new Set([\n338:   \"read-only\",\n339:   \"workspace-write\",\n340:   \"danger-full-access\",\n341: ]);\n342: const TMUX_TARGET_MAX_LENGTH = 96;\n343: const LAUNCH_COMMAND_MAX_LENGTH = 8_192;\n344: const UNSAFE_COMMAND_CHARACTER = /[\\p{Cc}\\p{Cf}\\p{Zl}\\p{Zp}]/u;"
+      },
+      {
+        "start": 337,
+        "end": 341,
+        "baseText": "337: const CODEX_SANDBOXES = new Set([\n338:   \"read-only\",\n339:   \"workspace-write\",\n340:   \"danger-full-access\",\n341: ]);"
+      },
+      {
+        "start": 355,
+        "end": 360,
+        "baseText": "355: function configuredCodexSandbox(config) {\n356:   const value = config.codexSandbox === undefined\n357:     ? \"workspace-write\"\n358:     : config.codexSandbox;\n359:   return CODEX_SANDBOXES.has(value) ? value : null;\n360: }"
+      },
+      {
+        "start": 409,
+        "end": 416,
+        "baseText": "409:   if (provider === \"codex\") {\n410:     if (\n411:       result.serviceTier !== effectiveSelection.serviceTier\n412:       || result.sandbox !== codexSandbox\n413:     ) {\n414:       rejectInvalidSelection();\n415:     }\n416:   }"
+      },
+      {
+        "start": 431,
+        "end": 450,
+        "baseText": "431: function assertAdapterSelectionResult(\n432:   operation,\n433:   result,\n434:   effectiveSelection,\n435:   codexSandbox,\n436: ) {\n437:   const provider = effectiveSelection.provider;\n438:   const requiredFields = ADAPTER_RESULT_FIELDS[provider]?.[operation];\n439:   if (\n440:     !requiredFields\n441:     || !result\n442:     || typeof result !== \"object\"\n443:     || Array.isArray(result)\n444:     || utilTypes.isProxy(result)\n445:     || Object.getPrototypeOf(result) !== Object.prototype\n446:   ) {\n447:     rejectInvalidSelection();\n448:   }\n449:   const ownKeys = Reflect.ownKeys(result);\n450:   if (!hasExactFields(ownKeys, requiredFields)) rejectInvalidSelection();"
+      },
+      {
+        "start": 523,
+        "end": 523,
+        "baseText": "523:   const codexSandbox = configuredCodexSandbox(config);"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/codex_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 36,
+        "end": 38,
+        "baseText": "36:   return config?.codexSandbox || process.env.AGENTS_CODEX_SANDBOX || \"workspace-write\";\n37: }\n38: "
+      },
+      {
+        "start": 45,
+        "end": 45,
+        "baseText": "45:   return args;"
+      },
+      {
+        "start": 54,
+        "end": 54,
+        "baseText": "54:   return args;"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/claude_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 34,
+        "end": 47,
+        "baseText": "34:   const args = [\n35:     \"--print\",\n36:     \"--output-format\",\n37:     \"json\",\n38:     \"--permission-mode\",\n39:     \"dontAsk\",\n40:     \"--no-session-persistence\",\n41:   ];\n42:   if (model) args.push(\"--model\", model);\n43:   if (reasoningEffort) args.push(\"--effort\", reasoningEffort);\n44:   if (prompt !== null) args.push(prompt);\n45:   return args;\n46: }\n47: "
+      },
+      {
+        "start": 49,
+        "end": 54,
+        "baseText": "49:   const launch = [claudeBin(config)];\n50:   if (model) launch.push(\"--model\", model);\n51:   if (reasoningEffort) launch.push(\"--effort\", reasoningEffort);\n52:   return launch;\n53: }\n54: "
+      },
+      {
+        "start": 238,
+        "end": 250,
+        "baseText": "238:           prompt,\n239:         }),\n240:         {\n241:           cwd: safeCwd,\n242:           encoding: \"utf-8\",\n243:           timeout: this.config.adapterTimeoutMs || DEFAULT_TIMEOUT_MS,\n244:         },\n245:       );\n246:       const result = {\n247:         stdout: proc.stdout || \"\",\n248:         stderr: proc.stderr || String(proc.error?.message || \"\"),\n249:         exitCode: proc.status ?? -1,\n250:         dryRun: false,"
+      },
+      {
+        "start": 344,
+        "end": 345,
+        "baseText": "344:         if (/^[A-Za-z0-9_./-]+$/.test(claudeBin(this.config))) {\n345:           this.rememberFreshClaudeSpawn({ tmuxTarget });"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/antigravity_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 39,
+        "end": 61,
+        "baseText": "39:   return config?.antigravityAuto === true || process.env.AGENTS_ANTIGRAVITY_AUTO === \"1\";\n40: }\n41: \n42: function buildAntigravityArgs(config, { model = null, reasoningEffort = null, prompt = null } = {}) {\n43:   const args = [\n44:     \"--print\",\n45:     \"--output-format\",\n46:     \"json\",\n47:   ];\n48:   if (autoApprove(config)) args.push(\"--dangerously-skip-permissions\");\n49:   if (model) args.push(\"--model\", model);\n50:   if (reasoningEffort) args.push(\"--effort\", reasoningEffort);\n51:   if (prompt !== null) args.push(prompt);\n52:   return args;\n53: }\n54: \n55: function buildAntigravityLaunch(config, { model = null, reasoningEffort = null } = {}) {\n56:   const launch = [antigravityBin(config)];\n57:   if (autoApprove(config)) launch.push(\"--dangerously-skip-permissions\");\n58:   if (model) launch.push(\"--model\", model);\n59:   if (reasoningEffort) launch.push(\"--effort\", reasoningEffort);\n60:   return launch;\n61: }"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/pi_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 40,
+        "end": 54,
+        "baseText": "40:   const args = [];\n41:   if (model) args.push(\"--model\", model);\n42:   if (reasoningEffort) args.push(\"--thinking\", reasoningEffort);\n43:   args.push(\"--print\", \"--mode\", \"json\");\n44:   if (prompt !== null) args.push(prompt);\n45:   return args;\n46: }\n47: \n48: function buildPiLaunch(config, { model = null, reasoningEffort = null } = {}) {\n49:   const launch = [piBin(config)];\n50:   if (model) launch.push(\"--model\", model);\n51:   if (reasoningEffort) launch.push(\"--thinking\", reasoningEffort);\n52:   return launch;\n53: }\n54: "
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/opencode_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 40,
+        "end": 42,
+        "baseText": "40:   return config?.opencodeAuto === true || process.env.AGENTS_OPENCODE_AUTO === \"1\";\n41: }\n42: "
+      },
+      {
+        "start": 50,
+        "end": 66,
+        "baseText": "50:   const args = [\"run\"];\n51:   if (model) args.push(\"-m\", model);\n52:   if (reasoningEffort) args.push(\"--variant\", reasoningEffort);\n53:   args.push(\"--format\", \"json\");\n54:   if (autoApprove(config)) args.push(\"--auto\");\n55:   if (prompt !== null) args.push(prompt);\n56:   return args;\n57: }\n58: \n59: function buildOpencodeLaunch(config, { model = null, reasoningEffort = null } = {}) {\n60:   const launch = [opencodeBin(config)];\n61:   if (model) launch.push(\"-m\", model);\n62:   if (reasoningEffort) launch.push(\"--variant\", reasoningEffort);\n63:   if (autoApprove(config)) launch.push(\"--auto\");\n64:   return launch;\n65: }\n66: "
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/adapters/gemini_adapter.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 189,
+        "end": 189,
+        "baseText": "189:       const proc = spawnSync(bin, [\"-p\", \"--yolo\", prompt], {"
+      }
+    ]
+  },
+  {
+    "file": "gateway/contracts/orchestrator-profile-v1.json",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 120,
+        "end": 124,
+        "baseText": "120:     \"gemini-cli\": {\n121:       \"agent\": \"gemini-cli\",\n122:       \"provider\": \"gemini-cli\",\n123:       \"execution\": \"registry-only\",\n124:       \"argvOwner\": \"unavailable\","
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/core/orchestrator_profile.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 321,
+        "end": 328,
+        "baseText": "321: function assertProviderExecutable(selection) {\n322:   const profile = CANONICAL_ORCHESTRATOR_PROFILE.providers[selection.provider];\n323:   if (profile.execution !== \"available\") {\n324:     selectionError(\n325:       \"EFFECTIVE_SELECTION_PROVIDER_UNAVAILABLE\",\n326:       \"agent\",\n327:       selection.provider,\n328:     );"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/core/policy_engine.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 352,
+        "end": 357,
+        "baseText": "352: export function evaluate(rawCtx, registries) {\n353:   const ctx = normalizePolicyContext(rawCtx);\n354:   const registryDecision = validateSelectionRegistry(ctx, registries);\n355:   if (registryDecision) return registryDecision;\n356:   return runPipeline(ctx, registries).final;\n357: }"
+      }
+    ]
+  },
+  {
+    "file": "gateway/src/tools/index.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 38,
+        "end": 43,
+        "baseText": "38:   adapters.register(\"gemini-cli\", new GeminiAdapter({ config, registries }));\n39:   adapters.register(\"claude-code\", new ClaudeAdapter({ config, registries }));\n40:   adapters.register(\"codex\", new CodexAdapter({ config, registries }));\n41:   adapters.register(\"antigravity\", new AntigravityAdapter({ config, registries }));\n42:   adapters.register(\"pi\", new PiAdapter({ config, registries }));\n43:   adapters.register(\"opencode\", new OpencodeAdapter({ config, registries }));"
+      }
+    ]
+  },
+  {
+    "file": "policies/roles.json",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 23,
+        "end": 24,
+        "baseText": "23:       \"denyActions\": [\n24:         \"code.write\","
+      },
+      {
+        "start": 33,
+        "end": 33,
+        "baseText": "33:       \"denyActions\": [\"code.write\", \"agent.spawn\"]"
+      },
+      {
+        "start": 58,
+        "end": 58,
+        "baseText": "58:       \"denyActions\": [\"code.write\", \"artifact.get.raw_restricted\", \"code.read.raw_restricted\"]"
+      },
+      {
+        "start": 63,
+        "end": 63,
+        "baseText": "63:       \"denyActions\": [\"code.write\", \"artifact.get.raw_restricted\"]"
+      },
+      {
+        "start": 68,
+        "end": 68,
+        "baseText": "68:       \"denyActions\": [\"code.write\", \"artifact.get.raw_restricted\"]"
+      },
+      {
+        "start": 73,
+        "end": 73,
+        "baseText": "73:       \"denyActions\": [\"code.write\", \"artifact.get.raw_restricted\"]"
+      },
+      {
+        "start": 83,
+        "end": 83,
+        "baseText": "83:       \"denyActions\": [\"code.write\", \"artifact.get.raw_restricted\", \"code.read.raw_restricted\"]"
+      }
+    ]
+  },
+  {
+    "file": "policies/profiles/kya/roles.json",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 57,
+        "end": 67,
+        "baseText": "57:     \"reviewer\": {\n58:       \"purpose\": \"Review repo changes and write review notes or review-driven fixes in non-restricted repos.\",\n59:       \"allowActions\": [\n60:         \"code.write\",\n61:         \"code.read\",\n62:         \"artifact.get.sanitized\",\n63:         \"artifact.get.sanitized.raw_restricted\",\n64:         \"artifact.put.review_notes\"\n65:       ],\n66:       \"denyActions\": [\"artifact.get.raw_restricted\", \"code.read.raw_restricted\"]\n67:     },"
+      }
+    ]
+  },
+  {
+    "file": "tests/gateway/gemini_delegate.test.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 29,
+        "end": 55,
+        "baseText": "29: function assertRegistryOnly(error) {\n30:   assert.equal(error.code, \"POLICY_DENIED\");\n31:   assert.equal(error.message, \"request denied by policy\");\n32:   assert.deepEqual(error.decision.selectionRejection, {\n33:     code: \"EFFECTIVE_SELECTION_PROVIDER_UNAVAILABLE\",\n34:     field: \"agent\",\n35:     provider: \"gemini-cli\",\n36:   });\n37:   return true;\n38: }\n39: \n40: test(\"registry-only Gemini denies dry-run delegate\", async () => {\n41:   const { root } = setup();\n42:   const adapter = new GeminiAdapter({\n43:     config: { dryRun: true, repoRoots: [root] },\n44:     registries: fakeRegistries(),\n45:   });\n46: \n47:   await assert.rejects(\n48:     () => adapter.delegate({\n49:       cwd: root,\n50:       prompt: \"write tests\",\n51:       traceId: \"tr-gemini-dry\",\n52:       role: \"coder\",\n53:     }),\n54:     assertRegistryOnly,\n55:   );"
+      }
+    ]
+  },
+  {
+    "file": "tests/gateway/gemini_supervised.test.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 36,
+        "end": 54,
+        "baseText": "36: function assertRegistryOnly(error) {\n37:   assert.equal(error.code, \"POLICY_DENIED\");\n38:   assert.equal(error.message, \"request denied by policy\");\n39:   assert.deepEqual(error.decision.selectionRejection, {\n40:     code: \"EFFECTIVE_SELECTION_PROVIDER_UNAVAILABLE\",\n41:     field: \"agent\",\n42:     provider: \"gemini-cli\",\n43:   });\n44:   return true;\n45: }\n46: \n47: test(\"registry-only Gemini denies dry-run spawn\", async () => {\n48:   const { root } = setup();\n49: \n50:   await assert.rejects(\n51:     () => adapter(root).spawn({ cwd: root, traceId: \"tr1\", role: \"coder\" }),\n52:     assertRegistryOnly,\n53:   );\n54: });"
+      }
+    ]
+  },
+  {
+    "file": "tests/gateway/orchestrator_profile_authority.test.js",
+    "baseExists": true,
+    "anchors": [
+      {
+        "start": 858,
+        "end": 880,
+        "baseText": "858:         { config: { codexSandbox: sandbox } },\n859:       );\n860:       const result = await value.service.delegate(\n861:         serviceArgs(value, \"delegate\"),\n862:       );\n863:       assert.equal(result.sandbox, sandbox);\n864:     });\n865:   }\n866: \n867:   for (const scenario of [\n868:     {\n869:       name: \"unknown result sandbox\",\n870:       config: {},\n871:       resultSandbox: \"not-a-codex-sandbox\",\n872:     },\n873:     {\n874:       name: \"whitespace result sandbox\",\n875:       config: {},\n876:       resultSandbox: \" \",\n877:     },\n878:     {\n879:       name: \"result sandbox mismatches configured sandbox\",\n880:       config: { codexSandbox: \"read-only\" },"
+      }
+    ]
+  }
+]

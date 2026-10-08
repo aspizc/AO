@@ -1,0 +1,1376 @@
+TAP version 13
+# Subtest: codex delegate validates target writeAccess in bound and unbound calls
+ok 1 - codex delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 66.183884
+  type: 'test'
+  ...
+# Subtest: codex spawn validates target writeAccess in bound and unbound calls
+ok 2 - codex spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 26.649774
+  type: 'test'
+  ...
+# Subtest: claude-code delegate validates target writeAccess in bound and unbound calls
+ok 3 - claude-code delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 52.760283
+  type: 'test'
+  ...
+# Subtest: claude-code spawn validates target writeAccess in bound and unbound calls
+ok 4 - claude-code spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 39.808428
+  type: 'test'
+  ...
+# Subtest: pi delegate validates target writeAccess in bound and unbound calls
+ok 5 - pi delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 32.354381
+  type: 'test'
+  ...
+# Subtest: pi spawn validates target writeAccess in bound and unbound calls
+ok 6 - pi spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 23.459601
+  type: 'test'
+  ...
+# Subtest: opencode delegate validates target writeAccess in bound and unbound calls
+ok 7 - opencode delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 27.347809
+  type: 'test'
+  ...
+# Subtest: opencode spawn validates target writeAccess in bound and unbound calls
+ok 8 - opencode spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 25.43551
+  type: 'test'
+  ...
+# Subtest: antigravity delegate validates target writeAccess in bound and unbound calls
+ok 9 - antigravity delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 23.287676
+  type: 'test'
+  ...
+# Subtest: antigravity spawn validates target writeAccess in bound and unbound calls
+ok 10 - antigravity spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 17.808297
+  type: 'test'
+  ...
+# Subtest: dry run delegate returns deterministic mock output
+ok 11 - dry run delegate returns deterministic mock output
+  ---
+  duration_ms: 11.552087
+  type: 'test'
+  ...
+# Subtest: dry run delegate reports the resolved model and effort when provided
+ok 12 - dry run delegate reports the resolved model and effort when provided
+  ---
+  duration_ms: 1.842421
+  type: 'test'
+  ...
+# Subtest: delegate real passes model and effort flags to agy cli
+ok 13 - delegate real passes model and effort flags to agy cli
+  ---
+  duration_ms: 147.125715
+  type: 'test'
+  ...
+# Subtest: delegate enforces policy denial before execution
+ok 14 - delegate enforces policy denial before execution
+  ---
+  duration_ms: 2.336087
+  type: 'test'
+  ...
+# Subtest: delegate rejects unsafe cwd outside repo roots
+ok 15 - delegate rejects unsafe cwd outside repo roots
+  ---
+  duration_ms: 1.680533
+  type: 'test'
+  ...
+# Subtest: spawn dry run creates deterministic session naming and launch command
+ok 16 - spawn dry run creates deterministic session naming and launch command
+  ---
+  duration_ms: 1.898051
+  type: 'test'
+  ...
+# Subtest: ask view kill dry run return deterministic responses and audit events
+ok 17 - ask view kill dry run return deterministic responses and audit events
+  ---
+  duration_ms: 20.983023
+  type: 'test'
+  ...
+# Subtest: permission bypass requires explicit config opt-in for delegate and spawn
+ok 18 - permission bypass requires explicit config opt-in for delegate and spawn
+  ---
+  duration_ms: 109.581431
+  type: 'test'
+  ...
+# Subtest: permission bypass requires explicit environment opt-in for delegate and spawn
+ok 19 - permission bypass requires explicit environment opt-in for delegate and spawn
+  ---
+  duration_ms: 101.430146
+  type: 'test'
+  ...
+# Subtest: non-opt-in environment values preserve permission prompts
+ok 20 - non-opt-in environment values preserve permission prompts
+  ---
+  duration_ms: 462.84792
+  type: 'test'
+  ...
+# Subtest: dry run delegate returns canonical default selection output
+ok 21 - dry run delegate returns canonical default selection output
+  ---
+  duration_ms: 9.529888
+  type: 'test'
+  ...
+# Subtest: dry run delegate reports the resolved model and effort when provided
+ok 22 - dry run delegate reports the resolved model and effort when provided
+  ---
+  duration_ms: 1.169289
+  type: 'test'
+  ...
+# Subtest: delegate real passes model and effort flags to claude cli
+ok 23 - delegate real passes model and effort flags to claude cli
+  ---
+  duration_ms: 114.567008
+  type: 'test'
+  ...
+# Subtest: delegate real uses canonical defaults when request fields are omitted
+ok 24 - delegate real uses canonical defaults when request fields are omitted
+  ---
+  duration_ms: 106.272035
+  type: 'test'
+  ...
+# Subtest: delegate audits session lifecycle
+ok 25 - delegate audits session lifecycle
+  ---
+  duration_ms: 11.91808
+  type: 'test'
+  ...
+# Subtest: policy deny prevents delegate session start and audits error
+ok 26 - policy deny prevents delegate session start and audits error
+  ---
+  duration_ms: 2.076942
+  type: 'test'
+  ...
+# Subtest: cwd guard runs even in dry run
+ok 27 - cwd guard runs even in dry run
+  ---
+  duration_ms: 0.669354
+  type: 'test'
+  ...
+# Subtest: dry run supervised cycle returns session info and audits input lifecycle
+ok 28 - dry run supervised cycle returns session info and audits input lifecycle
+  ---
+  duration_ms: 2.263009
+  type: 'test'
+  ...
+# Subtest: dry run spawn reports launch command with model and effort
+ok 29 - dry run spawn reports launch command with model and effort
+  ---
+  duration_ms: 0.896276
+  type: 'test'
+  ...
+# Subtest: spawn cwd guard runs in dry run
+ok 30 - spawn cwd guard runs in dry run
+  ---
+  duration_ms: 0.875808
+  type: 'test'
+  ...
+# Subtest: base reviewer/planner/editor cannot write: independent seats must be confined
+ok 31 - base reviewer/planner/editor cannot write: independent seats must be confined
+  ---
+  duration_ms: 1.976933
+  type: 'test'
+  ...
+# Subtest: derivation ignores role names: synthetic reviewer can write and coder can be denied
+ok 32 - derivation ignores role names: synthetic reviewer can write and coder can be denied
+  ---
+  duration_ms: 0.532046
+  type: 'test'
+  ...
+# Subtest: require_approval and unknown repository do not grant unattended write access
+ok 33 - require_approval and unknown repository do not grant unattended write access
+  ---
+  duration_ms: 0.176601
+  type: 'test'
+  ...
+# Subtest: codex delegate and spawn follow policy, preserving writable reviewer semantics (false)
+ok 34 - codex delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 102.808376
+  type: 'test'
+  ...
+# Subtest: codex delegate and spawn follow policy, preserving writable reviewer semantics (true)
+ok 35 - codex delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 79.299262
+  type: 'test'
+  ...
+# Subtest: claude-code delegate and spawn follow policy, preserving writable reviewer semantics (false)
+ok 36 - claude-code delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 103.443792
+  type: 'test'
+  ...
+# Subtest: claude-code delegate and spawn follow policy, preserving writable reviewer semantics (true)
+ok 37 - claude-code delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 94.801919
+  type: 'test'
+  ...
+# Subtest: pi delegate and spawn follow policy, preserving writable reviewer semantics (false)
+ok 38 - pi delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 92.354418
+  type: 'test'
+  ...
+# Subtest: pi delegate and spawn follow policy, preserving writable reviewer semantics (true)
+ok 39 - pi delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 106.516973
+  type: 'test'
+  ...
+# Subtest: opencode delegate and spawn follow policy, preserving writable reviewer semantics (false)
+ok 40 - opencode delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 101.606296
+  type: 'test'
+  ...
+# Subtest: opencode delegate and spawn follow policy, preserving writable reviewer semantics (true)
+ok 41 - opencode delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 86.541191
+  type: 'test'
+  ...
+# Subtest: antigravity delegate and spawn follow policy, preserving writable reviewer semantics (false)
+ok 42 - antigravity delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 4.73132
+  type: 'test'
+  ...
+# Subtest: antigravity delegate and spawn follow policy, preserving writable reviewer semantics (true)
+ok 43 - antigravity delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 83.729593
+  type: 'test'
+  ...
+# Subtest: Codex read-only ceiling holds even when policy allows writing
+ok 44 - Codex read-only ceiling holds even when policy allows writing
+  ---
+  duration_ms: 2.961473
+  type: 'test'
+  ...
+# Subtest: disabled codex returns clear error
+ok 45 - disabled codex returns clear error
+  ---
+  duration_ms: 10.906546
+  type: 'test'
+  ...
+# Subtest: codex can be registered with a custom disabled registry
+ok 46 - codex can be registered with a custom disabled registry
+  ---
+  duration_ms: 1.151645
+  type: 'test'
+  ...
+# Subtest: enabled dry run delegate works and audits lifecycle
+ok 47 - enabled dry run delegate works and audits lifecycle
+  ---
+  duration_ms: 18.859987
+  type: 'test'
+  ...
+# Subtest: enabled dry run delegate reports model effort sandbox and cwd
+ok 48 - enabled dry run delegate reports model effort sandbox and cwd
+  ---
+  duration_ms: 1.237233
+  type: 'test'
+  ...
+# Subtest: an unrequested tier preserves the public priority default
+ok 49 - an unrequested tier preserves the public priority default
+  ---
+  duration_ms: 153.143956
+  type: 'test'
+  ...
+# Subtest: enabled real delegate invokes fake codex exec with model effort sandbox and cwd
+ok 50 - enabled real delegate invokes fake codex exec with model effort sandbox and cwd
+  ---
+  duration_ms: 116.162129
+  type: 'test'
+  ...
+# Subtest: enabled delegate still applies policy
+ok 51 - enabled delegate still applies policy
+  ---
+  duration_ms: 0.750176
+  type: 'test'
+  ...
+# Subtest: enabled dry run still applies cwd guard
+ok 52 - enabled dry run still applies cwd guard
+  ---
+  duration_ms: 0.67045
+  type: 'test'
+  ...
+# Subtest: delegate rejects cwd that exposes repo excluded paths
+ok 53 - delegate rejects cwd that exposes repo excluded paths
+  ---
+  duration_ms: 1.123889
+  type: 'test'
+  ...
+# Subtest: delegate permits scoped cwd outside repo excluded paths
+ok 54 - delegate permits scoped cwd outside repo excluded paths
+  ---
+  duration_ms: 2.112545
+  type: 'test'
+  ...
+# Subtest: real delegate rejects cwd outside allowlist before process
+ok 55 - real delegate rejects cwd outside allowlist before process
+  ---
+  duration_ms: 0.881824
+  type: 'test'
+  ...
+# Subtest: codex restricted repo is allowed by policy
+ok 56 - codex restricted repo is allowed by policy
+  ---
+  duration_ms: 0.456875
+  type: 'test'
+  ...
+# Subtest: disallowed model is denied before process
+ok 57 - disallowed model is denied before process
+  ---
+  duration_ms: 0.620097
+  type: 'test'
+  ...
+# Subtest: CodexAdapter ask routes through the shared composer submission guard
+ok 58 - CodexAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 23.698454
+  type: 'test'
+  ...
+# Subtest: ClaudeAdapter ask routes through the shared composer submission guard
+ok 59 - ClaudeAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 3.438884
+  type: 'test'
+  ...
+# Subtest: AntigravityAdapter ask routes through the shared composer submission guard
+ok 60 - AntigravityAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 2.785944
+  type: 'test'
+  ...
+# Subtest: PiAdapter ask routes through the shared composer submission guard
+ok 61 - PiAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 2.156158
+  type: 'test'
+  ...
+# Subtest: OpencodeAdapter ask routes through the shared composer submission guard
+ok 62 - OpencodeAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 2.558064
+  type: 'test'
+  ...
+# Subtest: spawn dry run returns attach command and audits start
+ok 63 - spawn dry run returns attach command and audits start
+  ---
+  duration_ms: 4.869812
+  type: 'test'
+  ...
+# Subtest: spawn launch line includes model effort service tier sandbox and cwd
+ok 64 - spawn launch line includes model effort service tier sandbox and cwd
+  ---
+  duration_ms: 1.303627
+  type: 'test'
+  ...
+# Subtest: spawn without an explicit tier preserves the public priority default
+ok 65 - spawn without an explicit tier preserves the public priority default
+  ---
+  duration_ms: 0.872477
+  type: 'test'
+  ...
+# Subtest: disabled codex spawn is denied
+ok 66 - disabled codex spawn is denied
+  ---
+  duration_ms: 2.852904
+  type: 'test'
+  ...
+# Subtest: restricted repo spawn is allowed for codex restricted-coder
+ok 67 - restricted repo spawn is allowed for codex restricted-coder
+  ---
+  duration_ms: 4.450466
+  type: 'test'
+  ...
+# Subtest: spawn cwd guard runs before tmux
+ok 68 - spawn cwd guard runs before tmux
+  ---
+  duration_ms: 2.17307
+  type: 'test'
+  ...
+# Subtest: spawn rejects cwd that exposes repo excluded paths
+ok 69 - spawn rejects cwd that exposes repo excluded paths
+  ---
+  duration_ms: 5.326801
+  type: 'test'
+  ...
+# Subtest: spawn permits scoped cwd outside repo excluded paths
+ok 70 - spawn permits scoped cwd outside repo excluded paths
+  ---
+  duration_ms: 1.196865
+  type: 'test'
+  ...
+# Subtest: ask view kill dry run flow audits input and close
+ok 71 - ask view kill dry run flow audits input and close
+  ---
+  duration_ms: 3.923049
+  type: 'test'
+  ...
+# Subtest: registry-only Gemini denies dry-run delegate
+ok 72 - registry-only Gemini denies dry-run delegate
+  ---
+  duration_ms: 5.511282
+  type: 'test'
+  ...
+# Subtest: registry-only delegate audits one safe error and no session lifecycle
+ok 73 - registry-only delegate audits one safe error and no session lifecycle
+  ---
+  duration_ms: 6.170239
+  type: 'test'
+  ...
+# Subtest: registry-only denial precedes the cwd guard
+ok 74 - registry-only denial precedes the cwd guard
+  ---
+  duration_ms: 0.749888
+  type: 'test'
+  ...
+# Subtest: registry-only Gemini denies dry-run spawn
+ok 75 - registry-only Gemini denies dry-run spawn
+  ---
+  duration_ms: 7.175154
+  type: 'test'
+  ...
+# Subtest: registry-only spawn audits no supervised session start
+ok 76 - registry-only spawn audits no supervised session start
+  ---
+  duration_ms: 6.968037
+  type: 'test'
+  ...
+# Subtest: dry run ask returns response and audits bounded input
+ok 77 - dry run ask returns response and audits bounded input
+  ---
+  duration_ms: 1.96586
+  type: 'test'
+  ...
+# Subtest: view returns snapshot in dry run
+ok 78 - view returns snapshot in dry run
+  ---
+  duration_ms: 0.360143
+  type: 'test'
+  ...
+# Subtest: kill marks supervised session closed in audit
+ok 79 - kill marks supervised session closed in audit
+  ---
+  duration_ms: 1.902343
+  type: 'test'
+  ...
+# Subtest: registry-only spawn denial precedes cwd guard
+ok 80 - registry-only spawn denial precedes cwd guard
+  ---
+  duration_ms: 0.641964
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a mutable structural clone
+ok 81 - selection authority rejects a mutable structural clone
+  ---
+  duration_ms: 3.523547
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a frozen structural clone
+ok 82 - selection authority rejects a frozen structural clone
+  ---
+  duration_ms: 0.357778
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a JSON-rehydrated selection
+ok 83 - selection authority rejects a JSON-rehydrated selection
+  ---
+  duration_ms: 0.220261
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a selection with an extra field
+ok 84 - selection authority rejects a selection with an extra field
+  ---
+  duration_ms: 0.178011
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a selection with an extended source projection
+ok 85 - selection authority rejects a selection with an extended source projection
+  ---
+  duration_ms: 0.41515
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a selection with a valid-looking tampered source
+ok 86 - selection authority rejects a selection with a valid-looking tampered source
+  ---
+  duration_ms: 0.164427
+  type: 'test'
+  ...
+# Subtest: selection authority rejects a Proxy around a canonical selection
+ok 87 - selection authority rejects a Proxy around a canonical selection
+  ---
+  duration_ms: 0.181532
+  type: 'test'
+  ...
+# Subtest: selection authority rejects an object produced by another module instance
+ok 88 - selection authority rejects an object produced by another module instance
+  ---
+  duration_ms: 2.758555
+  type: 'test'
+  ...
+# Subtest: Codex bound dry-run rejects an unknown raw model plus mutable canonical clone with zero effects
+ok 89 - Codex bound dry-run rejects an unknown raw model plus mutable canonical clone with zero effects
+  ---
+  duration_ms: 4.388158
+  type: 'test'
+  ...
+# Subtest: Codex bound dry-run rejects a frozen canonical clone with zero effects
+ok 90 - Codex bound dry-run rejects a frozen canonical clone with zero effects
+  ---
+  duration_ms: 1.143421
+  type: 'test'
+  ...
+# Subtest: codex delegate rejects redundant raw model, effort, and tier fields before lifecycle effects
+ok 91 - codex delegate rejects redundant raw model, effort, and tier fields before lifecycle effects
+  ---
+  duration_ms: 0.885342
+  type: 'test'
+  ...
+# Subtest: codex delegate rejects a frozen structural selection before lifecycle effects
+ok 92 - codex delegate rejects a frozen structural selection before lifecycle effects
+  ---
+  duration_ms: 0.650195
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects redundant raw model, effort, and tier fields before lifecycle effects
+ok 93 - codex spawn rejects redundant raw model, effort, and tier fields before lifecycle effects
+  ---
+  duration_ms: 0.872038
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects a frozen structural selection before lifecycle effects
+ok 94 - codex spawn rejects a frozen structural selection before lifecycle effects
+  ---
+  duration_ms: 0.474839
+  type: 'test'
+  ...
+# Subtest: claude-code delegate rejects redundant raw model, effort, and tier fields before lifecycle effects
+ok 95 - claude-code delegate rejects redundant raw model, effort, and tier fields before lifecycle effects
+  ---
+  duration_ms: 0.85408
+  type: 'test'
+  ...
+# Subtest: claude-code delegate rejects a frozen structural selection before lifecycle effects
+ok 96 - claude-code delegate rejects a frozen structural selection before lifecycle effects
+  ---
+  duration_ms: 0.452418
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects redundant raw model, effort, and tier fields before lifecycle effects
+ok 97 - claude-code spawn rejects redundant raw model, effort, and tier fields before lifecycle effects
+  ---
+  duration_ms: 1.523227
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects a frozen structural selection before lifecycle effects
+ok 98 - claude-code spawn rejects a frozen structural selection before lifecycle effects
+  ---
+  duration_ms: 0.465938
+  type: 'test'
+  ...
+# Subtest: direct adapter rejects a branded cross-provider selection before lifecycle effects
+ok 99 - direct adapter rejects a branded cross-provider selection before lifecycle effects
+  ---
+  duration_ms: 0.476391
+  type: 'test'
+  ...
+# Subtest: direct adapter rejects registry drift before lifecycle effects
+ok 100 - direct adapter rejects registry drift before lifecycle effects
+  ---
+  duration_ms: 22.423984
+  type: 'test'
+  ...
+# Subtest: codex delegate rejects every missing adapter result field
+ok 101 - codex delegate rejects every missing adapter result field
+  ---
+  duration_ms: 44.904948
+  type: 'test'
+  ...
+# Subtest: codex delegate rejects non-scalar values in every allowed result field
+ok 102 - codex delegate rejects non-scalar values in every allowed result field
+  ---
+  duration_ms: 102.079467
+  type: 'test'
+  ...
+# Subtest: codex delegate rejects every accessor-backed result field without reading it
+ok 103 - codex delegate rejects every accessor-backed result field without reading it
+  ---
+  duration_ms: 18.258527
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects every missing adapter result field
+ok 104 - codex spawn rejects every missing adapter result field
+  ---
+  duration_ms: 16.893542
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects non-scalar values in every allowed result field
+ok 105 - codex spawn rejects non-scalar values in every allowed result field
+  ---
+  duration_ms: 67.662935
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects every accessor-backed result field without reading it
+ok 106 - codex spawn rejects every accessor-backed result field without reading it
+  ---
+  duration_ms: 22.394073
+  type: 'test'
+  ...
+# Subtest: claude-code delegate rejects every missing adapter result field
+ok 107 - claude-code delegate rejects every missing adapter result field
+  ---
+  duration_ms: 17.971404
+  type: 'test'
+  ...
+# Subtest: claude-code delegate rejects non-scalar values in every allowed result field
+ok 108 - claude-code delegate rejects non-scalar values in every allowed result field
+  ---
+  duration_ms: 62.897158
+  type: 'test'
+  ...
+# Subtest: claude-code delegate rejects every accessor-backed result field without reading it
+ok 109 - claude-code delegate rejects every accessor-backed result field without reading it
+  ---
+  duration_ms: 14.91087
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects every missing adapter result field
+ok 110 - claude-code spawn rejects every missing adapter result field
+  ---
+  duration_ms: 12.576113
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects non-scalar values in every allowed result field
+ok 111 - claude-code spawn rejects non-scalar values in every allowed result field
+  ---
+  duration_ms: 54.16466
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects every accessor-backed result field without reading it
+ok 112 - claude-code spawn rejects every accessor-backed result field without reading it
+  ---
+  duration_ms: 11.984848
+  type: 'test'
+  ...
+# Subtest: delegate rejects a result containing only the effective selection
+ok 113 - delegate rejects a result containing only the effective selection
+  ---
+  duration_ms: 10.613733
+  type: 'test'
+  ...
+# Subtest: delegate enforces provider-specific exact fields and scalar values
+    # Subtest: Codex wrong model
+    ok 1 - Codex wrong model
+      ---
+      duration_ms: 10.088128
+      type: 'test'
+      ...
+    # Subtest: Codex wrong effort
+    ok 2 - Codex wrong effort
+      ---
+      duration_ms: 8.924572
+      type: 'test'
+      ...
+    # Subtest: Codex wrong tier
+    ok 3 - Codex wrong tier
+      ---
+      duration_ms: 9.167615
+      type: 'test'
+      ...
+    # Subtest: Codex empty sandbox
+    ok 4 - Codex empty sandbox
+      ---
+      duration_ms: 9.796465
+      type: 'test'
+      ...
+    # Subtest: Claude wrong model
+    ok 5 - Claude wrong model
+      ---
+      duration_ms: 8.75374
+      type: 'test'
+      ...
+    # Subtest: Claude wrong effort
+    ok 6 - Claude wrong effort
+      ---
+      duration_ms: 8.340702
+      type: 'test'
+      ...
+    # Subtest: Claude spurious service tier
+    ok 7 - Claude spurious service tier
+      ---
+      duration_ms: 8.757359
+      type: 'test'
+      ...
+    # Subtest: Claude spurious sandbox
+    ok 8 - Claude spurious sandbox
+      ---
+      duration_ms: 11.778956
+      type: 'test'
+      ...
+    1..8
+ok 114 - delegate enforces provider-specific exact fields and scalar values
+  ---
+  duration_ms: 77.147981
+  type: 'test'
+  ...
+# Subtest: Codex delegate accepts only the configured canonical sandbox
+    # Subtest: default workspace-write
+    ok 1 - default workspace-write
+      ---
+      duration_ms: 13.611049
+      type: 'test'
+      ...
+    # Subtest: configured read-only
+    ok 2 - configured read-only
+      ---
+      duration_ms: 13.561272
+      type: 'test'
+      ...
+    # Subtest: configured workspace-write
+    ok 3 - configured workspace-write
+      ---
+      duration_ms: 13.275338
+      type: 'test'
+      ...
+    # Subtest: configured danger-full-access
+    ok 4 - configured danger-full-access
+      ---
+      duration_ms: 11.958791
+      type: 'test'
+      ...
+    # Subtest: unknown result sandbox
+    ok 5 - unknown result sandbox
+      ---
+      duration_ms: 15.900016
+      type: 'test'
+      ...
+    # Subtest: whitespace result sandbox
+    ok 6 - whitespace result sandbox
+      ---
+      duration_ms: 14.305698
+      type: 'test'
+      ...
+    # Subtest: result sandbox mismatches configured sandbox
+    ok 7 - result sandbox mismatches configured sandbox
+      ---
+      duration_ms: 15.681321
+      type: 'test'
+      ...
+    # Subtest: configured sandbox is outside the canonical domain
+    ok 8 - configured sandbox is outside the canonical domain
+      ---
+      duration_ms: 17.402249
+      type: 'test'
+      ...
+    1..8
+ok 115 - Codex delegate accepts only the configured canonical sandbox
+  ---
+  duration_ms: 117.283206
+  type: 'test'
+  ...
+# Subtest: invalid Codex sandbox configuration fails before adapter lookup for every operation
+    # Subtest: delegate
+    ok 1 - delegate
+      ---
+      duration_ms: 14.86898
+      type: 'test'
+      ...
+    # Subtest: spawn
+    ok 2 - spawn
+      ---
+      duration_ms: 13.385316
+      type: 'test'
+      ...
+    1..2
+ok 116 - invalid Codex sandbox configuration fails before adapter lookup for every operation
+  ---
+  duration_ms: 28.875089
+  type: 'test'
+  ...
+# Subtest: Codex delegate tool rejects an unknown sandbox with a stable body and no success effects
+ok 117 - Codex delegate tool rejects an unknown sandbox with a stable body and no success effects
+  ---
+  duration_ms: 16.277479
+  type: 'test'
+  ...
+# Subtest: codex spawn rejects every empty required string
+ok 118 - codex spawn rejects every empty required string
+  ---
+  duration_ms: 17.030254
+  type: 'test'
+  ...
+# Subtest: claude-code spawn rejects every empty required string
+ok 119 - claude-code spawn rejects every empty required string
+  ---
+  duration_ms: 18.142905
+  type: 'test'
+  ...
+# Subtest: codex spawn enforces canonical identifiers and commands
+    # Subtest: whitespace identity
+    ok 1 - whitespace identity
+      ---
+      duration_ms: 14.141782
+      type: 'test'
+      ...
+    # Subtest: identity containing a newline
+    ok 2 - identity containing a newline
+      ---
+      duration_ms: 8.800934
+      type: 'test'
+      ...
+    # Subtest: identity containing a tab
+    ok 3 - identity containing a tab
+      ---
+      duration_ms: 10.055391
+      type: 'test'
+      ...
+    # Subtest: identity containing NUL
+    ok 4 - identity containing NUL
+      ---
+      duration_ms: 11.487865
+      type: 'test'
+      ...
+    # Subtest: identity containing another control character
+    ok 5 - identity containing another control character
+      ---
+      duration_ms: 10.280671
+      type: 'test'
+      ...
+    # Subtest: non-ASCII identity
+    ok 6 - non-ASCII identity
+      ---
+      duration_ms: 9.143279
+      type: 'test'
+      ...
+    # Subtest: overlong identity
+    ok 7 - overlong identity
+      ---
+      duration_ms: 9.932727
+      type: 'test'
+      ...
+    # Subtest: non-canonical attach command
+    ok 8 - non-canonical attach command
+      ---
+      duration_ms: 11.277274
+      type: 'test'
+      ...
+    # Subtest: whitespace launch command
+    ok 9 - whitespace launch command
+      ---
+      duration_ms: 8.927572
+      type: 'test'
+      ...
+    # Subtest: launch command with leading whitespace
+    ok 10 - launch command with leading whitespace
+      ---
+      duration_ms: 7.874224
+      type: 'test'
+      ...
+    # Subtest: launch command with trailing whitespace
+    ok 11 - launch command with trailing whitespace
+      ---
+      duration_ms: 8.040486
+      type: 'test'
+      ...
+    # Subtest: launch command containing a tab
+    ok 12 - launch command containing a tab
+      ---
+      duration_ms: 7.917061
+      type: 'test'
+      ...
+    # Subtest: launch command containing a format control
+    ok 13 - launch command containing a format control
+      ---
+      duration_ms: 9.284348
+      type: 'test'
+      ...
+    # Subtest: non-NFC launch command
+    ok 14 - non-NFC launch command
+      ---
+      duration_ms: 8.803167
+      type: 'test'
+      ...
+    # Subtest: overlong launch command
+    ok 15 - overlong launch command
+      ---
+      duration_ms: 10.719781
+      type: 'test'
+      ...
+    # Subtest: bounded ASCII target and NFC command with internal spaces
+    ok 16 - bounded ASCII target and NFC command with internal spaces
+      ---
+      duration_ms: 7.893557
+      type: 'test'
+      ...
+    1..16
+ok 120 - codex spawn enforces canonical identifiers and commands
+  ---
+  duration_ms: 156.937521
+  type: 'test'
+  ...
+# Subtest: claude-code spawn enforces canonical identifiers and commands
+    # Subtest: whitespace identity
+    ok 1 - whitespace identity
+      ---
+      duration_ms: 8.332129
+      type: 'test'
+      ...
+    # Subtest: identity containing a newline
+    ok 2 - identity containing a newline
+      ---
+      duration_ms: 7.944998
+      type: 'test'
+      ...
+    # Subtest: identity containing a tab
+    ok 3 - identity containing a tab
+      ---
+      duration_ms: 8.264458
+      type: 'test'
+      ...
+    # Subtest: identity containing NUL
+    ok 4 - identity containing NUL
+      ---
+      duration_ms: 7.939405
+      type: 'test'
+      ...
+    # Subtest: identity containing another control character
+    ok 5 - identity containing another control character
+      ---
+      duration_ms: 8.048839
+      type: 'test'
+      ...
+    # Subtest: non-ASCII identity
+    ok 6 - non-ASCII identity
+      ---
+      duration_ms: 9.113327
+      type: 'test'
+      ...
+    # Subtest: overlong identity
+    ok 7 - overlong identity
+      ---
+      duration_ms: 7.77036
+      type: 'test'
+      ...
+    # Subtest: non-canonical attach command
+    ok 8 - non-canonical attach command
+      ---
+      duration_ms: 7.663757
+      type: 'test'
+      ...
+    # Subtest: whitespace launch command
+    ok 9 - whitespace launch command
+      ---
+      duration_ms: 7.411401
+      type: 'test'
+      ...
+    # Subtest: launch command with leading whitespace
+    ok 10 - launch command with leading whitespace
+      ---
+      duration_ms: 7.255037
+      type: 'test'
+      ...
+    # Subtest: launch command with trailing whitespace
+    ok 11 - launch command with trailing whitespace
+      ---
+      duration_ms: 7.460864
+      type: 'test'
+      ...
+    # Subtest: launch command containing a tab
+    ok 12 - launch command containing a tab
+      ---
+      duration_ms: 8.047898
+      type: 'test'
+      ...
+    # Subtest: launch command containing a format control
+    ok 13 - launch command containing a format control
+      ---
+      duration_ms: 8.069406
+      type: 'test'
+      ...
+    # Subtest: non-NFC launch command
+    ok 14 - non-NFC launch command
+      ---
+      duration_ms: 9.949854
+      type: 'test'
+      ...
+    # Subtest: overlong launch command
+    ok 15 - overlong launch command
+      ---
+      duration_ms: 7.326613
+      type: 'test'
+      ...
+    # Subtest: bounded ASCII target and NFC command with internal spaces
+    ok 16 - bounded ASCII target and NFC command with internal spaces
+      ---
+      duration_ms: 6.693361
+      type: 'test'
+      ...
+    1..16
+ok 121 - claude-code spawn enforces canonical identifiers and commands
+  ---
+  duration_ms: 128.637097
+  type: 'test'
+  ...
+# Subtest: spawn rejects an unsafe task-backed identity before persistence and successful audit
+ok 122 - spawn rejects an unsafe task-backed identity before persistence and successful audit
+  ---
+  duration_ms: 9.518677
+  type: 'test'
+  ...
+# Subtest: spawn tool rejects an unsafe command with a stable body and no disclosure
+ok 123 - spawn tool rejects an unsafe command with a stable body and no disclosure
+  ---
+  duration_ms: 8.778564
+  type: 'test'
+  ...
+# Subtest: delegate rejects malformed process exit codes
+    # Subtest: exitCode -2
+    ok 1 - exitCode -2
+      ---
+      duration_ms: 8.433604
+      type: 'test'
+      ...
+    # Subtest: exitCode 256
+    ok 2 - exitCode 256
+      ---
+      duration_ms: 7.549
+      type: 'test'
+      ...
+    # Subtest: exitCode 1.5
+    ok 3 - exitCode 1.5
+      ---
+      duration_ms: 7.324275
+      type: 'test'
+      ...
+    # Subtest: exitCode NaN
+    ok 4 - exitCode NaN
+      ---
+      duration_ms: 6.910892
+      type: 'test'
+      ...
+    # Subtest: exitCode Infinity
+    ok 5 - exitCode Infinity
+      ---
+      duration_ms: 7.80345
+      type: 'test'
+      ...
+    # Subtest: exitCode 9007199254740992
+    ok 6 - exitCode 9007199254740992
+      ---
+      duration_ms: 6.88265
+      type: 'test'
+      ...
+    # Subtest: exitCode 0
+    ok 7 - exitCode 0
+      ---
+      duration_ms: 7.810129
+      type: 'test'
+      ...
+    1..7
+ok 124 - delegate rejects malformed process exit codes
+  ---
+  duration_ms: 53.465411
+  type: 'test'
+  ...
+# Subtest: codex delegate accepts exact dry-run and process result contracts
+ok 125 - codex delegate accepts exact dry-run and process result contracts
+  ---
+  duration_ms: 10.768693
+  type: 'test'
+  ...
+# Subtest: codex spawn accepts exact dry-run and process result contracts
+ok 126 - codex spawn accepts exact dry-run and process result contracts
+  ---
+  duration_ms: 9.443768
+  type: 'test'
+  ...
+# Subtest: codex delegate preserves null and persisted task flows
+    # Subtest: taskId null
+    ok 1 - taskId null
+      ---
+      duration_ms: 8.46891
+      type: 'test'
+      ...
+    # Subtest: taskId present
+    ok 2 - taskId present
+      ---
+      duration_ms: 9.074455
+      type: 'test'
+      ...
+    1..2
+ok 127 - codex delegate preserves null and persisted task flows
+  ---
+  duration_ms: 17.886723
+  type: 'test'
+  ...
+# Subtest: codex spawn preserves null and persisted task flows
+    # Subtest: taskId null
+    ok 1 - taskId null
+      ---
+      duration_ms: 7.626697
+      type: 'test'
+      ...
+    # Subtest: taskId present
+    ok 2 - taskId present
+      ---
+      duration_ms: 9.207123
+      type: 'test'
+      ...
+    1..2
+ok 128 - codex spawn preserves null and persisted task flows
+  ---
+  duration_ms: 17.0083
+  type: 'test'
+  ...
+# Subtest: claude-code delegate accepts exact dry-run and process result contracts
+ok 129 - claude-code delegate accepts exact dry-run and process result contracts
+  ---
+  duration_ms: 8.769543
+  type: 'test'
+  ...
+# Subtest: claude-code spawn accepts exact dry-run and process result contracts
+ok 130 - claude-code spawn accepts exact dry-run and process result contracts
+  ---
+  duration_ms: 7.257816
+  type: 'test'
+  ...
+# Subtest: claude-code delegate preserves null and persisted task flows
+    # Subtest: taskId null
+    ok 1 - taskId null
+      ---
+      duration_ms: 6.837401
+      type: 'test'
+      ...
+    # Subtest: taskId present
+    ok 2 - taskId present
+      ---
+      duration_ms: 7.054373
+      type: 'test'
+      ...
+    1..2
+ok 131 - claude-code delegate preserves null and persisted task flows
+  ---
+  duration_ms: 14.030853
+  type: 'test'
+  ...
+# Subtest: claude-code spawn preserves null and persisted task flows
+    # Subtest: taskId null
+    ok 1 - taskId null
+      ---
+      duration_ms: 6.896886
+      type: 'test'
+      ...
+    # Subtest: taskId present
+    ok 2 - taskId present
+      ---
+      duration_ms: 7.235263
+      type: 'test'
+      ...
+    1..2
+ok 132 - claude-code spawn preserves null and persisted task flows
+  ---
+  duration_ms: 14.275323
+  type: 'test'
+  ...
+# Subtest: spawn rejects a mismatched session and tmux identity before persistence
+ok 133 - spawn rejects a mismatched session and tmux identity before persistence
+  ---
+  duration_ms: 9.76158
+  type: 'test'
+  ...
+# Subtest: spawn tool rejects a late-evaluated nested session id without leaking it
+ok 134 - spawn tool rejects a late-evaluated nested session id without leaking it
+  ---
+  duration_ms: 8.84567
+  type: 'test'
+  ...
+# Subtest: service delegate sends only the branded selection and returns its exact identity
+ok 135 - service delegate sends only the branded selection and returns its exact identity
+  ---
+  duration_ms: 8.204079
+  type: 'test'
+  ...
+# Subtest: service spawn sends only the branded selection and returns its exact identity
+ok 136 - service spawn sends only the branded selection and returns its exact identity
+  ---
+  duration_ms: 7.757278
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with missing selection
+ok 137 - service delegate rejects an adapter result with missing selection
+  ---
+  duration_ms: 8.88111
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with cloned selection and raw alias
+ok 138 - service delegate rejects an adapter result with cloned selection and raw alias
+  ---
+  duration_ms: 7.920571
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with contradictory model projection
+ok 139 - service delegate rejects an adapter result with contradictory model projection
+  ---
+  duration_ms: 9.954881
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with unknown adapter-owned selection field
+ok 140 - service delegate rejects an adapter result with unknown adapter-owned selection field
+  ---
+  duration_ms: 7.768714
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with proxied result
+ok 141 - service delegate rejects an adapter result with proxied result
+  ---
+  duration_ms: 7.7323
+  type: 'test'
+  ...
+# Subtest: service delegate rejects an adapter result with time-varying model accessor
+ok 142 - service delegate rejects an adapter result with time-varying model accessor
+  ---
+  duration_ms: 7.921918
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with missing selection
+ok 143 - service spawn rejects an adapter result with missing selection
+  ---
+  duration_ms: 7.843701
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with cloned selection and raw alias
+ok 144 - service spawn rejects an adapter result with cloned selection and raw alias
+  ---
+  duration_ms: 7.795332
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with contradictory model projection
+ok 145 - service spawn rejects an adapter result with contradictory model projection
+  ---
+  duration_ms: 7.870318
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with unknown adapter-owned selection field
+ok 146 - service spawn rejects an adapter result with unknown adapter-owned selection field
+  ---
+  duration_ms: 7.843925
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with proxied result
+ok 147 - service spawn rejects an adapter result with proxied result
+  ---
+  duration_ms: 8.305219
+  type: 'test'
+  ...
+# Subtest: service spawn rejects an adapter result with time-varying model accessor
+ok 148 - service spawn rejects an adapter result with time-varying model accessor
+  ---
+  duration_ms: 8.270229
+  type: 'test'
+  ...
+# Subtest: tool output rejects a cloned adapter selection without projecting its raw alias
+ok 149 - tool output rejects a cloned adapter selection without projecting its raw alias
+  ---
+  duration_ms: 8.142445
+  type: 'test'
+  ...
+# Subtest: a model id carries its provider, and only API providers demand a key
+ok 150 - a model id carries its provider, and only API providers demand a key
+  ---
+  duration_ms: 1.488601
+  type: 'test'
+  ...
+# Subtest: kimi k3 is refused by name when its key is absent, and passes when set
+ok 151 - kimi k3 is refused by name when its key is absent, and passes when set
+  ---
+  duration_ms: 0.513732
+  type: 'test'
+  ...
+# Subtest: the local base URL is overridable and falls back to the Ollama default
+ok 152 - the local base URL is overridable and falls back to the Ollama default
+  ---
+  duration_ms: 0.140934
+  type: 'test'
+  ...
+# Subtest: pi dry run resolves the local Qwen default and audits the lifecycle
+ok 153 - pi dry run resolves the local Qwen default and audits the lifecycle
+  ---
+  duration_ms: 12.67905
+  type: 'test'
+  ...
+# Subtest: pi passes the model as --model and the effort as --thinking, non-interactively
+ok 154 - pi passes the model as --model and the effort as --thinking, non-interactively
+  ---
+  duration_ms: 96.674482
+  type: 'test'
+  ...
+# Subtest: pi hands the local endpoint to the child process
+ok 155 - pi hands the local endpoint to the child process
+  ---
+  duration_ms: 150.674106
+  type: 'test'
+  ...
+# Subtest: pi supervised launch is the interactive line, with no --print
+ok 156 - pi supervised launch is the interactive line, with no --print
+  ---
+  duration_ms: 1.399356
+  type: 'test'
+  ...
+# Subtest: pi refuses kimi k3 without a key, before any process starts
+ok 157 - pi refuses kimi k3 without a key, before any process starts
+  ---
+  duration_ms: 1.13997
+  type: 'test'
+  ...
+# Subtest: opencode runs non-interactively with -m and json output
+ok 158 - opencode runs non-interactively with -m and json output
+  ---
+  duration_ms: 148.338875
+  type: 'test'
+  ...
+# Subtest: opencode only bypasses its permission prompt when told to
+ok 159 - opencode only bypasses its permission prompt when told to
+  ---
+  duration_ms: 89.774624
+  type: 'test'
+  ...
+# Subtest: opencode declares no effort dimension, so none is forwarded by default
+ok 160 - opencode declares no effort dimension, so none is forwarded by default
+  ---
+  duration_ms: 0.780954
+  type: 'test'
+  ...
+# Subtest: opencode refuses kimi k3 without a key
+ok 161 - opencode refuses kimi k3 without a key
+  ---
+  duration_ms: 0.681249
+  type: 'test'
+  ...
+1..161
+# tests 226
+# suites 0
+# pass 226
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1630.385013
