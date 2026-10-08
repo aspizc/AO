@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 Claude first-prompt completed acceptance | 10 | [request](A_0_4-live-profile-10_to_review.md); [operator decision](A_0_4-live-profile-10_operator-decision-memo.md) | [KO, source witness sound; stale-turn, attempt-0 and kill-cleanup guards untested (mutations survive); 213/213 focused host reproduced; root full gate and new live acceptance outstanding](A_0_4-live-profile-10_reviewed_KO.md) |
 | A/0/04 lint correction | 1 | [request](A_0_4-lint-1_to_review.md) | [OK, four regex-space substitutions; lint + affected suites; full gate not run](A_0_4-lint-1_reviewed_OK.md) |
 | A/0/04 bounded live ready-profile correction | 7 | [request](A_0_4-live-profile-7_to_review.md) | [OK, two witness-guard tests; scoped to trial 6 blockers](A_0_4-live-profile-7_reviewed_OK.md) |
 | A/0/04 bounded live ready-profile correction | 6 | [request](A_0_4-live-profile-6_to_review.md) | [KO, frame fix accepted; two untested witness guards](A_0_4-live-profile-6_reviewed_KO.md) |
