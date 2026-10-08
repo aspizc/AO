@@ -6,6 +6,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/06 integration status | status-2 | [request](A_0_6-status-2_to_review.md) | [OK: original RED cites Trial 1, V6 status and gate claims supported; live provider check remains open](A_0_6-status-2_reviewed_OK.md) |
+| A/0/06 integration status | status-1 | [request](A_0_6-status-1_to_review.md) | [KO: RED checkbox cites Trial 8's narrow follow-up instead of Trial 1 original RED; all other status claims supported](A_0_6-status-1_reviewed_KO.md) |
 | A/0/06 permission prompts | 1 | [request](A_0_6-1_to_review.md) | [KO: unguarded recheck-then-send lets a changed prompt receive the approved key (reproduced on pinned tmux); use agents-submit-v1; 22/22 RED, 273/273 GREEN](A_0_6-1_reviewed_KO.md) |
 | A/0/06 permission prompts | 2 | [request](A_0_6-2_to_review.md) | [KO: guarded CR closes the race (6/6 real pinned tmux, 296/296 focused GREEN), but consume+send precede any durable attempt record; a crash after delivery leaves no attempt audit and a later respond records a false `not_answered`/`prompt_no_longer_bound` (reproduced)](A_0_6-2_reviewed_KO.md) |
 | A/0/06 permission prompts | 3 | [request](A_0_6-3_to_review.md) | [KO: write-ahead in-flight CAS, attempting audit and crash `uncertain` recovery hold (RED 3/3+2/2 on frozen Trial 2, 301/301 focused GREEN, 6/6 real pinned tmux), but required `lint.gateway` exits 1 with 12 ESLint errors in candidate adapters/transport (baseline exit 0)](A_0_6-3_reviewed_KO.md) |

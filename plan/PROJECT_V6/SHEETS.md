@@ -1,6 +1,7 @@
 # Project V6 — Executable sheets
 
-Status: in progress; A/0/00, A/0/01, A/0/02, A/0/04 and A/0/05 integrated on the release branch.
+Status: in progress; A/0/00, A/0/01, A/0/02, A/0/04, A/0/05 and A/0/06
+integrated on the release branch. A/0/06 live acceptance remains open.
 
 Dependency order is binding unless a reviewed plan change updates this file,
 the stage README, and the affected sheets together.
@@ -12,13 +13,14 @@ the stage README, and the affected sheets together.
 | [A/0/02](A/0/02.md) | Generic public setup and reusable workflows | `integrated` | — | A/0/03 | `gateway/src/core/registry.js`, `gateway/src/config.js`, `cli/src/agents_cli/doctor_command.py`, `gateway/src/mcp_server.js`, `prompts/kya_*`, `scripts/kya_*`, `scripts/check_public_hygiene.py`, `scripts/ci_gate.py`, `ci/public-hygiene-fixtures.json`, `docs/kya-implementation-runbook.md`, `docs/operator-guide.md`, `tests/`; `policies/` edits and local launcher setup are operator-owned | `A_0_2` |
 | [A/0/04](A/0/04.md) | `agent_ask` submits the prompt | `integrated` | — | A/0/03, A/0/06 | `gateway/src/adapters/tmux_client.js`, `gateway/src/adapters/base_adapter.js`, the five executable adapters, `gateway/src/config.js`, `gateway/src/tools/{catalog,tool_errors}.js`, derived MCP contract/catalog docs, `gateway/README.md`, `tests/gateway/` | `A_0_4` |
 | [A/0/05](A/0/05.md) | Supervised sessions survive a gateway restart | `integrated` | — | A/0/03 | `gateway/src/core/{request_context,request_recovery_identity,sqlite_migration_sets,policy_types}.js`, `gateway/src/core/repositories/{request_context,task,orchestration,session,lifecycle}_repo.js`, `gateway/migrations/005_request_context_lineage.sql`, `gateway/src/services/{task,orchestration}_service.js`, `gateway/src/mcp_server.js`, `gateway/src/tools/{orchestration,catalog,tool_helpers,index}.js`, `gateway/contracts/mcp-tools-v1.json`, `docs/mcp-tool-catalog.md`, `gateway/README.md`, `tests/gateway/` | `A_0_5` |
-| [A/0/06](A/0/06.md) | The Gateway handles children's trust and permission prompts | `planned` | A/0/00, A/0/04 | A/0/03 | the five executable adapters (recognisers), `gateway/src/services/agent_service.js` (watcher), `gateway/src/services/approval_service.js`, `gateway/src/tools/catalog.js`, `gateway/README.md`, `tests/gateway/` | `A_0_6` |
+| [A/0/06](A/0/06.md) | The Gateway handles children's trust and permission prompts | `integrated` (live check open) | A/0/00, A/0/04 | A/0/03 | the five executable adapters (recognisers), `gateway/src/services/agent_service.js` (watcher), `gateway/src/services/approval_service.js`, `gateway/src/tools/catalog.js`, `gateway/README.md`, `tests/gateway/` | `A_0_6` |
 | [A/0/03](A/0/03.md) | Release AO 1.1.0 | `planned` | A/0/00, A/0/01, A/0/02, A/0/04, A/0/05, A/0/06 | — | `scripts/release_candidate.py` (`SEMVER_TAG` accepts unprefixed SemVer), `tests/structure/test_release_candidate_contract.py`, `CHANGELOG.md`, local `refs/heads/release-base/1.0.0` and `release/1.1.0` refs, release evidence outside the checkout, local annotated tag | `A_0_3` |
 
 Execution order: wave 1 = A/0/04 ∥ A/0/02; wave 2 = A/0/00 → A/0/01, with A/0/05 in parallel;
 wave 3 = A/0/06; wave 4 = A/0/03. First-two-wave change approved by the operator on 2026-10-07: `A/0/04` moves to wave 1 (it is S, P0 and removes most manual intervention; it never depended on `A/0/00`, only shared adapter files), and `A/0/00`/`A/0/01` follow it.
 
-Inventory: **7 executable sheets**, `5 integrated + 2 unfinished`.
+Inventory: **7 executable sheets**, `6 integrated + 1 release sheet planned`.
+The A/0/06 real-provider acceptance check is still open.
 
 Parallel work requires isolated worktrees and serial integration, including
 explicit conflict review of the shared `gateway/src/config.js` wave-1 edits.

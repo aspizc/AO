@@ -8,7 +8,11 @@ integrated at `343222e869e02b1860a384e52788378e7bb74734` on
 `release/1.1.0`. A/0/01 is reviewed and integrated at
 `69f222f852c80d299ae562f1f9d6f7bf75ca1a10`. A/0/05 and the reviewed
 A/0/04 live refinement are integrated at `7982e422577ad6dfb37ef0c7b1e3c8433735430a`.
-Two sheets remain unfinished; no V6 feature is promoted to main or released as 1.1.0.
+A/0/06 is reviewed and integrated at `44c215f3df936ee87eff0f36cb7a8d9bb22c1884`;
+its [merged-tree gate](reviews/A_0_6-merged-gate.md) passed 3,312 tests with
+12 declared infrastructure skips, while its real-provider approval check
+remains open. A/0/03 release assembly remains unfinished. No V6 feature is
+promoted to main or released as 1.1.0.
 See the [A/0/01 integration verdict](reviews/A_0_1-integration-1_reviewed_OK.md) and [merged-tree gate](reviews/A_0_1-integrated-gate.md).
 See the [A/0/00 integration verdict](reviews/A_0_0-integration-1_reviewed_OK.md) and [merged-tree gate](reviews/A_0_0-integrated-gate.md).
 See the [A/0/04 integration verdict](reviews/A_0_4-integration-1_reviewed_OK.md) and [merge gate](reviews/A_0_4-integration-1-root-gate.md).

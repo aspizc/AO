@@ -1,6 +1,6 @@
 # AO project status
 
-As of **2026-10-08**. This is the current public project overview. Package
+As of **2026-10-09**. This is the current public project overview. Package
 versions and imported plan generations do not establish a release.
 
 ## Published implementation and evidence
@@ -106,6 +106,19 @@ required Redis passed 22/22 and public hygiene found 0 issues. See the
 [acceptance record](../plan/PROJECT_V6/reviews/A_0_5-integrated-acceptance.md).
 This is integration on the release branch, not promotion or release.
 
+A/0/06 adds bounded supervised trust and permission prompt recognition,
+approval requests, and a guarded one-time answer path. No command is
+auto-answered by default; only an operator-defined exact scope can enable it.
+The implementation was independently reviewed through Trial 8 and merged at
+`44c215f` on `release/1.1.0`. The [merge verdict](../plan/PROJECT_V6/reviews/A_0_6-merge-1_reviewed_OK.md)
+binds the source and target blobs and the sole review-index conflict. The
+[committed-tree gate](../plan/PROJECT_V6/reviews/A_0_6-merged-gate.md) on
+`6187aca` exited 0: **3,312 passed, 0 failed, 12 declared infrastructure
+skips; 3,324 total**, with Redis 22/22 and zero public hygiene findings.
+The real-provider check of automatic and manually granted commands is still
+open; the optional provider lane ran zero tests. This is integration, not
+promotion or release.
+
 ## Unreleased V7 integration
 
 A/0/00 (generic project profiles and deterministic preflight) and A/0/01
@@ -167,7 +180,9 @@ with their components.
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
 branch descending from `1.0.0`; A/0/00, A/0/01, A/0/02, A/0/04 and A/0/05 are
-reviewed and integrated on the release branch. A/0/06 and A/0/03 remain unfinished.
+reviewed and integrated on the release branch. A/0/06 is also integrated,
+with its real-provider approval check pending. A/0/03 release assembly
+remains unfinished.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains
