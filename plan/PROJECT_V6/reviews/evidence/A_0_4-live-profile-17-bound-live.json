@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-08T08:41:24.835Z",
+  "candidate": "5197f6683fcfa312c246b6bda6c9cc094c5e7f03",
+  "sourceHashes": {
+    "gateway/src/adapters/base_adapter.js": "9c9a96b15e11f293c2e32d1ca73f8d7a07d43c227b40a9f5e536dc777b39b247",
+    "tests/gateway/prompt_submission.test.js": "fa39402b1f64f867694d08a50b9e99b295cc42b49a31363185088c17993fe1da",
+    "tests/gateway/fixtures/codex_0_160_1_warning_only_draft.json": "fe1aef6bdd039d395667d0822314f9a5904012d253745fc1e3b289be43a9570f"
+  },
+  "tmuxVersion": "tmux 3.6a-agents.3",
+  "tmuxSha256": "6487f795314828f9952cc5ee6fc83c6028beb54bdee28d42dc7c1329246ec386",
+  "codexVersion": "codex-cli 0.160.1",
+  "claudeVersion": "2.1.294 (Claude Code)",
+  "results": [
+    {
+      "agent": "codex",
+      "model": "gpt-6.1-sol",
+      "reasoningEffort": "medium",
+      "ready": true,
+      "askReturned": true,
+      "acceptance": true,
+      "guardedEnterCount": 1,
+      "plainEnterCount": 0,
+      "finalTokenOccurrences": 2
+    },
+    {
+      "agent": "claude-code",
+      "model": "claude-opus-5-5",
+      "reasoningEffort": "medium",
+      "ready": true,
+      "askReturned": true,
+      "acceptance": true,
+      "guardedEnterCount": 1,
+      "plainEnterCount": 0,
+      "finalTokenOccurrences": 2
+    }
+  ],
+  "limitations": [
+    "The warning-only draft branch was not observed live; normal composer profile was observed.",
+    "No manual Enter was sent after agent.ask; the wrapper recorded one guarded submit and zero plain Enter calls per provider."
+  ]
+}

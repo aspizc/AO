@@ -335,9 +335,15 @@ export class ClaudeAdapter extends BaseAdapter {
       }).join(" ");
 
       if (!dryRun) {
+        this.forgetFreshClaudeSpawn({ tmuxTarget });
         if (!isTmuxAvailable()) throw new Error("tmux is required for claude supervised mode");
         assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
+        // Only an unadorned executable path can establish a fresh plain launch.
+        // Configured shell wrappers/arguments may resume history: stay uncertain.
+        if (/^[A-Za-z0-9_./-]+$/.test(claudeBin(this.config))) {
+          this.rememberFreshClaudeSpawn({ tmuxTarget });
+        }
       }
 
       auditSessionStarted({ traceId, role, mode: "supervised", tmuxTarget });
@@ -388,6 +394,7 @@ export class ClaudeAdapter extends BaseAdapter {
   }
 
   async kill({ tmuxTarget, traceId, role }) {
+    this.forgetFreshClaudeSpawn({ tmuxTarget });
     const dryRun = isDryRun(this.config);
     if (!dryRun) {
       assertTmuxOk(tmuxSync(buildKillSessionCmd({ target: tmuxTarget })), "kill-session");

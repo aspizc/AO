@@ -105,6 +105,18 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
   const rows = snapshot.split("\n");
   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
   if (provider === "codex") {
+    // One measured post-paste footer variant, never initial input or acceptance evidence.
+    if (/^ +⚠ 2 warnings · f2 to view *$/.test(rows[39])) {
+      const text = rows[36]?.startsWith("› ") ? rows[36].slice(2) : "";
+      if (phase !== "draft" || pane.width !== 120 || pane.height !== 40 || pane.cursor !== 36
+        || rows.length !== 41 || rows[40] !== "" || rows[1]?.trim() !== ">_ OpenAI Codex (v0.160.1)"
+        || !codexLiveStatus.test(rows[38]) || rows[37]?.trim() !== ""
+        || rows.slice(13, 36).some((row) => row.trim() !== "")
+        || rows.slice(0, 36).some((row) => codexWorking.test(row))
+        || !text || text === "Ask Codex to do anything" || text.length >= 800 || /[^\x20-\x7e]/.test(text)
+        || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width) return { state: "unknown_state" };
+      return { state: "composer", text, warningDraft: true, identity: "36:39:120:40" };
+    }
     const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
     if (((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
@@ -123,14 +135,20 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
       || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
       || rows.slice(footer + 1).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
     const status = rows.slice(Math.max(0, start - 2), start).join("\n");
-    const modernWork = (codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))
+    // Measured 0.160.1 welcome viewport: first-turn Working sits three rows above input.
+    const welcomeWork = pane.width === 120 && pane.height === 40 && start === 36 && footer === 39
+      && rows.length === 41 && rows[40] === ""
+      && rows[1]?.trim() === ">_ OpenAI Codex (v0.160.1)"
+      && codexWorking.test(rows[33]) && rows[34]?.trim() === "" && rows[35]?.trim() === ""
+      && codexSpinnerStatus.test(rows[38]);
+    const modernWork = welcomeWork || (codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))
       && codexWorking.test(rows[start - 4])
       && rows[start - 3]?.trim() === "" && rows[start - 1]?.trim() === "";
     if (codexSpinnerStatus.test(rows[footer - 1]) && !modernWork) return { state: "unknown_state" };
     const busy = modernWork || /Working \([0-9hms .]+[•·] esc to interrupt\)/.test(status);
     // A cursor outside the measured composer cannot prove that Enter targets it.
-    return { state: busy ? "busy" : "composer", text, modernWork,
-      workRow: modernWork ? start - 4 : codexWorking.test(rows[start - 2]) ? start - 2 : null,
+    return { state: busy ? "busy" : "composer", text, modernWork, welcomeWork,
+      workRow: welcomeWork ? 33 : modernWork ? start - 4 : codexWorking.test(rows[start - 2]) ? start - 2 : null,
       identity: `${start}:${footer}:${pane.width}:${pane.height}` };
   }
   if (provider === "pi") {
@@ -234,6 +252,7 @@ function observe(run, target, provider, owned, phase = "ready") {
     snapshot = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(raw);
   } catch { throw submissionError("unknown_state"); }
   return { ...classifyProviderPane(provider, snapshot, pane, phase), snapshot, buffer,
+    mode: pane.mode, inputOff: pane.inputOff, synchronized: pane.synchronized,
     serverPid: fields[0], target, panePid: fields[2], width: fields[3], height: fields[4], cursorX: fields[5], cursorY: fields[6] };
 }
 
@@ -274,10 +293,15 @@ function requireComposer(observation, text, identity) {
   }
 }
 
-function freshCodexWork(ready, guard, after, prompt) {
+function freshCodexWork(ready, pending, guard, after, prompt, attempt) {
   if (after.workRow === null || after.workRow === undefined
     || ["serverPid", "target", "panePid", "width", "height"].some((key) => after[key] !== guard[key])) return false;
-  const prior = [ready, guard].map((observation) => observation.snapshot.split("\n").slice(0, Number(observation.cursorY)));
+  // This welcome witness is first-Enter only, with every ask frame bound to the same pane.
+  if (after.welcomeWork && (attempt !== 0
+    || [ready, pending].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
+      .some((key) => frame[key] !== guard[key])))) return false;
+  const prior = (after.welcomeWork ? [ready, pending, guard] : [ready, guard])
+    .map((observation) => observation.snapshot.split("\n").slice(0, Number(observation.cursorY)));
   // Ignore clock changes and row movement: a prior Working row is stale evidence.
   if (prior.some((rows) => rows.some((row) => codexWorking.test(row)))) return false;
   if (!after.modernWork) return true; // Retained source profile: newly appearing active Working row.
@@ -288,6 +312,7 @@ function freshCodexWork(ready, guard, after, prompt) {
     .filter((index) => index >= 0);
   if (echoes.length !== 1) return false;
   const index = echoes[0];
+  if (after.welcomeWork && (index !== 15 || !rows.slice(16, 33).every((row) => row.trim() === ""))) return false;
   // A newly inserted user history cell, not old history shifted into the viewport.
   return prior.every((before) => !before.some((row) => row.replace(/ +$/, "") === echo)
     && before[index]?.trim() === "" && rows.slice(0, index).every((row, offset) => row === before[offset]))
@@ -297,7 +322,77 @@ function freshCodexWork(ready, guard, after, prompt) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const boundedDelay = (value, fallback, max) => Number.isSafeInteger(value) && value >= 0 ? Math.min(value, max) : fallback;
 
-export async function submitPrompt({ target, prompt, provider, config = {}, run = tmuxSync, wait = sleep }) {
+function freshClaudeResponse(spawn, ready, pending, guard, after, prompt) {
+  // Operator option 1: only a locally recorded fresh plain launch's first ask.
+  // This is the measured 2.1.293 single-line completed layout, not a turn ID.
+  const identity = ["serverPid", "target", "panePid"];
+  // Geometry is pinned at the first ask, allowing a same-process pre-ask resize.
+  if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
+    || [pending, guard, after].some((frame) => ["width", "height"].some((key) => frame[key] !== ready[key]))
+    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+    || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
+    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
+  const rows = after.snapshot.split("\n");
+  if ([...prior, rows].some((lines) => lines.length !== 41 || lines[40] !== "")
+    || prior.some((lines) => lines.slice(0, 35).some((row) => row.trim() !== ""))
+    || rows[35] !== "─".repeat(120) || rows[37] !== rows[35]
+    || !/^❯\u00a0 *$/.test(rows[36])
+    || rows[38] !== prior[2][38]
+    || rows[39]?.trim() !== "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents") return false;
+  const echo = `❯ ${prompt}`;
+  const echoes = rows.slice(0, 35).map((row, index) => row.replace(/ +$/, "") === echo ? index : -1)
+    .filter((index) => index >= 0);
+  if (echoes.length !== 1) return false;
+  const index = echoes[0];
+  // A blank transcript excludes rendered prior turns and shifted/spoofed cells.
+  // Require exactly the measured user cell, gap, and printable assistant cell.
+  return index + 2 < 35 && /^● [\x21-\x7e][\x20-\x7e]*$/.test(rows[index + 2])
+    && rows.slice(0, 35).every((row, offset) => offset === index || offset === index + 2 || row.trim() === "")
+    && prior.every((lines) => rows.slice(0, index).every((row, offset) => row === lines[offset]));
+}
+
+function freshClaude294Response(spawn, ready, pending, guard, after, prompt, working = false) {
+  // Measured first-ask layout only. The launch header is preserved, not history.
+  const identity = ["serverPid", "target", "panePid"];
+  // Geometry is pinned at the first ask, allowing a same-process pre-ask resize.
+  if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
+    || [pending, guard, after].some((frame) => ["width", "height"].some((key) => frame[key] !== ready[key]))
+    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+    || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
+    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
+  const rows = after.snapshot.split("\n");
+  const header = prior[0].slice(0, 4);
+  if (header[0] !== "" || header[1] !== " ▐▛███▛█   Claude Code v2.1.294"
+    || header[2] !== "▝▜██████▀  Opus 5.5 with medium effort · Claude Max"
+    || !/^ ▝▝   ▝▝   \/[A-Za-z0-9_./-]+$/.test(header[3])
+    || [...prior, rows].some((lines) => lines.length !== 41 || lines[40] !== ""
+      || header.some((row, index) => lines[index] !== row)
+      || lines[34] !== " ".repeat(100) + "◐ medium · /effort")
+    || prior.some((lines) => lines.slice(4, 34).some((row) => row.trim() !== ""))
+    || rows[35] !== "─".repeat(120) || rows[37] !== rows[35]
+    || !/^❯\u00a0 *$/.test(rows[36]) || rows[38] !== prior[2][38]
+    || rows[39]?.trim() !== "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"
+    || rows[6] !== `❯ ${prompt}` || rows[7] !== "") return false;
+  if (working) {
+    // 2.1.294 binary frame set; a strict word also covers configured verbs.
+    // Return the per-turn verb so animated glyphs cannot hide a changed turn.
+    // Observed pre-assistant transient: empty cell and bare spinner only.
+    const spinner = rows[8] === ""
+      ? /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)…$/.exec(rows[33])
+      : rows[8] === "●" ? /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)… \(\d+s · ↓ \d+ tokens\)$/.exec(rows[33]) : null;
+    return spinner
+      && rows.slice(4, 34).every((row, index) => [6, 8, 33].includes(index + 4) || row.trim() === "")
+      ? spinner[1] : false;
+  }
+  return /^● [\x21-\x7e][\x20-\x7e]*$/.test(rows[8])
+    // Exactly the binary's kg set, gated above by the 2.1.294 header.
+    && /^✻ (?:Baked|Brewed|Churned|Cogitated|Cooked|Crunched|Sautéed|Worked) for \d+s · done \d{1,2}:\d{2} [AP]M$/.test(rows[10])
+    && rows.slice(4, 34).every((row, index) => [6, 8, 10].includes(index + 4) || row.trim() === "");
+}
+
+export async function submitPrompt({ target, prompt, provider, config = {}, run = tmuxSync, wait = sleep, firstPromptProcess = null }) {
   if (invalidText(prompt, true)) throw submissionError("invalid_text");
   const pane = paneState(run, target);
   target = pane.target;
@@ -323,12 +418,41 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
       else if (guard.state !== "composer" || guard.text !== prompt || guard.identity !== pending.identity) {
         throw submissionError("acceptance_uncertain");
       }
+      if (pending.warningDraft || guard.warningDraft) {
+        // No footer transition or process drift can authorize this variant's first Enter.
+        if (attempt !== 0 || !pending.warningDraft || !guard.warningDraft || guard.snapshot !== pending.snapshot
+          || [ready, pending].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
+            .some((key) => frame[key] !== guard[key]))
+          || ready.snapshot.split("\n").slice(0, 36).join("\n") !== pending.snapshot.split("\n").slice(0, 36).join("\n")
+          || ready.snapshot.split("\n")[38] !== pending.snapshot.split("\n")[38]) throw submissionError("unknown_state");
+      }
       guardedSubmit(run, guard, attempt);
       delivered = true;
       await wait(boundedDelay(config.tmuxAskDelayMs, 1500, 5000));
-      const after = observe(run, target, provider, owned, "draft");
+      let after = observe(run, target, provider, owned, "draft");
+      if (provider === "claude-code" && attempt === 0) {
+        if (freshClaudeResponse(firstPromptProcess, ready, pending, guard, after, prompt)
+          || freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
+          return { snapshot: after.snapshot, dryRun: false };
+        }
+        const workingVerb = freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true);
+        if (workingVerb) {
+          // Observation only: never re-enter the retry path after this witness.
+          for (let poll = 0; poll < 8; poll++) {
+            await wait(1000);
+            after = observe(run, target, provider, owned, "draft");
+            if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
+              return { snapshot: after.snapshot, dryRun: false };
+            }
+            if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true) !== workingVerb) {
+              throw submissionError("acceptance_uncertain");
+            }
+          }
+          throw submissionError("acceptance_uncertain");
+        }
+      }
       if (after.state === "busy" && after.text === ""
-        && (provider !== "codex" || freshCodexWork(ready, guard, after, prompt))) {
+        && (provider !== "codex" || freshCodexWork(ready, pending, guard, after, prompt, attempt))) {
         return { snapshot: after.snapshot, dryRun: false };
       }
       if (after.state !== "composer" || after.text !== prompt || after.identity !== pending.identity) {
@@ -396,14 +520,39 @@ export function assertSafeCwd(cwd, allowedRoots) {
 }
 
 export class BaseAdapter {
+  #freshClaudeSpawns = new Map();
+
   constructor({ id, config, registries }) {
     this.id = id;
     this.config = config;
     this.registries = registries;
   }
 
-  submitPrompt({ tmuxTarget, prompt }) {
-    return submitPrompt({ target: tmuxTarget, prompt, provider: this.id, config: this.config });
+  rememberFreshClaudeSpawn({ tmuxTarget, run = tmuxSync }) {
+    if (this.id !== "claude-code") return;
+    this.#freshClaudeSpawns.delete(tmuxTarget);
+    const owned = new Set();
+    let identity;
+    try {
+      const pane = paneState(run, tmuxTarget);
+      const observation = observe(run, pane.target, this.id, owned);
+      identity = Object.fromEntries(["serverPid", "target", "panePid"]
+        .map((key) => [key, observation[key]]));
+    } finally {
+      cleanupOwnedBuffers(run, owned, "transport_failed");
+    }
+    this.#freshClaudeSpawns.set(tmuxTarget, identity);
+  }
+
+  forgetFreshClaudeSpawn({ tmuxTarget }) {
+    this.#freshClaudeSpawns.delete(tmuxTarget);
+  }
+
+  submitPrompt({ tmuxTarget, prompt, run = tmuxSync, wait = sleep }) {
+    const firstPromptProcess = this.#freshClaudeSpawns.get(tmuxTarget);
+    // Consume synchronously, even on invalid input, refusal or concurrent ask.
+    this.#freshClaudeSpawns.delete(tmuxTarget);
+    return submitPrompt({ target: tmuxTarget, prompt, provider: this.id, config: this.config, run, wait, firstPromptProcess });
   }
 
   submitLaunchCommand({ tmuxTarget, line }) {

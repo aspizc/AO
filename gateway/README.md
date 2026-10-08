@@ -166,11 +166,93 @@ ten explicit spinner frames in the pinned 0.160.1
 [status/title frame table](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs#L31-L36),
 also used by [status-line thread-title progress](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/thread_title_status.rs#L20-L49).
 Unknown suffixes and completed-only Codex captures remain uncertain.
+Trial 16 adds the measured 0.160.1 welcome viewport at 120×40: composer row 36,
+footer row 39, Working row 33, blank rows 34–35 and a pinned spinner on row 38.
+Its version header, exact newly inserted prompt echo on row 15, unchanged
+preceding welcome rows and blank rows 16–32 bind the first Enter. Ready,
+pasted draft, final guard and after must retain server/pane identity and size;
+all three pre-Enter histories must lack the echo and any prior Working row.
+This witness never credits a second Enter or a completed-only reply. Other
+three-row layouts, menus, unrelated busy output and missing evidence remain
+uncertain. The sanitized fixture derives from root's disposable live check;
+refined-candidate live acceptance and independent review remain outstanding.
+Trial 17 addresses only a reported intermittent pre-submit refusal: one 0.160.1
+post-paste draft showed the exact prompt at row 36 and an idle cwd status at
+row 38, but row 39 contained only spaces and `⚠ 2 warnings · f2 to view`.
+No later state was captured; eleven subsequent disposable runs were positive,
+including a 1 ms submit delay. Those runs do not prove that the rare state is
+stable or that changing the delay fixes it. The sanitized draft-only fixture
+reconstructs the supplied layout and uses synthetic padding and identifiers.
+
+The warnings-only variant is limited to draft phase, the exact 0.160.1 header,
+120×40 geometry, exact visible single-line ASCII text/end cursor, blank history
+below the welcome copy and no prior Working. It never authorizes initial input
+or counts as acceptance. After guarded bracketed paste, pending and guard must
+both identify this variant and have identical captures. They must share ready's
+server/pane identity, size, unchanged prefix and cwd status before the first
+guarded Enter. Any footer transition, changed state or missing observation
+refuses without Enter. The variant cannot authorize a retry Enter. Existing
+queue/warnings profiles and positive acceptance checks are unchanged. Live
+reproduction of a stable rare draft, refined-candidate acceptance and fresh
+independent review remain outstanding; reliability is not claimed from fixtures.
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
 and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).
-Claude's completed `●` response is left uncertain: the supplied snapshots lack
-pre-Enter guard capture and a verified 2.1.293 fresh-turn renderer contract.
+Claude's completed `●` response was left uncertain in trials 5–9. The operator
+subsequently selected option 1 in the
+[completed-turn decision](../plan/PROJECT_V6/reviews/A_0_4_to_check_by_human.md);
+the [trial 10 memo](../plan/PROJECT_V6/reviews/A_0_4-live-profile-10_operator-decision-memo.md)
+records that instruction. The new completed-response witness is limited to the
+first ask after a successful, plain supervised Claude launch registered by this
+adapter instance. Eligibility is consumed before that ask, including failures,
+and is lost on kill or Gateway restart. Reattached sessions have no eligibility.
+Spawn, ready, pasted draft, final guard and post-Enter server/pane identity must
+match. Geometry is pinned at the first ask: ready, pasted draft, final guard
+and post-Enter frames must share the measured 120×40 geometry. A same-process,
+same-pane resize before the first ask is allowed; any resize during the ask
+remains unproven. The ready/draft/guard transcript must be blank;
+the exact guarded single-line ASCII prompt must appear once as a new user cell,
+followed by the measured printable single-line assistant cell with only blank
+rows elsewhere. The empty composer, cursor, borders, idle footer and unchanged
+prefix must match the measured 2.1.293 layout. All other completed layouts,
+reused processes, history, duplicates, reflow, menus or missing evidence remain
+`acceptance_uncertain` without replay. Existing active-busy witnesses retain
+their separate behavior. Shell arguments in the configured executable disable
+fresh-launch eligibility; executable-path wrappers are an operator-controlled
+assumption, not binary attestation. This is observational first-prompt evidence,
+not a general renderer contract or stable turn ID. A new live acceptance and
+independent review are required before integration.
+
+Trial 12 adds the observed Claude Code `2.1.294` first-ask layout: the
+unchanged launch header occupies rows 1–3, the prior conversation at rows
+4–33 is blank, and row 34 holds the measured medium effort hint. The exact
+new user cell and assistant spinner can authorize observation only. Up to
+eight further one-second captures wait for the measured single-line reply
+and completion timing row; no additional Enter or paste is sent. Each capture
+must retain the registered server/pane identity, first-ask geometry, header, effort hint,
+empty composer and footer. Any unexpected intermediate frame or exhausted
+poll remains `acceptance_uncertain`. This narrow profile covers the measured
+Opus 5.5 medium launch, spinner and completion layout; other variants remain
+unproven. The sanitized fixture reproduces a disposable live run that returned
+uncertain at the initial observation and showed its reply seven seconds later.
+Focused fixture tests do not constitute a successful live acceptance run of
+the refined candidate.
+
+Trial 13 corrects the cosmetic markers using byte-search evidence from the
+installed 2.1.294 binary. Completion accepts exactly Baked, Brewed, Churned,
+Cogitated, Cooked, Crunched, Sautéed and Worked. The working glyph may animate
+among `·`, `✢`, `*`, `✶`, `✻`, `✽`; the spinner verb must match
+`[A-Z][A-Za-z]*(?:-[a-z]+)*` and remain identical across all working frames.
+The existing parenthetical format, version gate and safety guards remain.
+Ghostty's `✳` frame is unverified and refused. The private observation's cwd
+is absolute and its header is unchanged; no tilde-path support is inferred.
+
+Trial 14 also admits the observed pre-assistant transient: the exact prompt
+echo with an empty assistant row and a bare spinner such as `* Proofing…`.
+It authorizes only the same bounded first-ask observation poll. The spinner
+word must remain unchanged through a transition to the existing assistant
+cell with parenthetical status. Unobserved combinations stay uncertain;
+identity, blank-history and no-second-Enter guards remain in force.
 The [operator evidence request](../plan/PROJECT_V6/reviews/A_0_4-live-profile-5_operator-evidence-request.md)
 records the missing timing and turn-binding measurements. Trial 5 lacked later
 metadata; the [latest trial 6 captures](../tests/gateway/fixtures/a04_live_profiles_trial6.json)
