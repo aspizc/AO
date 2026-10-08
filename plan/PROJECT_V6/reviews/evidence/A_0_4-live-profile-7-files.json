@@ -1,0 +1,18 @@
+{
+  "entryHEAD": "e5e6387a4b62d0ad3c13cfca74be76bb8fb38d12",
+  "status": "uncommitted combined trial5+6 candidate with exactly two trial7 regression tests; awaiting fresh independent review",
+  "files": {
+    "gateway/src/adapters/base_adapter.js": "d3350f29b5e3174f5079f3b696de309c0a243bcf758966ad90bfeda82cad4807",
+    "gateway/README.md": "c28662255c5024b9e9172fbf61d5e63e2d27f1a2c1a164496ae2572fa7105654",
+    "tests/gateway/prompt_submission.test.js": "9b0b25ca7e39e46b4df42303f6984764b7b01d3f5df06672ec8a34c94d7818c0",
+    "tests/gateway/fixtures/a04_live_profiles_trial5.json": "326ca1d321f2ffa61fbbc6c38fde6858d0d3e3d089fd250b2d674987bf84ea63",
+    "tests/gateway/fixtures/a04_live_profiles_trial6.json": "258f7c8ebd0b56b544d17ed9d9d710e7830e1fb257c964325c7c309c60374ccb",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-7_to_review.md": "e6de59fb046bb191e9001158c6f43b8e9f3919c5027545d96585093d751b3672",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-ascii-red.txt": "b209e6c62f0fe692f27e390834aa854caa53a270e038e10aba4a506a5d8239ec",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-checks.json": "88086c6463cf64b7a1a722030d6617e1c97c166242d1f036eb7f9daf5d067169",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-green.txt": "c5e64a1b729e2ffade7690d193e67122d9344e0e642d5cc9d47b2715363309c9",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-mutations.json": "8ba85db4982547624b53477f1e32ceda0c1385f560928ce7a8e2df5b9c522597",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-prior-blank-red.txt": "92db9e54348f05ac71942285297eacda18a32cd9451e8a8086acad446bf9e125",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-7-test-delta.txt": "3fa82b1b0fac67a1dedf4233fb3cc3a09482a6565f4b046514d9c49580474057"
+  }
+}

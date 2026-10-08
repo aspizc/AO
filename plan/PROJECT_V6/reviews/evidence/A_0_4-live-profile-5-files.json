@@ -1,0 +1,10 @@
+{
+  "gateway/src/adapters/base_adapter.js": "92b154a209aa3dc525e3756a6ff843dbb72861a1d4ef7d62f5a935027efb1e74",
+  "tests/gateway/prompt_submission.test.js": "b038564b61d8907a9c2ee85c8393908f9cb3b3962819d8deaa31472dec0eb6d5",
+  "tests/gateway/fixtures/a04_live_profiles_trial5.json": "326ca1d321f2ffa61fbbc6c38fde6858d0d3e3d089fd250b2d674987bf84ea63",
+  "gateway/README.md": "f0088526cf633947eb511a3f8ed8850842fc284f4cf1cc22b0620c43642559c6",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-5-red.txt": "7e73f2baac95e443fcd9e3db07bd9385742882e06d086852c63411319d12f079",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-5-green.txt": "a51888916c85080226249efaef67aa41bb18bdf6d1d1e6aeede7c84ff2904884",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-5-capture.txt": "24d3110b11996d02e459ef44d8631edfa5ab07104ef849186644afa57cef7b44",
+  "plan/PROJECT_V6/reviews/A_0_4-live-profile-5_operator-evidence-request.md": "f4fa1d09480ec42e4a553038913020d4cc22f62df27732262ad3c3a863e0efaa"
+}

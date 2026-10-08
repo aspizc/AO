@@ -1,0 +1,106 @@
+{
+  "sourceKind": "Sanitized layout derived from disposable Claude Code 2.1.294 observations; synthetic prompt, paths, process identifiers and clock. No live acceptance claim.",
+  "version": "2.1.294",
+  "prompt": "Reply exactly a04_trial12_reply. Do not use tools.",
+  "laterDelayMs": 7013,
+  "ready": {
+    "pane": {
+      "target": "%1",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "200",
+      "target": "%1",
+      "panePid": "300",
+      "width": "120",
+      "height": "40"
+    },
+    "snapshot": "\n ▐▛███▛█   Claude Code v2.1.294\n▝▜██████▀  Opus 5.5 with medium effort · Claude Max\n ▝▝   ▝▝   /tmp/a04-fixture\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                    ◐ medium · /effort\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Try \"how does <filepath> work?\"\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  worker@fixture:/tmp/a04-fixture\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+  },
+  "working": {
+    "pane": {
+      "target": "%1",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "200",
+      "target": "%1",
+      "panePid": "300",
+      "width": "120",
+      "height": "40"
+    },
+    "snapshot": "\n ▐▛███▛█   Claude Code v2.1.294\n▝▜██████▀  Opus 5.5 with medium effort · Claude Max\n ▝▝   ▝▝   /tmp/a04-fixture\n\n\n❯ Reply exactly a04_trial12_reply. Do not use tools.\n\n●\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n✽ Twisting… (1s · ↓ 2 tokens)\n                                                                                                    ◐ medium · /effort\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯                                                              \n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  worker@fixture:/tmp/a04-fixture\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+  },
+  "after": {
+    "pane": {
+      "target": "%1",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "200",
+      "target": "%1",
+      "panePid": "300",
+      "width": "120",
+      "height": "40"
+    },
+    "snapshot": "\n ▐▛███▛█   Claude Code v2.1.294\n▝▜██████▀  Opus 5.5 with medium effort · Claude Max\n ▝▝   ▝▝   /tmp/a04-fixture\n\n\n❯ Reply exactly a04_trial12_reply. Do not use tools.\n\n● a04_trial12_reply\n\n✻ Sautéed for 1s · done 9:00 AM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                    ◐ medium · /effort\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯                                                              \n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  worker@fixture:/tmp/a04-fixture\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+  },
+  "postPaste": {
+    "pane": {
+      "target": "%1",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 52
+    },
+    "submitState": {
+      "serverPid": "200",
+      "target": "%1",
+      "panePid": "300",
+      "width": "120",
+      "height": "40"
+    },
+    "snapshot": "\n ▐▛███▛█   Claude Code v2.1.294\n▝▜██████▀  Opus 5.5 with medium effort · Claude Max\n ▝▝   ▝▝   /tmp/a04-fixture\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                    ◐ medium · /effort\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Reply exactly a04_trial12_reply. Do not use tools.\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  worker@fixture:/tmp/a04-fixture\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+  },
+  "guard": {
+    "pane": {
+      "target": "%1",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 52
+    },
+    "submitState": {
+      "serverPid": "200",
+      "target": "%1",
+      "panePid": "300",
+      "width": "120",
+      "height": "40"
+    },
+    "snapshot": "\n ▐▛███▛█   Claude Code v2.1.294\n▝▜██████▀  Opus 5.5 with medium effort · Claude Max\n ▝▝   ▝▝   /tmp/a04-fixture\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                    ◐ medium · /effort\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Reply exactly a04_trial12_reply. Do not use tools.\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  worker@fixture:/tmp/a04-fixture\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n"
+  }
+}

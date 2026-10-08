@@ -1,0 +1,14 @@
+[
+  {
+    "mutation": "prior-blank",
+    "removed": "&& before[index]?.trim() === \"\" &&",
+    "replacement": "&&",
+    "sourceSHA256": "3a3edae09895c6f5014775231f9a95a4a5eecf9f9ff958073098306f7d504b8a"
+  },
+  {
+    "mutation": "ascii",
+    "removed": "  if (/[^\\x20-\\x7e]/.test(prompt) || prompt.endsWith(\" \")) return false;\n",
+    "replacement": "",
+    "sourceSHA256": "6b67f86e93be0bdab3afd1736a98f18b708357f80a5a4b7cd5d41d0d7522d5f1"
+  }
+]

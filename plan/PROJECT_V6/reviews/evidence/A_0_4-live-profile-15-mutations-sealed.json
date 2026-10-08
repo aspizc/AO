@@ -1,0 +1,23 @@
+{
+  "geometry": {
+    "exitCode": 1,
+    "mutantSha256": "8f8dd70d875ac4310ba2552f0acf8a596e8055c6e393be4a263d83d310f7ba4c",
+    "failures": [
+      "not ok 37 - trial15 2.1.293 geometry drift during ask cannot borrow the completed reply or replay",
+      "not ok 40 - trial15 2.1.294 geometry drift during ask cannot borrow the completed reply or replay"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "mutantSha256": "e15218a4747c3032988a63398f88421620506d690c1da3622a8b8ba2faca4587",
+    "failures": [
+      "not ok 9 - trial12 identity drift or ambiguous intermediate cells cannot be rescued by later completion",
+      "not ok 10 - trial12 completed layout requires unique exact cells and matching first-ask provenance",
+      "not ok 26 - trial14 a bare spinner cannot authorize reused processes or prior conversation",
+      "not ok 27 - trial14 changed word identity or ambiguous cells cannot borrow later completion",
+      "not ok 29 - trial10 mismatched spawn ready guard or after identity cannot bind the completed response",
+      "not ok 36 - trial15 2.1.293 pre-ask server pane or PID replacement cannot inherit spawn authority",
+      "not ok 39 - trial15 2.1.294 pre-ask server pane or PID replacement cannot inherit spawn authority"
+    ]
+  }
+}

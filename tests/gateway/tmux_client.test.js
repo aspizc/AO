@@ -1,10 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { withOwnedTmuxServer } from "./fixtures/owned_tmux_server.js";
 import {
   buildCapturePaneCmd,
   buildKillSessionCmd,
   buildNewSessionCmd,
   buildSendKeysCmd,
+  buildSubmitCmd,
   isTmuxAvailable,
   tmuxSync,
 } from "../../gateway/src/adapters/tmux_client.js";
@@ -20,11 +22,13 @@ test("builds tmux commands as argument arrays", () => {
   ]);
   assert.deepEqual(buildSendKeysCmd({ target: "ag-x", line: "ls -la" }), [
     "send-keys",
+    "-l",
     "-t",
     "ag-x",
+    "--",
     "ls -la",
-    "Enter",
   ]);
+  assert.deepEqual(buildSubmitCmd({ target: "ag-x" }), ["send-keys", "-t", "ag-x", "Enter"]);
   assert.deepEqual(buildCapturePaneCmd({ target: "ag-x", lines: 50 }), [
     "capture-pane",
     "-pt",
@@ -45,17 +49,12 @@ test("uses default capture size", () => {
   ]);
 });
 
-test("creates and kills a session when tmux is available", { skip: !isTmuxAvailable() }, (t) => {
-  const target = `agtest-${Date.now()}`;
-  const create = tmuxSync(buildNewSessionCmd({ target, cwd: "/tmp" }));
-  if (create.status !== 0) {
-    t.skip(`tmux cannot create sessions in this environment: ${create.stderr.trim()}`);
-    return;
-  }
-  try {
+test("creates and kills a session and reaps its owned server", { skip: !isTmuxAvailable() }, async () => {
+  await withOwnedTmuxServer("tmux", async ({ socket }) => {
+    const target = `agtest-${Date.now()}`;
+    const create = tmuxSync(["-S", socket, ...buildNewSessionCmd({ target, cwd: "/tmp" }), "--", "/bin/sleep", "3600"]);
     assert.equal(create.status, 0);
-  } finally {
-    const killed = tmuxSync(buildKillSessionCmd({ target }));
+    const killed = tmuxSync(["-S", socket, ...buildKillSessionCmd({ target })]);
     assert.equal(killed.status, 0);
-  }
+  });
 });

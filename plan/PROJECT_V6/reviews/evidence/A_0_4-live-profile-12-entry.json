@@ -1,0 +1,11 @@
+{
+  "head": "e6d241ed2d6981121f739d0b9941384295b2fb54",
+  "sha256": {
+    "gateway/src/adapters/base_adapter.js": "ebfa9f4c7c054bf8ab31d7f083f23bc3f74f1a1d2acd38aa24ae2096116e583c",
+    "gateway/src/adapters/claude_adapter.js": "51886842c68cf4bc83bce81ea723f38912f50ce5b19e97a96def8195c14c36f9",
+    "gateway/README.md": "bdf635dde713842d556c6d97948262df67b881937d43c5220c59471e0f42af2e",
+    "tests/gateway/claude_first_prompt.test.js": "646020ff28e56741e118df53ed49667372d9bd01e694f84e181c662ef5f417bd",
+    "ci/suites.json": "03d2d2ddca4942961ec3415b734408ed094b591535cccc101415242a59bebec5",
+    "plan/PROJECT_V6/reviews/README.md": "eff52bc8f462750c61a28bae21e8ab059a7634c0547ad6bfdab18c66ef2c8b3f"
+  }
+}

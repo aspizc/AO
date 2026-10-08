@@ -11,6 +11,10 @@ const SAFE_RULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const SAFE_ERROR_CODE = /^[A-Z][A-Z0-9_]{0,199}$/;
 const LEASE_MAX_MESSAGE = /^leaseTtlMs exceeds maximum ([1-9][0-9]{0,15})$/;
 const LEASE_INTEGER_MESSAGE = "leaseTtlMs must be a positive safe integer";
+const SAFE_SUBMISSION_REASONS = new Set([
+  "busy", "decision_required", "unknown_state", "paste_unavailable", "invalid_text",
+  "not_submitted", "acceptance_uncertain", "concurrent_ask", "transport_failed",
+]);
 
 function safeNumber(value) {
   return Number.isFinite(value) ? value : undefined;
@@ -137,6 +141,9 @@ export function safeToolErrorBody(error, contract = {}) {
     || (typeof configuredMessage === "string" ? configuredMessage : undefined)
     || (code === "INVALID_INPUT" ? "invalid input" : "tool operation failed");
   const body = { error: code, code, message };
+  if (code === "AGENT_PROMPT_NOT_SUBMITTED" && SAFE_SUBMISSION_REASONS.has(error?.reason)) {
+    body.reason = error.reason;
+  }
   if (code === "POLICY_DENIED") {
     const decision = safePolicyDecision(error?.decision);
     if (decision) body.decision = decision;

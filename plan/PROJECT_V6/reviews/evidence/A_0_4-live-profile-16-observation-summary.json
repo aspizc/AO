@@ -1,0 +1,17 @@
+{
+  "codexVersion": "codex-cli 0.160.1",
+  "claudeVersion": "2.1.294 (Claude Code)",
+  "codexAskAccepted": false,
+  "claudeAskAccepted": true,
+  "echoRow": 15,
+  "workRow": 33,
+  "composerRow": 36,
+  "spinnerRow": 38,
+  "footerRow": 39,
+  "geometry": [
+    120,
+    40
+  ],
+  "observedIdentityAndGeometryStable": true,
+  "laterExactReplyObserved": true
+}

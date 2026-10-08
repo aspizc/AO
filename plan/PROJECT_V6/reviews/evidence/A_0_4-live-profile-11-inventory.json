@@ -1,0 +1,9 @@
+{
+  "algorithm": "SHA-256 of sorted discovered path names joined by newline, not file contents",
+  "inventorySha256": "sha256:6406044a37fa09cccdefd91885a60dfed8224af421988d25b260931c3ba17b5f",
+  "manifestUnchangedSinceTrial11Entry": true,
+  "testPathPresent": true,
+  "refreshExitCode": 0,
+  "validateExitCode": 0,
+  "newFilePaths": false
+}

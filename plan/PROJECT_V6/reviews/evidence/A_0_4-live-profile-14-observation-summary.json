@@ -1,0 +1,15 @@
+{
+  "source": "workspace/root-a04-live-acceptance-result.json",
+  "version": "2.1.294 (Claude Code)",
+  "initialDelayMs": 1765,
+  "laterDelayMs": 7010,
+  "initialOutcome": "acceptance_uncertain",
+  "uniqueEchoRow": 6,
+  "assistantRow8EmptyInitially": true,
+  "workingRow33": "* Proofing…",
+  "laterAssistantReplyMatchedUniqueToken": true,
+  "laterCompletionVerb": "Cooked",
+  "headerUnchanged": true,
+  "serverPaneGeometryUnchanged": true,
+  "privacy": "No raw header, cwd, prompt token, PID or session identity copied."
+}

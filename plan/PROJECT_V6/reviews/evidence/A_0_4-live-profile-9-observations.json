@@ -1,0 +1,85 @@
+{
+  "entryHEAD": "09708fa72dea630c47a2bdb67e1bde86342d1d79",
+  "provider": "claude-code",
+  "version": "2.1.293 (Claude Code)",
+  "actualObserveSequence": true,
+  "matchedOuterResult": "probe worktree ignored result; main worktree ignored result is an earlier distinct run",
+  "stages": [
+    {
+      "stage": "ready",
+      "at": "2026-10-08T00:42:06.382Z",
+      "phase": "ready",
+      "classification": "composer",
+      "cursor": [
+        2,
+        36
+      ],
+      "geometry": [
+        120,
+        40
+      ]
+    },
+    {
+      "stage": "postPaste",
+      "at": "2026-10-08T00:42:06.553Z",
+      "phase": "draft",
+      "classification": "composer",
+      "cursor": [
+        63,
+        36
+      ],
+      "geometry": [
+        120,
+        40
+      ]
+    },
+    {
+      "stage": "guard",
+      "at": "2026-10-08T00:42:06.566Z",
+      "phase": "draft",
+      "classification": "composer",
+      "cursor": [
+        63,
+        36
+      ],
+      "geometry": [
+        120,
+        40
+      ]
+    },
+    {
+      "stage": "after",
+      "at": "2026-10-08T00:42:08.082Z",
+      "phase": "draft",
+      "classification": "unknown_state",
+      "cursor": [
+        2,
+        36
+      ],
+      "geometry": [
+        120,
+        40
+      ]
+    }
+  ],
+  "wallClockIntervalsMs": {
+    "readyToPaste": 171,
+    "pasteToGuard": 13,
+    "guardToAfter": 1516
+  },
+  "timestampClock": "new Date().toISOString(); wall-clock, no monotonic timer recorded",
+  "sameServerPanePIDTargetSize": true,
+  "exactPendingEqualsFinalGuard": true,
+  "promptEchoAbsentReadyAndGuardHistory": true,
+  "newEchoAssistantCompletionRowsPreviouslyBlank": true,
+  "prefixBeforeEchoUnchanged": true,
+  "outerErrorSnapshotEqualsProductionAfter": true,
+  "outerErrorAndLaterSnapshotIdentical": true,
+  "outerRecordedTimes": {
+    "preAsk": "2026-10-08T00:42:06.354Z",
+    "error": "2026-10-08T00:42:08.106Z",
+    "later": "2026-10-08T00:42:15.115Z"
+  },
+  "remainingGap": "No version-bound source/event contract excludes replay of an older internally stored turn into a previously blank viewport. No stable accepted-turn id/sequence is recorded. CR outcome is root-reported, not an event in this observe-only trace.",
+  "decision": "Preserve uncertainty; stop at specific renderer/turn-design request."
+}

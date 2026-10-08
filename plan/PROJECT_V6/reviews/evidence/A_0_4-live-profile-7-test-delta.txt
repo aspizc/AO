@@ -1,0 +1,40 @@
+--- trial6/prompt_submission.test.js
++++ trial7/prompt_submission.test.js
+@@ -1298,3 +1298,37 @@
+     assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+   }
+ });
++
++test("trial7 fresh echo replacing a prior nonblank non-echo row cannot confirm this Enter", async () => {
++  const profile = trial6Codex, draft = trial5Draft(profile);
++  const beforeRows = profile.preAsk.snapshot.split("\n");
++  const guardRows = draft.snapshot.split("\n");
++  // The prefix is unchanged, but this row was occupied in both prior views.
++  beforeRows[17] = guardRows[17] = "existing transcript content";
++  const before = { ...profile.preAsk, snapshot: beforeRows.join("\n") };
++  const guard = { ...draft, snapshot: guardRows.join("\n") };
++  const after = profile.error;
++  assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane, "draft").modernWork, true);
++  const fx = trial3Fixture("codex", [before, guard, guard, after], profile.prompt);
++  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial7 exact printable non-ASCII prompt echo with fresh Working cannot confirm this Enter", async () => {
++  const profile = trial6Codex, prompt = "héllo";
++  const draftRows = profile.preAsk.snapshot.split("\n");
++  draftRows[36] = `› ${prompt}`;
++  // Keep the admitted warnings footer: the queue profile independently refuses
++  // non-ASCII drafts and would prevent this test from reaching the witness.
++  const draft = { snapshot: draftRows.join("\n"), pane: { ...profile.preAsk.pane, cursorX: prompt.length + 2 } };
++  const afterRows = profile.error.snapshot.split("\n");
++  afterRows[17] = `› ${prompt}` + " ".repeat(18);
++  const after = { ...profile.error, snapshot: afterRows.join("\n") };
++  assert.equal(base.classifyProviderPane("codex", draft.snapshot, draft.pane, "draft").text, prompt);
++  assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane, "draft").modernWork, true);
++  const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], prompt);
++  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++  assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});

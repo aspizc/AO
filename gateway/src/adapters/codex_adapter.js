@@ -7,7 +7,6 @@ import {
   buildCapturePaneCmd,
   buildKillSessionCmd,
   buildNewSessionCmd,
-  buildSendKeysCmd,
   isTmuxAvailable,
   tmuxSync,
 } from "./tmux_client.js";
@@ -173,10 +172,6 @@ function assertCodexCwdDoesNotExposeExcludedPaths({ safeCwd, repo, registries, c
       throw err;
     }
   }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class CodexAdapter extends BaseAdapter {
@@ -414,7 +409,7 @@ export class CodexAdapter extends BaseAdapter {
       if (!dryRun) {
         if (!isTmuxAvailable()) throw new Error("tmux is required for codex supervised mode");
         assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
-        assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: launchCommand })), "send-keys");
+        await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
       auditAppend({
@@ -453,12 +448,9 @@ export class CodexAdapter extends BaseAdapter {
         return { snapshot: `[dry-run codex ask]\n${prompt}\n[ok]`, dryRun: true };
       }
 
-      assertTmuxOk(tmuxSync(buildSendKeysCmd({ target: tmuxTarget, line: prompt })), "send-keys");
-      await sleep(this.config.tmuxAskDelayMs || 1500);
-      const captured = tmuxSync(buildCapturePaneCmd({ target: tmuxTarget, lines: 400 }));
-      assertTmuxOk(captured, "capture-pane");
-      auditSessionInput({ traceId, role, tmuxTarget, prompt });
-      return { snapshot: captured.stdout || "", dryRun: false };
+      const result = await this.submitPrompt({ tmuxTarget, prompt });
+      this.auditPromptSubmission({ traceId, role, tmuxTarget, prompt });
+      return result;
     } catch (err) {
       auditAdapterError({ traceId, role, where: "ask", err });
       throw err;

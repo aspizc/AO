@@ -1,0 +1,68 @@
+{
+  "scratchOnly": true,
+  "results": [
+    {
+      "mutation": "stale",
+      "sourcePath": "gateway/src/adapters/base_adapter.js",
+      "sourceSha256": "ebfa9f4c7c054bf8ab31d7f083f23bc3f74f1a1d2acd38aa24ae2096116e583c",
+      "mutantSha256": "3f12647e6892b9f5d7acfcc1326b1475b7ff72fcdb2761306caa81380a381b20",
+      "replace": {
+        "before": "prior.some((lines) => lines.slice(0, 35).some((row) => row.trim() !== \"\"))",
+        "after": "false"
+      },
+      "testSha256": "646020ff28e56741e118df53ed49667372d9bd01e694f84e181c662ef5f417bd",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern",
+        "trial11 an older identical completed turn",
+        "tests/gateway/claude_first_prompt.test.js"
+      ],
+      "exitCode": 1,
+      "missingExpectedRejection": true,
+      "oneFailedTest": true
+    },
+    {
+      "mutation": "attempt",
+      "sourcePath": "gateway/src/adapters/base_adapter.js",
+      "sourceSha256": "ebfa9f4c7c054bf8ab31d7f083f23bc3f74f1a1d2acd38aa24ae2096116e583c",
+      "mutantSha256": "8269179b26deb5e1086be5905c56ed4c31405195beb90c5d618bd5edbb0b466b",
+      "replace": {
+        "before": "provider === \"claude-code\" && attempt === 0",
+        "after": "provider === \"claude-code\""
+      },
+      "testSha256": "646020ff28e56741e118df53ed49667372d9bd01e694f84e181c662ef5f417bd",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern",
+        "trial11 a completed response after the retry Enter",
+        "tests/gateway/claude_first_prompt.test.js"
+      ],
+      "exitCode": 1,
+      "missingExpectedRejection": true,
+      "oneFailedTest": true
+    },
+    {
+      "mutation": "kill",
+      "sourcePath": "gateway/src/adapters/claude_adapter.js",
+      "sourceSha256": "51886842c68cf4bc83bce81ea723f38912f50ce5b19e97a96def8195c14c36f9",
+      "mutantSha256": "0e840eb091d574a03a734c570cae4caefb24f3e24cad2857bab79f375007f50d",
+      "replace": {
+        "before": "async kill({ tmuxTarget, traceId, role }) {\n    this.forgetFreshClaudeSpawn({ tmuxTarget });",
+        "after": "async kill({ tmuxTarget, traceId, role }) {"
+      },
+      "testSha256": "646020ff28e56741e118df53ed49667372d9bd01e694f84e181c662ef5f417bd",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern",
+        "trial11 killing a plain-launch Claude",
+        "tests/gateway/claude_first_prompt.test.js"
+      ],
+      "exitCode": 1,
+      "missingExpectedRejection": true,
+      "oneFailedTest": true
+    }
+  ]
+}

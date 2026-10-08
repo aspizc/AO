@@ -1,0 +1,5 @@
+{
+  "cmd-send-keys.c": "0d50b4e75fe1c30b4f02e65259c7d309294b1470717b7fa7f9c3118095170a69",
+  "cmd-paste-buffer.c": "c1b8bdd687cc7a4d0efee33dc831fdce6a746ae9f316c8fa33ee1b9969146af4",
+  "cmd-agents-capture.c": "4d80a8610651a1dd304b9b0e9b45d6832e115d9827d5166f26b4f9dbcdec27e2"
+}

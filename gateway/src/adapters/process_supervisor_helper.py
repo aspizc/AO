@@ -4330,7 +4330,7 @@ def _open_retained_tmux_connection(
         if version_result.returncode != 0 or version_result.stderr != b"":
             raise TerminalChangedError("tmux custom runtime handshake failed")
         reported_version = version_result.stdout.strip().decode("ascii", "strict")
-        if reported_version != "3.6a-agents.1":
+        if reported_version != "3.6a-agents.3":
             raise TerminalChangedError("tmux custom runtime version mismatch")
         commands_result = transport.command(["list-commands"])
         if (commands_result.returncode != 0

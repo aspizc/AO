@@ -1,0 +1,958 @@
+TAP version 13
+# Subtest: dry run delegate returns deterministic mock output
+ok 1 - dry run delegate returns deterministic mock output
+  ---
+  duration_ms: 3.829595
+  type: 'test'
+  ...
+# Subtest: dry run delegate reports the resolved model and effort when provided
+ok 2 - dry run delegate reports the resolved model and effort when provided
+  ---
+  duration_ms: 0.691939
+  type: 'test'
+  ...
+# Subtest: delegate real passes model and effort flags to agy cli
+ok 3 - delegate real passes model and effort flags to agy cli
+  ---
+  duration_ms: 94.413693
+  type: 'test'
+  ...
+# Subtest: delegate enforces policy denial before execution
+ok 4 - delegate enforces policy denial before execution
+  ---
+  duration_ms: 1.185847
+  type: 'test'
+  ...
+# Subtest: delegate rejects unsafe cwd outside repo roots
+ok 5 - delegate rejects unsafe cwd outside repo roots
+  ---
+  duration_ms: 0.587079
+  type: 'test'
+  ...
+# Subtest: spawn dry run creates deterministic session naming and launch command
+ok 6 - spawn dry run creates deterministic session naming and launch command
+  ---
+  duration_ms: 0.772461
+  type: 'test'
+  ...
+# Subtest: ask view kill dry run return deterministic responses and audit events
+ok 7 - ask view kill dry run return deterministic responses and audit events
+  ---
+  duration_ms: 7.498981
+  type: 'test'
+  ...
+# Subtest: permission bypass requires explicit config opt-in for delegate and spawn
+ok 8 - permission bypass requires explicit config opt-in for delegate and spawn
+  ---
+  duration_ms: 83.748719
+  type: 'test'
+  ...
+# Subtest: permission bypass requires explicit environment opt-in for delegate and spawn
+ok 9 - permission bypass requires explicit environment opt-in for delegate and spawn
+  ---
+  duration_ms: 73.649911
+  type: 'test'
+  ...
+# Subtest: non-opt-in environment values preserve permission prompts
+ok 10 - non-opt-in environment values preserve permission prompts
+  ---
+  duration_ms: 285.058055
+  type: 'test'
+  ...
+# Subtest: cwd inside allowed root passes and returns real path
+ok 11 - cwd inside allowed root passes and returns real path
+  ---
+  duration_ms: 1.451252
+  type: 'test'
+  ...
+# Subtest: cwd outside allowed root fails
+ok 12 - cwd outside allowed root fails
+  ---
+  duration_ms: 0.486603
+  type: 'test'
+  ...
+# Subtest: realpath escape via symlink is rejected
+ok 13 - realpath escape via symlink is rejected
+  ---
+  duration_ms: 0.326356
+  type: 'test'
+  ...
+# Subtest: dot dot path normalized outside the root is rejected
+ok 14 - dot dot path normalized outside the root is rejected
+  ---
+  duration_ms: 0.277192
+  type: 'test'
+  ...
+# Subtest: root prefix sibling does not match without path separator
+ok 15 - root prefix sibling does not match without path separator
+  ---
+  duration_ms: 0.230269
+  type: 'test'
+  ...
+# Subtest: missing cwd or roots fail closed
+ok 16 - missing cwd or roots fail closed
+  ---
+  duration_ms: 0.109538
+  type: 'test'
+  ...
+# Subtest: missing cwd path fails with CwdViolation
+ok 17 - missing cwd path fails with CwdViolation
+  ---
+  duration_ms: 0.207592
+  type: 'test'
+  ...
+# Subtest: base adapter methods must be implemented by subclasses
+ok 18 - base adapter methods must be implemented by subclasses
+  ---
+  duration_ms: 0.541781
+  type: 'test'
+  ...
+# Subtest: dry run delegate returns canonical default selection output
+ok 19 - dry run delegate returns canonical default selection output
+  ---
+  duration_ms: 3.166012
+  type: 'test'
+  ...
+# Subtest: dry run delegate reports the resolved model and effort when provided
+ok 20 - dry run delegate reports the resolved model and effort when provided
+  ---
+  duration_ms: 0.506203
+  type: 'test'
+  ...
+# Subtest: delegate real passes model and effort flags to claude cli
+ok 21 - delegate real passes model and effort flags to claude cli
+  ---
+  duration_ms: 113.066852
+  type: 'test'
+  ...
+# Subtest: delegate real uses canonical defaults when request fields are omitted
+ok 22 - delegate real uses canonical defaults when request fields are omitted
+  ---
+  duration_ms: 80.071966
+  type: 'test'
+  ...
+# Subtest: delegate audits session lifecycle
+ok 23 - delegate audits session lifecycle
+  ---
+  duration_ms: 5.556648
+  type: 'test'
+  ...
+# Subtest: policy deny prevents delegate session start and audits error
+ok 24 - policy deny prevents delegate session start and audits error
+  ---
+  duration_ms: 1.96553
+  type: 'test'
+  ...
+# Subtest: cwd guard runs even in dry run
+ok 25 - cwd guard runs even in dry run
+  ---
+  duration_ms: 0.415742
+  type: 'test'
+  ...
+# Subtest: dry run supervised cycle returns session info and audits input lifecycle
+ok 26 - dry run supervised cycle returns session info and audits input lifecycle
+  ---
+  duration_ms: 1.58853
+  type: 'test'
+  ...
+# Subtest: dry run spawn reports launch command with model and effort
+ok 27 - dry run spawn reports launch command with model and effort
+  ---
+  duration_ms: 0.590397
+  type: 'test'
+  ...
+# Subtest: spawn cwd guard runs in dry run
+ok 28 - spawn cwd guard runs in dry run
+  ---
+  duration_ms: 0.543336
+  type: 'test'
+  ...
+# Subtest: disabled codex returns clear error
+ok 29 - disabled codex returns clear error
+  ---
+  duration_ms: 4.189284
+  type: 'test'
+  ...
+# Subtest: codex can be registered with a custom disabled registry
+ok 30 - codex can be registered with a custom disabled registry
+  ---
+  duration_ms: 0.547631
+  type: 'test'
+  ...
+# Subtest: enabled dry run delegate works and audits lifecycle
+ok 31 - enabled dry run delegate works and audits lifecycle
+  ---
+  duration_ms: 7.131199
+  type: 'test'
+  ...
+# Subtest: enabled dry run delegate reports model effort sandbox and cwd
+ok 32 - enabled dry run delegate reports model effort sandbox and cwd
+  ---
+  duration_ms: 0.521178
+  type: 'test'
+  ...
+# Subtest: an unrequested tier preserves the public priority default
+ok 33 - an unrequested tier preserves the public priority default
+  ---
+  duration_ms: 70.816726
+  type: 'test'
+  ...
+# Subtest: enabled real delegate invokes fake codex exec with model effort sandbox and cwd
+ok 34 - enabled real delegate invokes fake codex exec with model effort sandbox and cwd
+  ---
+  duration_ms: 73.831893
+  type: 'test'
+  ...
+# Subtest: enabled delegate still applies policy
+ok 35 - enabled delegate still applies policy
+  ---
+  duration_ms: 0.611545
+  type: 'test'
+  ...
+# Subtest: enabled dry run still applies cwd guard
+ok 36 - enabled dry run still applies cwd guard
+  ---
+  duration_ms: 0.527616
+  type: 'test'
+  ...
+# Subtest: delegate rejects cwd that exposes repo excluded paths
+ok 37 - delegate rejects cwd that exposes repo excluded paths
+  ---
+  duration_ms: 0.829702
+  type: 'test'
+  ...
+# Subtest: delegate permits scoped cwd outside repo excluded paths
+ok 38 - delegate permits scoped cwd outside repo excluded paths
+  ---
+  duration_ms: 0.688156
+  type: 'test'
+  ...
+# Subtest: real delegate rejects cwd outside allowlist before process
+ok 39 - real delegate rejects cwd outside allowlist before process
+  ---
+  duration_ms: 1.33199
+  type: 'test'
+  ...
+# Subtest: codex restricted repo is allowed by policy
+ok 40 - codex restricted repo is allowed by policy
+  ---
+  duration_ms: 0.392586
+  type: 'test'
+  ...
+# Subtest: disallowed model is denied before process
+ok 41 - disallowed model is denied before process
+  ---
+  duration_ms: 0.479471
+  type: 'test'
+  ...
+# Subtest: CodexAdapter ask routes through the shared composer submission guard
+ok 42 - CodexAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 9.848583
+  type: 'test'
+  ...
+# Subtest: ClaudeAdapter ask routes through the shared composer submission guard
+ok 43 - ClaudeAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 1.358375
+  type: 'test'
+  ...
+# Subtest: AntigravityAdapter ask routes through the shared composer submission guard
+ok 44 - AntigravityAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 1.188809
+  type: 'test'
+  ...
+# Subtest: PiAdapter ask routes through the shared composer submission guard
+ok 45 - PiAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 0.97359
+  type: 'test'
+  ...
+# Subtest: OpencodeAdapter ask routes through the shared composer submission guard
+ok 46 - OpencodeAdapter ask routes through the shared composer submission guard
+  ---
+  duration_ms: 1.012221
+  type: 'test'
+  ...
+# Subtest: spawn dry run returns attach command and audits start
+ok 47 - spawn dry run returns attach command and audits start
+  ---
+  duration_ms: 1.811882
+  type: 'test'
+  ...
+# Subtest: spawn launch line includes model effort service tier sandbox and cwd
+ok 48 - spawn launch line includes model effort service tier sandbox and cwd
+  ---
+  duration_ms: 0.441926
+  type: 'test'
+  ...
+# Subtest: spawn without an explicit tier preserves the public priority default
+ok 49 - spawn without an explicit tier preserves the public priority default
+  ---
+  duration_ms: 0.311525
+  type: 'test'
+  ...
+# Subtest: disabled codex spawn is denied
+ok 50 - disabled codex spawn is denied
+  ---
+  duration_ms: 1.101679
+  type: 'test'
+  ...
+# Subtest: restricted repo spawn is allowed for codex restricted-coder
+ok 51 - restricted repo spawn is allowed for codex restricted-coder
+  ---
+  duration_ms: 1.436561
+  type: 'test'
+  ...
+# Subtest: spawn cwd guard runs before tmux
+ok 52 - spawn cwd guard runs before tmux
+  ---
+  duration_ms: 0.493076
+  type: 'test'
+  ...
+# Subtest: spawn rejects cwd that exposes repo excluded paths
+ok 53 - spawn rejects cwd that exposes repo excluded paths
+  ---
+  duration_ms: 1.903105
+  type: 'test'
+  ...
+# Subtest: spawn permits scoped cwd outside repo excluded paths
+ok 54 - spawn permits scoped cwd outside repo excluded paths
+  ---
+  duration_ms: 0.498363
+  type: 'test'
+  ...
+# Subtest: ask view kill dry run flow audits input and close
+ok 55 - ask view kill dry run flow audits input and close
+  ---
+  duration_ms: 1.419714
+  type: 'test'
+  ...
+# Subtest: a model id carries its provider, and only API providers demand a key
+ok 56 - a model id carries its provider, and only API providers demand a key
+  ---
+  duration_ms: 1.220627
+  type: 'test'
+  ...
+# Subtest: kimi k3 is refused by name when its key is absent, and passes when set
+ok 57 - kimi k3 is refused by name when its key is absent, and passes when set
+  ---
+  duration_ms: 0.422582
+  type: 'test'
+  ...
+# Subtest: the local base URL is overridable and falls back to the Ollama default
+ok 58 - the local base URL is overridable and falls back to the Ollama default
+  ---
+  duration_ms: 0.118844
+  type: 'test'
+  ...
+# Subtest: pi dry run resolves the local Qwen default and audits the lifecycle
+ok 59 - pi dry run resolves the local Qwen default and audits the lifecycle
+  ---
+  duration_ms: 8.952152
+  type: 'test'
+  ...
+# Subtest: pi passes the model as --model and the effort as --thinking, non-interactively
+ok 60 - pi passes the model as --model and the effort as --thinking, non-interactively
+  ---
+  duration_ms: 75.285649
+  type: 'test'
+  ...
+# Subtest: pi hands the local endpoint to the child process
+ok 61 - pi hands the local endpoint to the child process
+  ---
+  duration_ms: 71.213574
+  type: 'test'
+  ...
+# Subtest: pi supervised launch is the interactive line, with no --print
+ok 62 - pi supervised launch is the interactive line, with no --print
+  ---
+  duration_ms: 0.992464
+  type: 'test'
+  ...
+# Subtest: pi refuses kimi k3 without a key, before any process starts
+ok 63 - pi refuses kimi k3 without a key, before any process starts
+  ---
+  duration_ms: 0.751958
+  type: 'test'
+  ...
+# Subtest: opencode runs non-interactively with -m and json output
+ok 64 - opencode runs non-interactively with -m and json output
+  ---
+  duration_ms: 80.350992
+  type: 'test'
+  ...
+# Subtest: opencode only bypasses its permission prompt when told to
+ok 65 - opencode only bypasses its permission prompt when told to
+  ---
+  duration_ms: 64.750059
+  type: 'test'
+  ...
+# Subtest: opencode declares no effort dimension, so none is forwarded by default
+ok 66 - opencode declares no effort dimension, so none is forwarded by default
+  ---
+  duration_ms: 0.56585
+  type: 'test'
+  ...
+# Subtest: opencode refuses kimi k3 without a key
+ok 67 - opencode refuses kimi k3 without a key
+  ---
+  duration_ms: 0.553448
+  type: 'test'
+  ...
+# Subtest: ask delivers exact multiline/key-name text without an intermediate submit
+ok 68 - ask delivers exact multiline/key-name text without an intermediate submit
+  ---
+  duration_ms: 6.002081
+  type: 'test'
+  ...
+# Subtest: ask retries Enter once only for the same positively identified pending composer
+ok 69 - ask retries Enter once only for the same positively identified pending composer
+  ---
+  duration_ms: 0.496132
+  type: 'test'
+  ...
+# Subtest: ask fails after a second confirmed unchanged composer and does not resend text
+ok 70 - ask fails after a second confirmed unchanged composer and does not resend text
+  ---
+  duration_ms: 0.61436
+  type: 'test'
+  ...
+# Subtest: permission and model menus receive no keys
+ok 71 - permission and model menus receive no keys
+  ---
+  duration_ms: 1.696742
+  type: 'test'
+  ...
+# Subtest: unknown or busy pane cannot be submitted
+ok 72 - unknown or busy pane cannot be submitted
+  ---
+  duration_ms: 0.628959
+  type: 'test'
+  ...
+# Subtest: a menu appearing after paste receives no Enter
+ok 73 - a menu appearing after paste receives no Enter
+  ---
+  duration_ms: 0.282588
+  type: 'test'
+  ...
+# Subtest: prompt disappearance without acceptance is uncertain and never retried
+ok 74 - prompt disappearance without acceptance is uncertain and never retried
+  ---
+  duration_ms: 0.239001
+  type: 'test'
+  ...
+# Subtest: an unknown observation followed by pending text cannot authorize a retry
+ok 75 - an unknown observation followed by pending text cannot authorize a retry
+  ---
+  duration_ms: 0.332204
+  type: 'test'
+  ...
+# Subtest: stale acceptance text away from the active composer cannot confirm this submission
+ok 76 - stale acceptance text away from the active composer cannot confirm this submission
+  ---
+  duration_ms: 0.44845
+  type: 'test'
+  ...
+# Subtest: bracketed paste disabled or unavailable refuses before input
+ok 77 - bracketed paste disabled or unavailable refuses before input
+  ---
+  duration_ms: 0.510866
+  type: 'test'
+  ...
+# Subtest: unsupported controls refuse before target observation or input
+ok 78 - unsupported controls refuse before target observation or input
+  ---
+  duration_ms: 0.305169
+  type: 'test'
+  ...
+# Subtest: owned buffers are isolated and cleaned on transport failure with safe metadata
+ok 79 - owned buffers are isolated and cleaned on transport failure with safe metadata
+  ---
+  duration_ms: 0.50486
+  type: 'test'
+  ...
+# Subtest: same-target concurrent asks cannot interleave even through target aliases
+ok 80 - same-target concurrent asks cannot interleave even through target aliases
+  ---
+  duration_ms: 7.528842
+  type: 'test'
+  ...
+# Subtest: foreign provider composer layouts stay closed without fabricated readiness
+ok 81 - foreign provider composer layouts stay closed without fabricated readiness
+  ---
+  duration_ms: 0.73223
+  type: 'test'
+  ...
+# Subtest: pi 0.73.1 uses its editor borders and working loader, not a Codex banner
+ok 82 - pi 0.73.1 uses its editor borders and working loader, not a Codex banner
+  ---
+  duration_ms: 0.275057
+  type: 'test'
+  ...
+# Subtest: OpenCode 1.18.20 uses its source composer border, agent metadata and interrupt footer
+ok 83 - OpenCode 1.18.20 uses its source composer border, agent metadata and interrupt footer
+  ---
+  duration_ms: 0.37378
+  type: 'test'
+  ...
+# Subtest: OpenCode overlays, shell mode, paste summaries and cursor drift cannot authorize Enter
+ok 84 - OpenCode overlays, shell mode, paste summaries and cursor drift cannot authorize Enter
+  ---
+  duration_ms: 0.152349
+  type: 'test'
+  ...
+# Subtest: launch sends literal single-line text then separate Enter after settling
+ok 85 - launch sends literal single-line text then separate Enter after settling
+  ---
+  duration_ms: 0.273712
+  type: 'test'
+  ...
+# Subtest: unsupported_runtime_has_no_unguarded_fallback
+ok 86 - unsupported_runtime_has_no_unguarded_fallback
+  ---
+  duration_ms: 0.199033
+  type: 'test'
+  ...
+# Subtest: an unsupported guarded option has a bounded refusal with no raw fallback
+ok 87 - an unsupported guarded option has a bounded refusal with no raw fallback
+  ---
+  duration_ms: 0.201803
+  type: 'test'
+  ...
+# Subtest: bracketed mode disappearing at paste refuses atomically without sending raw multiline
+ok 88 - bracketed mode disappearing at paste refuses atomically without sending raw multiline
+  ---
+  duration_ms: 0.185973
+  type: 'test'
+  ...
+# Subtest: Claude 2.1.292 source profile submits literal key names only after exact draft and fresh loading footer
+ok 89 - Claude 2.1.292 source profile submits literal key names only after exact draft and fresh loading footer
+  ---
+  duration_ms: 0.844317
+  type: 'test'
+  ...
+# Subtest: Claude source placeholder and a typed identical string are distinguished by the composer cursor
+ok 90 - Claude source placeholder and a typed identical string are distinguished by the composer cursor
+  ---
+  duration_ms: 0.135386
+  type: 'test'
+  ...
+# Subtest: Claude retries one unchanged observed draft but never repeats the pasted text
+ok 91 - Claude retries one unchanged observed draft but never repeats the pasted text
+  ---
+  duration_ms: 0.325977
+  type: 'test'
+  ...
+# Subtest: Claude model, effort and folder trust dialogs cannot receive text or Enter
+ok 92 - Claude model, effort and folder trust dialogs cannot receive text or Enter
+  ---
+  duration_ms: 0.343086
+  type: 'test'
+  ...
+# Subtest: Claude loading and unknown panes refuse before any buffer or input
+ok 93 - Claude loading and unknown panes refuse before any buffer or input
+  ---
+  duration_ms: 0.297567
+  type: 'test'
+  ...
+# Subtest: Claude uncertain rendering and cursor states stay closed
+ok 94 - Claude uncertain rendering and cursor states stay closed
+  ---
+  duration_ms: 0.198912
+  type: 'test'
+  ...
+# Subtest: Claude input echo, disappearance and stale loading footer do not confirm acceptance or authorize replay
+ok 95 - Claude input echo, disappearance and stale loading footer do not confirm acceptance or authorize replay
+  ---
+  duration_ms: 0.613641
+  type: 'test'
+  ...
+# Subtest: Claude a decision at the final Enter guard prevents both first submit and retry
+ok 96 - Claude a decision at the final Enter guard prevents both first submit and retry
+  ---
+  duration_ms: 0.41927
+  type: 'test'
+  ...
+# Subtest: Claude summarized or changed drafts refuse before Enter instead of inferring the sent prompt
+ok 97 - Claude summarized or changed drafts refuse before Enter instead of inferring the sent prompt
+  ---
+  duration_ms: 0.33299
+  type: 'test'
+  ...
+# Subtest: Antigravity isolated binary help strings do not establish a composer profile
+ok 98 - Antigravity isolated binary help strings do not establish a composer profile
+  ---
+  duration_ms: 0.280527
+  type: 'test'
+  ...
+# Subtest: decision words in history and literal drafts do not impersonate focused Codex menus
+ok 99 - decision words in history and literal drafts do not impersonate focused Codex menus
+  ---
+  duration_ms: 0.675233
+  type: 'test'
+  ...
+# Subtest: Claude exact decision titles in transcript and draft remain composer text
+ok 100 - Claude exact decision titles in transcript and draft remain composer text
+  ---
+  duration_ms: 0.529795
+  type: 'test'
+  ...
+# Subtest: focused known menus and changed unknown menus remain closed
+ok 101 - focused known menus and changed unknown menus remain closed
+  ---
+  duration_ms: 0.31727
+  type: 'test'
+  ...
+# Subtest: dot2_runtime_refuses_before_prompt_paste
+ok 102 - dot2_runtime_refuses_before_prompt_paste
+  ---
+  duration_ms: 0.215197
+  type: 'test'
+  ...
+# Subtest: capability_probe_rejects_missing_submit_command_before_buffer
+ok 103 - capability_probe_rejects_missing_submit_command_before_buffer
+  ---
+  duration_ms: 0.195344
+  type: 'test'
+  ...
+# Subtest: submit_nondiagnostic_failure_is_uncertain_without_retry
+ok 104 - submit_nondiagnostic_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.532467
+  type: 'test'
+  ...
+# Subtest: submit_fixed_refusal_maps_first_and_retry_public_envelopes
+ok 105 - submit_fixed_refusal_maps_first_and_retry_public_envelopes
+  ---
+  duration_ms: 20.539056
+  type: 'test'
+  ...
+# Subtest: submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant
+ok 106 - submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant
+  ---
+  duration_ms: 0.435401
+  type: 'test'
+  ...
+# Subtest: capability probes require strict raw ASCII and exact empty-stderr success on every operation
+ok 107 - capability probes require strict raw ASCII and exact empty-stderr success on every operation
+  ---
+  duration_ms: 0.780866
+  type: 'test'
+  ...
+# Subtest: invalid UTF-8 captured evidence refuses without replacement inference or keys
+ok 108 - invalid UTF-8 captured evidence refuses without replacement inference or keys
+  ---
+  duration_ms: 0.204868
+  type: 'test'
+  ...
+# Subtest: cleanup attempts every owned buffer but never suppresses a non-missing error or retries
+ok 109 - cleanup attempts every owned buffer but never suppresses a non-missing error or retries
+  ---
+  duration_ms: 0.404952
+  type: 'test'
+  ...
+# Subtest: post_cr_capture_failure_is_uncertain_without_retry
+ok 110 - post_cr_capture_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.357086
+  type: 'test'
+  ...
+# Subtest: post_cr_invalid_metadata_is_uncertain_without_retry
+ok 111 - post_cr_invalid_metadata_is_uncertain_without_retry
+  ---
+  duration_ms: 0.163183
+  type: 'test'
+  ...
+# Subtest: post_cr_invalid_utf8_is_uncertain_without_retry
+ok 112 - post_cr_invalid_utf8_is_uncertain_without_retry
+  ---
+  duration_ms: 0.183432
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_capture_failure_is_uncertain_without_retry
+ok 113 - post_cr_retry_guard_capture_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.1535
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_metadata_failure_is_uncertain_without_retry
+ok 114 - post_cr_retry_guard_metadata_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.137471
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_utf8_failure_is_uncertain_without_retry
+ok 115 - post_cr_retry_guard_utf8_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.23112
+  type: 'test'
+  ...
+# Subtest: first_submit_status2_cleanup_success_preserves_uncertainty_and_one_cr
+ok 116 - first_submit_status2_cleanup_success_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.362234
+  type: 'test'
+  ...
+# Subtest: first_submit_status2_cleanup_failure_preserves_uncertainty_and_one_cr
+ok 117 - first_submit_status2_cleanup_failure_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.185752
+  type: 'test'
+  ...
+# Subtest: first_submit_throws_cleanup_success_preserves_uncertainty_and_one_cr
+ok 118 - first_submit_throws_cleanup_success_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.135152
+  type: 'test'
+  ...
+# Subtest: first_submit_throws_cleanup_failure_preserves_uncertainty_and_one_cr
+ok 119 - first_submit_throws_cleanup_failure_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.145915
+  type: 'test'
+  ...
+# Subtest: first_submit_fixed_refusal_cleanup_success_remains_pre_delivery
+ok 120 - first_submit_fixed_refusal_cleanup_success_remains_pre_delivery
+  ---
+  duration_ms: 0.306578
+  type: 'test'
+  ...
+# Subtest: first_submit_fixed_refusal_cleanup_failure_remains_pre_delivery
+ok 121 - first_submit_fixed_refusal_cleanup_failure_remains_pre_delivery
+  ---
+  duration_ms: 0.185535
+  type: 'test'
+  ...
+# Subtest: codex observed 120x40 ready profile preserves the empty composer
+ok 122 - codex observed 120x40 ready profile preserves the empty composer
+  ---
+  duration_ms: 0.197641
+  type: 'test'
+  ...
+# Subtest: codex observed ready layout retains exact draft checks without claiming live acceptance
+ok 123 - codex observed ready layout retains exact draft checks without claiming live acceptance
+  ---
+  duration_ms: 0.348866
+  type: 'test'
+  ...
+# Subtest: codex observed profile still refuses focused menu trust busy and unknown states before input
+ok 124 - codex observed profile still refuses focused menu trust busy and unknown states before input
+  ---
+  duration_ms: 1.312769
+  type: 'test'
+  ...
+# Subtest: claude-code observed 120x40 ready profile preserves the empty composer
+ok 125 - claude-code observed 120x40 ready profile preserves the empty composer
+  ---
+  duration_ms: 0.105807
+  type: 'test'
+  ...
+# Subtest: claude-code observed ready layout retains exact draft checks without claiming live acceptance
+ok 126 - claude-code observed ready layout retains exact draft checks without claiming live acceptance
+  ---
+  duration_ms: 0.232704
+  type: 'test'
+  ...
+# Subtest: claude-code observed profile still refuses focused menu trust busy and unknown states before input
+ok 127 - claude-code observed profile still refuses focused menu trust busy and unknown states before input
+  ---
+  duration_ms: 0.392824
+  type: 'test'
+  ...
+# Subtest: codex measured footer profile rejects near misses and unmeasured geometry
+ok 128 - codex measured footer profile rejects near misses and unmeasured geometry
+  ---
+  duration_ms: 0.202756
+  type: 'test'
+  ...
+# Subtest: claude-code measured footer profile rejects near misses and unmeasured geometry
+ok 129 - claude-code measured footer profile rejects near misses and unmeasured geometry
+  ---
+  duration_ms: 0.089877
+  type: 'test'
+  ...
+# Subtest: trial2 Codex observed singular warning and variable padding preserve readiness
+ok 130 - trial2 Codex observed singular warning and variable padding preserve readiness
+  ---
+  duration_ms: 0.116767
+  type: 'test'
+  ...
+# Subtest: trial2 Claude observed pre-ask and post-paste layouts retain exact draft and composer identity
+ok 131 - trial2 Claude observed pre-ask and post-paste layouts retain exact draft and composer identity
+  ---
+  duration_ms: 0.11262
+  type: 'test'
+  ...
+# Subtest: trial2 Claude status row allows guarded Enter on the unchanged draft without false acceptance
+ok 132 - trial2 Claude status row allows guarded Enter on the unchanged draft without false acceptance
+  ---
+  duration_ms: 0.546922
+  type: 'test'
+  ...
+# Subtest: trial2 observed layouts keep menus trust busy and unknown states closed before input
+ok 133 - trial2 observed layouts keep menus trust busy and unknown states closed before input
+  ---
+  duration_ms: 0.657669
+  type: 'test'
+  ...
+# Subtest: trial2 measured footer changes do not open near misses unknown status or cursor drift
+ok 134 - trial2 measured footer changes do not open near misses unknown status or cursor drift
+  ---
+  duration_ms: 0.308984
+  type: 'test'
+  ...
+# Subtest: trial2 Claude post-paste decision or unknown status prevents the first Enter
+ok 135 - trial2 Claude post-paste decision or unknown status prevents the first Enter
+  ---
+  duration_ms: 0.526589
+  type: 'test'
+  ...
+# Subtest: trial3 observed Codex queue footer is a draft only in the post-paste phase
+ok 136 - trial3 observed Codex queue footer is a draft only in the post-paste phase
+  ---
+  duration_ms: 0.144668
+  type: 'test'
+  ...
+# Subtest: trial3 observed Claude status plus full footer is ready with recorded metadata
+ok 137 - trial3 observed Claude status plus full footer is ready with recorded metadata
+  ---
+  duration_ms: 0.13555
+  type: 'test'
+  ...
+# Subtest: trial3 observed queue draft supports guarded Enter and bounded retry without claiming acceptance
+ok 138 - trial3 observed queue draft supports guarded Enter and bounded retry without claiming acceptance
+  ---
+  duration_ms: 0.506094
+  type: 'test'
+  ...
+# Subtest: trial3 Claude measured ready footer permits exact simulated drafts without false acceptance
+ok 139 - trial3 Claude measured ready footer permits exact simulated drafts without false acceptance
+  ---
+  duration_ms: 0.544296
+  type: 'test'
+  ...
+# Subtest: trial3 queue footer never authorizes a blank placeholder or an initial paste
+ok 140 - trial3 queue footer never authorizes a blank placeholder or an initial paste
+  ---
+  duration_ms: 0.420312
+  type: 'test'
+  ...
+# Subtest: trial3 queue draft requires measured status geometry exact ASCII cursor and footer
+ok 141 - trial3 queue draft requires measured status geometry exact ASCII cursor and footer
+  ---
+  duration_ms: 0.217404
+  type: 'test'
+  ...
+# Subtest: trial3 decisions trust busy and unknown still refuse with zero input
+ok 142 - trial3 decisions trust busy and unknown still refuse with zero input
+  ---
+  duration_ms: 0.693737
+  type: 'test'
+  ...
+# Subtest: trial3 queue draft cannot authorize Enter on a fresh decision or changed draft
+ok 143 - trial3 queue draft cannot authorize Enter on a fresh decision or changed draft
+  ---
+  duration_ms: 0.351723
+  type: 'test'
+  ...
+# Subtest: trial3 busy queue draft cannot receive Enter or become acceptance evidence
+ok 144 - trial3 busy queue draft cannot receive Enter or become acceptance evidence
+  ---
+  duration_ms: 0.303927
+  type: 'test'
+  ...
+# Subtest: trial3 measured Claude status full footer still rejects near misses and overlays
+ok 145 - trial3 measured Claude status full footer still rejects near misses and overlays
+  ---
+  duration_ms: 0.150348
+  type: 'test'
+  ...
+# Subtest: trial4 exact observed capture padding and cursor identify the queue draft
+ok 146 - trial4 exact observed capture padding and cursor identify the queue draft
+  ---
+  duration_ms: 0.950441
+  type: 'test'
+  ...
+# Subtest: trial4 padded queue draft reaches guarded Enter without false acceptance
+ok 147 - trial4 padded queue draft reaches guarded Enter without false acceptance
+  ---
+  duration_ms: 0.457132
+  type: 'test'
+  ...
+# Subtest: trial4 queue padding allows trailing literal spaces only with exact indentation and phase
+ok 148 - trial4 queue padding allows trailing literal spaces only with exact indentation and phase
+  ---
+  duration_ms: 0.295946
+  type: 'test'
+  ...
+# Subtest: trial4 padded queue draft retains status cursor busy decision and unknown refusals
+ok 149 - trial4 padded queue draft retains status cursor busy decision and unknown refusals
+  ---
+  duration_ms: 0.506659
+  type: 'test'
+  ...
+# Subtest: trial4 observed Claude post-Enter pane is not acceptance evidence
+ok 150 - trial4 observed Claude post-Enter pane is not acceptance evidence
+  ---
+  duration_ms: 0.365108
+  type: 'test'
+  ...
+# Subtest: agent.ask emits the public submission code and allowlisted reason without private data
+ok 151 - agent.ask emits the public submission code and allowlisted reason without private data
+  ---
+  duration_ms: 3.819488
+  type: 'test'
+  ...
+# Subtest: unknown exceptions never expose messages, details, decisions, or credentials
+ok 152 - unknown exceptions never expose messages, details, decisions, or credentials
+  ---
+  duration_ms: 0.451628
+  type: 'test'
+  ...
+# Subtest: only explicitly authorized domain codes survive with catalog-owned messages
+ok 153 - only explicitly authorized domain codes survive with catalog-owned messages
+  ---
+  duration_ms: 0.237143
+  type: 'test'
+  ...
+# Subtest: validation issues retain safe field and bound details but not attacker values
+ok 154 - validation issues retain safe field and bound details but not attacker values
+  ---
+  duration_ms: 1.273101
+  type: 'test'
+  ...
+# Subtest: coordination lease errors retain the exact safe field-specific limit
+ok 155 - coordination lease errors retain the exact safe field-specific limit
+  ---
+  duration_ms: 0.454533
+  type: 'test'
+  ...
+# Subtest: policy errors keep only safe decision fields
+ok 156 - policy errors keep only safe decision fields
+  ---
+  duration_ms: 0.345791
+  type: 'test'
+  ...
+# Subtest: policy rule IDs require canonical provenance for thrown and returned errors
+ok 157 - policy rule IDs require canonical provenance for thrown and returned errors
+  ---
+  duration_ms: 0.424023
+  type: 'test'
+  ...
+# Subtest: legacy message payload errors use common sanitization without changing their envelope
+ok 158 - legacy message payload errors use common sanitization without changing their envelope
+  ---
+  duration_ms: 0.230409
+  type: 'test'
+  ...
+1..158
+# tests 158
+# suites 0
+# pass 158
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 681.842344

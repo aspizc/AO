@@ -1,0 +1,71 @@
+diff --git a/plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-entry-test.js b/tests/gateway/claude_first_prompt.test.js
+index b6f193a..eae1cc9 100644
+--- a/plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-11-entry-test.js
++++ b/tests/gateway/claude_first_prompt.test.js
+@@ -52,6 +52,26 @@ test("trial10 completed cells without fresh spawn provenance remain uncertain wi
+   assert.equal(fx.buffers.size, 0);
+ });
+ 
++test("trial11 an older identical completed turn already on screen cannot confirm the first ask", async () => {
++  const records = clone([profile.ready, profile.postPaste, profile.guard, profile.after]);
++  const transcript = profile.after.snapshot.split("\n").slice(0, 35);
++  for (const record of records.slice(0, 3)) {
++    record.snapshot = [...transcript, ...record.snapshot.split("\n").slice(35)].join("\n");
++  }
++  const fx = harness(records);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial11 a completed response after the retry Enter cannot use the attempt-zero witness", async () => {
++  const fx = harness([profile.ready, profile.postPaste, profile.guard,
++    profile.postPaste, profile.guard, profile.after]);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r", "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
+ function replaceRow(observation, row, text) {
+   const rows = observation.snapshot.split("\n");
+   rows[row] = text;
+@@ -187,3 +207,39 @@ test("trial10 Claude spawn and ask wire first-prompt eligibility only after a su
+     fs.rmSync(directory, { recursive: true, force: true });
+   }
+ });
++
++test("trial11 killing a plain-launch Claude revokes eligibility before its first ask", async () => {
++  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "a04-kill-first-prompt-"));
++  const previousPath = process.env.PATH;
++  const previousDryRun = process.env.AGENTS_DRY_RUN;
++  try {
++    // The fake kill leaves the captured layout available to expose stale eligibility.
++    fs.writeFileSync(path.join(directory, "tmux"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
++    process.env.PATH = `${directory}:${previousPath}`;
++    delete process.env.AGENTS_DRY_RUN;
++    configureAudit({ auditLog: path.join(directory, "audit.jsonl") });
++    const registries = {
++      getAgent: () => ({ reasoningEfforts: ["medium"], allowedClassifications: ["internal"], allowedRoles: ["coder"], requiresApprovalFor: [] }),
++      getRepo: () => null,
++      getRole: () => ({ allowActions: ["agent.spawn", "agent.ask"] }),
++      getProtectedBranches: () => [],
++    };
++    const fx = harness([profile.ready, profile.ready, profile.postPaste, profile.guard, profile.after]);
++    const adapter = new ClaudeAdapter({ registries, config: { repoRoots: [directory], claudeBin: "claude" } });
++    adapter.submitLaunchCommand = async () => {};
++    adapter.rememberFreshClaudeSpawn = ({ tmuxTarget }) =>
++      BaseAdapter.prototype.rememberFreshClaudeSpawn.call(adapter, { tmuxTarget, run: fx.run });
++    adapter.submitPrompt = (args) => BaseAdapter.prototype.submitPrompt.call(adapter, { ...args, run: fx.run, wait: async () => {} });
++    const traceId = "tr-kill-first-prompt";
++    const result = await adapter.spawn({ cwd: directory, traceId, role: "coder", model: "claude-opus-5-5", reasoningEffort: "medium" });
++    assert.deepEqual(await adapter.kill({ tmuxTarget: result.tmuxTarget, traceId, role: "coder" }), { closed: true, dryRun: false });
++    await assert.rejects(() => adapter.ask({ tmuxTarget: result.tmuxTarget, prompt: profile.prompt, traceId, role: "coder" }), uncertain);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  } finally {
++    process.env.PATH = previousPath;
++    if (previousDryRun === undefined) delete process.env.AGENTS_DRY_RUN;
++    else process.env.AGENTS_DRY_RUN = previousDryRun;
++    fs.rmSync(directory, { recursive: true, force: true });
++  }
++});

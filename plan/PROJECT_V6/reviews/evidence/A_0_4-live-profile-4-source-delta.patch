@@ -1,0 +1,52 @@
+--- a/gateway/src/adapters/base_adapter.js
++++ b/gateway/src/adapters/base_adapter.js
+@@ -9,16 +9,16 @@
+ 
+ const activeSubmissions = new Set();
+ const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
+-const codexQueueFooter = "  tab to queue message";
++const codexQueueFooter = /^  tab to queue message *$/;
+ const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
+ // Measured 0.160.1 status row; this is rendering evidence, not model selection.
+ const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
+ function codexGap(rows, cursor, footer) {
+-  if ((codexWarningsFooter.test(rows[footer]) || rows[footer] === codexQueueFooter)
++  if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+     && !codexLiveStatus.test(rows[footer - 1])) return false;
+   return rows.slice(cursor + 1, footer).every((row, index) => row.trim() === ""
+     || (cursor + 1 + index === footer - 1
+-      && (codexWarningsFooter.test(rows[footer]) || rows[footer] === codexQueueFooter)
++      && (codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+       && codexLiveStatus.test(row)));
+ }
+ function invalidText(text, allowNewlines) {
+@@ -30,7 +30,7 @@
+ }
+ function activeDecision(provider, rows, pane) {
+   if (provider === "codex") {
+-    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || row === codexQueueFooter);
++    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
+     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
+     if (start >= 0 && pane.cursor >= start && pane.cursor < footer
+       && codexGap(rows, pane.cursor, footer)) return false;
+@@ -102,9 +102,9 @@
+   const rows = snapshot.split("\n");
+   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
+   if (provider === "codex") {
+-    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || row === codexQueueFooter);
++    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
+     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
+-    if (((codexWarningsFooter.test(rows[footer]) || rows[footer] === codexQueueFooter)
++    if (((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+       && (pane.width !== 120 || pane.height !== 40))
+       || start < 0 || footer - start < 2 || footer - start > 12
+       || pane.cursor < start || pane.cursor >= footer
+@@ -115,7 +115,7 @@
+     if (text === "Ask Codex to do anything" && pane.cursorX === 2 && pane.cursor === start) text = "";
+     // The measured queue footer identifies only a fully visible pasted draft.
+     // It cannot authorize initial input or prove acceptance, even with a placeholder.
+-    if (rows[footer] === codexQueueFooter && (phase !== "draft" || !text
++    if (codexQueueFooter.test(rows[footer]) && (phase !== "draft" || !text
+       || pane.cursor !== start || /[^\x20-\x7e]/.test(text)
+       || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
+       || rows.slice(footer + 1).some((row) => row.trim() !== ""))) return { state: "unknown_state" };

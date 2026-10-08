@@ -137,6 +137,7 @@ test("catalog error allowlists are operation-specific and complete", () => {
     "NOT_FOUND",
     "POLICY_DENIED",
     "ADAPTER_DISABLED",
+    "AGENT_PROMPT_NOT_SUBMITTED",
     "TIMEOUT",
   ]);
   for (const name of ["agent.view", "agent.kill"]) {

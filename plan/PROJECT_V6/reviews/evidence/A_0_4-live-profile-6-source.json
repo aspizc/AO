@@ -1,0 +1,23 @@
+{
+  "release": "rust-v0.160.1",
+  "primaryURLs": {
+    "frames": "https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs#L31-L36",
+    "selection": "https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs#L1029-L1034",
+    "status_use": "https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/thread_title_status.rs#L20-L49"
+  },
+  "frames": [
+    "⠋",
+    "⠙",
+    "⠹",
+    "⠸",
+    "⠼",
+    "⠴",
+    "⠦",
+    "⠧",
+    "⠇",
+    "⠏"
+  ],
+  "statusSurfacesSHA256": "e96ac7db77866266a5b146b885f03487bf801511295bd35474877783537e6200",
+  "threadTitleStatusSHA256": "58b43abcbba1024eafb1a59365cf71544f2721c9c20bdc83f9646deffc6f73c4",
+  "meaning": "Finite rendering whitelist only; title/status progress is not a fresh-work witness. Acceptance still requires fresh exact prompt and Working with identity and viewport guards."
+}

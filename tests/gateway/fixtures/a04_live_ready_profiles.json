@@ -1,0 +1,32 @@
+[
+  {
+    "provider": "codex",
+    "version": "codex-cli 0.160.1",
+    "provenance": "root operator ready-pane observation; ready classification only, acceptance failed before input",
+    "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /workspace/project\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursorX": 2,
+      "cursor": 36,
+      "width": 120,
+      "height": 40
+    }
+  },
+  {
+    "provider": "claude-code",
+    "version": "2.1.293 (Claude Code)",
+    "provenance": "root operator ready-pane observation; ready classification only, acceptance failed before input",
+    "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Try \"fix lint errors\"\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n",
+    "pane": {
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursorX": 2,
+      "cursor": 36,
+      "width": 120,
+      "height": 40
+    }
+  }
+]

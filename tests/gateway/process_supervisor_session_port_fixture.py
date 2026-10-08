@@ -4159,9 +4159,9 @@ def _host_tmux_probe(helper_path: str) -> int:
         stderr=subprocess.PIPE,
         check=True,
     ).stdout.decode("ascii").strip()
-    if version != "tmux 3.6a-agents.1":
+    if version != "tmux 3.6a-agents.3":
         raise RuntimeError(
-            f"required tmux 3.6a-agents.1, observed {version}"
+            f"required tmux 3.6a-agents.3, observed {version}"
         )
 
     socket_name = f"d007c-{os.getpid()}-{time.time_ns()}"
@@ -4418,9 +4418,9 @@ def _bound_relay_host_probe(helper_path: str) -> int:
         stderr=subprocess.PIPE,
         check=True,
     ).stdout.decode("ascii").strip()
-    if version != "tmux 3.6a-agents.1":
+    if version != "tmux 3.6a-agents.3":
         raise RuntimeError(
-            f"required tmux 3.6a-agents.1, observed {version}"
+            f"required tmux 3.6a-agents.3, observed {version}"
         )
 
     socket_name = f"d007c-bound-{os.getpid()}-{time.time_ns()}"

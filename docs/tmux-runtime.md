@@ -1,7 +1,8 @@
 # Pinned tmux runtime
 
-The retained-control session tests require `tmux 3.6a-agents.1`, including
-the `agents-capture-v1` extension. A distribution's unmodified tmux cannot
+The retained-control session tests require `tmux 3.6a-agents.3`, including
+the unchanged `agents-capture-v1` extension and the atomic
+`paste-buffer -G -p -r` guard and consuming `agents-submit-v1` final-CR command. A distribution's unmodified tmux cannot
 provide that contract. The source archive, patch, extension, and Linux builder
 image are pinned in
 [`gateway/vendor/tmux-agents/manifest.json`](../gateway/vendor/tmux-agents/manifest.json).
@@ -22,7 +23,7 @@ curl --fail --location --retry 3 --proto '=https' --tlsv1.2 \
 gateway/vendor/tmux-agents/build-offline.sh \
   "$tmux_build_dir/tmux-3.6a.tar.gz" "$tmux_build_dir"
 mkdir -p "$tmux_build_dir/bin"
-ln -s ../tmux-3.6a-agents.1-linux-amd64 "$tmux_build_dir/bin/tmux"
+ln -s ../tmux-3.6a-agents.3-linux-amd64 "$tmux_build_dir/bin/tmux"
 export PATH="$tmux_build_dir/bin:$PATH"
 export D007C_TEST_TMUX_PATH="$tmux_build_dir/bin"
 export D007C_RUN_REAL_TMUX_PROBE=1
@@ -49,3 +50,15 @@ For a runtime deployment, configure the compatible binary as `tmux` on the
 Gateway's executable search path. The Linux build does not verify Darwin
 artifacts; the native Darwin build instructions remain in the
 [vendor README](../gateway/vendor/tmux-agents/README.md).
+
+The V6 A/0/04 real-input tests use an owned socket per fixture and require the
+same custom binary on `PATH` (or an explicit `A04_TEST_TMUX` binary path):
+
+```bash
+node --test tests/gateway/guarded_paste.test.js tests/gateway/guarded_submit.test.js
+```
+
+These tests observe raw terminal bytes and zero-byte refusals for disabled
+or changed bracketed-paste mode, input-off, copy mode and synchronization.
+They verify UTF-8 and LF preservation with separate final Enter. This
+terminal proof does not establish that a provider accepted a prompt.

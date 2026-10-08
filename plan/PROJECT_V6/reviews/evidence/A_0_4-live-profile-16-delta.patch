@@ -1,0 +1,194 @@
+--- entry/gateway/src/adapters/base_adapter.js
++++ candidate/gateway/src/adapters/base_adapter.js
+@@ -123,14 +123,20 @@
+       || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
+       || rows.slice(footer + 1).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
+     const status = rows.slice(Math.max(0, start - 2), start).join("\n");
+-    const modernWork = (codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))
++    // Measured 0.160.1 welcome viewport: first-turn Working sits three rows above input.
++    const welcomeWork = pane.width === 120 && pane.height === 40 && start === 36 && footer === 39
++      && rows.length === 41 && rows[40] === ""
++      && rows[1]?.trim() === ">_ OpenAI Codex (v0.160.1)"
++      && codexWorking.test(rows[33]) && rows[34]?.trim() === "" && rows[35]?.trim() === ""
++      && codexSpinnerStatus.test(rows[38]);
++    const modernWork = welcomeWork || (codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))
+       && codexWorking.test(rows[start - 4])
+       && rows[start - 3]?.trim() === "" && rows[start - 1]?.trim() === "";
+     if (codexSpinnerStatus.test(rows[footer - 1]) && !modernWork) return { state: "unknown_state" };
+     const busy = modernWork || /Working \([0-9hms .]+[•·] esc to interrupt\)/.test(status);
+     // A cursor outside the measured composer cannot prove that Enter targets it.
+-    return { state: busy ? "busy" : "composer", text, modernWork,
+-      workRow: modernWork ? start - 4 : codexWorking.test(rows[start - 2]) ? start - 2 : null,
++    return { state: busy ? "busy" : "composer", text, modernWork, welcomeWork,
++      workRow: welcomeWork ? 33 : modernWork ? start - 4 : codexWorking.test(rows[start - 2]) ? start - 2 : null,
+       identity: `${start}:${footer}:${pane.width}:${pane.height}` };
+   }
+   if (provider === "pi") {
+@@ -275,10 +281,15 @@
+   }
+ }
+ 
+-function freshCodexWork(ready, guard, after, prompt) {
++function freshCodexWork(ready, pending, guard, after, prompt, attempt) {
+   if (after.workRow === null || after.workRow === undefined
+     || ["serverPid", "target", "panePid", "width", "height"].some((key) => after[key] !== guard[key])) return false;
+-  const prior = [ready, guard].map((observation) => observation.snapshot.split("\n").slice(0, Number(observation.cursorY)));
++  // This welcome witness is first-Enter only, with every ask frame bound to the same pane.
++  if (after.welcomeWork && (attempt !== 0
++    || [ready, pending].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
++      .some((key) => frame[key] !== guard[key])))) return false;
++  const prior = (after.welcomeWork ? [ready, pending, guard] : [ready, guard])
++    .map((observation) => observation.snapshot.split("\n").slice(0, Number(observation.cursorY)));
+   // Ignore clock changes and row movement: a prior Working row is stale evidence.
+   if (prior.some((rows) => rows.some((row) => codexWorking.test(row)))) return false;
+   if (!after.modernWork) return true; // Retained source profile: newly appearing active Working row.
+@@ -289,6 +300,7 @@
+     .filter((index) => index >= 0);
+   if (echoes.length !== 1) return false;
+   const index = echoes[0];
++  if (after.welcomeWork && (index !== 15 || !rows.slice(16, 33).every((row) => row.trim() === ""))) return false;
+   // A newly inserted user history cell, not old history shifted into the viewport.
+   return prior.every((before) => !before.some((row) => row.replace(/ +$/, "") === echo)
+     && before[index]?.trim() === "" && rows.slice(0, index).every((row, offset) => row === before[offset]))
+@@ -420,7 +432,7 @@
+         }
+       }
+       if (after.state === "busy" && after.text === ""
+-        && (provider !== "codex" || freshCodexWork(ready, guard, after, prompt))) {
++        && (provider !== "codex" || freshCodexWork(ready, pending, guard, after, prompt, attempt))) {
+         return { snapshot: after.snapshot, dryRun: false };
+       }
+       if (after.state !== "composer" || after.text !== prompt || after.identity !== pending.identity) {
+--- entry/tests/gateway/prompt_submission.test.js
++++ candidate/tests/gateway/prompt_submission.test.js
+@@ -1332,3 +1332,130 @@
+   assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`, "\r"]);
+   assert.equal(fx.buffers.size, 0);
+ });
++
++const trial16Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_welcome_working.json", import.meta.url), "utf8"));
++function trial16Fixture(records = [trial16Codex.ready, trial16Codex.draft, trial16Codex.draft, trial16Codex.after]) {
++  const fx = trial3Fixture("codex", records, trial16Codex.prompt);
++  let index = 0;
++  const run = (args, options) => {
++    const frame = records[Math.min(index, records.length - 1)];
++    const result = fx.run(args, options);
++    if (args[0] === "capture-pane") index++;
++    if (args[0] === "display-message" && args.at(-1) !== "#{version}") {
++      const { pane, submitState: state } = frame;
++      return { ...result, stdout: args.at(-1).startsWith("#{pid}|")
++        ? `${state.serverPid}|${state.target}|${state.panePid}|${pane.width}|${pane.height}|${pane.cursorX}|${pane.cursor}\n`
++        : `${pane.target}|${pane.mode}|${pane.inputOff}|${pane.synchronized}|${pane.cursor}|${pane.height}|${pane.width}|${pane.cursorX}\n` };
++    }
++    return result;
++  };
++  return { ...fx, ask: () => base.submitPrompt({ provider: "codex", target: "%12", prompt: trial16Codex.prompt, run, wait: async () => {} }) };
++}
++function trial16Rows(frame, changes) {
++  const copy = structuredClone(frame), rows = copy.snapshot.split("\n");
++  for (const [row, text] of Object.entries(changes)) rows[row] = text;
++  copy.snapshot = rows.join("\n");
++  return copy;
++}
++const trial16Frames = () => [trial16Codex.ready, trial16Codex.draft, trial16Codex.draft, trial16Codex.after].map((frame) => structuredClone(frame));
++const trial16OneEnter = (fx) => {
++  assert.deepEqual(fx.inputs, [`\x1b[200~${trial16Codex.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++};
++
++test("trial16 measured Codex welcome Working at start minus three confirms the exact new prompt with one Enter", async () => {
++  const fx = trial16Fixture();
++  assert.equal((await fx.ask()).snapshot, trial16Codex.after.snapshot);
++  trial16OneEnter(fx);
++});
++
++test("trial16 welcome Working refuses initial input as busy without keys", async () => {
++  const fx = trial16Fixture([trial16Codex.after]);
++  await assert.rejects(fx.ask, reason("busy"));
++  assert.deepEqual(fx.inputs, []);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial16 missing wrong duplicated shifted stale or unrelated echo cannot bind welcome Working to this Enter", async () => {
++  for (const changes of [{ 15: "" }, { 15: "› unrelated request" }, { 16: `› ${trial16Codex.prompt}` },
++    { 15: "", 16: `› ${trial16Codex.prompt}` }, { 14: `› ${trial16Codex.prompt}`, 15: "" }, { 16: "› another request" },
++    { 16: "unrelated busy transcript" }, { 4: "changed welcome" }]) {
++    const records = trial16Frames();
++    records[3] = trial16Rows(records[3], changes);
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++    trial16OneEnter(fx);
++  }
++  for (const stage of [0, 1, 2]) {
++    const records = trial16Frames();
++    records[stage] = trial16Rows(records[stage], { 15: `› ${trial16Codex.prompt}` });
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++    trial16OneEnter(fx);
++  }
++});
++
++test("trial16 prior Working in any pre-Enter frame cannot become new acceptance", async () => {
++  for (const stage of [0, 1, 2]) {
++    const records = trial16Frames();
++    records[stage] = trial16Rows(records[stage], { 14: "• Working (9s • esc to interrupt)" });
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++    trial16OneEnter(fx);
++  }
++});
++
++test("trial16 changed server pane PID or geometry in any ask frame refuses welcome acceptance", async () => {
++  for (const stage of [0, 1, 2, 3]) {
++    for (const key of ["serverPid", "target", "panePid", "width", "height"]) {
++      const records = trial16Frames(), frame = records[stage];
++      if (key === "width" || key === "height") {
++        frame.pane[key]++;
++        frame.submitState[key] = String(frame.pane[key]);
++      } else {
++        frame.submitState[key] = key === "target" ? "%13" : "999";
++        if (key === "target") frame.pane.target = "%13";
++      }
++      const fx = trial16Fixture(records);
++      await assert.rejects(fx.ask, (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED"
++        && ["unknown_state", "acceptance_uncertain"].includes(error.reason));
++      assert.ok(fx.inputs.filter((input) => input === "\r").length <= 1);
++      assert.equal(fx.buffers.size, 0);
++    }
++  }
++});
++
++test("trial16 menu decision and unrelated busy layouts cannot borrow welcome acceptance", async () => {
++  for (const changes of [{ 33: "" }, { 33: "• Working on something unrelated" }, { 34: "unexpected gap" },
++    { 35: "unexpected gap" }, { 38: "  unrecognized status · ⠇" },
++    { 1: "  >_ OpenAI Codex (v0.160.2)" }, { 32: "Select model" },
++    { 15: "Do you want to proceed?", 16: "› 1. Allow", 17: "  2. Cancel" }]) {
++    const records = trial16Frames();
++    records[3] = trial16Rows(records[3], changes);
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++    trial16OneEnter(fx);
++  }
++  // Change every frame together so prefix equality cannot substitute for the version pin.
++  const unverified = trial16Frames().map((frame) => trial16Rows(frame, { 1: "  >_ OpenAI Codex (v0.160.2)" }));
++  const unknownVersion = trial16Fixture(unverified);
++  await assert.rejects(unknownVersion.ask, reason("acceptance_uncertain"));
++  trial16OneEnter(unknownVersion);
++  const decision = trial16Rows(trial16Codex.draft, { 32: "Do you want to proceed?", 33: "› 1. Allow", 34: "  2. Cancel" });
++  decision.pane.cursor = 33;
++  const fx = trial16Fixture([trial16Codex.ready, trial16Codex.draft, decision]);
++  await assert.rejects(fx.ask, reason("decision_required"));
++  assert.deepEqual(fx.inputs, [`\x1b[200~${trial16Codex.prompt}\x1b[201~`]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial16 welcome Working after a second Enter or completed-only reply cannot confirm the first submission", async () => {
++  const retry = trial16Fixture([trial16Codex.ready, trial16Codex.draft, trial16Codex.draft,
++    trial16Codex.draft, trial16Codex.draft, trial16Codex.after]);
++  await assert.rejects(retry.ask, reason("acceptance_uncertain"));
++  assert.deepEqual(retry.inputs, [`\x1b[200~${trial16Codex.prompt}\x1b[201~`, "\r", "\r"]);
++  assert.equal(retry.buffers.size, 0);
++  const completed = trial16Fixture([trial16Codex.ready, trial16Codex.draft, trial16Codex.draft, trial16Codex.later]);
++  await assert.rejects(completed.ask, reason("acceptance_uncertain"));
++  trial16OneEnter(completed);
++});

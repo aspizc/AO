@@ -1,0 +1,20 @@
+{
+  "status": "immutable trial 10 handoff; independent verdict pending",
+  "sha256": {
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-10_to_review.md": "fddc2719a6322d8564438ebdd6fbf6e56d03180f1bb4c426b7ec0a1233230f69",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-10_operator-decision-memo.md": "a069cdf2f32a7b35e2e3de571e86ccc2f896d157200ec859af0872908827c1d8",
+    "plan/PROJECT_V6/reviews/README.md": "7468f8bcb2e3893937cb4997554a2332aa56aa13286622f1b6a8e057c976c790",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-entry.json": "5b2029b85519259e258aa0603680f70e4458cf223441021491f17c1adb8086ba",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-entry.patch": "b48b6d275fa61be0bd82d143a9ea334f931899f59c7e5b927f7f2957422c7417",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-files.json": "ad121ec6e70bafeb6a9d95d3507af7cb4e1db0b555fc777fa2295b87ebf19c79",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-prior-full-gate.log.gz": "1073b6b08427af7e8f6e80ec4cf9d87220ad2c01712ac26c7b746cc3e4272dfa",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-prior-green-host.log.gz": "c2c5e63fdd43ee8ad66c085ba24b7d7f7ca02e9218797007882dd08f2f1feb57",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-prior-red-host.log.gz": "ff573aef7aeeacb4d421440e1b500d421dde95ff79dd519351439c4cd1bc6c26",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-prior-red.log.gz": "46771dbb0b6370f23a3556ebe0a948862a7e832327a9178a66b04c6cb529e04c",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-resume-focused-default-host.log.gz": "f5699bb3a188a43027f003f1c7fe06a12e960e859d1ef382056ca331a6af0bcf",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-resume-focused-pinned-host.log.gz": "171654a498b3648a98696b22f7d45e484db33478e385df75e447910fec82b30d",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-resume-lint.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-resume-manifest-tests.log.gz": "167f03842af932d51c296a795d8546be282fb218314db423f40655b1ffd30180",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-10-resume-manifest-validation.log.gz": "6e58ca42987ee2c303acb6482ab7582c2bbf690617ad3c50cc956e0d51023d14"
+  }
+}

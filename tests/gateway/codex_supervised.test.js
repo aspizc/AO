@@ -4,6 +4,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { CodexAdapter } from "../../gateway/src/adapters/codex_adapter.js";
+import { ClaudeAdapter } from "../../gateway/src/adapters/claude_adapter.js";
+import { AntigravityAdapter } from "../../gateway/src/adapters/antigravity_adapter.js";
+import { PiAdapter } from "../../gateway/src/adapters/pi_adapter.js";
+import { OpencodeAdapter } from "../../gateway/src/adapters/opencode_adapter.js";
 import { CwdViolation } from "../../gateway/src/adapters/base_adapter.js";
 import { configureAudit, query, _resetForTests as resetAudit } from "../../gateway/src/core/audit.js";
 
@@ -58,6 +62,19 @@ function adapter(root, overrides = {}) {
       ...overrides,
     },
     registries: fakeRegistries(overrides),
+  });
+}
+
+for (const Adapter of [CodexAdapter, ClaudeAdapter, AntigravityAdapter, PiAdapter, OpencodeAdapter]) {
+  test(`${Adapter.name} ask routes through the shared composer submission guard`, async () => {
+    const { root } = setup();
+    const subject = new Adapter({ config: { dryRun: false, repoRoots: [root] }, registries: fakeRegistries() });
+    const calls = [];
+    subject.submitPrompt = async (args) => { calls.push(args); return { snapshot: "accepted-fixture", dryRun: false }; };
+    const result = await subject.ask({ tmuxTarget: "owned-target", prompt: "private prompt", role: "coder", traceId: "tr-shared-submit" });
+    assert.deepEqual(calls, [{ tmuxTarget: "owned-target", prompt: "private prompt" }]);
+    assert.deepEqual(result, { snapshot: "accepted-fixture", dryRun: false });
+    assert.doesNotMatch(JSON.stringify(await query({ traceId: "tr-shared-submit" })), /private prompt|accepted-fixture/);
   });
 }
 

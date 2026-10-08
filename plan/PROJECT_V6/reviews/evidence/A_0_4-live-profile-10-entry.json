@@ -1,0 +1,16 @@
+{
+  "entryHEAD": "73223e9a1a46b27f97cb59144cb85a348e9d732f",
+  "files": {
+    "gateway/README.md": "bdf635dde713842d556c6d97948262df67b881937d43c5220c59471e0f42af2e",
+    "gateway/src/adapters/base_adapter.js": "ebfa9f4c7c054bf8ab31d7f083f23bc3f74f1a1d2acd38aa24ae2096116e583c",
+    "gateway/src/adapters/claude_adapter.js": "51886842c68cf4bc83bce81ea723f38912f50ce5b19e97a96def8195c14c36f9",
+    "tests/gateway/claude_first_prompt.test.js": "3b22ec564ff858d13427e97e9fed3fc624438a8b2475ab6ba46d140de68ff575"
+  },
+  "manifestBefore": "sha256:404c273b299560d51ef72aa6d1278ecd84397aa37576a99c28d7750f720ce638",
+  "manifestExpected": "sha256:6406044a37fa09cccdefd91885a60dfed8224af421988d25b260931c3ba17b5f",
+  "inventoryWithoutNewTest": "sha256:404c273b299560d51ef72aa6d1278ecd84397aa37576a99c28d7750f720ce638",
+  "validationBefore": [
+    "test.gateway: stale inventorySha256; expected sha256:6406044a37fa09cccdefd91885a60dfed8224af421988d25b260931c3ba17b5f"
+  ],
+  "newTestInInventory": true
+}

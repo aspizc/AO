@@ -35,4 +35,24 @@ diff --git a/tmux.c b/tmux.c
 +++ b/tmux.c
 @@ -346 +346 @@ getversion(void)
 -	return (TMUX_VERSION);
-+	return (TMUX_VERSION "-agents.1");
++	return (TMUX_VERSION "-agents.2");
+diff --git a/cmd-paste-buffer.c b/cmd-paste-buffer.c
+--- a/cmd-paste-buffer.c
++++ b/cmd-paste-buffer.c
+@@ -36,2 +36,2 @@
+-	.args = { "db:prs:t:", 0, 0, NULL },
+-	.usage = "[-dpr] [-s separator] " CMD_BUFFER_USAGE " "
++	.args = { "db:Gprs:t:", 0, 0, NULL },
++	.usage = "[-dGpr] [-s separator] " CMD_BUFFER_USAGE " "
+@@ -55,0 +56,11 @@
++
++	/* Guard framing and enqueue in this same server command execution. */
++	if (args_has(args, 'G') &&
++	    (!bracket || !args_has(args, 'r') || args_has(args, 's') ||
++	    window_pane_exited(wp) || wp->fd == -1 ||
++	    (wp->flags & PANE_INPUTOFF) || !TAILQ_EMPTY(&wp->modes) ||
++	    options_get_number(wp->options, "synchronize-panes") ||
++	    !(wp->screen->mode & MODE_BRACKETPASTE))) {
++		cmdq_error(item, "agents: bracketed paste unavailable");
++		return (CMD_RETURN_ERROR);
++	}

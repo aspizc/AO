@@ -184,7 +184,7 @@
       "exclude": [
         "tests/gateway/*_live.test.js"
       ],
-      "inventorySha256": "sha256:7437d443e77037f43f2cb3dbd1f981b382e7868c25d4d229daa2f55f748e6128",
+      "inventorySha256": "sha256:dd421db70c712d2a552c3c7b0979f61ee43ca133fa003b1471e790a0ee819ea1",
       "minimumTests": 1,
       "timeoutSeconds": 900,
       "allowedSkips": [

@@ -1,0 +1,85 @@
+{
+  "sourceKind": "Sanitized root live layout; synthetic prompt, reply, path, IDs and clock. Draft is simulated; no candidate live acceptance claim.",
+  "version": "0.160.1",
+  "prompt": "Reply exactly a04_trial16_reply. Do not use tools.",
+  "ready": {
+    "snapshot": " \n  >_ OpenAI Codex (v0.160.1)\n     /fixture/a04\n\n  Shall we put some verbs after that cursor?\n\n  To get started, describe a task or try one of these commands:\n\n  /init - create an AGENTS.md file with instructions for Codex\n  /status - show current session configuration\n  /permissions - choose what Codex is allowed to do\n  /model - choose what model and reasoning effort to use     \n  /review - review any changes and find issues                        \n                                                                        \n                                                                         \n                                                                          \n                                                                          \n                                                                           \n                                                                            \n                                                                            \n                                                                             \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /fixture/a04 \n  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "draft": {
+    "snapshot": " \n  >_ OpenAI Codex (v0.160.1)\n     /fixture/a04\n\n  Shall we put some verbs after that cursor?\n\n  To get started, describe a task or try one of these commands:\n\n  /init - create an AGENTS.md file with instructions for Codex\n  /status - show current session configuration\n  /permissions - choose what Codex is allowed to do\n  /model - choose what model and reasoning effort to use     \n  /review - review any changes and find issues                        \n                                                                        \n                                                                         \n                                                                          \n                                                                          \n                                                                           \n                                                                            \n                                                                            \n                                                                             \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n\n\n\n› Reply exactly a04_trial16_reply. Do not use tools.\n\n  GPT-6.1-Sol medium fast · /fixture/a04 \n  tab to queue message                                                                                                 \n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 52
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "after": {
+    "snapshot": " \n  >_ OpenAI Codex (v0.160.1)\n     /fixture/a04\n\n  Shall we put some verbs after that cursor?\n\n  To get started, describe a task or try one of these commands:\n\n  /init - create an AGENTS.md file with instructions for Codex\n  /status - show current session configuration\n  /permissions - choose what Codex is allowed to do\n  /model - choose what model and reasoning effort to use     \n  /review - review any changes and find issues                        \n                                                                        \n                                                                         \n› Reply exactly a04_trial16_reply. Do not use tools.                 \n                                                                          \n                                                                           \n                                                                            \n                                                                            \n                                                                             \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n• Working (1s • esc to interrupt)                                                           \n\n\n› Ask Codex to do anything                               \n\n  GPT-6.1-Sol medium fast · /fixture/a04 · ⠇\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "later": {
+    "snapshot": " \n  >_ OpenAI Codex (v0.160.1)\n     /fixture/a04\n\n  Shall we put some verbs after that cursor?\n\n  To get started, describe a task or try one of these commands:\n\n  /init - create an AGENTS.md file with instructions for Codex\n  /status - show current session configuration\n  /permissions - choose what Codex is allowed to do\n  /model - choose what model and reasoning effort to use     \n  /review - review any changes and find issues                        \n                                                                        \n                                                                         \n› Reply exactly a04_trial16_reply. Do not use tools.                 \n                                                                          \n                                                                           \n• a04_trial16_reply                                                    \n                                                                            \n  Worked for 3s • 09:00                                                                                                 \n                                                                            \n                                                                            \n                                                                           \n                                                                         \n                                                                      \n                                                                     \n                                                                   \n\n\n\n\n\n                                                                                            \n\n\n› Ask Codex to do anything                               \n\n  GPT-6.1-Sol medium fast · /fixture/a04\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  }
+}

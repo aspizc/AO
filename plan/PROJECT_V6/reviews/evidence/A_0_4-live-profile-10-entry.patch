@@ -1,0 +1,359 @@
+diff --git a/gateway/README.md b/gateway/README.md
+index de13f6a..1400892 100644
+--- a/gateway/README.md
++++ b/gateway/README.md
+@@ -169,8 +169,27 @@ Unknown suffixes and completed-only Codex captures remain uncertain.
+ Codex's Working and user-history markers are grounded in the pinned
+ [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
+ and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).
+-Claude's completed `●` response is left uncertain: the supplied snapshots lack
+-pre-Enter guard capture and a verified 2.1.293 fresh-turn renderer contract.
++Claude's completed `●` response was left uncertain in trials 5–9. The operator
++subsequently selected option 1 in the
++[completed-turn decision](../plan/PROJECT_V6/reviews/A_0_4_to_check_by_human.md);
++the [trial 10 memo](../plan/PROJECT_V6/reviews/A_0_4-live-profile-10_operator-decision-memo.md)
++records that instruction. The new completed-response witness is limited to the
++first ask after a successful, plain supervised Claude launch registered by this
++adapter instance. Eligibility is consumed before that ask, including failures,
++and is lost on kill or Gateway restart. Reattached sessions have no eligibility.
++Spawn, ready, pasted draft, final guard and post-Enter server/pane identity and
++120×40 geometry must match. The ready/draft/guard transcript must be blank;
++the exact guarded single-line ASCII prompt must appear once as a new user cell,
++followed by the measured printable single-line assistant cell with only blank
++rows elsewhere. The empty composer, cursor, borders, idle footer and unchanged
++prefix must match the measured 2.1.293 layout. All other completed layouts,
++reused processes, history, duplicates, reflow, menus or missing evidence remain
++`acceptance_uncertain` without replay. Existing active-busy witnesses retain
++their separate behavior. Shell arguments in the configured executable disable
++fresh-launch eligibility; executable-path wrappers are an operator-controlled
++assumption, not binary attestation. This is observational first-prompt evidence,
++not a general renderer contract or stable turn ID. A new live acceptance and
++independent review are required before integration.
+ The [operator evidence request](../plan/PROJECT_V6/reviews/A_0_4-live-profile-5_operator-evidence-request.md)
+ records the missing timing and turn-binding measurements. Trial 5 lacked later
+ metadata; the [latest trial 6 captures](../tests/gateway/fixtures/a04_live_profiles_trial6.json)
+diff --git a/gateway/src/adapters/base_adapter.js b/gateway/src/adapters/base_adapter.js
+index 5e813de..3c67130 100644
+--- a/gateway/src/adapters/base_adapter.js
++++ b/gateway/src/adapters/base_adapter.js
+@@ -234,6 +234,7 @@ function observe(run, target, provider, owned, phase = "ready") {
+     snapshot = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(raw);
+   } catch { throw submissionError("unknown_state"); }
+   return { ...classifyProviderPane(provider, snapshot, pane, phase), snapshot, buffer,
++    mode: pane.mode, inputOff: pane.inputOff, synchronized: pane.synchronized,
+     serverPid: fields[0], target, panePid: fields[2], width: fields[3], height: fields[4], cursorX: fields[5], cursorY: fields[6] };
+ }
+ 
+@@ -297,7 +298,35 @@ function freshCodexWork(ready, guard, after, prompt) {
+ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+ const boundedDelay = (value, fallback, max) => Number.isSafeInteger(value) && value >= 0 ? Math.min(value, max) : fallback;
+ 
+-export async function submitPrompt({ target, prompt, provider, config = {}, run = tmuxSync, wait = sleep }) {
++function freshClaudeResponse(spawn, ready, pending, guard, after, prompt) {
++  // Operator option 1: only a locally recorded fresh plain launch's first ask.
++  // This is the measured 2.1.293 single-line completed layout, not a turn ID.
++  const identity = ["serverPid", "target", "panePid", "width", "height"];
++  if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
++    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
++    || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
++    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
++  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
++  const rows = after.snapshot.split("\n");
++  if ([...prior, rows].some((lines) => lines.length !== 41 || lines[40] !== "")
++    || prior.some((lines) => lines.slice(0, 35).some((row) => row.trim() !== ""))
++    || rows[35] !== "─".repeat(120) || rows[37] !== rows[35]
++    || !/^❯\u00a0 *$/.test(rows[36])
++    || rows[38] !== prior[2][38]
++    || rows[39]?.trim() !== "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents") return false;
++  const echo = `❯ ${prompt}`;
++  const echoes = rows.slice(0, 35).map((row, index) => row.replace(/ +$/, "") === echo ? index : -1)
++    .filter((index) => index >= 0);
++  if (echoes.length !== 1) return false;
++  const index = echoes[0];
++  // A blank transcript excludes rendered prior turns and shifted/spoofed cells.
++  // Require exactly the measured user cell, gap, and printable assistant cell.
++  return index + 2 < 35 && /^● [\x21-\x7e][\x20-\x7e]*$/.test(rows[index + 2])
++    && rows.slice(0, 35).every((row, offset) => offset === index || offset === index + 2 || row.trim() === "")
++    && prior.every((lines) => rows.slice(0, index).every((row, offset) => row === lines[offset]));
++}
++
++export async function submitPrompt({ target, prompt, provider, config = {}, run = tmuxSync, wait = sleep, firstPromptProcess = null }) {
+   if (invalidText(prompt, true)) throw submissionError("invalid_text");
+   const pane = paneState(run, target);
+   target = pane.target;
+@@ -327,6 +356,10 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run
+       delivered = true;
+       await wait(boundedDelay(config.tmuxAskDelayMs, 1500, 5000));
+       const after = observe(run, target, provider, owned, "draft");
++      if (provider === "claude-code" && attempt === 0
++        && freshClaudeResponse(firstPromptProcess, ready, pending, guard, after, prompt)) {
++        return { snapshot: after.snapshot, dryRun: false };
++      }
+       if (after.state === "busy" && after.text === ""
+         && (provider !== "codex" || freshCodexWork(ready, guard, after, prompt))) {
+         return { snapshot: after.snapshot, dryRun: false };
+@@ -396,14 +429,39 @@ export function assertSafeCwd(cwd, allowedRoots) {
+ }
+ 
+ export class BaseAdapter {
++  #freshClaudeSpawns = new Map();
++
+   constructor({ id, config, registries }) {
+     this.id = id;
+     this.config = config;
+     this.registries = registries;
+   }
+ 
+-  submitPrompt({ tmuxTarget, prompt }) {
+-    return submitPrompt({ target: tmuxTarget, prompt, provider: this.id, config: this.config });
++  rememberFreshClaudeSpawn({ tmuxTarget, run = tmuxSync }) {
++    if (this.id !== "claude-code") return;
++    this.#freshClaudeSpawns.delete(tmuxTarget);
++    const owned = new Set();
++    let identity;
++    try {
++      const pane = paneState(run, tmuxTarget);
++      const observation = observe(run, pane.target, this.id, owned);
++      identity = Object.fromEntries(["serverPid", "target", "panePid", "width", "height"]
++        .map((key) => [key, observation[key]]));
++    } finally {
++      cleanupOwnedBuffers(run, owned, "transport_failed");
++    }
++    this.#freshClaudeSpawns.set(tmuxTarget, identity);
++  }
++
++  forgetFreshClaudeSpawn({ tmuxTarget }) {
++    this.#freshClaudeSpawns.delete(tmuxTarget);
++  }
++
++  submitPrompt({ tmuxTarget, prompt, run = tmuxSync, wait = sleep }) {
++    const firstPromptProcess = this.#freshClaudeSpawns.get(tmuxTarget);
++    // Consume synchronously, even on invalid input, refusal or concurrent ask.
++    this.#freshClaudeSpawns.delete(tmuxTarget);
++    return submitPrompt({ target: tmuxTarget, prompt, provider: this.id, config: this.config, run, wait, firstPromptProcess });
+   }
+ 
+   submitLaunchCommand({ tmuxTarget, line }) {
+diff --git a/gateway/src/adapters/claude_adapter.js b/gateway/src/adapters/claude_adapter.js
+index 24dcf9c..c179762 100644
+--- a/gateway/src/adapters/claude_adapter.js
++++ b/gateway/src/adapters/claude_adapter.js
+@@ -335,9 +335,15 @@ export class ClaudeAdapter extends BaseAdapter {
+       }).join(" ");
+ 
+       if (!dryRun) {
++        this.forgetFreshClaudeSpawn({ tmuxTarget });
+         if (!isTmuxAvailable()) throw new Error("tmux is required for claude supervised mode");
+         assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
+         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
++        // Only an unadorned executable path can establish a fresh plain launch.
++        // Configured shell wrappers/arguments may resume history: stay uncertain.
++        if (/^[A-Za-z0-9_./-]+$/.test(claudeBin(this.config))) {
++          this.rememberFreshClaudeSpawn({ tmuxTarget });
++        }
+       }
+ 
+       auditSessionStarted({ traceId, role, mode: "supervised", tmuxTarget });
+@@ -388,6 +394,7 @@ export class ClaudeAdapter extends BaseAdapter {
+   }
+ 
+   async kill({ tmuxTarget, traceId, role }) {
++    this.forgetFreshClaudeSpawn({ tmuxTarget });
+     const dryRun = isDryRun(this.config);
+     if (!dryRun) {
+       assertTmuxOk(tmuxSync(buildKillSessionCmd({ target: tmuxTarget })), "kill-session");
+diff --git a/tests/gateway/claude_first_prompt.test.js b/tests/gateway/claude_first_prompt.test.js
+new file mode 100644
+index 0000000..b6f193a
+--- /dev/null
++++ b/tests/gateway/claude_first_prompt.test.js
+@@ -0,0 +1,189 @@
++import { test } from "node:test";
++import assert from "node:assert/strict";
++import fs from "node:fs";
++import os from "node:os";
++import path from "node:path";
++import { BaseAdapter, submitPrompt } from "../../gateway/src/adapters/base_adapter.js";
++import { ClaudeAdapter } from "../../gateway/src/adapters/claude_adapter.js";
++import { configureAudit } from "../../gateway/src/core/audit.js";
++
++const [profile] = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial9.json", import.meta.url), "utf8"));
++const clone = (value) => structuredClone(value);
++const uncertain = (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED" && error.reason === "acceptance_uncertain";
++
++function harness(records = [profile.ready, profile.postPaste, profile.guard, profile.after]) {
++  let index = 0;
++  const buffers = new Map();
++  const inputs = [];
++  const run = (args, options = {}) => {
++    const observation = records[Math.min(index, records.length - 1)];
++    const { pane, submitState: state } = observation;
++    if (args[0] === "display-message") {
++      if (args.at(-1) === "#{version}") return { status: 0, stderr: "", stdout: Buffer.from("3.6a-agents.3\n") };
++      return { status: 0, stdout: args.at(-1).startsWith("#{pid}|")
++        ? `${state.serverPid}|${state.target}|${state.panePid}|${pane.width}|${pane.height}|${pane.cursorX}|${pane.cursor}\n`
++        : `${pane.target}|${pane.mode}|${pane.inputOff}|${pane.synchronized}|${pane.cursor}|${pane.height}|${pane.width}|${pane.cursorX}\n` };
++    }
++    if (args[0] === "list-commands") return { status: 0, stderr: "", stdout: Buffer.from("agents-submit-v1 -b buffer-name -t target-pane\npaste-buffer [-dGpr]\n") };
++    if (args[0] === "capture-pane") { buffers.set(args[args.indexOf("-b") + 1], Buffer.from(observation.snapshot)); index++; }
++    if (args[0] === "save-buffer") return { status: 0, stdout: buffers.get(args[2]) };
++    if (args[0] === "load-buffer") buffers.set(args[2], options.input);
++    if (args[0] === "paste-buffer") inputs.push(`\x1b[200~${buffers.get(args[args.indexOf("-b") + 1])}\x1b[201~`);
++    if (args[0] === "agents-submit-v1") { inputs.push("\r"); buffers.delete(args[2]); }
++    if (args[0] === "delete-buffer" && !buffers.delete(args[2])) return { status: 1, stderr: `unknown buffer: ${args[2]}\n` };
++    return { status: 0, stdout: "", stderr: "" };
++  };
++  const options = { target: "%1", tmuxTarget: "%1", prompt: profile.prompt, provider: "claude-code", run, wait: async () => {} };
++  const ask = (firstPromptProcess = profile.ready.submitState) => submitPrompt({ ...options, firstPromptProcess });
++  return { run, options, ask, inputs, buffers };
++}
++
++test("trial10 newly spawned Claude first prompt accepts the exact completed boundary frames with one Enter", async () => {
++  const fx = harness();
++  assert.equal((await fx.ask()).snapshot, profile.after.snapshot);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial10 completed cells without fresh spawn provenance remain uncertain without replay", async () => {
++  const fx = harness();
++  await assert.rejects(() => fx.ask(null), uncertain);
++  assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
++  assert.equal(fx.buffers.size, 0);
++});
++
++function replaceRow(observation, row, text) {
++  const rows = observation.snapshot.split("\n");
++  rows[row] = text;
++  observation.snapshot = rows.join("\n");
++}
++
++test("trial10 prior rendered conversation, hidden-history reuse and marker spoof cannot prove a first turn", async () => {
++  for (const prior of ["❯ Summarize this.", "● older answer", "old transcript", "✻ Cogitated for 1s"]) {
++    const records = clone([profile.ready, profile.postPaste, profile.guard, profile.after]);
++    for (const record of records.slice(0, 3)) replaceRow(record, 2, prior);
++    const fx = harness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
++    assert.equal(fx.buffers.size, 0);
++  }
++  // Identical completed cells restored from offscreen on a reused process have no spawn capability.
++  const fx = harness();
++  await assert.rejects(() => fx.ask(null), uncertain);
++});
++
++test("trial10 mismatched spawn ready guard or after identity cannot bind the completed response", async () => {
++  for (const stage of [0, 1, 2, 3]) {
++    for (const key of ["serverPid", "panePid", "target"]) {
++      const records = clone([profile.ready, profile.postPaste, profile.guard, profile.after]);
++      records[stage].submitState[key] = key === "target" ? "%2" : "999";
++      if (key === "target") records[stage].pane.target = "%2";
++      const fx = harness(records);
++      await assert.rejects(fx.ask, (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED");
++      assert.ok(fx.inputs.filter((input) => input === "\r").length <= 1);
++      assert.equal(fx.buffers.size, 0);
++    }
++  }
++  const fx = harness();
++  await assert.rejects(() => fx.ask({ ...profile.ready.submitState, panePid: "999" }), uncertain);
++});
++
++test("trial10 missing duplicate reflowed non-ASCII or spoofed cells and unsafe pane modes stay uncertain", async () => {
++  const changes = [
++    (after) => replaceRow(after, 6, ""),
++    (after) => replaceRow(after, 8, ""),
++    (after) => replaceRow(after, 9, `❯ ${profile.prompt}`),
++    (after) => replaceRow(after, 9, "● duplicate answer"),
++    (after) => replaceRow(after, 8, "● ❯ spoofed user turn"),
++    (after) => replaceRow(after, 8, "● héllo"),
++    (after) => replaceRow(after, 4, "shifted prefix"),
++    (after) => replaceRow(after, 36, "❯\u00a0unexpected draft"),
++    (after) => replaceRow(after, 39, "Select model"),
++    (after) => { after.pane.width = 119; },
++    (after) => { after.pane.cursorX = 3; },
++    (after) => { after.pane.mode = "1"; },
++    (after) => { after.pane.inputOff = "1"; },
++    (after) => { after.pane.synchronized = "1"; },
++  ];
++  for (const change of changes) {
++    const records = clone([profile.ready, profile.postPaste, profile.guard, profile.after]);
++    change(records[3]);
++    const fx = harness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++test("trial10 exact final draft guard is required before any Enter", async () => {
++  const records = clone([profile.ready, profile.postPaste, profile.guard, profile.after]);
++  replaceRow(records[2], 36, "❯\u00a0" + "x".repeat(profile.prompt.length));
++  const fx = harness(records);
++  await assert.rejects(fx.ask, (error) => error.reason === "unknown_state");
++  assert.equal(fx.inputs.includes("\r"), false);
++});
++
++test("trial10 adapter consumes fresh spawn eligibility on its first ask including failure", async () => {
++  for (const invalidFirst of [false, true]) {
++    const records = [profile.ready, ...Array(2).fill([profile.ready, profile.postPaste, profile.guard, profile.after]).flat()];
++    const fx = harness(records);
++    const adapter = new BaseAdapter({ id: "claude-code", config: {} });
++    adapter.rememberFreshClaudeSpawn({ tmuxTarget: "%1", run: fx.run });
++    if (invalidFirst) {
++      await assert.rejects(() => adapter.submitPrompt({ ...fx.options, prompt: "\x01" }), (error) => error.reason === "invalid_text");
++    } else {
++      assert.equal((await adapter.submitPrompt(fx.options)).snapshot, profile.after.snapshot);
++    }
++    await assert.rejects(() => adapter.submitPrompt(fx.options), uncertain);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++test("trial10 Claude spawn and ask wire first-prompt eligibility only after a successful plain launch", async () => {
++  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "a04-first-prompt-"));
++  const previousPath = process.env.PATH;
++  const previousDryRun = process.env.AGENTS_DRY_RUN;
++  try {
++    // A fake transport only: no Claude executable or live provider is launched.
++    fs.writeFileSync(path.join(directory, "tmux"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
++    process.env.PATH = `${directory}:${previousPath}`;
++    delete process.env.AGENTS_DRY_RUN;
++    configureAudit({ auditLog: path.join(directory, "audit.jsonl") });
++    const registries = {
++      getAgent: () => ({ reasoningEfforts: ["medium"], allowedClassifications: ["internal"], allowedRoles: ["coder"], requiresApprovalFor: [] }),
++      getRepo: () => null,
++      getRole: () => ({ allowActions: ["agent.spawn", "agent.ask"] }),
++      getProtectedBranches: () => [],
++    };
++    for (const variant of ["plain", "wrapper-arguments", "failed-launch", "dry-run"]) {
++      const fx = harness([profile.ready, ...Array(2).fill([profile.ready, profile.postPaste, profile.guard, profile.after]).flat()]);
++      const adapter = new ClaudeAdapter({ registries, config: { dryRun: variant === "dry-run", repoRoots: [directory],
++        claudeBin: variant === "wrapper-arguments" ? "claude --resume" : "claude" } });
++      let registered = 0;
++      adapter.submitLaunchCommand = async () => { if (variant === "failed-launch") throw new Error("launch failed"); };
++      adapter.rememberFreshClaudeSpawn = ({ tmuxTarget }) => {
++        registered++;
++        BaseAdapter.prototype.rememberFreshClaudeSpawn.call(adapter, { tmuxTarget, run: fx.run });
++      };
++      adapter.submitPrompt = (args) => BaseAdapter.prototype.submitPrompt.call(adapter, { ...args, run: fx.run, wait: async () => {} });
++      const spawn = () => adapter.spawn({ cwd: directory, traceId: `tr-first-${variant}`, role: "coder", model: "claude-opus-5-5", reasoningEffort: "medium" });
++      if (variant === "failed-launch") {
++        await assert.rejects(spawn, /launch failed/);
++        assert.equal(registered, 0);
++        continue;
++      }
++      const result = await spawn();
++      assert.equal(registered, variant === "plain" ? 1 : 0);
++      if (variant !== "plain") continue;
++      const ask = () => adapter.ask({ tmuxTarget: result.tmuxTarget, prompt: profile.prompt, traceId: "tr-first-plain", role: "coder" });
++      assert.equal((await ask()).snapshot, profile.after.snapshot);
++      await assert.rejects(ask, uncertain);
++      assert.equal(fx.buffers.size, 0);
++    }
++  } finally {
++    process.env.PATH = previousPath;
++    if (previousDryRun === undefined) delete process.env.AGENTS_DRY_RUN;
++    else process.env.AGENTS_DRY_RUN = previousDryRun;
++    fs.rmSync(directory, { recursive: true, force: true });
++  }
++});

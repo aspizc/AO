@@ -1,0 +1,9 @@
+{
+  "gateway/src/adapters/base_adapter.js": "c80a1ffc40460c4e7775ae48a71629bd525c5c956ce5a4992920019bcb6e8f4a",
+  "tests/gateway/prompt_submission.test.js": "84d23ddf7d7e3c662d6439d45d1296befae22c6e4a653d5882cdc430fa55ab18",
+  "tests/gateway/fixtures/a04_live_profiles_trial4.json": "a3afce8c57b9acaf4767ed7b124336a1ce915311ae560632889e9fd16870ac88",
+  "gateway/README.md": "5327e0dacffaa9da3120e647055cec5903088022bcd5e77e75d16e06f2a883e6",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-4-red.txt": "9e1ad71bd96d14924b238eef8400e7090819d8ace7b9666266bae9102f5fd9c0",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-4-green.txt": "21d1fa9fffd0411e73521ac52e04ea15169002103221e32b24dbcbcff4c8a957",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-4-source-delta.patch": "cd806014d4045498b9f34d46ef5dcf7711ea1aec3311bc5a4ba97184ecedb76f"
+}

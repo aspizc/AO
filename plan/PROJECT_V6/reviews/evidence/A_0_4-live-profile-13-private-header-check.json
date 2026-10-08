@@ -1,0 +1,13 @@
+{
+  "source": "workspace/root-a04-live-acceptance-result.json",
+  "capturesChecked": [
+    "preAskPane",
+    "errorPane",
+    "laterPane"
+  ],
+  "headerCwdStartsSlash": true,
+  "headerCwdStartsTilde": false,
+  "headerRows0Through3Identical": true,
+  "mascotRowsUnchanged": true,
+  "decision": "Retain absolute-path regex; no raw identifying cwd copied. No mascot animation observed in these three captures."
+}

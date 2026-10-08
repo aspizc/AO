@@ -1,0 +1,27 @@
+{
+  "candidateBinary": {
+    "path": "/tmp/ao-a04-f1-impl/build2/bin/tmux",
+    "sha256": "6487f795314828f9952cc5ee6fc83c6028beb54bdee28d42dc7c1329246ec386"
+  },
+  "mutants": {
+    "pid": {
+      "sourceSha256": "92d237b9bf98a196fcfe73fde941cd985b98feecbd32c84b148b68e56628bd61",
+      "binarySha256": "69f2661ce81884400aa105a526a1bda84747f25cf00725dea895d427e72bec15",
+      "removed": "pane_pid != wp->pid ||",
+      "replacement": "0 ||",
+      "sourceBaselineSha256": "789491bcab1673c330477cbf05c3a9636e995f0b83fb8fb6011205bc34c2aa98",
+      "redFailures": 2,
+      "assertion": "refusal delivers zero CR; observed one extra 0x0d in first and retry"
+    },
+    "framing": {
+      "sourceSha256": "f35bbbd64e677500402422f42d4cdb41443e1fc310b258489668261f78d2d171",
+      "binarySha256": "b64ea6baaac2c7410bf284c0ed823ed63fc75c870d501fa1795d78a5711f9aaf",
+      "removed": "!(wp->screen->mode & MODE_BRACKETPASTE)",
+      "replacement": "0",
+      "sourceBaselineSha256": "789491bcab1673c330477cbf05c3a9636e995f0b83fb8fb6011205bc34c2aa98",
+      "redFailures": 2,
+      "assertion": "refusal delivers zero CR; observed one extra 0x0d in first and retry"
+    }
+  },
+  "buildCommand": "docker run --rm --pull never --network none --user 1000:1000 --mount type=bind,src=/tmp/ao-a04-trial3,dst=/work node@sha256:0625f79a0c9f5005e31dba1761260b9f66ea8a3293e5f645eb4550a4c7dcdbb9 sh -ec 'cd /work/mutant-pid; YACC=true ./configure --disable-static > /work/pid-config.log 2>&1; make -j2 > /work/pid-build.log 2>&1; cd /work/mutant-framing; YACC=true ./configure --disable-static > /work/framing-config.log 2>&1; make -j2 > /work/framing-build.log 2>&1'"
+}
