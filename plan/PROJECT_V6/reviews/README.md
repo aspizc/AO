@@ -6,6 +6,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/03 existing V7 lineage | scope-1 | [request](A_0_3-scope-1_to_review.md) | [OK: two reviewed V7 foundations already integrated on selected release branch; no new runtime scope](A_0_3-scope-1_reviewed_OK.md) |
+| A/0/03 changelog candidate | changelog-1 | [request](A_0_3-changelog-1_to_review.md) | [OK: six V6 summaries and historical separation supported; settle already integrated V7 scope before candidate freeze](A_0_3-changelog-1_reviewed_OK.md) |
 | A/0/06 integration status | status-2 | [request](A_0_6-status-2_to_review.md) | [OK: original RED cites Trial 1, V6 status and gate claims supported; live provider check remains open](A_0_6-status-2_reviewed_OK.md) |
 | A/0/06 integration status | status-1 | [request](A_0_6-status-1_to_review.md) | [KO: RED checkbox cites Trial 8's narrow follow-up instead of Trial 1 original RED; all other status claims supported](A_0_6-status-1_reviewed_KO.md) |
 | A/0/06 permission prompts | 1 | [request](A_0_6-1_to_review.md) | [KO: unguarded recheck-then-send lets a changed prompt receive the approved key (reproduced on pinned tmux); use agents-submit-v1; 22/22 RED, 273/273 GREEN](A_0_6-1_reviewed_KO.md) |

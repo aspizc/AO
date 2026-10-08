@@ -5,16 +5,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 ## Unreleased
 
+## [1.1.0] - 2026-10-09
+
+- Added role-derived CLI write restrictions for Codex, Claude Code,
+  Antigravity, pi and OpenCode (A/0/00). Codex uses a read-only OS sandbox for
+  non-writers; the other providers use CLI tool restrictions. Claude,
+  Antigravity and OpenCode can still expose a shell that writes, so their
+  read-only profile is not an OS sandbox.
+- Added informational worker role, trace and task environment markers for
+  headless and supervised children (A/0/01). These markers do not grant
+  authority.
+- Added generic project setup, operator-local repository overlays, public
+  hygiene checks, reusable planning/review prompts and runnable examples
+  (A/0/02). Personal repository entries were removed from public profiles;
+  historical plan and audit records remain preserved.
+- Added guarded, provider-aware prompt submission for supervised children
+  (A/0/04), with bounded acceptance checks and explicit uncertain-delivery
+  errors.
+- Added bounded recovery of supervised sessions after a Gateway restart for
+  the same Linux principal, machine and private SQLite state (A/0/05).
+- Added detection and approval-bound one-time answers for supervised trust
+  and command-permission prompts (A/0/06). No command is auto-answered by
+  default, and the "don't ask again" option is never sent. The real-provider
+  automatic/manual approval acceptance remains open.
+- Added generic project profiles and deterministic preflight for wave
+  planning (PROJECT_V7 A/0/00). Automated wave dispatch remains planned.
 - Added cooperative local wave capacity accounting and `agent-run wave
   budget-init`: atomic count/provider/declared-memory reservations, immutable
-  host headroom, and retained charges for uncertain effects. This V7 foundation
-  does not implement automated wave dispatch or enforce OS memory limits.
+  host headroom, and retained charges for uncertain effects (PROJECT_V7
+  A/0/01). This foundation does not implement automated wave dispatch or
+  enforce OS memory limits.
 
-- Added additive operator-local repository overlays shared by the Gateway,
-  doctor and policy CLI; removed personal registrations from public profiles.
-- Added the required public hygiene check, generic planning/coding/review
-  prompts, and two runnable project examples. Automated wave scheduling
-  remains planned in PROJECT_V7.
+## Historical notes present in the 1.0.0 tag
 
 - Changed the public defaults to Codex `gpt-6.1-sol` / `max` / `priority`
   and Claude `claude-opus-5-5` / `max`, including the model-specific Codex
