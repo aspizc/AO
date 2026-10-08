@@ -1,0 +1,70 @@
+{
+  "A_0_6-7-focused-green.log": {
+    "tests": 303,
+    "pass": 303,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-mcp-scrubbed-green.log": {
+    "tests": 21,
+    "pass": 21,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-projection-green.log": {
+    "tests": 11,
+    "pass": 11,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-projection-red.log": {
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "skipped": 0
+  },
+  "A_0_6-7-reattach-green.log": {
+    "tests": 124,
+    "pass": 124,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-spawn-record-green.log": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-spawn-record-red.log": {
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "skipped": 0
+  },
+  "A_0_6-7-tick-green.log": {
+    "tests": 2,
+    "pass": 0,
+    "fail": 2,
+    "skipped": 0,
+    "evidenceStatus": "sandbox output failure; invalid as semantic RED/GREEN"
+  },
+  "A_0_6-7-tick-host-green.log": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "skipped": 0
+  },
+  "A_0_6-7-tick-host-red.log": {
+    "tests": 2,
+    "pass": 0,
+    "fail": 2,
+    "skipped": 0
+  },
+  "A_0_6-7-tick-red.log": {
+    "tests": 2,
+    "pass": 0,
+    "fail": 2,
+    "skipped": 0,
+    "evidenceStatus": "sandbox output failure; invalid as semantic RED/GREEN"
+  }
+}

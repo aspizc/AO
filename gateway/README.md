@@ -679,3 +679,84 @@ test infrastructure separately and returns nonzero. Existing Gateway processes
 keep their startup tool registry. Each client adopts the eight tools when it
 starts a new Gateway process (or reconnects in a mode that launches a fresh
 stdio process).
+
+### Supervised trust and permission prompts
+
+Codex and Claude Code supervised sessions watch the current visible pane once
+per second. `agent.view` also observes the pane and returns `promptApproval`
+with the approval ID, kind, exact rendered command, options and pane target.
+The request action is `session.prompt.command`, `session.prompt.trust`,
+`session.prompt.permission` or `session.prompt.unknown`. Approval requests are
+non-blocking; a human uses `approval.respond` to grant or deny them. Unknown
+menus always need manual operator intervention and never receive Gateway keys,
+even if their approval is granted.
+
+No commands are automatically answered by default. Only the operator may add
+`sessionPromptScopes` to a role in `policies/roles.json`, for example:
+
+```json
+{
+  "sessionPromptScopes": [
+    { "kind": "command", "command": "npm test", "action": "test.run" }
+  ]
+}
+```
+
+Each scope is an exact rendered-text match, including line breaks. The operator
+must classify the actual command with its canonical underlying action; a scope
+is not a shell parser and cannot infer the safety of arbitrary commands. The
+role must explicitly list both `session.prompt.command` and `test.run` in its
+`allowActions`; neither action may be denied or require approval for automatic
+answers. Additionally enable `session.prompt.command` in `AGENTS_AUTOAPPROVE`.
+Claude Bash dialogs use kind `permission` and action
+`session.prompt.permission`; folder trust uses kind `trust` and action
+`session.prompt.trust`. There are no wildcard scopes or implicit test/read-only
+scopes. Restricted repositories and underlying `NEVER_AUTO` actions remain
+human-only. These settings do not widen the child's CLI confinement.
+
+Human grants still respect role denies. An unmapped command conservatively
+requires the role's write authority; a read-only role needs an operator-defined
+exact scope with an allowed underlying action. Unknown commands receive no
+automatic classification. The Gateway never selects `p`, "always allow",
+"don't ask again", or "switch to auto mode". All three recognized prompt kinds
+confirm only the observed selected first one-time choice with a single guarded CR; no shortcut or ordinary key send is
+used.
+
+Before input, the separate approval-bound answer path uses the pinned tmux
+`3.6a-agents.3` runtime. It captures the current grid into a uniquely owned
+`agents-submit-<uuid>` buffer with `capture-pane -b ... -N -T`, then decodes
+those exact buffer bytes for the recognizer and approval binding check. The
+approval compare-and-set consumes the decision and persists a `promptAnswer`
+marker with `status: "in_flight"`, `outcome: "attempting"`, `response: "Enter"`,
+the target and `attemptedAt`. A write-ahead `SESSION_PROMPT_ANSWER_ATTEMPT`
+records `attempting` before the guard runs; an audit append failure sends nothing.
+The low-level
+`agents-submit-v1` operation atomically compares the evidence with the grid,
+server/pane PIDs, geometry, cursor and input modes, checks pending output, and
+enqueues only one CR. It never uses composer `submitPrompt` or plain
+`send-keys`. Missing runtime support fails closed. Owned evidence buffers are
+consumed or cleaned on every path.
+
+A known guard refusal records outcome `refused`; a timeout, unexpected failure
+or uncertain cleanup records `uncertain`. Neither is retried or emits
+`SESSION_PROMPT_ANSWERED`. Attempts record the command, approval ID, target,
+decider and outcome. The terminal result replaces only the exact in-flight
+payload through a compare-and-set. Only a confirmed successful guard whose
+terminal `sent` result was committed emits the answered event.
+
+Invalidated bindings and stopped sessions persist a terminal `promptAnswer`
+and audit `SESSION_PROMPT_INVALIDATED`. Never-consumed decisions use reason
+`prompt_no_longer_bound`. An unfinished in-flight or legacy consumed decision
+instead records `status: "not_answered"`, `outcome: "uncertain"` and reason
+`transport_uncertain_after_restart`: input may already have reached the child.
+This also applies when invalidating or stopping a watcher during delivery.
+An uncertain prompt is never re-answered automatically.
+Pending approvals expire instead of remaining grantable. Already granted rows
+retain their decision history and a visible terminal answer result. Both
+`approval.respond` and `approval.poll` return this `promptAnswer`. A human grant
+on an old ID reports `not_answered`, rather than silently accepting an unbound
+decision. Bindings are local to the active watcher; after a Gateway restart, an
+orphaned ID is invalidated when answered or granted. Ordinary approval wait
+listeners do not constitute prompt-answer authority. Viewing an explicitly
+reattached session starts a new observation/request. Root's live acceptance
+still owns verification with actual provider menus and operator policy scopes.

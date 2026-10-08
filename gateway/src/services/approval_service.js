@@ -14,6 +14,25 @@ export const NEVER_AUTO = new Set([
   "code.write.protected_branch",
 ]);
 
+// Dedicated bindings: approval.wait/event listeners are not answer authority.
+const promptResponders = new Map();
+export function registerPromptResponder(approvalId, handler) {
+  promptResponders.set(approvalId, handler);
+  return () => { if (promptResponders.get(approvalId) === handler) promptResponders.delete(approvalId); };
+}
+
+export function invalidatePromptApproval(approvalId, detail = "orphaned") {
+  const promptAnswer = { status: "not_answered", reason: "prompt_no_longer_bound", detail };
+  if (repo.recordPromptAnswer(approvalId, promptAnswer)) {
+    const row = repo.getApproval(approvalId);
+    const result = repo.promptAnswerResult(row);
+    auditAppend({ type: "SESSION_PROMPT_INVALIDATED", traceId: row.trace_id, approvalId,
+      reason: result.reason, outcome: result.outcome, detail });
+    approvalBus.emit(approvalId, poll({ approvalId }));
+  }
+  return repo.promptAnswerResult(repo.getApproval(approvalId)) || promptAnswer;
+}
+
 function noteSummary(note) {
   return String(note || "").slice(0, 500);
 }
@@ -107,9 +126,12 @@ export function respond({ approvalId, decision, decidedBy = null, note = null })
 
   const row = repo.getApproval(approvalId);
   if (!row) throw notFound(`approval ${approvalId} not found`);
-  if (row.status !== "pending") {
-    return { approvalId, status: row.status, decidedAt: row.decided_at, decidedBy: row.decided_by };
+  if (row.action.startsWith("session.prompt.") && decision === "granted"
+    && !promptResponders.has(approvalId) && (!repo.promptAnswerResult(row) || repo.hasUnfinishedPromptAttempt(row))) {
+    invalidatePromptApproval(approvalId);
+    return poll({ approvalId });
   }
+  if (row.status !== "pending") return poll({ approvalId });
 
   const updated = repo.decideApproval(approvalId, decision, decidedBy, note);
   auditAppend({
@@ -125,6 +147,9 @@ export function respond({ approvalId, decision, decidedBy = null, note = null })
     decidedAt: updated.decided_at,
     decidedBy: updated.decided_by,
   };
+  promptResponders.get(approvalId)?.(result);
+  const promptAnswer = repo.promptAnswerResult(repo.getApproval(approvalId));
+  if (promptAnswer) result.promptAnswer = promptAnswer;
   approvalBus.emit(approvalId, result);
   return result;
 }
@@ -132,11 +157,13 @@ export function respond({ approvalId, decision, decidedBy = null, note = null })
 export function poll({ approvalId }) {
   const row = repo.getApproval(approvalId);
   if (!row) return { error: "NOT_FOUND" };
+  const promptAnswer = repo.promptAnswerResult(row);
   return {
     approvalId,
     status: row.status,
     decidedAt: row.decided_at,
     decidedBy: row.decided_by,
+    ...(promptAnswer ? { promptAnswer } : {}),
   };
 }
 

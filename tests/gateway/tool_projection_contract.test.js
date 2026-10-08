@@ -158,3 +158,12 @@ test("review-note policy actions are not callable MCP tool names", () => {
     + JSON.stringify({ tool: "artifact.put.review_notes", arguments: {} }) + '\n```';
   assert.deepEqual(validateToolCallExamples(fictionalCall), ["example 1: unknown canonical tool"]);
 });
+
+test("prompt policy actions are not callable MCP tool names", () => {
+  const actions = ["session.prompt.command", "session.prompt.trust", "session.prompt.permission", "session.prompt.unknown"];
+  for (const action of actions) {
+    assert.deepEqual(validateToolReferences(`Policy action: ${action}`), [], "literal policy actions must remain usable in operator documentation");
+    const call = '```json mcp-tool-call\n' + JSON.stringify({ tool: action, arguments: {} }) + '\n```';
+    assert.deepEqual(validateToolCallExamples(call), ["example 1: unknown canonical tool"], "an action allowlist must never grant MCP callability");
+  }
+});

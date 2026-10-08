@@ -1,0 +1,28 @@
+{
+  "removedChildEnvironmentNames": [],
+  "results": [
+    {
+      "lane": "mcp-worker-env-removed",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "tests/gateway/otel_tool_spans.test.js",
+        "tests/gateway/registry_overlay.test.js",
+        "tests/e2e/mcp_two_agent_workflow.test.js"
+      ],
+      "exitCode": 1
+    },
+    {
+      "lane": "reattach-worker-env-removed",
+      "argv": [
+        "node",
+        "--test",
+        "tests/gateway/request_context_reattach.test.js"
+      ],
+      "exitCode": 1
+    }
+  ],
+  "pinnedTmux": "/tmp/a06-test-bin/tmux",
+  "tmuxTmpdir": "/tmp/ao-a06-trial6-tmux-qfg44gh1"
+}

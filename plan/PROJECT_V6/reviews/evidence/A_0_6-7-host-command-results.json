@@ -1,0 +1,85 @@
+{
+  "removedInheritedEnvironmentNames": [
+    "AGENTS_AGENT_TIMEOUT_MS",
+    "AGENTS_AUTOAPPROVE",
+    "AGENTS_CLAUDE_BIN",
+    "AGENTS_CODEX_BIN",
+    "AGENTS_CODEX_SANDBOX",
+    "AGENTS_COORDINATION_REDIS_URL",
+    "AGENTS_DRY_RUN",
+    "AGENTS_POLICIES_DIR",
+    "AGENTS_REPOSITORIES_OVERLAY",
+    "AGENTS_REPO_ROOTS",
+    "AGENTS_REQUEST_PRINCIPAL_AGENT",
+    "AGENTS_REQUEST_PRINCIPAL_ROLE",
+    "AGENTS_WORKSPACE"
+  ],
+  "pinnedTmux": "/tmp/a06-test-bin/tmux",
+  "tmuxTmpdir": "/tmp/ao-a06-trial7-green-tmux-hyaqf8f0",
+  "results": [
+    {
+      "lane": "spawn-record-green",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=spawn record-failure",
+        "tests/gateway/request_context_reattach.test.js"
+      ],
+      "exitCode": 0
+    },
+    {
+      "lane": "reattach-green",
+      "argv": [
+        "node",
+        "--test",
+        "tests/gateway/request_context_reattach.test.js"
+      ],
+      "exitCode": 0
+    },
+    {
+      "lane": "mcp-scrubbed-green",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "tests/gateway/otel_tool_spans.test.js",
+        "tests/gateway/registry_overlay.test.js",
+        "tests/e2e/mcp_two_agent_workflow.test.js"
+      ],
+      "exitCode": 0
+    },
+    {
+      "lane": "focused-green",
+      "argv": [
+        "node",
+        "--test",
+        "tests/gateway/claude_first_prompt.test.js",
+        "tests/gateway/prompt_submission.test.js",
+        "tests/gateway/prompt_submission_capture.test.js",
+        "tests/gateway/session_prompt.test.js",
+        "tests/gateway/session_prompt_crash.test.js",
+        "tests/gateway/session_prompt_guard.test.js",
+        "tests/gateway/session_prompt_transport.test.js",
+        "tests/gateway/autoapprove_mechanism.test.js",
+        "tests/gateway/approval_service.test.js",
+        "tests/gateway/tool_agent.test.js",
+        "tests/gateway/tool_approval.test.js",
+        "tests/gateway/approval_state.test.js",
+        "tests/gateway/approval_wait.test.js",
+        "tests/gateway/tool_catalog.test.js"
+      ],
+      "exitCode": 0
+    },
+    {
+      "lane": "full-lint-green",
+      "argv": [
+        "npm",
+        "--prefix",
+        "gateway",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

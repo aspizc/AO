@@ -1,3 +1,4 @@
+import { captureSessionPrompt, answerSessionPrompt } from "./session_prompt.js";
 import fs from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
@@ -778,6 +779,18 @@ export class BaseAdapter {
   auditPromptSubmission({ traceId, role, tmuxTarget, prompt }) {
     auditAppend({ type: "SESSION_INPUT", traceId, agent: this.id, role,
       tmuxTarget, promptLength: prompt.length, submitted: true });
+  }
+
+  capturePrompt({ tmuxTarget }) {
+    this.checkEnabled();
+    if (this.config?.dryRun || process.env.AGENTS_DRY_RUN === "1") return null;
+    return captureSessionPrompt({ tmuxTarget });
+  }
+
+  answerPrompt(args) {
+    this.checkEnabled();
+    if (this.config?.dryRun || process.env.AGENTS_DRY_RUN === "1") return false;
+    return answerSessionPrompt(args);
   }
 
   async delegate(_args) {

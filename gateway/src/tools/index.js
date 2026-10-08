@@ -61,6 +61,7 @@ export function getToolRegistry({
     value() {
       if (!closePromise) {
         closePromise = Promise.resolve().then(async () => {
+          agentService.close();
           if (typeof coordination?.close === "function") {
             await coordination.close();
           }

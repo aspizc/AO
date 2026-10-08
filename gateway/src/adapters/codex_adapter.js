@@ -22,6 +22,58 @@ import {
   assertServerOwnedExecutionBinding,
 } from "../core/request_context.js";
 
+// Complete observed menu shapes only; all other waiting menus are unknown.
+export function recognizeCodexPrompt(snapshot) {
+  if (typeof snapshot !== "string" || Array.from(snapshot).some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 8 || (code >= 11 && code <= 31);
+  })) return null;
+  const rows = snapshot.split("\n").map((row) => row.trimEnd());
+  const commandTitle = rows.findLastIndex((row) => row.trim() === "Would you like to run the following command?");
+  if (commandTitle >= 0) {
+    const tail = rows.slice(commandTitle);
+    const menu = tail.findIndex((row) => /^\s*› 1\. Yes, proceed \(y\)$/.test(row));
+    if (menu < 0) return null;
+    const persistent = /^\s*2\. Yes, and don't ask again for (?:this exact command|commands that start with .+) \(p\)$/.test(tail[menu + 1] || "");
+    const denyIndex = menu + (persistent ? 2 : 1);
+    if (!(new RegExp(`^\\s*${persistent ? 3 : 2}\\. No, and tell Codex what to do differently \\(esc\\)$`)).test(tail[denyIndex] || "")
+      || tail.slice(denyIndex + 1).some((row) => row.trim() && row.trim() !== "Press enter to confirm or esc to cancel")) return null;
+    const start = tail.findIndex((row) => /^ {2}\$ \S/.test(row));
+    if (start < 1 || start >= menu) return null;
+    const context = tail.slice(1, start).filter((row) => row.trim());
+    if (context.length && (!/^ {2}Environment: \S/.test(context[0])
+      || !/^ {2}Reason: \S/.test(context[1] || "")
+      || context.slice(2).some((row) => !/^ {2}\S/.test(row)))) return null;
+    const commandRows = tail.slice(start, menu);
+    while (commandRows.at(-1)?.trim() === "") commandRows.pop();
+    if (commandRows.some((row) => !/^ {2}/.test(row))) return null;
+    // Preserve rendered line breaks; never guess whether a row was shell input
+    // or terminal wrapping. Scope matching binds this exact rendered text.
+    const command = commandRows.map((row, index) => row.slice(index === 0 ? 4 : 2)).join("\n");
+    return { kind: "command", command, options: persistent ? ["y", "p", "esc"] : ["y", "esc"] };
+  }
+  const folder = rows.findLastIndex((row) => row.trim() === "Folder access");
+  if (folder >= 0) {
+    const tail = rows.slice(folder);
+    const menu = tail.findIndex((row) => /^\s*› 1\. Trust and continue$/.test(row));
+    const explanation = tail.slice(2, menu).map((row) => row.trim()).filter(Boolean).join(" ");
+    if (menu < 0 || !/^ {2}\/\S+$/.test(tail[1] || "")
+      || explanation !== "Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings can run code automatically, even without a model request. Continue only if you trust these files. Your trust decision will be saved."
+      || !/^\s*2\. Quit$/.test(tail[menu + 1] || "")
+      || tail.slice(menu + 2).some((row) => row.trim() && row.trim() !== "enter continue · esc quit")) return null;
+    return { kind: "trust", command: tail[1].slice(2), options: ["1", "2"] };
+  }
+  const trustTitle = rows.findLastIndex((row) => row.trim() === "Do you trust the contents of this directory?");
+  if (trustTitle < 0) return null;
+  const tail = rows.slice(trustTitle);
+  const menu = tail.findIndex((row) => /^\s*› 1\. Yes, proceed$/.test(row));
+  const paths = tail.slice(1, menu).filter((row) => row.trim());
+  if (menu < 0 || paths.length !== 1 || !/^ {2}\/[^\r\n]+$/.test(paths[0])
+    || !/^\s*2\. No, quit$/.test(tail[menu + 1] || "")
+    || tail.slice(menu + 2).some((row) => row.trim() && row.trim() !== "Press enter to confirm or esc to cancel")) return null;
+  return { kind: "trust", command: paths[0].slice(2), options: ["1", "2"] };
+}
+
 const AGENT_ID = "codex";
 const DEFAULT_TIMEOUT_MS = 600_000;
 
@@ -469,6 +521,8 @@ export class CodexAdapter extends BaseAdapter {
       throw err;
     }
   }
+
+  recognizePrompt(snapshot) { return recognizeCodexPrompt(snapshot); }
 
   async view({ tmuxTarget } = {}) {
     this.checkEnabled();

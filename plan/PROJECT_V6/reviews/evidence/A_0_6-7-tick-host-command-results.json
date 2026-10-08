@@ -1,0 +1,42 @@
+{
+  "redProductCommit": "7ac9438172be74661273c0aaa76b5cfb451fa6e9",
+  "removedInheritedEnvironmentNames": [
+    "AGENTS_AGENT_TIMEOUT_MS",
+    "AGENTS_AUTOAPPROVE",
+    "AGENTS_CLAUDE_BIN",
+    "AGENTS_CODEX_BIN",
+    "AGENTS_CODEX_SANDBOX",
+    "AGENTS_COORDINATION_REDIS_URL",
+    "AGENTS_DRY_RUN",
+    "AGENTS_POLICIES_DIR",
+    "AGENTS_REPOSITORIES_OVERLAY",
+    "AGENTS_REPO_ROOTS",
+    "AGENTS_REQUEST_PRINCIPAL_AGENT",
+    "AGENTS_REQUEST_PRINCIPAL_ROLE",
+    "AGENTS_WORKSPACE"
+  ],
+  "results": [
+    {
+      "lane": "tick-host-red",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=watcher tick",
+        "tests/gateway/session_prompt.test.js"
+      ],
+      "cwd": "/tmp/ao-a06-trial7-tick-red-3cwb0joy",
+      "exitCode": 1
+    },
+    {
+      "lane": "tick-host-green",
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=watcher tick",
+        "tests/gateway/session_prompt.test.js"
+      ],
+      "cwd": "/home/carase/git/personal/AO/workspace/clones/wt-v6-a06",
+      "exitCode": 0
+    }
+  ]
+}

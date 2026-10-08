@@ -1,0 +1,43 @@
+{
+  "baseHead": "5570d182e7fd8bf88f6513e5e9a2aa9f34ffb998",
+  "trial1HandoffSha256": "ecafbf16c28cb0812be75ba76d9e9597286ef1bb051ad1720ca5f75a2ece6a80",
+  "trial1CandidateManifestSha256": "7d659e7fd147aa07194042eeb725c47d70b8bdc87a08d33af23854258f1f52b0",
+  "pinnedTmuxSha256": "6487f795314828f9952cc5ee6fc83c6028beb54bdee28d42dc7c1329246ec386",
+  "candidateFiles": {
+    "ci/suites.json": "ca6a45db602d4d2bee73f527319d613214c058f2b4f91d9005af5639d4be8dbf",
+    "gateway/README.md": "425f5ded5101c34ca694c37027e61de77d0ee542df5d0036128220e2f0343672",
+    "gateway/src/adapters/base_adapter.js": "e2bdec2746dde123fea9f1efd4ccfe98852a998f9acf0015446eeea28df66e4b",
+    "gateway/src/adapters/claude_adapter.js": "5726d6df7e7307aa6e2902210aae9fa0b39d4aabf4585594332b0a7a910bf9fe",
+    "gateway/src/adapters/codex_adapter.js": "32dc67c4fa213a8e5c1368db791deab258999b460fcc7c3c37cc7cd1b80c7188",
+    "gateway/src/adapters/session_prompt.js": "c31cc550457ef03d305da579463a0ad67512e55ceeae4739c9c67fa766c850c0",
+    "gateway/src/core/policy_types.js": "d977e65f84a78a8956f1f936f3c5dd5ddc4c77d5ac0bcdda0ccb5be8cfd638a2",
+    "gateway/src/core/repositories/approval_repo.js": "d80e1d397e053b7654dc086a354663092043d4f355cc2e65a89959328d9c91c9",
+    "gateway/src/services/agent_service.js": "7212c9f6450a17b07bfd3722b12a516befc0f336650ca2f84f412434f3d4e97b",
+    "gateway/src/services/approval_service.js": "9b75fe50164936d5192dd6d753ee9d9c009982ff543c2d251164e22b49b0399b",
+    "gateway/src/services/session_prompt_service.js": "c2a70effc1222d186c1dcf622bbf1e68fe7034281ff1c5cc258385e3e571ef2d",
+    "gateway/src/tools/index.js": "7a9f3030bb4737632695b17a56258375411b68596f9df004bbd990cd461e7568",
+    "tests/gateway/fixtures/session_prompts/README.json": "1f31419125ed0ca4469fae9e01ffc37c25783d8bb243997ffb0e1bb506318fbe",
+    "tests/gateway/fixtures/session_prompts/claude-permission.txt": "d76f82d4bace047cd19900438824e3331588f1e797307dab3c191cd4c2f86d8e",
+    "tests/gateway/fixtures/session_prompts/codex-command.txt": "92add895ad0cce21cf99425ff4e21351781a050aa5e07e0535f63831b3baebcd",
+    "tests/gateway/fixtures/session_prompts/codex-trust.txt": "3802c8c1de95bacbd656b12dc4f51d56995ee6ebeeb24a68859f2ac4798bdf7c",
+    "tests/gateway/session_prompt.test.js": "2b8ad6ddc0655d8943840bea7461f544f08b54712356a99a249c4502fd6e403e",
+    "tests/gateway/session_prompt_guard.test.js": "6969564191fb094d4159b43a28f630ed761708b382b032f85182b78da5b85b26",
+    "tests/gateway/session_prompt_race_fixture.py": "560316e341905ac5f549da3e0757c881bbe67ddef0636656c402a24c689e2eb5",
+    "tests/gateway/session_prompt_transport.test.js": "387bde88a8fe29f9a44533599e18e4ef10ac4ccb1e99fae47fa8b9b40fdb870b",
+    "tests/gateway/session_prompt_transport_fixture.js": "3febbd973739caacf0ac83ce2c0c56ee5cdfec11abdccf1f914a35a77c8ce071"
+  },
+  "evidenceFiles": {
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-trial1-input-sha256.json": "7d659e7fd147aa07194042eeb725c47d70b8bdc87a08d33af23854258f1f52b0",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-lifecycle-red.log": "23247b4317c12caa05d44770bcb224640e5ba6382ab3e42495e2347fd4da6317",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-transport-red.log": "d44923757ee2fc7cfcfabbcba5d7c74927d68928f19faf520573effb496a8dd8",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-real-tmux-red.log": "2e40b0bd98663ed01d4f3c4e884770c976f536a04b7aec8585ff45e7f9c8e742",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-real-tmux-green.log": "a18160a28bc27947b1d3d69659a5d8c61078e305651c0f5dcc7dc59dcc10ef1d",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-terminal-outcomes-replay-red.log": "171cbb7e7638195fa75231dc28e54ee8aee63ee1aa2b5a8cb8c64f11a1b0e524",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-terminal-outcomes-replay-green.log": "38eccffdfe4a60a9ee8315f3c6278dd5c6fc94918dc623279e7e2031699afe37",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-final-focused-green.log": "c6c65312dc42c79bd293cfc5caa4262046e243e3e0ebbde89f61aca9e7f0c742",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-python-lint.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-final-inventory-validation.log": "41dc6ba14508349323b0358620003754e7eaa9f373c4076fae9b77112af77581",
+    "plan/PROJECT_V6/reviews/evidence/A_0_6-2-sealed-diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

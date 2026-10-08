@@ -1,0 +1,18 @@
+{
+  "ci/suites.json": "31f57f7c7c4e7c74b58e372cd3e32db2cbf48b7d335a4f27c0c40b76c752b2e5",
+  "gateway/README.md": "9439c871f9d26db012408617eae6d6ae5ca3e5186286e2866cd94524aa7dbac0",
+  "gateway/src/adapters/base_adapter.js": "e2bdec2746dde123fea9f1efd4ccfe98852a998f9acf0015446eeea28df66e4b",
+  "gateway/src/adapters/claude_adapter.js": "5726d6df7e7307aa6e2902210aae9fa0b39d4aabf4585594332b0a7a910bf9fe",
+  "gateway/src/adapters/codex_adapter.js": "32dc67c4fa213a8e5c1368db791deab258999b460fcc7c3c37cc7cd1b80c7188",
+  "gateway/src/adapters/session_prompt.js": "46e35ee60a262634fe74f15d8fd61c9c5ab7edc66ff31a1da14c40e58fab650f",
+  "gateway/src/core/policy_types.js": "d977e65f84a78a8956f1f936f3c5dd5ddc4c77d5ac0bcdda0ccb5be8cfd638a2",
+  "gateway/src/core/repositories/approval_repo.js": "861ee21b020b5f5f819e689c23cd9838b734951202a7dee439856c26953c2b05",
+  "gateway/src/services/agent_service.js": "7212c9f6450a17b07bfd3722b12a516befc0f336650ca2f84f412434f3d4e97b",
+  "gateway/src/services/session_prompt_service.js": "d078cbf1464ebc4ee632bbbad2c0042a23d2250e0139ce144a5a4eef462e7a27",
+  "gateway/src/tools/index.js": "7a9f3030bb4737632695b17a56258375411b68596f9df004bbd990cd461e7568",
+  "tests/gateway/fixtures/session_prompts/README.json": "1f31419125ed0ca4469fae9e01ffc37c25783d8bb243997ffb0e1bb506318fbe",
+  "tests/gateway/fixtures/session_prompts/claude-permission.txt": "d76f82d4bace047cd19900438824e3331588f1e797307dab3c191cd4c2f86d8e",
+  "tests/gateway/fixtures/session_prompts/codex-command.txt": "92add895ad0cce21cf99425ff4e21351781a050aa5e07e0535f63831b3baebcd",
+  "tests/gateway/fixtures/session_prompts/codex-trust.txt": "3802c8c1de95bacbd656b12dc4f51d56995ee6ebeeb24a68859f2ac4798bdf7c",
+  "tests/gateway/session_prompt.test.js": "4fcd3541ac24270357a7bc1fc11dbf494098c7756b9efe744cf73176da039ad0"
+}

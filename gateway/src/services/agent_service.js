@@ -1,3 +1,4 @@
+import { createSessionPromptWatcher } from "./session_prompt_service.js";
 import { settleRequestLaunch, transferRequestLaunch } from "../adapters/request_launch_cleanup.js";
 import { types as utilTypes } from "node:util";
 
@@ -562,7 +563,9 @@ export function createAgentService({
     }
   }
   const codexSandbox = configuredCodexSandbox(config);
+  const promptWatcher = createSessionPromptWatcher({ adapters, registries, config });
   return {
+    close() { promptWatcher.close(); },
     async delegate({
       agent,
       role,
@@ -759,7 +762,9 @@ export function createAgentService({
         return transferRequestLaunch(launched, Object.freeze({
           ...result,
           effectiveSelection,
-        }));
+        }), () => {
+          if (!result.dryRun && execution.taskId) promptWatcher.watch(result.sessionId);
+        });
       } catch (err) {
         try { await settleRequestLaunch(launched, false); } catch (cleanupError) {
           auditServiceError({ traceId, where: "agent.spawn.cleanup", err: cleanupError });
@@ -799,6 +804,11 @@ export function createAgentService({
       const result = await adapters.get(row.agent).view({ tmuxTarget: row.tmux_target });
       revalidateRequestContextBinding(requestBinding);
       bestEffortInterventionCheck({ sessionId, currentSnapshot: result.snapshot, traceId });
+      if (!result.dryRun) {
+        const promptApproval = promptWatcher.observe({ sessionId });
+        promptWatcher.watch(sessionId);
+        if (promptApproval) return { ...result, promptApproval };
+      }
       return result;
     },
 
@@ -811,6 +821,7 @@ export function createAgentService({
         role: row.role,
       });
       revalidateRequestContextBinding(requestBinding);
+      promptWatcher.stop(sessionId);
       sessionRepo.setSessionStatus(sessionId, "closed", nowIso());
       return result;
     },

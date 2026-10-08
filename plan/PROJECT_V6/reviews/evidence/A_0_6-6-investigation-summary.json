@@ -1,0 +1,68 @@
+{
+  "commit": "7ac9438172be74661273c0aaa76b5cfb451fa6e9",
+  "fullGateLog": "/tmp/ao-v6-a06-gate-7ac9438.log",
+  "fullGateLogSha256": "b8704bacb3040a7e86121dd950f1b57d9e665b542b010163bc55dbdeeb465164",
+  "fullGateExitCode": 1,
+  "fullGateCounts": {
+    "failed": 6,
+    "passed": 3303,
+    "skipped": 12,
+    "tests": 3321
+  },
+  "redisLane": {
+    "classification": "required",
+    "counts": {
+      "failed": 0,
+      "passed": 22,
+      "skipped": 0,
+      "tests": 22
+    },
+    "errors": [],
+    "id": "test.redis-live",
+    "infrastructureUnavailable": [],
+    "status": "passed"
+  },
+  "targetedResults": {
+    "mcp-worker-env-removed": {
+      "tests": 21,
+      "pass": 17,
+      "fail": 4,
+      "skipped": 0
+    },
+    "reattach-worker-env-removed": {
+      "tests": 125,
+      "pass": 124,
+      "fail": 1,
+      "skipped": 0
+    },
+    "baseline-mcp": {
+      "tests": 21,
+      "pass": 17,
+      "fail": 4,
+      "skipped": 0
+    },
+    "baseline-reattach": {
+      "tests": 124,
+      "pass": 124,
+      "fail": 0,
+      "skipped": 0
+    },
+    "docs-red": {
+      "tests": 10,
+      "pass": 9,
+      "fail": 1,
+      "skipped": 0
+    },
+    "docs-green": {
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "attribution": {
+    "mcpE2e": "Same four failures reproduced on pre-A06 c0405b1; no AGENTS_WORKER_* variables present, so removal hypothesis was not confirmed.",
+    "reattach": "Candidate-only async teardown regression reproduced; pre-A06 124/124 pass. Runtime code left unchanged.",
+    "publicDocs": "Candidate README action references triggered tool validator; wording-only correction passes all 10 tests."
+  }
+}

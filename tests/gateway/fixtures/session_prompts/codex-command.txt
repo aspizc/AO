@@ -1,0 +1,24 @@
+› Implement V6 A/0/06 in this clean worktree from 7982e42. Read AGENTS.md, pla… 
+                                                                                
+• Running ln -s /tmp/a06-fixturexxxxxxxxxxxxxxxxxx .venv …                      
+    + Show details                                                              
+                                                                                
+                                                                                
+  Would you like to run the following command?                                  
+                                                                                
+  Environment: local                                                            
+                                                                                
+  Reason: May I run the sheet's focused verification suite on the host, where   
+  Node's test worker can run correctly?                                         
+                                                                                
+  $ ln -s /tmp/a06-fixturexxxxxxxxxxxxxxxxxx .venv                              
+  node --test tests/gateway/*prompt*.test.js                                    
+  tests/gateway/autoapprove_mechanism.test.js                                   
+  tests/gateway/approval_service.test.js >                                      
+  plan/PROJECT_V6/reviews/evidence/A_0_6-1-green.log 2>&1                       
+                                                                               
+                                                                               
+› 1. Yes, proceed (y)                                                           
+  2. No, and tell Codex what to do differently (esc)
+                                                                                
+  Press enter to confirm or esc to cancel                                       

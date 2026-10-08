@@ -1,0 +1,7 @@
+{
+  "sourceKind": "Operator-provided live raw pane captures with pinned tmux capture-pane -p -N -T; absolute private paths replaced by benign ASCII paths of equal length. All other rendered bytes retained. Provider answering is not verified by these captures.",
+  "providers": {
+    "codex": "operator capture",
+    "claude-code": "2.1.294"
+  }
+}
