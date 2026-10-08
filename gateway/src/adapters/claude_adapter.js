@@ -12,6 +12,7 @@ import { append as auditAppend } from "../core/audit.js";
 import {
   evaluate,
   resolveAgentExecutionProfile,
+  resolveCliWriteAccess,
 } from "../core/policy_engine.js";
 import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
 import {
@@ -30,7 +31,7 @@ function claudeBin(config) {
   return config?.claudeBin || process.env.AGENTS_CLAUDE_BIN || "claude";
 }
 
-function buildClaudeArgs({ model = null, reasoningEffort = null, prompt = null } = {}) {
+function buildClaudeArgs({ model = null, reasoningEffort = null, writeAccess, prompt = null } = {}) {
   const args = [
     "--print",
     "--output-format",
@@ -41,14 +42,16 @@ function buildClaudeArgs({ model = null, reasoningEffort = null, prompt = null }
   ];
   if (model) args.push("--model", model);
   if (reasoningEffort) args.push("--effort", reasoningEffort);
+  if (!writeAccess) args.push("--disallowedTools", "Edit", "Write", "NotebookEdit");
   if (prompt !== null) args.push(prompt);
   return args;
 }
 
-function buildClaudeLaunch(config, { model = null, reasoningEffort = null } = {}) {
+function buildClaudeLaunch(config, { model = null, reasoningEffort = null, writeAccess } = {}) {
   const launch = [claudeBin(config)];
   if (model) launch.push("--model", model);
   if (reasoningEffort) launch.push("--effort", reasoningEffort);
+  if (!writeAccess) launch.push("--disallowedTools", "Edit", "Write", "NotebookEdit");
   return launch;
 }
 
@@ -66,13 +69,14 @@ function effectiveModel(decision, consumer) {
   };
 }
 
-function auditSessionStarted({ traceId, role, mode, tmuxTarget = null }) {
+function auditSessionStarted({ traceId, role, mode, writeAccess, tmuxTarget = null }) {
   auditAppend({
     type: "SESSION_STARTED",
     traceId,
     agent: AGENT_ID,
     role,
     mode,
+    writeAccess,
     tmuxTarget,
   });
 }
@@ -206,12 +210,13 @@ export class ClaudeAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: AGENT_ID, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "delegate");
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
-      auditSessionStarted({ traceId, role, mode: "headless" });
+      auditSessionStarted({ traceId, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
         const result = {
@@ -225,6 +230,7 @@ export class ClaudeAdapter extends BaseAdapter {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
           effectiveSelection: decision.effectiveSelection,
+          writeAccess,
         };
         auditSessionClosed({ traceId, role, mode: "headless", exitCode: result.exitCode });
         return result;
@@ -235,6 +241,7 @@ export class ClaudeAdapter extends BaseAdapter {
         buildClaudeArgs({
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
+          writeAccess,
           prompt,
         }),
         {
@@ -251,6 +258,7 @@ export class ClaudeAdapter extends BaseAdapter {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
       auditSessionClosed({ traceId, role, mode: "headless", exitCode: result.exitCode });
       return result;
@@ -317,6 +325,7 @@ export class ClaudeAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: AGENT_ID, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
@@ -332,6 +341,7 @@ export class ClaudeAdapter extends BaseAdapter {
       const launchCommand = buildClaudeLaunch(this.config, {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
+        writeAccess,
       }).join(" ");
 
       if (!dryRun) {
@@ -346,7 +356,7 @@ export class ClaudeAdapter extends BaseAdapter {
         }
       }
 
-      auditSessionStarted({ traceId, role, mode: "supervised", tmuxTarget });
+      auditSessionStarted({ traceId, role, writeAccess, mode: "supervised", tmuxTarget });
       return {
         sessionId: tmuxTarget,
         tmuxTarget,
@@ -354,6 +364,7 @@ export class ClaudeAdapter extends BaseAdapter {
         launchCommand,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
     } catch (err) {
       if (

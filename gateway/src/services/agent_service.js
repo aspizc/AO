@@ -3,6 +3,7 @@ import { types as utilTypes } from "node:util";
 import { newSessionId } from "../core/ids.js";
 import {
   evaluate,
+  resolveCliWriteAccess,
   selectionDenialDecision,
 } from "../core/policy_engine.js";
 import {
@@ -267,6 +268,7 @@ const SPAWN_RESULT_FIELDS = Object.freeze([
   "launchCommand",
   "dryRun",
   "effectiveSelection",
+  "writeAccess",
 ]);
 
 const ADAPTER_RESULT_FIELDS = Object.freeze({
@@ -280,6 +282,7 @@ const ADAPTER_RESULT_FIELDS = Object.freeze({
       "reasoningEffort",
       "serviceTier",
       "effectiveSelection",
+      "writeAccess",
       "sandbox",
     ]),
     spawn: SPAWN_RESULT_FIELDS,
@@ -293,6 +296,7 @@ const ADAPTER_RESULT_FIELDS = Object.freeze({
       "model",
       "reasoningEffort",
       "effectiveSelection",
+      "writeAccess",
     ]),
     spawn: SPAWN_RESULT_FIELDS,
   }),
@@ -305,6 +309,7 @@ const ADAPTER_RESULT_FIELDS = Object.freeze({
       "model",
       "reasoningEffort",
       "effectiveSelection",
+      "writeAccess",
     ]),
     spawn: SPAWN_RESULT_FIELDS,
   }),
@@ -317,6 +322,7 @@ const ADAPTER_RESULT_FIELDS = Object.freeze({
       "model",
       "reasoningEffort",
       "effectiveSelection",
+      "writeAccess",
     ]),
     spawn: SPAWN_RESULT_FIELDS,
   }),
@@ -329,6 +335,7 @@ const ADAPTER_RESULT_FIELDS = Object.freeze({
       "model",
       "reasoningEffort",
       "effectiveSelection",
+      "writeAccess",
     ]),
     spawn: SPAWN_RESULT_FIELDS,
   }),
@@ -433,6 +440,7 @@ function assertAdapterSelectionResult(
   result,
   effectiveSelection,
   codexSandbox,
+  writeAccess,
 ) {
   const provider = effectiveSelection.provider;
   const requiredFields = ADAPTER_RESULT_FIELDS[provider]?.[operation];
@@ -463,6 +471,8 @@ function assertAdapterSelectionResult(
   if (
     !Object.hasOwn(normalized, "effectiveSelection")
     || normalized.effectiveSelection !== effectiveSelection
+    || typeof normalized.writeAccess !== "boolean"
+    || normalized.writeAccess !== writeAccess
   ) {
     rejectInvalidSelection();
   }
@@ -559,6 +569,10 @@ export function createAgentService({
           codexSandbox,
           "delegate",
         );
+        const writeAccess = resolveCliWriteAccess({
+          agent: execution.agent, role: execution.role, repo: execution.repositoryId,
+        }, registries);
+        const effectiveCodexSandbox = writeAccess ? codexSandbox : "read-only";
         const adapter = adapters.get(execution.agent);
         const adapterResult = await withTimeout(
           adapter.delegate({
@@ -581,7 +595,8 @@ export function createAgentService({
           "delegate",
           adapterResult,
           effectiveSelection,
-          codexSandbox,
+          effectiveCodexSandbox,
+          writeAccess,
         );
         createSessionIfTaskProvided({
           sessionId,
@@ -647,6 +662,10 @@ export function createAgentService({
           codexSandbox,
           "spawn",
         );
+        const writeAccess = resolveCliWriteAccess({
+          agent: execution.agent, role: execution.role, repo: execution.repositoryId,
+        }, registries);
+        const effectiveCodexSandbox = writeAccess ? codexSandbox : "read-only";
         const adapter = adapters.get(execution.agent);
         const adapterResult = await adapter.spawn({
           cwd: execution.cwd,
@@ -664,7 +683,8 @@ export function createAgentService({
           "spawn",
           adapterResult,
           effectiveSelection,
-          codexSandbox,
+          effectiveCodexSandbox,
+          writeAccess,
         );
         createSessionIfTaskProvided({
           sessionId: result.sessionId,

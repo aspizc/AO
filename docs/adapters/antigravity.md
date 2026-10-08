@@ -72,3 +72,17 @@ When `AGENTS_DRY_RUN=1` or `config.dryRun` is enabled, the adapter returns deter
 2. Set `AGENTS_ANTIGRAVITY_BIN` or `AGENTS_AGY_BIN` if `agy` is not on your `PATH`.
 3. Run the Antigravity adapter tests via `npm test` inside the gateway folder.
 4. Validate supervised tmux mode on the operator machine before deploying real workflows.
+
+## Role-derived CLI permissions
+
+Both paths derive boolean `writeAccess` from the target agent, role and
+repository policy: only `code.write` = `allow` grants it. The installed CLI
+failed the scratch plan-mode probe with an argument-parsing error; that does
+not demonstrate write refusal. Consequently non-writers receive
+`POLICY_DENIED` before any child or tmux launch, including in dry-run mode.
+The builders encode `--mode plan` and omit `--dangerously-skip-permissions`
+for non-writers, but those branches cannot launch until a later reviewed
+change verifies confinement. Writers preserve opt-in
+`AGENTS_ANTIGRAVITY_AUTO=1`. A plan-mode tool restriction would not be an OS
+sandbox: an allowed shell tool could still write. Successful writer results
+and `SESSION_STARTED` record `writeAccess`.

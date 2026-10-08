@@ -12,6 +12,7 @@ import { append as auditAppend } from "../core/audit.js";
 import {
   evaluate,
   resolveAgentExecutionProfile,
+  resolveCliWriteAccess,
 } from "../core/policy_engine.js";
 import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
 import {
@@ -46,21 +47,23 @@ function autoApprove(config) {
  * declares no effort dimension for this agent because `--variant` is
  * provider-specific, but it is forwarded when a caller does resolve one.
  */
-function buildOpencodeArgs(config, { model = null, reasoningEffort = null, prompt = null } = {}) {
+function buildOpencodeArgs(config, { model = null, reasoningEffort = null, writeAccess, prompt = null } = {}) {
   const args = ["run"];
   if (model) args.push("-m", model);
   if (reasoningEffort) args.push("--variant", reasoningEffort);
   args.push("--format", "json");
-  if (autoApprove(config)) args.push("--auto");
+  if (writeAccess && autoApprove(config)) args.push("--auto");
+  if (!writeAccess) args.push("--agent", "plan");
   if (prompt !== null) args.push(prompt);
   return args;
 }
 
-function buildOpencodeLaunch(config, { model = null, reasoningEffort = null } = {}) {
+function buildOpencodeLaunch(config, { model = null, reasoningEffort = null, writeAccess } = {}) {
   const launch = [opencodeBin(config)];
   if (model) launch.push("-m", model);
   if (reasoningEffort) launch.push("--variant", reasoningEffort);
-  if (autoApprove(config)) launch.push("--auto");
+  if (writeAccess && autoApprove(config)) launch.push("--auto");
+  if (!writeAccess) launch.push("--agent", "plan");
   return launch;
 }
 
@@ -99,13 +102,14 @@ function assertSuppliedSelection({
   });
 }
 
-function auditSessionStarted({ traceId, agentId, role, mode, tmuxTarget = null }) {
+function auditSessionStarted({ traceId, agentId, role, mode, writeAccess, tmuxTarget = null }) {
   auditAppend({
     type: "SESSION_STARTED",
     traceId,
     agent: agentId || AGENT_ID,
     role,
     mode,
+    writeAccess,
     tmuxTarget,
   });
 }
@@ -226,13 +230,14 @@ export class OpencodeAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "delegate", this.id);
       assertModelCredentials(effectiveModelValue);
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "headless" });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
         const result = {
@@ -246,6 +251,7 @@ export class OpencodeAdapter extends BaseAdapter {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
           effectiveSelection: decision.effectiveSelection,
+          writeAccess,
         };
         auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
         return result;
@@ -256,6 +262,7 @@ export class OpencodeAdapter extends BaseAdapter {
         buildOpencodeArgs(this.config, {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
+          writeAccess,
           prompt,
         }),
         {
@@ -273,6 +280,7 @@ export class OpencodeAdapter extends BaseAdapter {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
       auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
       return result;
@@ -339,6 +347,7 @@ export class OpencodeAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
@@ -355,6 +364,7 @@ export class OpencodeAdapter extends BaseAdapter {
       const launchCommand = buildOpencodeLaunch(this.config, {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
+        writeAccess,
       }).join(" ");
 
       if (!dryRun) {
@@ -363,7 +373,7 @@ export class OpencodeAdapter extends BaseAdapter {
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "supervised", tmuxTarget });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "supervised", tmuxTarget });
       return {
         sessionId: tmuxTarget,
         tmuxTarget,
@@ -371,6 +381,7 @@ export class OpencodeAdapter extends BaseAdapter {
         launchCommand,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
     } catch (err) {
       if (

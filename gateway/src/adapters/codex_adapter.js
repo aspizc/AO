@@ -14,6 +14,7 @@ import { append as auditAppend } from "../core/audit.js";
 import {
   evaluate,
   resolveAgentExecutionProfile,
+  resolveCliWriteAccess,
 } from "../core/policy_engine.js";
 import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
 import {
@@ -251,13 +252,14 @@ export class CodexAdapter extends BaseAdapter {
         registries: this.registries,
         config: this.config,
       });
+      const writeAccess = resolveCliWriteAccess({ agent: AGENT_ID, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         serviceTier: effectiveServiceTier,
       } = effectiveModel(decision, "delegate");
-      const sandbox = codexSandbox(this.config);
-      auditAppend({ type: "SESSION_STARTED", traceId, agent: AGENT_ID, role, mode: "headless" });
+      const sandbox = writeAccess ? codexSandbox(this.config) : "read-only";
+      auditAppend({ type: "SESSION_STARTED", traceId, agent: AGENT_ID, role, writeAccess, mode: "headless" });
 
       const result = isDryRun(this.config)
         ? {
@@ -273,6 +275,7 @@ export class CodexAdapter extends BaseAdapter {
             reasoningEffort: effectiveReasoningEffort,
             serviceTier: effectiveServiceTier,
             effectiveSelection: decision.effectiveSelection,
+            writeAccess,
             sandbox,
           }
         : (() => {
@@ -301,6 +304,7 @@ export class CodexAdapter extends BaseAdapter {
               reasoningEffort: effectiveReasoningEffort,
               serviceTier: effectiveServiceTier,
               effectiveSelection: decision.effectiveSelection,
+              writeAccess,
               sandbox,
             };
           })();
@@ -384,12 +388,13 @@ export class CodexAdapter extends BaseAdapter {
         registries: this.registries,
         config: this.config,
       });
+      const writeAccess = resolveCliWriteAccess({ agent: AGENT_ID, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         serviceTier: effectiveServiceTier,
       } = effectiveModel(decision, "spawn");
-      const sandbox = codexSandbox(this.config);
+      const sandbox = writeAccess ? codexSandbox(this.config) : "read-only";
       const tmuxTarget = buildTmuxTarget({
         traceId,
         agent: AGENT_ID,
@@ -418,6 +423,7 @@ export class CodexAdapter extends BaseAdapter {
         agent: AGENT_ID,
         role,
         mode: "supervised",
+        writeAccess,
         tmuxTarget,
       });
       return {
@@ -427,6 +433,7 @@ export class CodexAdapter extends BaseAdapter {
         launchCommand,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
     } catch (err) {
       if (

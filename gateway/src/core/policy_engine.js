@@ -356,6 +356,10 @@ export function evaluate(rawCtx, registries) {
   return runPipeline(ctx, registries).final;
 }
 
+export function resolveCliWriteAccess({ agent, role, repo }, registries) {
+  return evaluate({ agent, role, repo, action: "code.write" }, registries).decision === "allow";
+}
+
 export function explain(rawCtx, registries) {
   const ctx = normalizePolicyContext(rawCtx);
   const registryDecision = validateSelectionRegistry(ctx, registries);

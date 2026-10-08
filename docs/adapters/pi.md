@@ -86,3 +86,11 @@ show configuration; verify capacity on the machine that runs the provider.
 The adapter also exports `OLLAMA_BASE_URL`/`OLLAMA_HOST` to the child process,
 taken from `AGENTS_OLLAMA_BASE_URL` and defaulting to
 `http://127.0.0.1:11434/v1`, so a non-default endpoint needs no config edit.
+
+## Role-derived CLI permissions
+
+Both launches derive boolean `writeAccess` from the target agent, role and
+repository policy: only `code.write` = `allow` grants it. Non-writers receive
+`--tools read,grep,find,ls`; writers keep the existing tools. The allowlist
+excludes `bash`, but it is a tool restriction, not an OS sandbox. Results and
+`SESSION_STARTED` record `writeAccess`.

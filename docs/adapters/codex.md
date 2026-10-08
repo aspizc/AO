@@ -82,3 +82,13 @@ The adapter:
 Codex is allowed for `restricted` repositories when the repository registry also
 lists `codex` in `allowedAgents`. The adapter still runs the shared policy
 engine before any process or tmux operation.
+
+## Role-derived CLI permissions
+
+Both delegate and supervised launches derive `writeAccess` from
+`evaluate({ agent, role, repo, action: "code.write" })`: only `allow` grants
+access; `deny` and `require_approval` fail closed. Non-writers receive
+`-s read-only`, an OS sandbox. Writers retain the configured sandbox, including
+a configured `read-only` ceiling. The result reports the policy grant even
+when that ceiling prevents writes. The service checks the per-call sandbox
+and boolean `writeAccess`; `SESSION_STARTED` records the grant.

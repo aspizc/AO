@@ -12,6 +12,7 @@ import { append as auditAppend } from "../core/audit.js";
 import {
   evaluate,
   resolveAgentExecutionProfile,
+  resolveCliWriteAccess,
 } from "../core/policy_engine.js";
 import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
 import {
@@ -39,22 +40,24 @@ function autoApprove(config) {
   return config?.antigravityAuto === true || process.env.AGENTS_ANTIGRAVITY_AUTO === "1";
 }
 
-function buildAntigravityArgs(config, { model = null, reasoningEffort = null, prompt = null } = {}) {
+function buildAntigravityArgs(config, { model = null, reasoningEffort = null, writeAccess, prompt = null } = {}) {
   const args = [
     "--print",
     "--output-format",
     "json",
   ];
-  if (autoApprove(config)) args.push("--dangerously-skip-permissions");
+  if (writeAccess && autoApprove(config)) args.push("--dangerously-skip-permissions");
+  if (!writeAccess) args.push("--mode", "plan");
   if (model) args.push("--model", model);
   if (reasoningEffort) args.push("--effort", reasoningEffort);
   if (prompt !== null) args.push(prompt);
   return args;
 }
 
-function buildAntigravityLaunch(config, { model = null, reasoningEffort = null } = {}) {
+function buildAntigravityLaunch(config, { model = null, reasoningEffort = null, writeAccess } = {}) {
   const launch = [antigravityBin(config)];
-  if (autoApprove(config)) launch.push("--dangerously-skip-permissions");
+  if (writeAccess && autoApprove(config)) launch.push("--dangerously-skip-permissions");
+  if (!writeAccess) launch.push("--mode", "plan");
   if (model) launch.push("--model", model);
   if (reasoningEffort) launch.push("--effort", reasoningEffort);
   return launch;
@@ -85,13 +88,14 @@ function assertSuppliedSelection({
   });
 }
 
-function auditSessionStarted({ traceId, agentId, role, mode, tmuxTarget = null }) {
+function auditSessionStarted({ traceId, agentId, role, mode, writeAccess, tmuxTarget = null }) {
   auditAppend({
     type: "SESSION_STARTED",
     traceId,
     agent: agentId || AGENT_ID,
     role,
     mode,
+    writeAccess,
     tmuxTarget,
   });
 }
@@ -211,12 +215,17 @@ export class AntigravityAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
+      // The installed CLI probe did not verify plan-mode write refusal.
+      if (!writeAccess) {
+        assertPolicyAllowed(evaluate({ agent: this.id, role, repo, action: "code.write" }, this.registries));
+      }
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "delegate", this.id);
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "headless" });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
         const result = {
@@ -230,6 +239,7 @@ export class AntigravityAdapter extends BaseAdapter {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
           effectiveSelection: decision.effectiveSelection,
+          writeAccess,
         };
         auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
         return result;
@@ -240,6 +250,7 @@ export class AntigravityAdapter extends BaseAdapter {
         buildAntigravityArgs(this.config, {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
+          writeAccess,
           prompt,
         }),
         {
@@ -256,6 +267,7 @@ export class AntigravityAdapter extends BaseAdapter {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
       auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
       return result;
@@ -322,6 +334,11 @@ export class AntigravityAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
+      // The installed CLI probe did not verify plan-mode write refusal.
+      if (!writeAccess) {
+        assertPolicyAllowed(evaluate({ agent: this.id, role, repo, action: "code.write" }, this.registries));
+      }
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
@@ -337,6 +354,7 @@ export class AntigravityAdapter extends BaseAdapter {
       const launchCommand = buildAntigravityLaunch(this.config, {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
+        writeAccess,
       }).join(" ");
 
       if (!dryRun) {
@@ -345,7 +363,7 @@ export class AntigravityAdapter extends BaseAdapter {
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "supervised", tmuxTarget });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "supervised", tmuxTarget });
       return {
         sessionId: tmuxTarget,
         tmuxTarget,
@@ -353,6 +371,7 @@ export class AntigravityAdapter extends BaseAdapter {
         launchCommand,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
     } catch (err) {
       if (
