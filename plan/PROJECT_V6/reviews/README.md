@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/05 local recovery implementation | 3 | [request](A_0_5-3_to_review.md) | [candidate-scope OK](A_0_5-3_reviewed_OK.md): KO1–5 and 7 verified, focused 40/40 and service 144/144 under default isolation; not full-sheet — CI inventory, full gate and live Codex acceptance pending root/operator |
 | A/0/05 local recovery implementation | 2 | [checkpoint 18 handoff](A_0_5-18_unreviewed_handoff.md) | [KO](A_0_5-2_reviewed_KO.md): default-isolation test failure, orphaned private delegate server, thread-children gap, denial-envelope override; gate and live check pending |
 | A/0/05 local recovery implementation | 1 | [request](A_0_5-1_to_review.md) | [source-only OK](A_0_5-1_reviewed_OK.md); [full gate failed](A_0_5-1-root-gate-failure.md), trial 2 needed |
 | A/0/05 append-only recovery migrations | 2 | [request](A_0_5-plan-2_to_review.md) | [OK](A_0_5-plan-2_reviewed_OK.md) |
