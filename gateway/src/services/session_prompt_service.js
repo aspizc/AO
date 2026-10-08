@@ -162,7 +162,7 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
     auditAppend({ type: "SESSION_PROMPT_DETECTED", traceId: row.trace_id, sessionId,
       approvalId: result.approvalId, kind: prompt.kind, command: prompt.command, options: prompt.options });
     const onDecision = () => {
-      try { answer(result); } catch (error) { reportError(sessionId, error); }
+      try { answer(result); } catch (error) { reportError(sessionId, error, binding.traceId); }
     };
     binding.unregister = registerPromptResponder(result.approvalId, onDecision);
     if (result.status === "granted") return description(binding, answer(result).status);
@@ -186,28 +186,39 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
     current.delete(sessionId);
   }
 
-  function reportError(sessionId, error) {
-    auditAppend({ type: "SESSION_PROMPT_ERROR", sessionId,
-      traceId: sessions.getSessionById(sessionId)?.trace_id, error: String(error.message) });
+  function reportError(sessionId, error, traceId) {
+    try {
+      auditAppend({ type: "SESSION_PROMPT_ERROR", sessionId,
+        traceId, error: String(error.message) });
+    } catch { /* State or audit shutdown must never escape a watcher callback. */ }
   }
   function stop(sessionId) {
     clearTimeout(timers.get(sessionId));
     timers.delete(sessionId);
+    current.delete(sessionId);
     for (const [id, binding] of bindings) {
       if (binding.sessionId === sessionId) {
         binding.unregister?.();
-        invalidatePromptApproval(id, "session_stopped");
         bindings.delete(id);
+        try { invalidatePromptApproval(id, "session_stopped"); }
+        catch (error) { reportError(sessionId, error, binding.traceId); }
       }
     }
-    current.delete(sessionId);
   }
   function watch(sessionId) {
     if (closed || timers.has(sessionId)) return;
+    let traceId;
+    try { traceId = sessions.getSessionById(sessionId)?.trace_id; }
+    catch { return; }
     const tick = () => {
       timers.delete(sessionId);
-      try { observe({ sessionId }); } catch (error) { reportError(sessionId, error); }
-      if (!closed && live(sessionId)) watch(sessionId);
+      try {
+        observe({ sessionId });
+        if (!closed && live(sessionId)) watch(sessionId);
+      } catch (error) {
+        try { stop(sessionId); } catch { /* Timer safety also covers cleanup failure. */ }
+        reportError(sessionId, error, traceId);
+      }
     };
     const timer = setTimeout(tick, 1000);
     timer.unref();

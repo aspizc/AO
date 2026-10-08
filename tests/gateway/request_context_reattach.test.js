@@ -1160,6 +1160,20 @@ test("current context expiry elapsing during await refuses while original durabl
 for (const method of ["spawn", "delegate"]) for (const outcome of method === "spawn" ? ["revoke", "adapter-failure", "adapter-failure-name-reused", "adapter-failure-before-response", "adapter-failure-response-timeout", "record-failure", "name-reused", "multipane", "multiwindow", "ambiguous", "ambiguous-after-signal", "resistant", "detached-descendant", "bounded", "accepted"] : ["revoke", "late", "accepted"]) test(
   outcome === "revoke" ? `${method} post-await denial must leave no untracked real child`
     : `${method} ${outcome} settles only its observed child after durable publication`, async (t) => {
+  let service;
+  t.after(() => service?.close());
+  const promptTimers = new Set();
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  t.mock.method(globalThis, "setTimeout", (callback, ms, ...args) => {
+    const handle = originalSetTimeout(callback, ms, ...args);
+    if (callback.name === "tick") promptTimers.add(handle);
+    return handle;
+  });
+  t.mock.method(globalThis, "clearTimeout", (handle) => {
+    promptTimers.delete(handle);
+    return originalClearTimeout(handle);
+  });
   const f = fixture(t); const traceId = await f.seed();
   const tmux = await ownedTmuxFixture(t);
   const oldDryRun = process.env.AGENTS_DRY_RUN;
@@ -1399,7 +1413,7 @@ process.exit(result.status ?? 2);
       throw error;
     });
   } } : adapter;
-  const service = createAgentService({ config, registries, adapters: new Map([["codex", serviceAdapter]]),
+  service = createAgentService({ config, registries, adapters: new Map([["codex", serviceAdapter]]),
     selectionObservers: { audit() {
       if (outcome !== "name-reused") return;
       assert.equal(tmux.run(["rename-session", "-t", `=${target}`, "retained-owned-child"]).status, 0);
@@ -1503,6 +1517,7 @@ process.exit(result.status ?? 2);
     assert.equal(readLinuxProcessIdentity(child.pid)?.startToken === child.startToken, method === "spawn",
       "supervised success transfers the live child; headless success reaps its descendants");
     if (method === "spawn") {
+      assert.equal(promptTimers.size, 1, "successful durable publication starts exactly one prompt watcher");
       const value = parse(result);
       assert.ok(sessionRepo.getSessionById(value.sessionId));
       assert.ok(n.recovery.repository.getTrace(traceId).payload.sessions.some(row => row.sessionId === value.sessionId));
@@ -1510,6 +1525,7 @@ process.exit(result.status ?? 2);
     return;
   }
   if (outcome === "record-failure") {
+    assert.equal(promptTimers.size, 0, "failed durable publication must never arm a prompt watcher");
     assert.equal(result.isError, true);
     assert.equal(n.recovery.repository.getTrace(traceId).payload.sessions.some(row => row.tmuxTarget === target), false);
     assert.notEqual(readLinuxProcessIdentity(child.pid)?.startToken, child.startToken,

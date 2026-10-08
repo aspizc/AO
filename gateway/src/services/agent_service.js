@@ -758,12 +758,13 @@ export function createAgentService({
           effectiveSelection,
           selectionObservers,
         });
-        if (!result.dryRun && execution.taskId) promptWatcher.watch(result.sessionId);
         // The protected tool retains cleanup ownership until durable recording.
         return transferRequestLaunch(launched, Object.freeze({
           ...result,
           effectiveSelection,
-        }));
+        }), () => {
+          if (!result.dryRun && execution.taskId) promptWatcher.watch(result.sessionId);
+        });
       } catch (err) {
         try { await settleRequestLaunch(launched, false); } catch (cleanupError) {
           auditServiceError({ traceId, where: "agent.spawn.cleanup", err: cleanupError });

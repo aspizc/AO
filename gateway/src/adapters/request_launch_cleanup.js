@@ -10,6 +10,7 @@ import { appendLocalOnly } from "../core/audit.js";
 
 // Receipts never appear in the public adapter result, session rows or MCP input.
 const receipts = new WeakMap();
+const publications = new WeakMap();
 function failure() {
   return Object.assign(new Error("adapter-owned launch cleanup could not be verified"), { code: "ADAPTER_CLEANUP_FAILED" });
 }
@@ -241,7 +242,12 @@ export function withRequestLaunchCleanup(adapter) {
 
 export async function settleRequestLaunch(result, accepted) {
   const receipt = result && receipts.get(result);
-  if (!receipt) return;
+  const publish = result && publications.get(result);
+  if (result) publications.delete(result);
+  if (!receipt) {
+    if (accepted) publish?.();
+    return;
+  }
   // Headless results never transfer a supervised child to the business layer.
   if (!accepted || receipt.headless) {
     // Service timeout settlement and a later observer must share one cleanup.
@@ -249,13 +255,15 @@ export async function settleRequestLaunch(result, accepted) {
     await receipt.settlement;
   }
   receipts.delete(result);
+  if (accepted && !receipt.headless) publish?.();
 }
 
-export function transferRequestLaunch(result, published) {
+export function transferRequestLaunch(result, published, onPublished) {
   const receipt = receipts.get(result);
   if (receipt) {
     receipts.set(published, receipt);
     receipts.delete(result);
   }
+  if (onPublished) publications.set(published, onPublished);
   return published;
 }

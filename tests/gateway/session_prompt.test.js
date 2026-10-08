@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { promptTransportFixture } from "./session_prompt_transport_fixture.js";
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -366,4 +367,31 @@ test("lost in-flight terminal CAS after watcher stop cannot emit answered", asyn
   assert.equal(response.promptAnswer.reason, "transport_uncertain_after_restart");
   fx.watcher.answer(pending);
   assert.deepEqual(fx.inputs, ["\r"]);
+});
+
+for (const mode of ["state-loss", "audit-failure"]) test(`watcher tick ${mode} cannot escape or retain a timer`, () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "a06-tick-"));
+  try {
+    const child = spawnSync(process.execPath, [new URL("./session_prompt_tick_fixture.mjs", import.meta.url).pathname, directory, mode], { encoding: "utf8", timeout: 5000 });
+    assert.equal(child.status, 0, child.stderr);
+    const evidence = JSON.parse(child.stdout.trim());
+    assert.deepEqual(evidence.uncaught, [], "state loss or audit failure must never escape the timeout callback");
+    assert.equal(evidence.pendingPromptTimers, 0, "a failed tick must stop rather than re-arm");
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test("responder-path failure audit retains the session trace for investigation", async () => {
+  const fx = await fresh({ auto: false });
+  const pending = fx.watcher.observe({ sessionId: "session" });
+  const expectedTrace = sessions.getSessionById("session").trace_id;
+  Object.defineProperty(fx.roleData, "sessionPromptScopes", { get() { throw new Error("policy lookup failed"); } });
+  try {
+    assert.doesNotThrow(() => respond({ approvalId: pending.approvalId, decision: "granted", decidedBy: "human" }));
+    const errors = await query({ type: "SESSION_PROMPT_ERROR" });
+    assert.equal(errors.length, 1, "the registered responder must report the actual answer failure");
+    assert.equal(errors[0].sessionId, "session");
+    assert.equal(errors[0].error, "policy lookup failed");
+    assert.equal(errors[0].traceId, expectedTrace, "responder errors must remain attributable to their session's authoritative trace");
+    assert.deepEqual(fx.inputs, [], "policy failure must never authorize transport");
+  } finally { fx.watcher.close(); }
 });
