@@ -1,0 +1,28 @@
+{
+  "baseline": "c0405b1dc9c19c505a61ed48e4244b4e0228baaf",
+  "scratchTree": "/tmp/ao-a06-trial6-baseline-_bvu5y2g",
+  "removedChildEnvironmentNames": [],
+  "results": [
+    {
+      "lane": "baseline-mcp",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "tests/gateway/otel_tool_spans.test.js",
+        "tests/gateway/registry_overlay.test.js",
+        "tests/e2e/mcp_two_agent_workflow.test.js"
+      ],
+      "exitCode": 1
+    },
+    {
+      "lane": "baseline-reattach",
+      "argv": [
+        "node",
+        "--test",
+        "tests/gateway/request_context_reattach.test.js"
+      ],
+      "exitCode": 0
+    }
+  ]
+}
