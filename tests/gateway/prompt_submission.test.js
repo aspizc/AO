@@ -1582,8 +1582,8 @@ test("trial17 warning-only draft does not authorize a retry Enter when submissio
 });
 const startupCodex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_update_welcome_draft.json", import.meta.url), "utf8"));
 const startupRecords = () => [startupCodex.ready, startupCodex.draft, startupCodex.draft, startupCodex.ready].map((frame) => structuredClone(frame));
-function startupFixture(records = startupRecords()) {
-  const fx = trial3Fixture("codex", records, startupCodex.prompt);
+function startupFixture(records = startupRecords(), prompt = startupCodex.prompt) {
+  const fx = trial3Fixture("codex", records, prompt);
   let index = 0;
   const run = (args, options) => {
     const frame = records[Math.min(index, records.length - 1)];
@@ -1597,7 +1597,7 @@ function startupFixture(records = startupRecords()) {
     }
     return result;
   };
-  return { ...fx, ask: () => base.submitPrompt({ provider: "codex", target: "%12", prompt: startupCodex.prompt, run, wait: async () => {} }) };
+  return { ...fx, ask: () => base.submitPrompt({ provider: "codex", target: "%12", prompt, run, wait: async () => {} }) };
 }
 const startupNoEnter = (fx) => {
   assert.ok(fx.inputs.every((input) => input !== "\r"));
@@ -1853,4 +1853,105 @@ test("startup3 raw padding bounds glyphs and duplicate notice remain closed", as
 test("startup3 an absent echo is an unknown layout rather than a busy witness", () => {
   const frame = trial16Rows(startup3Codex.captures[0], { 15: "" });
   assert.equal(base.classifyProviderPane("codex", frame.snapshot, frame.pane, "draft").state, "unknown_state");
+});
+
+const startup4Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_post_turn_ready.json", import.meta.url), "utf8"));
+const startup4Records = () => [startup4Codex.ready, startup4Codex.draft, startup4Codex.draft, startup4Codex.ready].map((frame) => structuredClone(frame));
+function startup4Fixture(records = startup4Records()) {
+  return startupFixture(records, startup4Codex.prompt);
+}
+
+test("startup4 completed turn with cwd-bound clipped Ready permits exactly one guarded Enter", async () => {
+  const fx = startup4Fixture();
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${startup4Codex.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
+  assert.equal(fx.calls.some((call) => call.args[0] === "send-keys"), false);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("startup4 measured empty composer and visible draft are phase and exact cursor bound", () => {
+  const { ready, draft } = startup4Codex;
+  assert.equal(base.classifyProviderPane("codex", ready.snapshot, ready.pane).text, "");
+  const result = base.classifyProviderPane("codex", draft.snapshot, draft.pane, "draft");
+  assert.equal(result.state, "composer"); assert.equal(result.text, startup4Codex.prompt);
+  assert.equal(base.classifyProviderPane("codex", draft.snapshot, draft.pane).state, "unknown_state");
+  assert.equal(base.classifyProviderPane("codex", ready.snapshot, ready.pane, "draft").state, "unknown_state");
+});
+
+test("startup4 initial busy menus incomplete extra and malformed history receive no paste", async () => {
+  for (const changes of [{ 33: "• Working (1s • esc to interrupt)" }, { 33: "◦ Working (1s • esc to interrupt)" },
+    { 15: "" }, { 18: "" }, { 20: "" }, { 14: "› stale request" }, { 21: "unrelated transcript" },
+    { 20: "  Working for 5s • 14:23" }, { 20: "  Worked for 5s • 99:99" },
+    { 15: "› " }, { 18: "•" }, { 18: "  1. Allow" }, { 15: "› prior non-ASCII é" }]) {
+    const frame = trial16Rows(startup4Codex.ready, changes); const fx = startup4Fixture([frame]);
+    await assert.rejects(fx.ask, reason("unknown_state")); assert.deepEqual(fx.inputs, []);
+  }
+  const frame = trial16Rows(startup4Codex.ready, { 34: "Do you want to proceed?", 35: "› 1. Allow", 36: "  2. Cancel" });
+  frame.pane.cursor = 35; const fx = startup4Fixture([frame]);
+  await assert.rejects(fx.ask, reason("decision_required")); assert.deepEqual(fx.inputs, []);
+});
+
+test("startup4 notice version status cwd footer padding size and cursor variants remain closed", async () => {
+  const source = startup4Codex.ready.snapshot.split("\n");
+  for (const changes of [{ 0: "Update available!" }, { 9: "  >_ OpenAI Codex (v0.160.2)" },
+    { 12: "  Do you want to proceed?" }, { 38: source[38].replace("R…", "W…") },
+    { 38: source[38].replace("R…", "Ready") }, { 38: source[38] + " " },
+    { 38: source[38].replace("R…", "R?") }, { 10: "     /fixture/other" },
+    { 36: "› stale editor text" }, { 37: "\t" }, { 13: " ".repeat(121) }, { 20: source[20].trimEnd() + "\t" },
+    { 39: source[39].replace("2 warnings", "3 warnings") }, { 40: " " }]) {
+    const frame = trial16Rows(startup4Codex.ready, changes);
+    assert.equal(base.classifyProviderPane("codex", frame.snapshot, frame.pane).state, "unknown_state");
+    const fx = startup4Fixture([frame]); await assert.rejects(fx.ask, reason("unknown_state")); assert.deepEqual(fx.inputs, []);
+  }
+  for (const key of ["cursor", "cursorX", "width", "height", "mode", "inputOff", "synchronized"]) {
+    const frame = structuredClone(startup4Codex.ready), pane = frame.pane;
+    pane[key] = typeof pane[key] === "number" ? pane[key] + 1 : "1";
+    const fx = startup4Fixture([frame]); await assert.rejects(fx.ask, reason("unknown_state")); assert.deepEqual(fx.inputs, []);
+  }
+});
+
+test("startup4 changed prior history status padding payload or process across frames prevents Enter", async () => {
+  const source = startup4Codex.ready.snapshot.split("\n");
+  for (const [stage, changes] of [[1, { 15: "› altered previous request" }], [2, { 18: "• altered previous response" }],
+    [2, { 20: "  Worked for 6s • 14:23" }], [2, { 13: source[13] + " " }],
+    [1, { 36: "› " + "x".repeat(84) }], [2, { 36: "› " + "x".repeat(84) }],
+    [2, { 39: source[39] }]]) {
+    const records = startup4Records(); records[stage] = trial16Rows(records[stage], changes);
+    const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  for (const stage of [0, 1, 2]) {
+    for (const key of ["serverPid", "target", "panePid"]) {
+      const records = startup4Records(); records[stage].submitState[key] = key === "target" ? "%13" : "999";
+      if (key === "target") records[stage].pane.target = "%13";
+      const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+    }
+  }
+});
+
+test("startup4 prior response or unchanged draft never confirms a second ask or permits retry", async () => {
+  for (const after of [startup4Codex.ready, startup4Codex.draft]) {
+    const records = startup4Records(); records[3] = structuredClone(after); records.push(startup4Codex.draft);
+    const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.equal(fx.inputs.filter((input) => input === "\r").length, 1); assert.equal(fx.buffers.size, 0);
+  }
+});
+
+test("startup4 Ready clipping length phase and draft bytes stay narrowly bound", async () => {
+  const frame = trial16Rows(startup4Codex.ready, { 10: "     /fixture/short", 38: "  GPT-6.1-Sol medium fast · /fixture/short · R…" });
+  assert.equal(base.classifyProviderPane("codex", frame.snapshot, frame.pane).state, "unknown_state");
+  const fx = startup4Fixture([frame]); await assert.rejects(fx.ask, reason("unknown_state")); assert.deepEqual(fx.inputs, []);
+  assert.equal(base.classifyProviderPane("codex", startup4Codex.ready.snapshot, startup4Codex.ready.pane, "unrecognized").state, "unknown_state");
+  for (const changes of [{ 36: "› " + "é".repeat(84) }, { 36: "› " }, { 36: "› Ask Codex to do anything" },
+    { 36: "› first line", 37: "  second line" }, { 39: "  tab to queue message" }, { 38: "unrelated status" }]) {
+    const records = startup4Records(); records[1] = trial16Rows(records[1], changes);
+    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+    const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+});
+
+test("startup4 wrong draft end cursor prevents guarded submit", async () => {
+  const records = startup4Records(); records[1].pane.cursorX++;
+  assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+  const fx = startup4Fixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
 });

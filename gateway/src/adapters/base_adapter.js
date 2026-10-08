@@ -161,6 +161,29 @@ function codexUpdateWelcomeWork(rows, pane) {
     && codexSpinnerStatus.test(rows[38]) && rows[38].startsWith(status)
     && rows[39] === "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view";
 }
+// Measured post-turn 0.160.1 Ready label clipped after an 87-column ASCII cwd.
+function codexPostTurnPane(rows, pane, phase) {
+  if (pane.width !== 120 || pane.height !== 40 || pane.cursor !== 36
+    || rows.length !== 41 || rows[40] !== "" || rows.some((row) => row.length > pane.width)
+    || !codexUpdateWelcomeHeader(rows, pane.width) || rows[10].slice(5).length !== 87
+    || rows[38] !== `  GPT-6.1-Sol medium fast · ${rows[10].slice(5)} · R…`
+    || !rows.slice(13, 36).every((row, index) => index + 13 === 15
+      ? /^› [\x21-\x7e][\x20-\x7e]*$/.test(row) : index + 13 === 18
+        ? /^• [\x21-\x7e][\x20-\x7e]*$/.test(row) : index + 13 === 20
+          ? /^ {2}Worked for [0-9]{1,5}s • (?:[01][0-9]|2[0-3]):[0-5][0-9] *$/.test(row) : /^ *$/.test(row))
+    || !/^ *$/.test(rows[37])) return null;
+  let text = "";
+  if (phase === "ready") {
+    if (pane.cursorX !== 2 || !/^› Ask Codex to do anything *$/.test(rows[36])
+      || rows[39] !== "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view") return null;
+  } else if (phase === "draft") {
+    text = rows[36].startsWith("› ") ? rows[36].slice(2) : "";
+    if (!text || text === "Ask Codex to do anything" || /[^\x20-\x7e]/.test(text)
+      || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
+      || rows[39] !== " ".repeat(94) + "⚠ 2 warnings · f2 to view") return null;
+  } else return null;
+  return { state: "composer", text, warningDraft: phase === "draft", identity: "36:39:120:40" };
+}
 function codexGap(rows, cursor, footer) {
   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
     && !(codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))) return false;
@@ -255,6 +278,8 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
       return { state: "busy", text: "", modernWork: true, welcomeWork: true,
         workRow: 33, identity: "36:39:120:40" };
     }
+    const postTurn = codexPostTurnPane(rows, pane, phase);
+    if (postTurn) return postTurn;
     // The shifted startup header cannot borrow a generic draft/footer profile.
     if (phase === "draft" && rows[9]?.trim() === ">_ OpenAI Codex (v0.160.1)"
       && !codexUpdateWelcomeDraft(rows, pane.width)) return { state: "unknown_state" };

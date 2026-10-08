@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 live Codex post-turn Ready | live-startup-4 | [request](A_0_4-live-startup-4_to_review.md) | [OK: bounded second-ask readiness, 307/307 focused GREEN; post-Enter acceptance remains open](A_0_4-live-startup-4_reviewed_OK.md) |
 | A/0/04 live Codex startup Working | live-startup-3 | [request](A_0_4-live-startup-3_to_review.md) | [OK: strict first-ask Working witness, 299/299 focused GREEN; later post-turn ask remains open](A_0_4-live-startup-3_reviewed_OK.md) |
 | A/0/04 live Codex startup raw padding | live-startup-2 | [request](A_0_4-live-startup-2_to_review.md) | [OK: trial-1 corrections reviewed; 19-test RED, 291/291 focused GREEN, 18/18 guard mutations; live acceptance remains open](A_0_4-live-startup-2_reviewed_OK.md) |
 | A/0/04 live Codex startup notice | live-startup-1 | [request](A_0_4-live-startup-1_to_review.md) | [KO: real raw tmux padding rejects the draft before Enter; fixture provenance, README and guard tests also require correction](A_0_4-live-startup-1_reviewed_KO.md); [review identity correction](A_0_4-live-startup-1_review_identity_note.md) |

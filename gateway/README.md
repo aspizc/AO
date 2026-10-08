@@ -283,6 +283,23 @@ layouts, menus, changed prefixes and stale evidence remain unconfirmed. No
 new polling, timing or retry is added. Independent review and live A05
 acceptance on this candidate remain operator-owned.
 
+The separate post-turn Ready profile covers one measured completed-turn
+viewport after explicit Gateway reattach: the same notice/header, a single
+ASCII prompt at row 15, single ASCII assistant cell at row 18, `Worked for`
+completion at row 20, empty composer at row 36 and exact 2-warning footer.
+The 87-character ASCII cwd leaves only `R…` visible from idle `Ready` at
+120×40. This pin is grounded in the [idle-status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs)
+and [ellipsis clipping](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/line_truncation.rs).
+It is readiness only. Ready/refusal raw panes were identical, with synthetic
+path/prompt/reply replacements in the fixture; cursor/process metadata and
+post-paste drafts are reconstructed. A hypothetical unchanged single-line
+draft can receive one guarded Enter only through the existing warning-draft
+bindings. Busy/menu states, incomplete or extra history, changed bytes and
+other clipping/geometry/footer variants stay closed. There is no new retry,
+transport or recovery authority. The old response and completion never confirm
+the second ask; actual post-paste shape, second-turn acceptance, independent
+review and live A05 verification remain outstanding.
+
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
 and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).

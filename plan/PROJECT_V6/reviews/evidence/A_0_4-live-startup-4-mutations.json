@@ -1,0 +1,185 @@
+{
+  "red": {
+    "exitCode": 1,
+    "sourceSha256": "9636c4986b18a3e5f2275a697be48753c9fde446880ef34b68f4fe1a5c56afaf",
+    "failures": [
+      "not ok 151 - startup4 completed turn with cwd-bound clipped Ready permits exactly one guarded Enter",
+      "not ok 152 - startup4 measured empty composer and visible draft are phase and exact cursor bound",
+      "not ok 156 - startup4 prior response or unchanged draft never confirms a second ask or permits retry"
+    ]
+  },
+  "geometry": {
+    "exitCode": 1,
+    "sourceSha256": "355e7a25214a730b8691029ff4b408b16f5ee2341ef5d979f63fef39e1812f1d",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "cursor-row": {
+    "exitCode": 1,
+    "sourceSha256": "fe6ef1313c1aecce64d16a0720a0002ebf7c06a19564381e147d3b579610cbe2",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "capture": {
+    "exitCode": 1,
+    "sourceSha256": "9205de6b4a2a81f0d1c9262cac227b796e615ec11b7201925090b6bd06e3eed4",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "width": {
+    "exitCode": 1,
+    "sourceSha256": "2c882c79095e33147ced8abe4e1b70b83e25da59f2846b2316de4e755acbffc5",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "header": {
+    "exitCode": 1,
+    "sourceSha256": "d99e2072c163eeb36857545f059c388b42f6e387c200bb95b4c487c9e8ee8e97",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "cwd-length": {
+    "exitCode": 1,
+    "sourceSha256": "d9bd05fafb518ac4d8f7e7fd98443b1d1718016c2140c6a1393de50b76590aee",
+    "failures": [
+      "not ok 157 - startup4 Ready clipping length phase and draft bytes stay narrowly bound"
+    ]
+  },
+  "Ready-status": {
+    "exitCode": 1,
+    "sourceSha256": "bca4fa0eacc75208ea4d235455906ac85a4590c78484ea14de48bca0a19a6ad0",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed",
+      "not ok 157 - startup4 Ready clipping length phase and draft bytes stay narrowly bound"
+    ]
+  },
+  "prior-prompt": {
+    "exitCode": 1,
+    "sourceSha256": "2351ce71e1000b7f688603ab1dd5f5e10e12febd2fd22ab27bcccbf8d557eba7",
+    "failures": [
+      "not ok 153 - startup4 initial busy menus incomplete extra and malformed history receive no paste"
+    ]
+  },
+  "response": {
+    "exitCode": 1,
+    "sourceSha256": "05b9ba3bc90d8ce4763b06829e713c4d967921e26f109eea161d2c6e81eeb1c1",
+    "failures": [
+      "not ok 153 - startup4 initial busy menus incomplete extra and malformed history receive no paste"
+    ]
+  },
+  "completion": {
+    "exitCode": 1,
+    "sourceSha256": "c7478a09bd0d09ece10acb6370a197cda2ae1cacbe4df33c3e3a246b0fc384fb",
+    "failures": [
+      "not ok 153 - startup4 initial busy menus incomplete extra and malformed history receive no paste",
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "blank-history": {
+    "exitCode": 1,
+    "sourceSha256": "9d6b5b8fee5c773837142b3f886000d8af325fc4a1894352e39375126a6767bd",
+    "failures": [
+      "not ok 153 - startup4 initial busy menus incomplete extra and malformed history receive no paste"
+    ]
+  },
+  "gap": {
+    "exitCode": 1,
+    "sourceSha256": "a05cccf67182125eae092b1ffd37a65d00a8e33fbf61b0edafc88a0bd3efbd64",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "ready-cursor": {
+    "exitCode": 1,
+    "sourceSha256": "86c1a9112a64440cc025601310b45d03efce2a34808d5047c2f8973062076587",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "placeholder": {
+    "exitCode": 1,
+    "sourceSha256": "8de84c6cd9c4706c1d4f59c89e4c405eccf4e0bfd9f3a164057cc4cd2ecd91e3",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "ready-footer": {
+    "exitCode": 1,
+    "sourceSha256": "18d2476250421a76c36716cb2e284f7117ba6051317c937873f46514d43801b8",
+    "failures": [
+      "not ok 154 - startup4 notice version status cwd footer padding size and cursor variants remain closed"
+    ]
+  },
+  "draft-ascii": {
+    "exitCode": 1,
+    "sourceSha256": "4e2e7bfbb70106df861262a84139dd757eb66b302b1c9d126014778c6569f8a8",
+    "failures": [
+      "not ok 157 - startup4 Ready clipping length phase and draft bytes stay narrowly bound"
+    ]
+  },
+  "draft-cursor": {
+    "exitCode": 1,
+    "sourceSha256": "84994968b472335f0b6627e39c60c45781cddd2d7eb14adee6c7e5b516964017",
+    "failures": [
+      "not ok 158 - startup4 wrong draft end cursor prevents guarded submit"
+    ]
+  },
+  "draft-footer": {
+    "exitCode": 1,
+    "sourceSha256": "fea209e64edc7423eff982a30c7c5195e9226a4804601f2178b9145d0d78fd99",
+    "failures": [
+      "not ok 157 - startup4 Ready clipping length phase and draft bytes stay narrowly bound"
+    ]
+  },
+  "phase": {
+    "exitCode": 1,
+    "sourceSha256": "269a3a9b434053e4f1237bc2b3abb8004ff52c16fa2d0e91001660ae415b8709",
+    "failures": [
+      "not ok 157 - startup4 Ready clipping length phase and draft bytes stay narrowly bound"
+    ]
+  },
+  "first-enter": {
+    "exitCode": 1,
+    "sourceSha256": "d960dbcf483b489df4d7badfae7cd3d3227c1f511505235b1778f853011bac7b",
+    "failures": [
+      "not ok 131 - trial17 warning-only draft does not authorize a retry Enter when submission remains pending",
+      "not ok 133 - startup exact update draft is phase bound and never authorizes a retry",
+      "not ok 156 - startup4 prior response or unchanged draft never confirms a second ask or permits retry"
+    ]
+  },
+  "stable-capture": {
+    "exitCode": 1,
+    "sourceSha256": "9fa4c939b9088b0012f43beb432603014be1359210e13aaded15d628743647b7",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 136 - startup greeting slot cannot carry a menu history or a different greeting between captures",
+      "not ok 142 - startup2 changed raw padded bytes across ready pending and guard cannot authorize Enter",
+      "not ok 155 - startup4 changed prior history status padding payload or process across frames prevents Enter"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "sourceSha256": "cea13d2d935761faa2033cbea523dbc800c22e26228e43399811ba80f8613b16",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 135 - startup changed payload pane server prefix warning transitions or menu prevent Enter",
+      "not ok 155 - startup4 changed prior history status padding payload or process across frames prevents Enter"
+    ]
+  },
+  "ready-prefix": {
+    "exitCode": 1,
+    "sourceSha256": "c489e84dd98b3330d2a32e776b575ddd254445e3cd0809019a6878ca98231a70",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix",
+      "not ok 135 - startup changed payload pane server prefix warning transitions or menu prevent Enter",
+      "not ok 136 - startup greeting slot cannot carry a menu history or a different greeting between captures",
+      "not ok 142 - startup2 changed raw padded bytes across ready pending and guard cannot authorize Enter",
+      "not ok 145 - startup3 missing changed duplicate shifted or old echo and stale Working cannot confirm acceptance"
+    ]
+  }
+}
