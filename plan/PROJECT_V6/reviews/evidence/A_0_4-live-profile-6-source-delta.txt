@@ -1,0 +1,13 @@
+--- trial5/base_adapter.js
++++ trial6/base_adapter.js
+@@ -13,8 +13,8 @@
+ const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
+ // Measured 0.160.1 status row; this is rendering evidence, not model selection.
+ const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
+-// Only the measured spinner suffix is admitted; it never proves acceptance.
+-const codexSpinnerStatus = /^  GPT-6\.1-Sol medium fast · \S+ · ⠦ *$/;
++// Codex 0.160.1 status_surfaces.rs: explicit spinner frames, never acceptance alone.
++const codexSpinnerStatus = /^  GPT-6\.1-Sol medium fast · \S+ · [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] *$/;
+ const codexWorking = /^• Working \([0-9hms .]+• esc to interrupt\) *$/;
+ function codexGap(rows, cursor, footer) {
+   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
