@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 pre-ask resize and first-ask geometry | 15 | [request](A_0_4-live-profile-15_to_review.md) | [OK, spawn process identity (server/pane/pane PID) still bound on every frame; geometry pinned at first-ask ready so same-process pre-ask resize is accepted and any resize during the ask fails closed with one Enter at most; both Claude profiles; 2 RED, geometry/identity mutations and 246/246 focused host reproduced; hashes verified; root live 2.1.294 run returned acceptance; root full gate, Codex/bound live acceptance and integration outstanding](A_0_4-live-profile-15_reviewed_OK.md) |
 | A/0/04 Claude 2.1.294 pre-assistant transient | 14 | [request](A_0_4-live-profile-14_to_review.md) | [OK, bare pre-assistant spinner (empty row 8) admitted only as observation; success still needs exact reply and completion row; same-process, blank-history, stable-word, 8-poll and no-second-Enter guards unchanged; 4 RED, guard mutations and 239/239 focused host reproduced; hashes verified; root full gate, live acceptance and integration outstanding](A_0_4-live-profile-14_reviewed_OK.md) |
 | A/0/04 Claude 2.1.294 randomized marker contract | 13 | [request](A_0_4-live-profile-13_to_review.md) | [OK, eight binary completion verbs, six-glyph standard spinner set and per-ask stable strict verb verified against the 2.1.294 binary; trial12 safety boundary unchanged; 8 RED and guard mutations reproduced; 234/234 focused host reproduced; root full gate, live acceptance and integration outstanding](A_0_4-live-profile-13_reviewed_OK.md) |
 | A/0/04 Claude 2.1.294 bounded first-ask observation | 12 | [request](A_0_4-live-profile-12_to_review.md) | [KO, safety boundary sound (identity, blank history, no second Enter, bounded poll, cleanup) and 4 RED / 222/222 focused host reproduced; witness pins per-turn random 2.1.294 wording (completion verb 1 of 8, spinner verb 1 of 188, animated glyph), tests pin one sample; root full gate, live acceptance and integration outstanding](A_0_4-live-profile-12_reviewed_KO.md) |
@@ -54,6 +55,12 @@ Codex authoring and a distinct Codex reviewer under the already-authorized
 session-agent fallback; it is not cross-vendor or Gateway-spawned review.
 
 ## Current build checkpoint
+
+Trial 15 separates fresh-spawn process identity from geometry pinned at the first
+ask for both measured Claude profiles. See the [immutable handoff](A_0_4-live-profile-15_to_review.md).
+Implemented;
+independently reviewed OK ([verdict](A_0_4-live-profile-15_reviewed_OK.md)). No
+integration is claimed. Full gate, live acceptance and integration remain root-owned. Trial 14 OK remains historical evidence for its bound candidate.
 
 Trial 14 adds the live-observed pre-assistant bare-spinner transient to the
 existing first-ask observation poll. See the [immutable handoff](A_0_4-live-profile-14_to_review.md).

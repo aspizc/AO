@@ -1,0 +1,119 @@
+--- entry/gateway/src/adapters/base_adapter.js
++++ candidate/gateway/src/adapters/base_adapter.js
+@@ -301,8 +301,10 @@
+ function freshClaudeResponse(spawn, ready, pending, guard, after, prompt) {
+   // Operator option 1: only a locally recorded fresh plain launch's first ask.
+   // This is the measured 2.1.293 single-line completed layout, not a turn ID.
+-  const identity = ["serverPid", "target", "panePid", "width", "height"];
++  const identity = ["serverPid", "target", "panePid"];
++  // Geometry is pinned at the first ask, allowing a same-process pre-ask resize.
+   if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
++    || [pending, guard, after].some((frame) => ["width", "height"].some((key) => frame[key] !== ready[key]))
+     || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+     || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
+     || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+@@ -328,8 +330,10 @@
+ 
+ function freshClaude294Response(spawn, ready, pending, guard, after, prompt, working = false) {
+   // Measured first-ask layout only. The launch header is preserved, not history.
+-  const identity = ["serverPid", "target", "panePid", "width", "height"];
++  const identity = ["serverPid", "target", "panePid"];
++  // Geometry is pinned at the first ask, allowing a same-process pre-ask resize.
+   if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
++    || [pending, guard, after].some((frame) => ["width", "height"].some((key) => frame[key] !== ready[key]))
+     || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
+     || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
+     || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+@@ -500,7 +504,7 @@
+     try {
+       const pane = paneState(run, tmuxTarget);
+       const observation = observe(run, pane.target, this.id, owned);
+-      identity = Object.fromEntries(["serverPid", "target", "panePid", "width", "height"]
++      identity = Object.fromEntries(["serverPid", "target", "panePid"]
+         .map((key) => [key, observation[key]]));
+     } finally {
+       cleanupOwnedBuffers(run, owned, "transport_failed");
+--- entry/tests/gateway/claude_first_prompt.test.js
++++ candidate/tests/gateway/claude_first_prompt.test.js
+@@ -492,3 +492,81 @@
+     fs.rmSync(directory, { recursive: true, force: true });
+   }
+ });
++
++for (const measured of [profile, delayedProfile]) {
++  const version = measured === profile ? "2.1.293" : "2.1.294";
++  const frames = () => clone([measured.ready, measured.postPaste, measured.guard, measured.after]);
++  const spawnFrame = () => {
++    const frame = clone(measured.ready);
++    // Spawn observation is valid at 80x24; only first-ask frames carry the measured layout.
++    Object.assign(frame.pane, { width: 80, height: 24, cursor: 20 });
++    Object.assign(frame.submitState, { width: "80", height: "24" });
++    return frame;
++  };
++  const adapterHarness = (records, spawn = spawnFrame()) => {
++    const fx = harness([spawn, ...records]);
++    const adapter = new BaseAdapter({ id: "claude-code", config: {} });
++    adapter.rememberFreshClaudeSpawn({ tmuxTarget: "%1", run: fx.run });
++    return { ...fx, ask: () => adapter.submitPrompt({ ...fx.options, prompt: measured.prompt }) };
++  };
++
++  test(`trial15 ${version} same-process pre-ask resize accepts the first completed reply with one Enter`, async () => {
++    const fx = adapterHarness(frames());
++    assert.equal((await fx.ask()).snapshot, measured.after.snapshot);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${measured.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  });
++
++  test(`trial15 ${version} pre-ask server pane or PID replacement cannot inherit spawn authority`, async () => {
++    for (const key of ["serverPid", "target", "panePid"]) {
++      const spawn = spawnFrame();
++      spawn.submitState[key] = key === "target" ? "%2" : "999";
++      if (key === "target") spawn.pane.target = "%2";
++      const fx = adapterHarness(frames(), spawn);
++      await assert.rejects(fx.ask, uncertain);
++      assert.deepEqual(fx.inputs, [`\x1b[200~${measured.prompt}\x1b[201~`, "\r"]);
++      assert.equal(fx.buffers.size, 0);
++    }
++  });
++
++  test(`trial15 ${version} geometry drift during ask cannot borrow the completed reply or replay`, async () => {
++    for (const stage of [0, 1, 2, 3]) {
++      for (const dimension of ["width", "height"]) {
++        const records = frames();
++        // Change both observations coherently; this is not a mismatched display-message stub.
++        records[stage].pane[dimension]++;
++        records[stage].submitState[dimension] = String(records[stage].pane[dimension]);
++        if (stage === 0) {
++          // The source-backed shortcuts composer is valid outside the measured live size.
++          replaceRow(records[0], 38, "? for shortcuts");
++          replaceRow(records[0], 39, "");
++          if (dimension === "width") {
++            replaceRow(records[0], 35, "─".repeat(121));
++            replaceRow(records[0], 37, "─".repeat(121));
++          }
++        }
++        const fx = adapterHarness(records);
++        await assert.rejects(fx.ask, (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED"
++          && error.reason === (stage === 0 || stage === 3 ? "acceptance_uncertain" : "unknown_state"));
++        assert.deepEqual(fx.inputs, stage === 0 || stage === 3
++          ? [`\x1b[200~${measured.prompt}\x1b[201~`, "\r"]
++          : [`\x1b[200~${measured.prompt}\x1b[201~`]);
++        assert.equal(fx.buffers.size, 0);
++      }
++    }
++  });
++}
++
++test("trial15 2.1.294 geometry drift while observing remains uncertain even if the original layout returns", async () => {
++  for (const dimension of ["width", "height"]) {
++    const records = [delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++      delayedProfile.working, delayedProfile.working, delayedProfile.after].map(clone);
++    records[4].pane[dimension]++;
++    records[4].submitState[dimension] = String(records[4].pane[dimension]);
++    const fx = delayedHarness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.waits, [150, 1500, 1000]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
