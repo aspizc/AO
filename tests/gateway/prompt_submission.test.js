@@ -1094,3 +1094,241 @@ test("trial4 observed Claude post-Enter pane is not acceptance evidence", async 
   assert.deepEqual(fx.inputs, ["\x1b[200~Enter\x1b[201~", "\r"]);
   assert.equal(fx.buffers.size, 0);
 });
+
+const trial5Profiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial5.json", import.meta.url), "utf8"));
+const trial5Codex = trial5Profiles.find((profile) => profile.provider === "codex");
+const trial5Claude = trial5Profiles.find((profile) => profile.provider === "claude-code");
+function trial5Draft(profile) {
+  const rows = profile.preAsk.snapshot.split("\n");
+  rows[36] = (profile.provider === "codex" ? "› " : "❯\u00a0") + profile.prompt;
+  if (profile.provider === "codex") rows[39] = "  tab to queue message" + " ".repeat(97);
+  return { snapshot: rows.join("\n"), pane: { ...profile.preAsk.pane, cursorX: profile.prompt.length + 2 } };
+}
+
+test("trial5 observed Codex four-row Working and spinner status refuse initial input as busy", async () => {
+  const after = trial5Codex.error;
+  assert.equal(after.pane.cursorX, 2);
+  assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane).state, "busy");
+  const fx = trial3Fixture("codex", [after], trial5Codex.prompt);
+  await assert.rejects(fx.ask, reason("busy"));
+  assert.deepEqual(fx.inputs, []);
+  assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+});
+
+test("trial5 fresh exact prompt transcript plus Working establishes Codex acceptance after one Enter", async () => {
+  const profile = trial5Codex, draft = trial5Draft(profile);
+  const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, profile.error], profile.prompt);
+  const result = await fx.ask();
+  assert.equal(result.snapshot, profile.error.snapshot);
+  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("trial5 Codex missing wrong or stale prompt echo and stale Working cannot confirm this Enter", async () => {
+  const profile = trial5Codex, draft = trial5Draft(profile);
+  const rows = profile.error.snapshot.split("\n");
+  const missing = [...rows]; missing[17] = "";
+  const wrong = [...rows]; wrong[17] = "› " + "x".repeat(profile.prompt.length);
+  const staleBefore = profile.preAsk.snapshot.split("\n"); staleBefore[17] = rows[17];
+  const staleGuard = draft.snapshot.split("\n"); staleGuard[17] = rows[17];
+  const staleWork = profile.preAsk.snapshot.split("\n"); staleWork[10] = rows[32];
+  for (const [before, guard, after] of [
+    [profile.preAsk, draft, { ...profile.error, snapshot: missing.join("\n") }],
+    [profile.preAsk, draft, { ...profile.error, snapshot: wrong.join("\n") }],
+    [{ ...profile.preAsk, snapshot: staleBefore.join("\n") }, draft, profile.error],
+    [profile.preAsk, { ...draft, snapshot: staleGuard.join("\n") }, profile.error],
+    [{ ...profile.preAsk, snapshot: staleWork.join("\n") }, draft, profile.error],
+  ]) {
+    const fx = trial3Fixture("codex", [before, draft, guard, after], profile.prompt);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  }
+});
+
+test("trial5 spinner alone unknown status and changed target cannot establish Codex acceptance", async () => {
+  const profile = trial5Codex, draft = trial5Draft(profile);
+  const rows = profile.error.snapshot.split("\n");
+  const noWork = [...rows]; noWork[32] = "";
+  const status = [...rows]; status[38] = "  unrecognized status · ⠦";
+  for (const after of [{ ...profile.error, snapshot: noWork.join("\n") },
+    { ...profile.error, snapshot: status.join("\n") }]) {
+    const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], profile.prompt);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  }
+});
+
+test("trial5 completed Claude answer and blank composer remain uncertain without a fresh turn witness", async () => {
+  const profile = trial5Claude, draft = trial5Draft(profile);
+  assert.equal(profile.later.pane, null, "root did not record later metadata");
+  const fx = trial3Fixture("claude-code", [profile.preAsk, draft, draft, profile.error], profile.prompt);
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("trial5 stale source-profile Working history cannot become acceptance after reflow", async () => {
+  const historical = "• Working (9s • esc to interrupt)\nold transcript\n";
+  const fx = fixture({ screens: [historical + empty, pending("Enter"), pending("Enter"), working] });
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, ["\x1b[200~Enter\x1b[201~", "\r"]);
+});
+
+test("trial5 viewport reflow duplicate echo another user turn and pane replacement refuse acceptance", async () => {
+  const profile = trial5Codex, draft = trial5Draft(profile);
+  const original = profile.error.snapshot.split("\n");
+  const reflow = [...original]; reflow[10] = "viewport history changed";
+  const duplicate = [...original]; duplicate[19] = original[17];
+  const other = [...original]; other[19] = "› an unrelated request";
+  for (const rows of [reflow, duplicate, other]) {
+    const after = { ...profile.error, snapshot: rows.join("\n") };
+    const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], profile.prompt);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  }
+  const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, profile.error], profile.prompt);
+  const run = (args, options) => {
+    const result = fx.run(args, options);
+    if (args[0] === "display-message" && args.at(-1).startsWith("#{pid}|") && fx.inputs.includes("\r")) {
+      return { ...result, stdout: result.stdout.replace("100|%12|200|", "100|%12|300|") };
+    }
+    return result;
+  };
+  await assert.rejects(() => base.submitPrompt({ target: "%12", provider: "codex", prompt: profile.prompt, run, wait: async () => {} }), reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial5 completed Codex transcript alone remains uncertain without active fresh Working", async () => {
+  const profile = trial5Codex, draft = trial5Draft(profile);
+  // Later metadata is absent in the root result. This is a conservative test
+  // using inherited geometry, not an observed later cursor measurement.
+  const later = { ...profile.later, pane: profile.error.pane };
+  const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, later], profile.prompt);
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial5 active four-row Working refuses input even without a spinner and rejects malformed live gaps", async () => {
+  const after = trial5Codex.error;
+  const rows = after.snapshot.split("\n");
+  const noSpinner = { ...after, snapshot: after.snapshot.replace(" · ⠦", "") };
+  const fx = trial3Fixture("codex", [noSpinner], trial5Codex.prompt);
+  await assert.rejects(fx.ask, reason("busy"));
+  assert.deepEqual(fx.inputs, []);
+  for (const index of [33, 35]) {
+    const changed = [...rows]; changed[index] = "unrecognized live region";
+    assert.equal(base.classifyProviderPane("codex", changed.join("\n"), after.pane).state, "unknown_state");
+  }
+});
+
+const trial6Profiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial6.json", import.meta.url), "utf8"));
+const trial6Codex = trial6Profiles.find((profile) => profile.provider === "codex");
+// Pinned primary table, also used by status-line thread-title progress:
+// https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs#L31-L36
+const trial6SpinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+function trial6Frame(frame) {
+  return { ...trial6Codex.error, snapshot: trial6Codex.error.snapshot.replace(" · ⠼", ` · ${frame}`) };
+}
+
+for (const frame of trial6SpinnerFrames) {
+  test(`trial6 pinned frame ${frame} refuses busy input and confirms only fresh prompt plus Working after one Enter`, async () => {
+    const profile = trial6Codex, after = trial6Frame(frame), draft = trial5Draft(profile);
+    for (const phase of ["ready", "draft"]) {
+      const classified = base.classifyProviderPane("codex", after.snapshot, after.pane, phase);
+      assert.equal(classified.state, "busy");
+      assert.equal(classified.modernWork, true);
+      assert.equal(classified.workRow, 32);
+    }
+    const busy = trial3Fixture("codex", [after], profile.prompt);
+    await assert.rejects(busy.ask, reason("busy"));
+    assert.deepEqual(busy.inputs, []);
+    assert.equal(busy.calls.some((call) => call.args[0] === "load-buffer"), false);
+    const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], profile.prompt);
+    assert.equal((await fx.ask()).snapshot, after.snapshot);
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+    assert.equal(fx.buffers.size, 0);
+  });
+
+  test(`trial6 frame ${frame} alone or with missing or stale prompt cannot witness this Enter`, async () => {
+    const profile = trial6Codex, after = trial6Frame(frame), draft = trial5Draft(profile);
+    const noWork = after.snapshot.split("\n"); noWork[32] = "";
+    assert.equal(base.classifyProviderPane("codex", noWork.join("\n"), after.pane).state, "unknown_state");
+    const initial = trial3Fixture("codex", [{ ...after, snapshot: noWork.join("\n") }], profile.prompt);
+    await assert.rejects(initial.ask, reason("unknown_state"));
+    assert.deepEqual(initial.inputs, []);
+    const noEcho = after.snapshot.split("\n"); noEcho[17] = "";
+    const stale = profile.preAsk.snapshot.split("\n"); stale[17] = after.snapshot.split("\n")[17];
+    for (const [before, observation] of [
+      [profile.preAsk, { ...after, snapshot: noWork.join("\n") }],
+      [profile.preAsk, { ...after, snapshot: noEcho.join("\n") }],
+      [{ ...profile.preAsk, snapshot: stale.join("\n") }, after],
+    ]) {
+      const fx = trial3Fixture("codex", [before, draft, draft, observation], profile.prompt);
+      await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+      assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+    }
+  });
+}
+
+test("trial6 unknown glyphs and altered spinner indentation or padding refuse rather than broaden the pinned profile", async () => {
+  const profile = trial6Codex, draft = trial5Draft(profile);
+  for (const suffix of ["⠿", "⣿", "*", "⠼\t", "⠼ extra", "⠼⠦"]) {
+    const after = trial6Frame(suffix);
+    assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane).state, "unknown_state");
+    const initial = trial3Fixture("codex", [after], profile.prompt);
+    await assert.rejects(initial.ask, reason("unknown_state"));
+    assert.deepEqual(initial.inputs, []);
+    const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], profile.prompt);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  }
+  const padded = trial6Frame("⠼   ");
+  assert.equal(base.classifyProviderPane("codex", padded.snapshot, padded.pane).state, "busy");
+  const changed = padded.snapshot.split("\n"); changed[38] = changed[38].slice(1);
+  assert.equal(base.classifyProviderPane("codex", changed.join("\n"), padded.pane).state, "unknown_state");
+});
+
+test("trial6 measured completed panes stay uncertain even with recorded later cursor metadata", async () => {
+  for (const profile of trial6Profiles) {
+    assert.equal(profile.later.pane.cursorX, 2);
+    assert.equal(profile.later.pane.cursor, 36);
+    const draft = trial5Draft(profile);
+    const fx = trial3Fixture(profile.provider, [profile.preAsk, draft, draft, profile.later], profile.prompt);
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  }
+});
+
+test("trial7 fresh echo replacing a prior nonblank non-echo row cannot confirm this Enter", async () => {
+  const profile = trial6Codex, draft = trial5Draft(profile);
+  const beforeRows = profile.preAsk.snapshot.split("\n");
+  const guardRows = draft.snapshot.split("\n");
+  // The prefix is unchanged, but this row was occupied in both prior views.
+  beforeRows[17] = guardRows[17] = "existing transcript content";
+  const before = { ...profile.preAsk, snapshot: beforeRows.join("\n") };
+  const guard = { ...draft, snapshot: guardRows.join("\n") };
+  const after = profile.error;
+  assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane, "draft").modernWork, true);
+  const fx = trial3Fixture("codex", [before, guard, guard, after], profile.prompt);
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${profile.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("trial7 exact printable non-ASCII prompt echo with fresh Working cannot confirm this Enter", async () => {
+  const profile = trial6Codex, prompt = "héllo";
+  const draftRows = profile.preAsk.snapshot.split("\n");
+  draftRows[36] = `› ${prompt}`;
+  // Keep the admitted warnings footer: the queue profile independently refuses
+  // non-ASCII drafts and would prevent this test from reaching the witness.
+  const draft = { snapshot: draftRows.join("\n"), pane: { ...profile.preAsk.pane, cursorX: prompt.length + 2 } };
+  const afterRows = profile.error.snapshot.split("\n");
+  afterRows[17] = `› ${prompt}` + " ".repeat(18);
+  const after = { ...profile.error, snapshot: afterRows.join("\n") };
+  assert.equal(base.classifyProviderPane("codex", draft.snapshot, draft.pane, "draft").text, prompt);
+  assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane, "draft").modernWork, true);
+  const fx = trial3Fixture("codex", [profile.preAsk, draft, draft, after], prompt);
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.buffers.size, 0);
+});

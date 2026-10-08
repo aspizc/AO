@@ -1,0 +1,10 @@
+{
+  "entryHEAD": "e5e6387a4b62d0ad3c13cfca74be76bb8fb38d12",
+  "productionSourceUnchanged": true,
+  "addedTests": 2,
+  "priorTrackedArtifactsUnchanged": 39,
+  "trial5AndTrial6FixturesUnchanged": true,
+  "trial6CandidateExceptTestsUnchanged": true,
+  "diffCheck": "passed",
+  "scratchSetup": "First runs also failed a separate existing tool-envelope test due to omitted installed dependencies, then omitted static contracts. Read-only dependency symlinks and copies of gateway/contracts resolved those setup errors. Final mutation runs each fail only their intended new test. No shared production source mutation."
+}

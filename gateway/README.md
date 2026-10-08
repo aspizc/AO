@@ -150,6 +150,34 @@ follows one Enter and an `acceptance_uncertain` result; it proves neither
 successful acceptance nor permission to replay. Its footer needs no matching
 change. Live acceptance and the independent review of the inherited trial 3
 phase correction remain open.
+[Trial 5 sanitized captures](../tests/gateway/fixtures/a04_live_profiles_trial5.json)
+show both providers answered the disposable prompt, while `agent.ask` returned
+`acceptance_uncertain`. Answer occurrence counts do not establish tool success.
+The new measured Codex busy layout recognizes the active Working row four rows
+above the composer, its padded empty placeholder and the observed status suffix
+`· ⠦`. That suffix never proves acceptance alone. The post-Enter witness also
+requires a current single-line ASCII prompt echo newly inserted into a previously
+blank transcript row, unchanged preceding viewport rows, no stale Working/echo
+in initial or final-guard history, and matching server/pane identity and size.
+Duplicate echoes, intervening user turns, reflow and missing witnesses stay
+uncertain without replay. The retained source-profile Working path now rejects
+prior Working history independent of clock/row movement. Trial 6 admits only the
+ten explicit spinner frames in the pinned 0.160.1
+[status/title frame table](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/status_surfaces.rs#L31-L36),
+also used by [status-line thread-title progress](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/chatwidget/thread_title_status.rs#L20-L49).
+Unknown suffixes and completed-only Codex captures remain uncertain.
+Codex's Working and user-history markers are grounded in the pinned
+[status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
+and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).
+Claude's completed `●` response is left uncertain: the supplied snapshots lack
+pre-Enter guard capture and a verified 2.1.293 fresh-turn renderer contract.
+The [operator evidence request](../plan/PROJECT_V6/reviews/A_0_4-live-profile-5_operator-evidence-request.md)
+records the missing timing and turn-binding measurements. Trial 5 lacked later
+metadata; the [latest trial 6 captures](../tests/gateway/fixtures/a04_live_profiles_trial6.json)
+include measured later cursor metadata and the newly observed `⠼` frame. They
+still lack the pre-Enter guard capture and monotonic stage timestamps. The script waits
+7 seconds after failure before its later snapshot. Simulated success against
+sanitized Codex captures does not establish a successful live `agent.ask` retry.
 Root coordinates live provider launches, including Antigravity `1.3.0`.
 V6 A/0/04 is not closed.
 

@@ -13,13 +13,16 @@ const codexQueueFooter = /^  tab to queue message *$/;
 const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
 // Measured 0.160.1 status row; this is rendering evidence, not model selection.
 const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
+// Codex 0.160.1 status_surfaces.rs: explicit spinner frames, never acceptance alone.
+const codexSpinnerStatus = /^  GPT-6\.1-Sol medium fast · \S+ · [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] *$/;
+const codexWorking = /^• Working \([0-9hms .]+• esc to interrupt\) *$/;
 function codexGap(rows, cursor, footer) {
   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
-    && !codexLiveStatus.test(rows[footer - 1])) return false;
+    && !(codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))) return false;
   return rows.slice(cursor + 1, footer).every((row, index) => row.trim() === ""
     || (cursor + 1 + index === footer - 1
       && (codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
-      && codexLiveStatus.test(row)));
+      && (codexLiveStatus.test(row) || codexSpinnerStatus.test(row))));
 }
 function invalidText(text, allowNewlines) {
   return typeof text !== "string" || !text || !text.isWellFormed()
@@ -112,7 +115,7 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
     const textRows = rows.slice(start, pane.cursor + 1);
     if (textRows.slice(1).some((row) => !row.startsWith("  "))) return { state: "unknown_state" };
     let text = [textRows[0].replace(/^\s*[›»] ?/, ""), ...textRows.slice(1).map((row) => row.slice(2))].join("\n");
-    if (text === "Ask Codex to do anything" && pane.cursorX === 2 && pane.cursor === start) text = "";
+    if (text.replace(/ +$/, "") === "Ask Codex to do anything" && pane.cursorX === 2 && pane.cursor === start) text = "";
     // The measured queue footer identifies only a fully visible pasted draft.
     // It cannot authorize initial input or prove acceptance, even with a placeholder.
     if (codexQueueFooter.test(rows[footer]) && (phase !== "draft" || !text
@@ -120,9 +123,15 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
       || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
       || rows.slice(footer + 1).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
     const status = rows.slice(Math.max(0, start - 2), start).join("\n");
-    const busy = /Working \([0-9hms .]+[•·] esc to interrupt\)/.test(status);
+    const modernWork = (codexLiveStatus.test(rows[footer - 1]) || codexSpinnerStatus.test(rows[footer - 1]))
+      && codexWorking.test(rows[start - 4])
+      && rows[start - 3]?.trim() === "" && rows[start - 1]?.trim() === "";
+    if (codexSpinnerStatus.test(rows[footer - 1]) && !modernWork) return { state: "unknown_state" };
+    const busy = modernWork || /Working \([0-9hms .]+[•·] esc to interrupt\)/.test(status);
     // A cursor outside the measured composer cannot prove that Enter targets it.
-    return { state: busy ? "busy" : "composer", text, identity: `${start}:${footer}:${pane.width}:${pane.height}` };
+    return { state: busy ? "busy" : "composer", text, modernWork,
+      workRow: modernWork ? start - 4 : codexWorking.test(rows[start - 2]) ? start - 2 : null,
+      identity: `${start}:${footer}:${pane.width}:${pane.height}` };
   }
   if (provider === "pi") {
     const borders = rows.map((row, index) => /^─{3,}$/.test(row) ? index : -1).filter((index) => index >= 0);
@@ -265,6 +274,26 @@ function requireComposer(observation, text, identity) {
   }
 }
 
+function freshCodexWork(ready, guard, after, prompt) {
+  if (after.workRow === null || after.workRow === undefined
+    || ["serverPid", "target", "panePid", "width", "height"].some((key) => after[key] !== guard[key])) return false;
+  const prior = [ready, guard].map((observation) => observation.snapshot.split("\n").slice(0, Number(observation.cursorY)));
+  // Ignore clock changes and row movement: a prior Working row is stale evidence.
+  if (prior.some((rows) => rows.some((row) => codexWorking.test(row)))) return false;
+  if (!after.modernWork) return true; // Retained source profile: newly appearing active Working row.
+  if (/[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
+  const rows = after.snapshot.split("\n");
+  const echo = `› ${prompt}`;
+  const echoes = rows.slice(0, after.workRow).map((row, index) => row.replace(/ +$/, "") === echo ? index : -1)
+    .filter((index) => index >= 0);
+  if (echoes.length !== 1) return false;
+  const index = echoes[0];
+  // A newly inserted user history cell, not old history shifted into the viewport.
+  return prior.every((before) => !before.some((row) => row.replace(/ +$/, "") === echo)
+    && before[index]?.trim() === "" && rows.slice(0, index).every((row, offset) => row === before[offset]))
+    && !rows.slice(index + 1, after.workRow).some((row) => /^› /.test(row));
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const boundedDelay = (value, fallback, max) => Number.isSafeInteger(value) && value >= 0 ? Math.min(value, max) : fallback;
 
@@ -279,7 +308,8 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
   const owned = new Set();
   try {
     capability(run);
-    requireComposer(observe(run, target, provider, owned), "");
+    const ready = observe(run, target, provider, owned);
+    requireComposer(ready, "");
     buffer = `agents-prompt-${randomUUID()}`;
     owned.add(buffer);
     checkedRun(run, buildLoadBufferCmd({ buffer }), { input: prompt });
@@ -297,7 +327,10 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
       delivered = true;
       await wait(boundedDelay(config.tmuxAskDelayMs, 1500, 5000));
       const after = observe(run, target, provider, owned, "draft");
-      if (after.state === "busy" && after.text === "") return { snapshot: after.snapshot, dryRun: false };
+      if (after.state === "busy" && after.text === ""
+        && (provider !== "codex" || freshCodexWork(ready, guard, after, prompt))) {
+        return { snapshot: after.snapshot, dryRun: false };
+      }
       if (after.state !== "composer" || after.text !== prompt || after.identity !== pending.identity) {
         throw submissionError("acceptance_uncertain");
       }
