@@ -1,0 +1,260 @@
+{
+  "status": "partial unreviewed candidate; new pre-result failure remains RED",
+  "head": "98ebd202aff5a92dc401e260b69ff73a1421be70",
+  "checkpoint7Verification": {
+    "filesMatched": 47,
+    "evidenceArchivesMatched": 8,
+    "manifestSha256": "27c27422fbf4a94ea3f1e26f7a12d30d55da1095e2195634d716f2f8246a44e4"
+  },
+  "changedSinceCheckpoint7": [
+    "tests/gateway/request_context_reattach.test.js"
+  ],
+  "files": {
+    "ci/suites.json": {
+      "sha256": "4a8394c0392b387613c31883f683f313fc45cce3bf5ea7a843e9a8174abea1ba",
+      "gitBlobSha1": "c0cd96dbe64ae09a913046a67ffb07b1fbb338e7"
+    },
+    "docs/mcp-tool-catalog.md": {
+      "sha256": "2db5ce6b666b4ffa380901c0f19e30fcd87869624d1abb8a9ff88e096431e399",
+      "gitBlobSha1": "a598fa4ebb613c7e2b5cd448c3b16ccc0e2fe742"
+    },
+    "gateway/README.md": {
+      "sha256": "08851f357f60ab1c02e568bb010bffd3bc9d80ae2041bfde4cbc4f6e1fef1430",
+      "gitBlobSha1": "42905aaeded86894ea6a8307397481f779f323e5"
+    },
+    "gateway/contracts/mcp-tools-v1.json": {
+      "sha256": "45737b674ac8fbc9ba83b2719e89f867130523f0d4e9ddfcc39b56a0a1ca42dc",
+      "gitBlobSha1": "412fb248bff6bf6ca495100b3ef8c234ea21447f"
+    },
+    "gateway/contracts/orchestrator-profile-v1.json": {
+      "sha256": "3bce5c93f8d2b293c490450ea14525a7b0dc9e5cd007ed444c727446846670c2",
+      "gitBlobSha1": "31a7bfade2b003c9e560dbbd3cb3514c419b1e31"
+    },
+    "gateway/migrations/005_request_context_lineage.sql": {
+      "sha256": "bd583a4311f34751c75b0478f958800514199c6fd7163d3fe819b54658e28429",
+      "gitBlobSha1": "56de7f36724b6e6762487439a71648db2c87bff8"
+    },
+    "gateway/src/adapters/request_launch_cleanup.js": {
+      "sha256": "a076a0899fbed912ba5c7478dd2da1d719ad9a3df75e8071f06f16962cb10d55",
+      "gitBlobSha1": "1d3cf070fcb96936cff86df51330b42f9059c7c9"
+    },
+    "gateway/src/adapters/request_recovery_observations.js": {
+      "sha256": "56bd0718befffb5cb74e0ec9ac90c62284a8e3ef1a0b601b7a26281ea938c308",
+      "gitBlobSha1": "577a2d85a3670e10f787caf43fdff241030ba149"
+    },
+    "gateway/src/core/policy_types.js": {
+      "sha256": "fdd7e555137a793a7acd34d016fc6f3c16e5157bef42cbd6fea160df7da5c377",
+      "gitBlobSha1": "b25ebeb3e9b8420215b83ced4bb4195603e54c22"
+    },
+    "gateway/src/core/repositories/lifecycle_repo.js": {
+      "sha256": "2348f5cbf6eb94be1566b9656d5adfa64a0904f0e0a999f1cbe0c0497396c829",
+      "gitBlobSha1": "585fdbf94427a76f2c97183f1d361c3f41639527"
+    },
+    "gateway/src/core/repositories/request_context_repo.js": {
+      "sha256": "e51e24609a7be46cfd2dae230edd8919c29d118064efddd91fd52d03de220582",
+      "gitBlobSha1": "d558983a75ef55841fad3783adcc3e8b425e9649"
+    },
+    "gateway/src/core/repositories/task_repo.js": {
+      "sha256": "ca2b524e2a018d77c74a20c38ea3a7da7fcecf67a9bf488e7539661b80be8d1e",
+      "gitBlobSha1": "82fdaaf050c351650453714d2a94e72ff4d87ed7"
+    },
+    "gateway/src/core/request_context.js": {
+      "sha256": "446755747e7a370ccae40c05c5855a07b3622501d4e63b35f7237444b23c9f6e",
+      "gitBlobSha1": "c5796dd9abf7c876b8429589891ce4c7759c7fe1"
+    },
+    "gateway/src/core/request_recovery_identity.js": {
+      "sha256": "f6b6a0518567159b2e50d90722d3caab70400b852119287905f5e2a690c3d80a",
+      "gitBlobSha1": "1f26df708a64ab2c7c17ed772dbc1370b8757077"
+    },
+    "gateway/src/core/sqlite_migration_sets.js": {
+      "sha256": "0befbe1cf09f0d8373a70b9163fed86b971c455dec51cdc404eaf128050780a2",
+      "gitBlobSha1": "6af22bda3c4ac2032abc6897d5bf8c5125cb6f61"
+    },
+    "gateway/src/mcp_server.js": {
+      "sha256": "1737ae97fce47fde9cfca916318d236cd4038e925a31141c0ffa20fa64df8d4a",
+      "gitBlobSha1": "7913c56a43c3a89f7639ed6a98d7deae5c381e2d"
+    },
+    "gateway/src/services/agent_service.js": {
+      "sha256": "4d2eb60a63afd71372eb9bdc6e89bfbe7951157494bd4b11dad58d79f1d48c72",
+      "gitBlobSha1": "cfe72061cfeaea37f9182d50d85767d171876d35"
+    },
+    "gateway/src/services/request_recovery_service.js": {
+      "sha256": "90e6b9f533ff4cc202c2c6165697e9d6e9cb4cd02e57237cb0dfa677d5657613",
+      "gitBlobSha1": "23032ac14e6ad1ca37f2ae093847d03a371ca6d1"
+    },
+    "gateway/src/services/task_service.js": {
+      "sha256": "977bf25e4dbf9a8d998790604aea6fac4fed413dfa59d97a04374a1ec0df26b2",
+      "gitBlobSha1": "1c389c2c25a7d475f5ae2335c6299f81d6aab635"
+    },
+    "gateway/src/tools/agent.js": {
+      "sha256": "6450724f90a83db61a3f028377bdfd294b807067430b44d83c1c9ee04ba5b8d8",
+      "gitBlobSha1": "aa909ee7fbd6593ea490c9af49ce44492c2fa0cd"
+    },
+    "gateway/src/tools/catalog.js": {
+      "sha256": "d8f068acdfb17ba8dc188069ca0543cad832e03336d07fbc3f3a39a7a3b6cbb6",
+      "gitBlobSha1": "0f663b3793ec72ac272562a98e3e1a62ba16af30"
+    },
+    "gateway/src/tools/index.js": {
+      "sha256": "bd0f12586cf69c63bf1bda1bea76ed600ee48777c6d87d70a225dae37cac2e3a",
+      "gitBlobSha1": "61216f903804a7969c3dc648f7d3fda23cfc141c"
+    },
+    "gateway/src/tools/orchestration.js": {
+      "sha256": "783b635890bef92c372b1c27c72b3ba10d2f32864450f372338d0cd70214f513",
+      "gitBlobSha1": "b9ef30fc7abebe37896b3918a515b6d75cd50006"
+    },
+    "gateway/src/tools/tool_helpers.js": {
+      "sha256": "b925fc5ea7a5a19d401e545db57d5388449615a37bf095239d0a5f77ef9d5cdb",
+      "gitBlobSha1": "b7694026d27f5e9b8e8840525e28ccfa9ef0ed91"
+    },
+    "gateway/tests/scaffold.test.js": {
+      "sha256": "131f509531b083de8e9a3651f186fb9a64f602949995e9b6f72555eca94db201",
+      "gitBlobSha1": "1815a7128aa5fd6a23319ef53c9be7fe018c3a55"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-4_implementation_checkpoint.md": {
+      "sha256": "1313c4bd366148f7541620efe4cc89c44fc0ed0095d7e83f6aeb30db47c4d1ba",
+      "gitBlobSha1": "581da756b8ff42d947746fecede682afe43e9ab1"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-5_implementation_checkpoint.md": {
+      "sha256": "cf0647a15b1b789b0c4cd3b9a3758d688cf6021a5420bacf77bfefe9a8888d6a",
+      "gitBlobSha1": "0a71ffa92c4f2b2fa08e2fc858856f49881f920f"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-6_implementation_checkpoint.md": {
+      "sha256": "428659565a718a8335cd17aaf8836b33143b25de132a7659b8573447a0f51502",
+      "gitBlobSha1": "7b332cf2a2e26c20ba4088ec5b45114e62a832dc"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-accept-checkpoint-6-manifest.json": {
+      "sha256": "2ef489b8af2248862a3c21a54fb618b1ce336bb70e91b8f0c88bda762088bf20",
+      "gitBlobSha1": "33fe2834e8d68fd97521f2773ce6cc2e11d55081"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-medium-tmux-attribution.mjs": {
+      "sha256": "d5781e9185f4b37cad6e4d68268997c8c1297839c69f6a7f10f89afe0fce28d7",
+      "gitBlobSha1": "461b2f5b5bbe99c5192744729af5b362a01e363a"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-runtime-checkpoint-5-manifest.json": {
+      "sha256": "e0d5d38edb6519cb0ea08de48ea327c9a48f2206ad20d18754d175c6f60b03ec",
+      "gitBlobSha1": "6db8c9b8a2ede5428f6faf878295b0c0d30e20ad"
+    },
+    "tests/gateway/coordination_consumer_epoch_migrations.test.js": {
+      "sha256": "8b0a0eec2d19b2c96218064e845d994a63f7a2c71e47d1c422d6eafc56bebee4",
+      "gitBlobSha1": "30a450482698f0de0b32967850825463fd21a5af"
+    },
+    "tests/gateway/helpers/owned_tmux_fixture.js": {
+      "sha256": "bfb52417bc4a8c363fdcf687af67ce84f62f36b04a5fe2a3e311ca985fa2cabd",
+      "gitBlobSha1": "44c582d397cd0ddfdf23316cf7ce196eb3b3d715"
+    },
+    "tests/gateway/helpers/reattach_race_worker.js": {
+      "sha256": "681e23d55d1a3a6d82511310014408a9575d4da4b3da64e72dfd597e294acf19",
+      "gitBlobSha1": "5096e10089a4bef0bf6b266032e03aec727f23d8"
+    },
+    "tests/gateway/mcp_bootstrap.test.js": {
+      "sha256": "cf2de0e9e38637630544411681794ad3243c74965026f5ce8fb79b988de5764c",
+      "gitBlobSha1": "6c4d3822959ee8d06a787ad40e275f7700e8a193"
+    },
+    "tests/gateway/orchestrator_profile_contract.test.js": {
+      "sha256": "c3a788f9466b0ffb82b57418ec602357adfd33a7d3997e930c78cfc87df0ea98",
+      "gitBlobSha1": "3f3c1ff6676ab249c4b22b36989afe5308909aa9"
+    },
+    "tests/gateway/request_context_reattach.test.js": {
+      "sha256": "7f34172629cbaded80e6c9d9e05c1402680dbf1b37f229119fd22c538b9d8e75",
+      "gitBlobSha1": "3bc555e15fb5928214e08d29a5838237cd6108f1"
+    },
+    "tests/gateway/request_context_reattach_bootstrap.test.js": {
+      "sha256": "8e7c7c242963a1a6da31366196d6144d8c89f1a4adb725c4e59e21adf8cd2dc8",
+      "gitBlobSha1": "a4c1fd4386b9682aa181e3273a64c10310130ee6"
+    },
+    "tests/gateway/request_context_reattach_identity.test.js": {
+      "sha256": "c635b621bf7556b7b4fd55d7311431c335f945a3eddfb4221dabe9412a75c913",
+      "gitBlobSha1": "8d4ec8cb96542a63f445757d6a8d54460eadaae3"
+    },
+    "tests/gateway/request_context_reattach_observations.test.js": {
+      "sha256": "cc66ace93e75fac2c7837614a1f91fba7adaeafb681d2e1bff03ef863dc5a668",
+      "gitBlobSha1": "c3c0d7a2251df97f4d0a623131fa7fcee39bb765"
+    },
+    "tests/gateway/request_context_reattach_repository.test.js": {
+      "sha256": "d7c5180029c43a85675227d6e05ee0f2cb2fc4da12fd95d0f20ddc3cffe5eb59",
+      "gitBlobSha1": "a5857dc5f6dec80a90d022bc7b276e6efe60fba3"
+    },
+    "tests/gateway/task_service.test.js": {
+      "sha256": "2746f24625c211e594414b72e081c31aeeff50d795e8c5cfd79bd83d51026188",
+      "gitBlobSha1": "d0cd888c8e551efdfd6ce4926b47a8bea79c135e"
+    },
+    "tests/gateway/tool_catalog.test.js": {
+      "sha256": "8784e2780279ca2e924ce593720ed8485c212d829a17385c0911130860f4c805",
+      "gitBlobSha1": "39ebb50bf8fe88e963525b707cca96525ebb14f9"
+    },
+    "tests/gateway/tool_coordination_registry.test.js": {
+      "sha256": "41b7d82e82a8b553964e48a6bd461837e10dadfbf65635cee545bca0f9c09fd3",
+      "gitBlobSha1": "187fcf57c7653f623ac2384e1cca86b968c83cbb"
+    },
+    "tests/gateway/tool_orchestration_task.test.js": {
+      "sha256": "67c024553bf7c3ec304e134acac51748d800630cc60abaa88e9bf6f31006af75",
+      "gitBlobSha1": "3d2f3a28aa1e47f82725d59e13487d6eefc0b7d0"
+    },
+    "workspace/root-a05-acceptance.md": {
+      "sha256": "07ac430ed3714b87968ccf664f2750786ed3d7d8084fbc4f3192ad89d2105c93",
+      "gitBlobSha1": "1cf1a7c856db842fabdadb71e1c237af7fba8b3f"
+    },
+    "workspace/root-a05-medium.md": {
+      "sha256": "8bb2d4f5ea10450e49e7c6cf95e0e14f57a9f5cd9178b4170cb71b3f59b776e0",
+      "gitBlobSha1": "07082a20e1a275342efcb72a8fa3b4d29105b593"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-7_implementation_checkpoint.md": {
+      "sha256": "a63a100f724a2186a715c1cd5a0670de6f9368c97aff98043a6070ae563c4547",
+      "gitBlobSha1": "6399e77e3c791fd257ce1492cd3342cd591ad3c4"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-cleanup-checkpoint-7-manifest.json": {
+      "sha256": "27c27422fbf4a94ea3f1e26f7a12d30d55da1095e2195634d716f2f8246a44e4",
+      "gitBlobSha1": "2a5c57a9d54e38853f62ff529e3563cc98367e17"
+    }
+  },
+  "evidence": {
+    "plan/PROJECT_V6/reviews/v6-a05-checkpoint8-safe-sandbox-attempt.txt.gz": {
+      "sha256": "9da9f3c10be4e001490e72c24a3a8e006bb34b5f30f0ceab0088abc6b11e8105",
+      "uncompressedSha256": "c24892c8f48b517694dbb6db82b6fbccca1ee17f216644bbeb703d92223f54ad",
+      "originalSourceSha256": "84dfd061bcc3e7dc31585bfaee4a62da626de8f9f990746ab1f0b054e8724d22",
+      "classification": "environment failure: tmux startup refused",
+      "totals": [
+        "# tests 1",
+        "# pass 0",
+        "# fail 1",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0"
+      ],
+      "sanitization": "JSON diagnostics omitted; checkout path and observed process tokens redacted; no process command lines"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-checkpoint8-safe-pre-result-red.txt.gz": {
+      "sha256": "df741bb76f3aca8740fa363a23090caa062a31ec8643c826f52982f8bebe902d",
+      "uncompressedSha256": "59ec1b7a3eb955889e22b5cef96c002cfd1f93afec05b96be0add4e8ca613801",
+      "originalSourceSha256": "56a4b0b3cb6014360a98463920a8acb5d13b5c4a41d68d288a3374c99dd7f2ff",
+      "classification": "behavioral RED: started child remained alive before teardown",
+      "totals": [
+        "# tests 1",
+        "# pass 0",
+        "# fail 1",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0"
+      ],
+      "sanitization": "JSON diagnostics omitted; checkout path and observed process tokens redacted; no process command lines"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-checkpoint8-safe-preserved-cleanup-green.txt.gz": {
+      "sha256": "75bee645f4ee8aa9e9b768cccf96d2d184f5e155e3ab0e4693e5f8ea71ec1bbd",
+      "uncompressedSha256": "7ace26c4327853258b6ba30a71f48f976225414215830894cc29a77da140c422",
+      "originalSourceSha256": "7c0b774c8b972915ce6ef0f60343ea7e3ffd3be462d8ee74d5072eab462a6e86",
+      "classification": "six preserved cleanup regressions pass",
+      "totals": [
+        "# tests 6",
+        "# pass 6",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0"
+      ],
+      "sanitization": "JSON diagnostics omitted; checkout path and observed process tokens redacted; no process command lines"
+    }
+  },
+  "scopeDecision": "tmux_client observation-hook scope clarification pending; excluded paths untouched",
+  "broadContainmentExecuted": false,
+  "independentReviewExecuted": false
+}

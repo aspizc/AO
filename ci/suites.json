@@ -123,7 +123,7 @@
         "gateway/tests/**/*.js"
       ],
       "exclude": [],
-      "inventorySha256": "sha256:b5f82220048369f596b0717805193e92285053dfac225548fe6f6189c74e91ab",
+      "inventorySha256": "sha256:c60c895b612e6f8d141e9c292f13e09652701f08a38fab33338faf63eaef654d",
       "allowedSkips": [],
       "timeoutSeconds": 120
     },
@@ -184,7 +184,7 @@
       "exclude": [
         "tests/gateway/*_live.test.js"
       ],
-      "inventorySha256": "sha256:06f926e022ddc2d4be7ac97dfe4d9158bedda0e1cc1e4c24dbf5341c082b67e5",
+      "inventorySha256": "sha256:91cd704bc467f7455585b73928e0920c8826eb434ec48a07ac3ff798f7ec164b",
       "minimumTests": 1,
       "timeoutSeconds": 900,
       "allowedSkips": [

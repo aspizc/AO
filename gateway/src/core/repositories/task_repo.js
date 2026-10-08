@@ -16,13 +16,18 @@ const actionByStatus = Object.freeze({
 });
 
 export function createTask(row) {
-  getDb()
+  const database = getDb();
+  database
     .prepare(
-      `INSERT INTO tasks
+      database.backend === "sqlite"
+        ? `INSERT INTO tasks
+       (task_id, trace_id, assigned_agent, assigned_role, repo, status, created_at, closed_at, target_action)
+       VALUES (@taskId, @traceId, @assignedAgent, @assignedRole, @repo, @status, @createdAt, @closedAt, @targetAction)`
+        : `INSERT INTO tasks
        (task_id, trace_id, assigned_agent, assigned_role, repo, status, created_at, closed_at)
        VALUES (@taskId, @traceId, @assignedAgent, @assignedRole, @repo, @status, @createdAt, @closedAt)`,
     )
-    .run(row);
+    .run({ ...row, targetAction: row.targetAction ?? null });
   return row;
 }
 

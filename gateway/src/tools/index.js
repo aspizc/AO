@@ -1,5 +1,6 @@
 import { AntigravityAdapter } from "../adapters/antigravity_adapter.js";
 import { ClaudeAdapter } from "../adapters/claude_adapter.js";
+import { withRequestLaunchCleanup } from "../adapters/request_launch_cleanup.js";
 import { CodexAdapter } from "../adapters/codex_adapter.js";
 import { GeminiAdapter } from "../adapters/gemini_adapter.js";
 import { OpencodeAdapter } from "../adapters/opencode_adapter.js";
@@ -13,7 +14,7 @@ import { buildApprovalTools } from "./approval.js";
 import { buildArtifactTools } from "./artifact.js";
 import { buildCoordinationTools } from "./coordination.js";
 import { buildMessageTools } from "./message.js";
-import { buildOrchestrationTools } from "./orchestration.js";
+import { buildOrchestrationTools, buildRecoveryTools } from "./orchestration.js";
 import { buildSessionTools } from "./session.js";
 import { buildTaskTools } from "./task.js";
 
@@ -36,11 +37,11 @@ export function getToolRegistry({
 } = {}) {
   const adapters = createAdapterRegistry({ config, registries });
   adapters.register("gemini-cli", new GeminiAdapter({ config, registries }));
-  adapters.register("claude-code", new ClaudeAdapter({ config, registries }));
-  adapters.register("codex", new CodexAdapter({ config, registries }));
-  adapters.register("antigravity", new AntigravityAdapter({ config, registries }));
-  adapters.register("pi", new PiAdapter({ config, registries }));
-  adapters.register("opencode", new OpencodeAdapter({ config, registries }));
+  adapters.register("claude-code", withRequestLaunchCleanup(new ClaudeAdapter({ config, registries })));
+  adapters.register("codex", withRequestLaunchCleanup(new CodexAdapter({ config, registries })));
+  adapters.register("antigravity", withRequestLaunchCleanup(new AntigravityAdapter({ config, registries })));
+  adapters.register("pi", withRequestLaunchCleanup(new PiAdapter({ config, registries })));
+  adapters.register("opencode", withRequestLaunchCleanup(new OpencodeAdapter({ config, registries })));
   const agentService = createAgentService({ adapters, registries, config });
   const coordination = coordinationFactory({ config });
 
@@ -53,6 +54,7 @@ export function getToolRegistry({
     ...buildMessageTools({ config }),
     ...buildSessionTools(),
     ...buildCoordinationTools({ coordination }),
+    ...buildRecoveryTools(),
   ]);
   let closePromise = null;
   Object.defineProperty(tools, REGISTRY_CLOSE, {

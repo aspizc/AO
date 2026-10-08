@@ -83,6 +83,7 @@ export function assignTask({ caller, target, repo = null, brief = "", traceId, r
     traceId,
     assignedAgent: targetAgent,
     assignedRole: target.role,
+    targetAction: targetContext.action,
     repo,
     status: "pending",
     createdAt: nowIso(),

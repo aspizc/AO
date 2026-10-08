@@ -1,0 +1,4 @@
+import fs from "node:fs"; import os from "node:os"; import path from "node:path"; import {spawnSync} from "node:child_process";
+const root=fs.mkdtempSync(path.join(os.tmpdir(),"a05-attribution-")); const env={...process.env,TMUX_TMPDIR:root}; delete env.TMUX;
+function run(args){const r=spawnSync("tmux",args,{env,encoding:"utf8",timeout:2000}); console.log(JSON.stringify({args,status:r.status,signal:r.signal,stderr:r.stderr,stdout:r.stdout,error:r.error?.code}));}
+try {run(["-V"]);run(["new-session","-d","-s","a05-owned","sleep","15"]);run(["has-session","-t","=a05-owned"]);run(["kill-session","-t","=a05-owned"]);run(["has-session","-t","=a05-owned"]);await new Promise(r=>setTimeout(r,100));run(["has-session","-t","=a05-owned"]);} finally {run(["kill-server"]);fs.rmSync(root,{recursive:true,force:true});}

@@ -51,8 +51,20 @@ const ROOT_BASELINE_SQLITE = freezeSet([
   },
 ]);
 
-export const GENERIC_APPLICATION_SQLITE = freezeSet(ROOT_BASELINE_SQLITE);
-export const WIRING_A_SQLITE = freezeSet(ROOT_BASELINE_SQLITE);
+const REQUEST_CONTEXT_LINEAGE_SQLITE = Object.freeze({
+  id: "005_request_context_lineage",
+  path: "gateway/migrations/005_request_context_lineage.sql",
+  sha256: "bd583a4311f34751c75b0478f958800514199c6fd7163d3fe819b54658e28429",
+});
+
+export const GENERIC_APPLICATION_SQLITE = freezeSet([
+  ...ROOT_BASELINE_SQLITE,
+  REQUEST_CONTEXT_LINEAGE_SQLITE,
+]);
+export const WIRING_A_SQLITE = freezeSet([
+  ...ROOT_BASELINE_SQLITE,
+  REQUEST_CONTEXT_LINEAGE_SQLITE,
+]);
 export const WIRING_B_EPOCH_SQLITE = freezeSet([
   ...ROOT_BASELINE_SQLITE,
   {
@@ -62,6 +74,7 @@ export const WIRING_B_EPOCH_SQLITE = freezeSet([
       + "005_coordination_consumer_runtime_epoch.sql",
     sha256: "ba5cef90d2d30d89339acbf3a3fdbe3cb43815f23737a5faeb1e00c78523ea7d",
   },
+  REQUEST_CONTEXT_LINEAGE_SQLITE,
 ]);
 
 const KNOWN_MIGRATION_SETS = new Set([

@@ -359,6 +359,7 @@
       "instruction": "Inspect state, record intervention evidence, and resume or cancel without duplicating work.",
       "tools": [
         "orchestration.view",
+        "orchestration.reattach",
         "orchestration.pause",
         "orchestration.resume",
         "orchestration.cancel",
@@ -649,6 +650,14 @@
       "risk": "high",
       "destructive": true,
       "idempotency": "caller-keyed",
+      "retry": "same-input-only",
+      "protectedEffect": true
+    },
+    "orchestration.reattach": {
+      "effect": "mutation",
+      "risk": "high",
+      "destructive": false,
+      "idempotency": "natural",
       "retry": "same-input-only",
       "protectedEffect": true
     }

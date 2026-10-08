@@ -7,6 +7,38 @@ import {
   reduceLifecycle,
 } from "../lifecycle.js";
 import { getDb } from "../state.js";
+import { createRequestContextRepository } from "./request_context_repo.js";
+
+const terminalObservers = new WeakMap();
+const pendingTerminals = new WeakMap();
+
+// Nested savepoints cannot publish memory invalidation. Before the next
+// protected call, check the committed business row; outer rollbacks vanish.
+export function flushLifecycleTerminals(database) {
+  if (database.inTransaction) return;
+  const pending = pendingTerminals.get(database);
+  pendingTerminals.delete(database);
+  for (const state of pending?.values() ?? []) {
+    const config = entityConfig[state.entityType];
+    const row = database.prepare(`SELECT * FROM ${config.table} WHERE ${config.idColumn} = ?`).get(state.entityId);
+    const committed = stateFromRow(state.entityType, row);
+    if (committed && isRecoveryTerminal(committed)) {
+      for (const observer of terminalObservers.get(database) ?? []) observer(committed);
+    }
+  }
+}
+
+export function subscribeLifecycleTerminal(database, observer) {
+  let observers = terminalObservers.get(database);
+  if (!observers) terminalObservers.set(database, observers = new Set());
+  observers.add(observer);
+  return () => observers.delete(observer);
+}
+
+function isRecoveryTerminal(state) {
+  return (state.entityType === "orchestration" && ["completed", "cancelled"].includes(state.status))
+    || (state.entityType === "session" && ["closed", "error"].includes(state.status));
+}
 
 const entityConfig = Object.freeze({
   orchestration: Object.freeze({
@@ -277,8 +309,14 @@ function persistSqlite({
       db,
       transitionValues({ command, currentState, nextState, digest }),
     );
+    if (isRecoveryTerminal(nextState)
+      && db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'request_context_lineage'").get()) {
+      const recovery = createRequestContextRepository({ database: db });
+      if (nextState.entityType === "orchestration") recovery.removeTerminalTrace(command.traceId);
+      else recovery.removeTerminalSession({ traceId: command.traceId, sessionId: command.entityId });
+    }
   });
-  persist();
+  persist.immediate();
 }
 
 function postgresUpdateSql(command) {
@@ -478,6 +516,16 @@ export function applyLifecycleCommand(command, options = {}) {
     );
   }
 
+  if (isRecoveryTerminal(nextState)) {
+    if (db.inTransaction) {
+      let pending = pendingTerminals.get(db);
+      if (!pending) pendingTerminals.set(db, pending = new Map());
+      pending.set(`${nextState.entityType}:${nextState.entityId}`, nextState);
+    } else {
+      flushLifecycleTerminals(db);
+      for (const observer of terminalObservers.get(db) ?? []) observer(nextState);
+    }
+  }
   return {
     state: nextState,
     transition: getTransitionByIdempotencyKey(command.idempotencyKey),
