@@ -1,0 +1,17 @@
+{
+  "entryHEAD": "8dbe4c787af3ffdd619ceb7c772dd54458bb5f30",
+  "status": "assessment and evidence request only; no implementation; awaiting independent assessment or missing evidence",
+  "trackedFilesUnchanged": true,
+  "localRawFingerprintStable": true,
+  "testsRun": false,
+  "files": {
+    "gateway/src/adapters/base_adapter.js": "d3350f29b5e3174f5079f3b696de309c0a243bcf758966ad90bfeda82cad4807",
+    "tests/gateway/prompt_submission.test.js": "9b0b25ca7e39e46b4df42303f6984764b7b01d3f5df06672ec8a34c94d7818c0",
+    "gateway/README.md": "c28662255c5024b9e9172fbf61d5e63e2d27f1a2c1a164496ae2572fa7105654",
+    "tests/gateway/fixtures/a04_live_profiles_trial8.json": "6f4e17aa9200ff95e09865e27109fb667acbd7acec41bfe752a02598909449b1",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-8_to_review.md": "1a93d798ee136dc60b6cbae7e87450dc27afd8216eba0fb795acb5c1a44b3821",
+    "plan/PROJECT_V6/reviews/A_0_4-live-profile-8_operator-evidence-request.md": "4215a16fd03bf429cb3d4b18e145d43b794868680033a18fc70282ddcc132856",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-8-observations.json": "659542fe62ba7315eb677b1f8d149e3a8d62aa73379bb024e7b3231b73c94eb5",
+    "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-8-classification.json": "4da1a7d3a4c019110963050ab845622dc896b8f445e3ad494796ecd46f3c75bc"
+  }
+}

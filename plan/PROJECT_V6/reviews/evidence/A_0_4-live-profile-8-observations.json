@@ -1,0 +1,36 @@
+{
+  "provider": "claude-code",
+  "version": "2.1.293 (Claude Code)",
+  "captureFlags": [
+    "-N",
+    "-T"
+  ],
+  "toolOutcome": "acceptance_uncertain",
+  "recordedRows": {
+    "user": 6,
+    "assistant": 8,
+    "completion": 10,
+    "composer": 36
+  },
+  "readyEchoRowBlank": true,
+  "readyPrefixBeforeEchoUnchanged": true,
+  "uniqueMarkerAbsentFromReadyViewport": true,
+  "errorAndLaterByteIdentical": true,
+  "sameRecordedPaneID": true,
+  "recordedGeometry": [
+    120,
+    40
+  ],
+  "recordedCursor": [
+    2,
+    36
+  ],
+  "absentEvidence": [
+    "actual post-paste observation",
+    "actual final pre-CR guard observation",
+    "server PID and pane PID binding",
+    "monotonic capture times and guarded-CR outcome receipt",
+    "pinned 2.1.293 fresh accepted-turn renderer/event contract"
+  ],
+  "assessment": "Insufficient for a generic ASCII completed-turn acceptance marker; preserve uncertainty. No acceptance implementation or TDD change."
+}
