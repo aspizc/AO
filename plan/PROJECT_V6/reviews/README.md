@@ -58,6 +58,13 @@ session-agent fallback; it is not cross-vendor or Gateway-spawned review.
 
 ## Current build checkpoint
 
+Trial 18 rewrites only the Claude 2.1.294 cwd header regex's literal space
+runs as ` {3}` to clear `no-regex-spaces`; semantics unchanged. See the
+[immutable handoff](A_0_4-live-profile-18_to_review.md). Independent
+[OK verdict](A_0_4-live-profile-18_reviewed_OK.md); focused ESLint and
+131/131 prompt_submission only. Full gate not run; root owns gate and
+integration.
+
 Trial 17 admits only a stable, exact Codex 0.160.1 warnings-only post-paste
 draft through guarded first Enter. See the [immutable handoff](A_0_4-live-profile-17_to_review.md).
 Trial 16 artifacts and positive acceptance checks are preserved. Independent

@@ -1,0 +1,11 @@
+{
+  "gateway/src/adapters/base_adapter.js": "8ce501e17198ffdad954069d038bc9a118c6578f8616f04a3d74370da827bff1",
+  "tests/gateway/prompt_submission.test.js": "fa39402b1f64f867694d08a50b9e99b295cc42b49a31363185088c17993fe1da",
+  "plan/PROJECT_V6/reviews/A_0_4-live-profile-18_to_review.md": "73f51b0f4f6d44e840819a4aa4a0d7548caf3d0efcf39825c0e4444158b1880b",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-eslint-green.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-delta.patch": "ffd159554507d8fa6a2355fc289e3f90ddfc1401d3a05f334bd6bac0710aa83d",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-entry.json": "7d119e1105cfb69ffb0647d929424540fda9c04802d1c4470fa5bad1eb1741c1",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-equivalence.log.gz": "f5e3a6add74fbc7aa1ab533e82172296c2f2c3b5506e56d317ed24f22b662aaa",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-prompt-green.log.gz": "60db0b9fc312c8d926967992ceab86fae11dbc49c74b37865a4e2cb5be47d6e7",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-18-eslint-red.log.gz": "a3d3855f1ba758a99eaa056c36efc5c3b9a8182fff61e0f714b2a81e6cc4ef31"
+}
