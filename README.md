@@ -23,7 +23,10 @@ at [`b3aed7c`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82ed
 on `release/1.1.0`. A/0/02 (generic setup and public hygiene) is reviewed and
 integrated on that branch. A/0/04 (guarded supervised prompt submission) is
 integrated at `343222e`, and A/0/00 (role-derived CLI restrictions) is
-integrated at `a8e8430`. The other four V6 sheets remain unfinished.
+integrated at `a8e8430`. A/0/01 (worker environment markers) is integrated
+at `69f222f`; its [merged-tree gate](plan/PROJECT_V6/reviews/A_0_1-integrated-gate.md)
+passed 3,067 tests, failed 0, and recorded 12 declared infrastructure skips.
+The other three V6 sheets remain unfinished.
 V7 A/0/00 adds reviewed [generic project profiles](docs/generic-wave-runbook.md)
 and deterministic preflight, alongside the [cooperative capacity ledger](docs/wave-capacity.md)
 from A/0/01. Both are integrated on the release branch; automated wave dispatch

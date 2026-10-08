@@ -49,6 +49,17 @@ not live OS confinement. See the [merge verdict](../plan/PROJECT_V6/reviews/A_0_
 and [integrated gate](../plan/PROJECT_V6/reviews/A_0_0-integrated-gate.md).
 This is integration on the release branch, not promotion or release.
 
+A/0/01 adds informational worker role, trace and task environment markers to
+the five executable providers. Its independently reviewed implementation was
+merged at `69f222f` on `release/1.1.0`. The full gate on that commit exited 0:
+**3,067 passed, 0 failed, 12 declared infrastructure skips; 3,079 total**,
+including 22/22 required Redis tests and zero public hygiene findings. The
+skips comprise nine live PostgreSQL and three Gateway/Temporal integration
+tests; optional real-provider execution was not run. See the
+[merge verdict](../plan/PROJECT_V6/reviews/A_0_1-integration-1_reviewed_OK.md)
+and [integrated gate](../plan/PROJECT_V6/reviews/A_0_1-integrated-gate.md).
+This is integration on the release branch, not promotion or release.
+
 A/0/02 adds operator-local additive repository overlays, generic workflow
 examples and a required public hygiene gate. Integration commit:
 `7df29bda06aa3a139903dbb0cfc61860029f8159` on `release/1.1.0`. Its independently
@@ -135,8 +146,8 @@ with their components.
 ## Planning and release boundary
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
-branch descending from `1.0.0`; A/0/00, A/0/02 and A/0/04 are reviewed and
-integrated on the release branch, and the other four sheets remain unfinished.
+branch descending from `1.0.0`; A/0/00, A/0/01, A/0/02 and A/0/04 are reviewed and
+integrated on the release branch, and the other three sheets remain unfinished.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains
