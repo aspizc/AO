@@ -1,0 +1,14 @@
+{
+  "candidateFilesVerified": 47,
+  "canonicalEvidenceArchivesVerified": 8,
+  "newArchivesWithoutProcessCommandLines": 12,
+  "syntaxChecks": {
+    "gateway/src/adapters/request_launch_cleanup.js": 0,
+    "tests/gateway/request_context_reattach.test.js": 0
+  },
+  "gitDiffCheckExitCode": 0,
+  "checkpointSha256": "a63a100f724a2186a715c1cd5a0670de6f9368c97aff98043a6070ae563c4547",
+  "manifestSha256": "27c27422fbf4a94ea3f1e26f7a12d30d55da1095e2195634d716f2f8246a44e4",
+  "reviewed": false,
+  "fullGateRun": false
+}
