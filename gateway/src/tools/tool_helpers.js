@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { settleRequestLaunch } from "../adapters/request_launch_cleanup.js";
+import { appendLocalOnly } from "../core/audit.js";
 
 import {
   ACTION_CATALOG_VERSION,
@@ -8,6 +10,7 @@ import {
   bindRequestContext,
   isRequestContextProtectedAction,
   recordRequestContextResult,
+  requestContextDenialMetadata,
 } from "../core/request_context.js";
 import {
   getCatalogPayloadErrorMode,
@@ -151,6 +154,7 @@ export function defineTool({
         );
       }
 
+      let value;
       try {
         let effectiveContext = null;
         let effectiveArgs = parsed.data;
@@ -169,8 +173,9 @@ export function defineTool({
             effectiveContext,
           );
         }
-        const value = await handler(effectiveArgs, effectiveContext);
+        value = await handler(effectiveArgs, effectiveContext);
         if (resultIsDomainError(value)) {
+          await settleRequestLaunch(value, false);
           const safeBody = safeToolErrorBody(
             {
               code: value.error,
@@ -191,8 +196,22 @@ export function defineTool({
             value,
           );
         }
+        await settleRequestLaunch(value, true);
         return textToolResult(value);
       } catch (error) {
+        try { await settleRequestLaunch(value, false); }
+        catch (cleanupError) {
+          try { appendLocalOnly({ type: "ERROR", where: "tool.launch.cleanup", tool: name,
+            error: cleanupError?.code === "ADAPTER_CLEANUP_FAILED" ? "ADAPTER_CLEANUP_FAILED" : "CLEANUP_FAILED" }); }
+          catch { /* Private audit failure cannot replace the original denial. */ }
+        }
+        if (error?.code === "REQUEST_CONTEXT_DENIED" && typeof invocation?.denialObserver === "function") {
+          try {
+            invocation.denialObserver(requestContextDenialMetadata(invocation.requestContext, {
+              tool: name, reasonCode: error.reasonCode, args: parsed.data, now: invocation.now,
+            }));
+          } catch { /* A private observer cannot affect the fixed public denial. */ }
+        }
         return textToolResult(safeToolErrorBody(error, contract), true);
       }
     },

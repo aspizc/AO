@@ -23,6 +23,9 @@ import {
   REQUEST_CONTEXT_ERROR,
 } from "./core/request_context.js";
 import { initState } from "./core/state.js";
+import { createLocalRecoveryIdentity } from "./core/request_recovery_identity.js";
+import { createLocalRecoveryOwner } from "./adapters/request_recovery_observations.js";
+import { createRequestRecoveryService } from "./services/request_recovery_service.js";
 import { createTelemetry, safeToolCallAttributes, traceIdForCall } from "./core/telemetry.js";
 import { getToolContract } from "./tools/catalog.js";
 import {
@@ -139,6 +142,10 @@ export function createCallToolHandler({
   requestContext,
   transportBinding,
   now = () => new Date().toISOString(),
+  denialObserver = (metadata) => {
+    logErr("warn", "request context denied", metadata);
+    append?.({ type: "REQUEST_CONTEXT_DENIED", ...metadata });
+  },
 }) {
   return async (request, extra = {}) => {
     const traceId = traceIdForCall(request, extra);
@@ -163,6 +170,7 @@ export function createCallToolHandler({
             audience: transportBinding?.audience,
             connectionId: transportBinding?.connectionId,
             now: now(),
+            denialObserver,
           }
         : null;
       const result = await tool.handler(
@@ -219,13 +227,32 @@ export function createCallToolHandler({
   };
 }
 
+export async function shutdownGateway({ requestContext, tools, server, input,
+  closeRegistry = closeToolRegistry } = {}) {
+  try {
+    revokeRequestContext(requestContext);
+  } finally {
+    try {
+      await closeRegistry(tools);
+    } finally {
+      try {
+        await server.close();
+      } catch (err) {
+        logErr("warn", "gateway transport close failed", { error: String(err?.message || err) });
+      } finally {
+        input.pause();
+      }
+    }
+  }
+}
+
 async function main() {
   const config = loadConfig();
   const registries = loadRegistries({
     policiesDir: config.policiesDir,
     repositoriesOverlay: config.repositoriesOverlay,
   });
-  initState({ stateDb: config.stateDb });
+  const database = initState({ stateDb: config.stateDb });
   configureAudit({
     auditLog: config.auditLog,
     redisUrl: config.redisUrl,
@@ -246,11 +273,16 @@ async function main() {
     audience: "agents-gateway",
     connectionId: crypto.randomUUID(),
   };
+  const recovery = createRequestRecoveryService({ database,
+    identity: createLocalRecoveryIdentity({ stateDb: config.stateDb, backend: database.backend }),
+    owner: createLocalRecoveryOwner(transportBinding.connectionId),
+  });
   const requestContext = createGatewayRequestContext({
     config,
     registries,
     actionCatalogVersion: tools[0]?.actionCatalogVersion,
     connectionId: transportBinding.connectionId,
+    recovery,
   });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -286,20 +318,7 @@ async function main() {
     stopped = await termination.wait;
   } finally {
     termination.dispose();
-    revokeRequestContext(requestContext);
-    try {
-      await closeToolRegistry(tools);
-    } finally {
-      try {
-        await server.close();
-      } catch (err) {
-        logErr("warn", "gateway transport close failed", {
-          error: String(err?.message || err),
-        });
-      } finally {
-        process.stdin.pause();
-      }
-    }
+    await shutdownGateway({ requestContext, tools, server, input: process.stdin });
   }
   logErr("info", "gateway stopped", stopped);
   if (stopped.signal === "SIGINT") process.exitCode = 130;

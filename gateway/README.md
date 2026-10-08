@@ -1,5 +1,52 @@
 # Agents Gateway
 
+## Local restart recovery
+
+The recovery path is limited to Linux local stdio with SQLite. Startup derives
+the principal from equal real/effective numeric OS UIDs and binds it to the
+application-keyed machine-ID digest and the canonical state DB path. The DB
+file and its directory must belong to that UID and be unwritable by group or
+others. Gateway does not change their modes or ownership. A copied DB at a
+different machine or canonical path cannot confer recovery authority.
+
+After restarting the Gateway process on the same account, machine and state,
+call `orchestration.view` with `{}` to discover eligible saved traces, then
+call `orchestration.reattach` with only `{ "traceId": "<saved trace>" }`.
+Discovery grants no ownership. Explicit reattachment checks every task's
+repository ID/root, original expiry, canonical lifecycle state, prior owner
+absence and exact tmux targets before claiming the trace. A live or ambiguous
+prior owner refuses recovery; no time-based lease or extra approval is used.
+Protected calls continue to recheck durable ownership, state and expiry.
+
+The result lists recovered task/session IDs and sessions skipped as
+`target_gone` or `session_closed`. Discovery sorts at most 100 eligible traces;
+a saved explicit ID remains usable beyond that cap. Recovery sends no input
+and starts or kills no child. It restores supervised sessions only, without
+artifact, headless-session or approval grants, and never renews expiry.
+
+Darwin, PostgreSQL and missing or invalid local identity return an empty
+discovery and the generic `REQUEST_CONTEXT_DENIED` on reattach. Ordinary
+non-recovery calls remain available. This trusts the local account, credential
+namespace, machine identity and private state; it supplies no cross-host or
+remote-user authentication guarantee. Restarting the Gateway can preserve
+tmux children; a physical machine reboot generally loses them. Provider live
+restart acceptance remains an operator-run check for this candidate.
+
+Launch cleanup covers retained tmux receipts and descendants still observable
+under their Linux process ancestry, including children of non-main threads.
+Unobserved reparented non-tmux descendants without a retained receipt are
+unsupported: a private tmux server does not contain that provider tree.
+Numeric-PID observation and signalling have PID-reuse races and do not supply
+pidfd guarantees; initial PID reuse and tmux server-lifetime ID reuse remain
+limits. Ambiguous private-server identity returns `ADAPTER_CLEANUP_FAILED`
+and retains its socket and private `server-identity.json` for operator audit.
+Pane cleanup refusal still closes a wholly-owned private server only while
+its exact socket-observed Linux identity remains verified.
+
+If authority expires or is revoked while a kill is in progress, its dead
+target can leave a stale `running` session row. A later explicit recovery
+reports `target_gone` and grants no session authority for that dead target.
+
 Node.js support is defined by the repository's
 [canonical runtime contract](../docs/node-runtime.md) and enforced during npm
 installation.
@@ -8,7 +55,7 @@ The [worker environment contract](../docs/worker-environment.md) describes the
 informational role, trace and task markers set on every executable child.
 
 The [canonical MCP tool catalog](../docs/mcp-tool-catalog.md) is generated from
-the typed runtime catalog and pins all 33 tool names in protocol order.
+the typed runtime catalog and pins all 34 tool names in protocol order.
 
 ## MCP client identity and context lifetime
 

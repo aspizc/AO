@@ -1,3 +1,4 @@
+import { settleRequestLaunch, transferRequestLaunch } from "../adapters/request_launch_cleanup.js";
 import { types as utilTypes } from "node:util";
 
 import { newSessionId } from "../core/ids.js";
@@ -15,6 +16,7 @@ import {
 import {
   RequestContextError,
   assertServerOwnedExecutionBinding,
+  revalidateRequestContextBinding,
 } from "../core/request_context.js";
 import * as sessionRepo from "../core/repositories/session_repo.js";
 import { append as auditAppend } from "../core/audit.js";
@@ -574,6 +576,8 @@ export function createAgentService({
       serviceTier = null,
     }, requestBinding = null) {
       let sessionId = null;
+      let launched = null;
+      let abandoned = false;
       try {
         const { effectiveSelection, execution } = assertExecutionBinding({
           selectionObservers,
@@ -616,10 +620,23 @@ export function createAgentService({
             ...(requestBinding !== null && requestBinding !== undefined
               ? { requestBinding }
               : {}),
+          }).then(async (result) => {
+            // Timeout ends the request, not the owned adapter invocation.
+            if (abandoned) {
+              await settleRequestLaunch(result, false);
+            }
+            return result;
+          }).catch((error) => {
+            if (abandoned) auditServiceError({ traceId, where: "agent.delegate.late_cleanup", err: error });
+            throw error;
           }),
           agentTimeout(config),
           "agent.delegate",
         );
+        launched = adapterResult;
+        revalidateRequestContextBinding(requestBinding);
+        await settleRequestLaunch(launched, true);
+        revalidateRequestContextBinding(requestBinding);
         const result = assertAdapterSelectionResult(
           "delegate",
           adapterResult,
@@ -649,6 +666,10 @@ export function createAgentService({
           effectiveSelection,
         });
       } catch (err) {
+        abandoned = true;
+        try { await settleRequestLaunch(launched, false); } catch (cleanupError) {
+          auditServiceError({ traceId, where: "agent.delegate.cleanup", err: cleanupError });
+        }
         closeSessionIfPersisted(sessionId, "error");
         if (!(err instanceof RequestContextError)) {
           auditServiceError({ traceId, sessionId, where: "agent.delegate", err });
@@ -668,6 +689,7 @@ export function createAgentService({
       reasoningEffort = null,
       serviceTier = null,
     }, requestBinding = null) {
+      let launched = null;
       try {
         const { effectiveSelection, execution } = assertExecutionBinding({
           selectionObservers,
@@ -708,6 +730,8 @@ export function createAgentService({
             ? { requestBinding }
             : {}),
         });
+        launched = adapterResult;
+        revalidateRequestContextBinding(requestBinding);
         const result = assertAdapterSelectionResult(
           "spawn",
           adapterResult,
@@ -731,11 +755,15 @@ export function createAgentService({
           effectiveSelection,
           selectionObservers,
         });
-        return Object.freeze({
+        // The protected tool retains cleanup ownership until durable recording.
+        return transferRequestLaunch(launched, Object.freeze({
           ...result,
           effectiveSelection,
-        });
+        }));
       } catch (err) {
+        try { await settleRequestLaunch(launched, false); } catch (cleanupError) {
+          auditServiceError({ traceId, where: "agent.spawn.cleanup", err: cleanupError });
+        }
         if (!(err instanceof RequestContextError)) {
           auditServiceError({ traceId, where: "agent.spawn", err });
         }
@@ -743,11 +771,12 @@ export function createAgentService({
       }
     },
 
-    async ask({ sessionId, prompt, traceId }) {
+    async ask({ sessionId, prompt, traceId }, requestBinding = null) {
       const row = sessionRepo.getSessionById(sessionId);
       if (!row) throw unknownSession(sessionId);
       const adapter = adapters.get(row.agent);
       const before = await bestEffortView(adapter, row);
+      revalidateRequestContextBinding(requestBinding);
       recordExpectedAsk(sessionId, before?.snapshot || "", {});
       const result = await withTimeout(
         adapter.ask({
@@ -759,19 +788,21 @@ export function createAgentService({
         agentTimeout(config),
         "agent.ask",
       );
+      revalidateRequestContextBinding(requestBinding);
       bestEffortInterventionCheck({ sessionId, currentSnapshot: result.snapshot, traceId });
       return result;
     },
 
-    async view({ sessionId, traceId = null }) {
+    async view({ sessionId, traceId = null }, requestBinding = null) {
       const row = sessionRepo.getSessionById(sessionId);
       if (!row) throw unknownSession(sessionId);
       const result = await adapters.get(row.agent).view({ tmuxTarget: row.tmux_target });
+      revalidateRequestContextBinding(requestBinding);
       bestEffortInterventionCheck({ sessionId, currentSnapshot: result.snapshot, traceId });
       return result;
     },
 
-    async kill({ sessionId, traceId }) {
+    async kill({ sessionId, traceId }, requestBinding = null) {
       const row = sessionRepo.getSessionById(sessionId);
       if (!row) throw unknownSession(sessionId);
       const result = await adapters.get(row.agent).kill({
@@ -779,6 +810,7 @@ export function createAgentService({
         traceId,
         role: row.role,
       });
+      revalidateRequestContextBinding(requestBinding);
       sessionRepo.setSessionStatus(sessionId, "closed", nowIso());
       return result;
     },

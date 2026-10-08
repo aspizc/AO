@@ -63,6 +63,7 @@ export const Actions = Object.freeze([
   "coordination.send",
   "coordination.receive",
   "coordination.ack",
+  "orchestration.reattach",
 ]);
 
 const CANONICAL_ACTIONS = new Set(Actions);

@@ -64,11 +64,12 @@ const EXPECTED_NAMES = [
   "coordination.send",
   "coordination.receive",
   "coordination.ack",
+  "orchestration.reattach",
 ];
 
-test("canonical catalog freezes the exact 33-tool v1 order", () => {
+test("canonical catalog freezes the exact 34-tool v1 order with reattach appended", () => {
   assert.deepEqual(TOOL_NAMES, EXPECTED_NAMES);
-  assert.equal(TOOL_CATALOG.length, 33);
+  assert.equal(TOOL_CATALOG.length, 34);
   assertDeepFrozen(TOOL_CATALOG, "TOOL_CATALOG");
   for (const entry of TOOL_CATALOG) {
     assert.equal(entry.listed, "always", entry.name);
@@ -169,7 +170,7 @@ test("catalog error allowlists are operation-specific and complete", () => {
 test("versioned golden pins the complete public projection digest", () => {
   const golden = JSON.parse(fs.readFileSync(GOLDEN, "utf8"));
   assert.equal(golden.schemaVersion, 1);
-  assert.equal(golden.toolCount, 33);
+  assert.equal(golden.toolCount, 34);
   assert.deepEqual(golden.names, EXPECTED_NAMES);
   assert.equal(golden.projectionSha256, catalogProjectionDigest());
   assert.equal(

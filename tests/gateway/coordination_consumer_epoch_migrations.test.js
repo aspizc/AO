@@ -72,6 +72,12 @@ const ROOT_ENTRIES = Object.freeze([
   }),
 ]);
 const ROOT_IDS = ROOT_ENTRIES.map(({ id }) => id);
+const RECOVERY_ENTRY = Object.freeze({
+  id: "005_request_context_lineage",
+  path: "gateway/migrations/005_request_context_lineage.sql",
+  sha256: "bd583a4311f34751c75b0478f958800514199c6fd7163d3fe819b54658e28429",
+});
+const APPLICATION_IDS = [...ROOT_IDS, RECOVERY_ENTRY.id];
 const EPOCH_ID = "005_coordination_consumer_runtime_epoch";
 const EPOCH_RELATIVE_PATH = [
   "gateway/migrations/profiles",
@@ -201,9 +207,9 @@ test("migration sets are literal, ordered, distinct, and deeply frozen", () => {
     sha256: epochSha256,
   });
 
-  assert.deepEqual(GENERIC_APPLICATION_SQLITE, ROOT_ENTRIES);
-  assert.deepEqual(WIRING_A_SQLITE, ROOT_ENTRIES);
-  assert.deepEqual(WIRING_B_EPOCH_SQLITE, [...ROOT_ENTRIES, epochEntry]);
+  assert.deepEqual(GENERIC_APPLICATION_SQLITE, [...ROOT_ENTRIES, RECOVERY_ENTRY]);
+  assert.deepEqual(WIRING_A_SQLITE, [...ROOT_ENTRIES, RECOVERY_ENTRY]);
+  assert.deepEqual(WIRING_B_EPOCH_SQLITE, [...ROOT_ENTRIES, epochEntry, RECOVERY_ENTRY]);
   assert.notEqual(GENERIC_APPLICATION_SQLITE, WIRING_A_SQLITE);
   assert.notEqual(WIRING_A_SQLITE, WIRING_B_EPOCH_SQLITE);
   for (const selected of [
@@ -216,7 +222,7 @@ test("migration sets are literal, ordered, distinct, and deeply frozen", () => {
   }
 
   const source = fs.readFileSync(MIGRATION_MODULE_PATH, "utf8");
-  for (const entry of [...ROOT_ENTRIES, epochEntry]) {
+  for (const entry of [...ROOT_ENTRIES, epochEntry, RECOVERY_ENTRY]) {
     assert.match(source, new RegExp(`sha256: ["']${entry.sha256}["']`));
   }
   assert.doesNotMatch(
@@ -230,7 +236,7 @@ test("generic SQLite selection ignores a directory-scan canary", async () => {
     const state = await freshStateModule();
     try {
       state.initState({ stateDb: temporaryDatabasePath("epoch-generic-scan") });
-      assert.deepEqual(appliedIds(state.getDb()), ROOT_IDS);
+      assert.deepEqual(appliedIds(state.getDb()), APPLICATION_IDS);
       assert.equal(
         state.getDb().prepare(
           "SELECT count(*) AS count FROM main.sqlite_master "
@@ -248,7 +254,7 @@ test("WIRING-A SQLite selection ignores a directory-scan canary", async () => {
   await withDirectoryScanCanary(() => {
     const profile = createProfile();
     const pair = profile.createStore();
-    assert.deepEqual(appliedIds(pair.database), ROOT_IDS);
+    assert.deepEqual(appliedIds(pair.database), APPLICATION_IDS);
     assert.equal(
       pair.database.prepare(
         "SELECT count(*) AS count FROM main.sqlite_master "
@@ -267,13 +273,13 @@ test("generic state applies the exact set to fresh, existing, and reopened store
 
   const first = await freshStateModule();
   first.initState({ stateDb: filename });
-  assert.deepEqual(appliedIds(first.getDb()), ROOT_IDS);
+  assert.deepEqual(appliedIds(first.getDb()), APPLICATION_IDS);
   assert.equal(first.getDb().open, true);
   first._resetForTests();
 
   const reopened = await freshStateModule();
   reopened.initState({ stateDb: filename });
-  assert.deepEqual(appliedIds(reopened.getDb()), ROOT_IDS);
+  assert.deepEqual(appliedIds(reopened.getDb()), APPLICATION_IDS);
   assert.equal(
     reopened.getDb().prepare(
       "SELECT count(*) AS count FROM main.sqlite_master "
@@ -378,8 +384,8 @@ test("WIRING-A applies only its exact set and revalidates every opened handle", 
   const profile = createProfile();
   const pair = profile.createStore();
   const reopened = profile.openHandle(pair.storeOrigin);
-  assert.deepEqual(appliedIds(pair.database), ROOT_IDS);
-  assert.deepEqual(appliedIds(reopened.database), ROOT_IDS);
+  assert.deepEqual(appliedIds(pair.database), APPLICATION_IDS);
+  assert.deepEqual(appliedIds(reopened.database), APPLICATION_IDS);
   assert.equal(pair.database.open, true);
   assert.equal(reopened.database.open, true);
 
@@ -415,8 +421,18 @@ test("generic and WIRING-A reject a profile-only 005 row", () => {
   } = migrationApi();
   const profile = createProfile();
   const pair = profile.createStore();
-  applySqliteMigrationSet(pair.database, WIRING_B_EPOCH_SQLITE);
-  assert.deepEqual(appliedIds(pair.database), [...ROOT_IDS, EPOCH_ID]);
+  const filename = pair.database.name;
+  pair.database.close();
+  fs.unlinkSync(filename);
+  const database = new Database(filename);
+  try {
+    // Use the exact legacy H profile; H,R cannot upgrade across profiles to H,E,R.
+    applyRawPrefix(database, ROOT_ENTRIES, ROOT_ENTRIES.length);
+    applySqliteMigrationSet(database, WIRING_B_EPOCH_SQLITE);
+    assert.deepEqual(appliedIds(database), [...ROOT_IDS, EPOCH_ID, RECOVERY_ENTRY.id]);
+  } finally {
+    database.close();
+  }
   assertMigrationMismatch(() => profile.openHandle(pair.storeOrigin));
 });
 
@@ -477,7 +493,7 @@ test("file-backed application establishes and revalidates persistent WAL", () =>
       {
         freshMode: "wal",
         reopenedMode: "wal",
-        applied: ROOT_IDS,
+        applied: APPLICATION_IDS,
       },
     );
   } finally {
@@ -563,7 +579,7 @@ test("in-memory application preserves SQLite journal semantics", () => {
     applySqliteMigrationSet(database, GENERIC_APPLICATION_SQLITE);
     assert.equal(database.memory, true);
     assert.equal(journalMode(database), "memory");
-    assert.deepEqual(appliedIds(database), ROOT_IDS);
+    assert.deepEqual(appliedIds(database), APPLICATION_IDS);
   } finally {
     database.close();
   }
@@ -718,6 +734,93 @@ function insertReceiptAndAckIntent(database) {
   return consumeKey;
 }
 
+for (const [label, profileName, epoch] of [
+  ["generic H", "GENERIC_APPLICATION_SQLITE", false],
+  ["WIRING-A H", "WIRING_A_SQLITE", false],
+  ["WIRING-B H then E", "WIRING_B_EPOCH_SQLITE", true],
+]) {
+  test(`legacy ${label} upgrades and reopens with H then ${epoch ? "E then " : ""}R`, () => {
+    const api = migrationApi();
+    const filename = temporaryDatabasePath("reattach-legacy-upgrade");
+    let database = new Database(filename);
+    const historical = epoch
+      ? [...ROOT_ENTRIES, { id: EPOCH_ID, path: EPOCH_RELATIVE_PATH }]
+      : ROOT_ENTRIES;
+    applyRawPrefix(database, historical, historical.length);
+    database.exec(`
+      INSERT INTO orchestration_sessions
+        (session_id, trace_id, caller_agent, caller_role, status, created_at)
+      VALUES ('or-legacy', 'tr-legacy', 'codex', 'orchestrator', 'active', '2026-10-07');
+      INSERT INTO tasks
+        (task_id, trace_id, assigned_agent, assigned_role, repo, status, created_at)
+      VALUES ('ts-legacy', 'tr-legacy', 'codex', 'coder', 'app', 'pending', '2026-10-07');
+    `);
+    const ledgerSql = "SELECT rowid, id, applied_at FROM main.schema_migrations ORDER BY rowid";
+    const historicalLedger = database.prepare(ledgerSql).all();
+    const epochTables = [
+      "coordination_consumer_runtime_epoch_store",
+      "coordination_consumer_runtime_epoch_fences",
+      "coordination_consumer_receipts",
+      "coordination_consumer_ack_intents",
+    ];
+    if (epoch) {
+      const consumeKey = insertReceiptAndAckIntent(database);
+      database.exec(`
+        INSERT INTO coordination_consumer_runtime_epoch_store
+          (singleton, protocol_version, redis_authority_id, redis_namespace_id,
+           redis_binding_ordinal, allocation_state)
+        VALUES (1, 1, 'authority-a', 'namespace-a', 7, 'bound');
+        INSERT INTO coordination_consumer_runtime_owners(scope_id, generation, owner_state)
+        VALUES ('scope-a', 3, 'owned');
+        INSERT INTO coordination_consumer_runtime_epoch_fences
+          (scope_id, generation, phase, lease_expires_at_ms, participant_id,
+           recovery_term, recovery_controller_state)
+        VALUES ('scope-a', 3, 'active', 100, 'participant-a', 2, 'none');
+      `);
+      database.prepare(`UPDATE coordination_consumer_receipts SET
+        epoch_generation = 3, recovery_term = 2,
+        epoch_authority_kind = 'active', epoch_participant_id = 'participant-a'
+        WHERE consume_key = ?`).run(consumeKey);
+      database.prepare(`UPDATE coordination_consumer_ack_intents SET
+        epoch_generation = 3, recovery_term = 2, epoch_authority_kind = 'recovery',
+        epoch_participant_id = 'controller-a', recovery_controller_participant_id = 'controller-a',
+        settlement_generation = 3, settlement_recovery_term = 2,
+        settlement_authority_kind = 'active', settlement_participant_id = 'participant-a'
+        WHERE consume_key = ?`).run(consumeKey);
+    }
+    const epochRows = epochTables.map((table) => epoch
+      ? database.prepare(`SELECT * FROM main.${table}`).all()
+      : []);
+    database.close();
+    try {
+      for (let opening = 0; opening < 2; opening += 1) {
+        database = new Database(filename);
+        api.applySqliteMigrationSet(database, api[profileName]);
+        const ledger = database.prepare(ledgerSql).all();
+        assert.deepEqual(ledger.map(({ id }) => id), [
+          ...historical.map(({ id }) => id), "005_request_context_lineage",
+        ], "recovery must append after this profile's complete historical prefix");
+        assert.deepEqual(ledger.slice(0, historical.length), historicalLedger,
+          "upgrade must preserve historical rowid, id and applied timestamps");
+        assert.deepEqual(database.prepare(
+          "SELECT task_id, target_action FROM tasks",
+        ).all(), [{ task_id: "ts-legacy", target_action: null }]);
+        assert.equal(database.prepare(
+          "SELECT count(*) AS count FROM request_context_lineage",
+        ).get().count, 0, "historical business rows must not acquire recovery authority");
+        if (epoch) {
+          for (const [index, table] of epochTables.entries()) {
+            assert.deepEqual(database.prepare(`SELECT * FROM main.${table}`).all(), epochRows[index]);
+          }
+        }
+        database.close();
+      }
+    } finally {
+      if (database.open) database.close();
+    }
+  });
+}
+
 test("epoch selection appends only the exact main-qualified 005 schema", () => {
   const {
     WIRING_B_EPOCH_SQLITE,
@@ -727,7 +830,7 @@ test("epoch selection appends only the exact main-qualified 005 schema", () => {
   try {
     applySqliteMigrationSet(database, WIRING_B_EPOCH_SQLITE);
     applySqliteMigrationSet(database, WIRING_B_EPOCH_SQLITE);
-    assert.deepEqual(appliedIds(database), [...ROOT_IDS, EPOCH_ID]);
+    assert.deepEqual(appliedIds(database), [...ROOT_IDS, EPOCH_ID, RECOVERY_ENTRY.id]);
     assert.equal(database.open, true);
 
     const tableNames = database.prepare(

@@ -101,6 +101,7 @@ test("server_initializes_lists_tools_and_audits_boot", () => {
       "coordination.send",
       "coordination.receive",
       "coordination.ack",
+      "orchestration.reattach",
     ],
   );
   assert.ok(stderr.includes("gateway connected"), `missing connect log: ${stderr}`);

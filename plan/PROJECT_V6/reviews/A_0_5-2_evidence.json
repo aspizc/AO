@@ -1,0 +1,70 @@
+{
+  "traceId": "tr-r2-v6-a05-cp18-ee384ebd-c2a5-4757-99f3-a6a4ee6e1c32",
+  "taskId": "ts-f968233d-0c61-4bf3-a1e0-a5086dc2c2b8",
+  "manifestSha256": "1c1eb9311cd7ad1e44834ed356cdabddb96c00183a5c3fb46327a79970fe5d52",
+  "handoffSha256": "7ef1ce24c365748cd75fb811509fc49749f12a2d6972d4a5cc2d9ff7b51ab52e",
+  "head": "2ed684f82174c57cc43298bb90a296ce810996b0",
+  "fileHashesVerified": 60,
+  "checkpoint18ArchiveHashesVerified": 18,
+  "checkpoint13PreservedFiles": 42,
+  "checkpoint13ChangedFiles": [
+    "gateway/src/services/agent_service.js",
+    "gateway/src/adapters/request_launch_cleanup.js",
+    "gateway/src/tools/index.js",
+    "tests/gateway/request_context_reattach.test.js"
+  ],
+  "checkpoint13ArchiveHashesVerified": 8,
+  "rawLocalArchiveHashesVerified": 26,
+  "focused": {
+    "pass": 33,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exit": 0
+  },
+  "service": {
+    "pass": 144,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exit": 0
+  },
+  "independentRealLateRejection": {
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exit": 1
+  },
+  "evidence": {
+    "A_0_5-2_cp18-focused_evidence.txt.gz": {
+      "rawLocalSha256": "f0ba53558582dcbc4ddd9b52363e892191c390687f1a891c7654308978f48b0e",
+      "sha256": "1d4da5dad9984227150aa3a9cd0c468acc094e2780a29c65f0793c8476902bde",
+      "uncompressedSha256": "f9e7cebba35a761fad0a52f5c20707dfab8707b4c5e069a9b76b947ea6261682"
+    },
+    "A_0_5-2_cp18-service_evidence.txt.gz": {
+      "rawLocalSha256": "c4d1fc2488443d3f2f1d1655596e2834e3211cd43601a59157159ebf32046679",
+      "sha256": "fe094479d8939a9485501e062956e7e05286af06ae907a619f38dd5d8efde79c",
+      "uncompressedSha256": "c4d1fc2488443d3f2f1d1655596e2834e3211cd43601a59157159ebf32046679"
+    },
+    "A_0_5-2_late-rejection_evidence.txt.gz": {
+      "rawLocalSha256": "1e684079fd1b6835fc055477696774290f1907d94b206a61d56c8c43068dbe34",
+      "sha256": "6634eca2c1854b87d034a01872717128f096f34e8d58a86a87d20dc207d6ec0e",
+      "uncompressedSha256": "1e684079fd1b6835fc055477696774290f1907d94b206a61d56c8c43068dbe34"
+    },
+    "A_0_5-2_real-late-rejection_evidence.txt.gz": {
+      "rawLocalSha256": "e1b989bc9d93f9f23074b8c0518ecd2e9e3e6cee8c9f5ffc30bb7ed8cb8f4596",
+      "sha256": "0e575ff528ffd2177f0d1d05dfa88d8fe3caa3595f3fd7d62d7462abe6405f8b",
+      "uncompressedSha256": "22ac6a4b1b54aa004e906cbe7fd1cd6de761f333cb5f437bad8e466d966d126e"
+    },
+    "/tmp/v6-a05-r2-late-rejection.mjs": {
+      "sha256": "66d0aa72004cf91fe4c9fba6ffe6ec2bb015495d10d8a5452d0024cca11a46b7"
+    },
+    "/tmp/v6-a05-r2-real-late-rejection.test.mjs": {
+      "sha256": "63f8487347a6563a23b7cbbc44ef897be74bfd41a69f211bc67d06e4b11438cd"
+    }
+  }
+}

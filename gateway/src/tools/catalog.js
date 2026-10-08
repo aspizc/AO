@@ -234,8 +234,8 @@ const specs = [
   }),
   createSpec({
     name: "orchestration.view",
-    description: "View an orchestration session by trace ID.",
-    schema: TraceSchema,
+    description: "View an owned orchestration or discover eligible local restart traces.",
+    schema: strictObject({ traceId: z.string().min(1).optional() }),
     example: { traceId: "tr-contract-example" },
   }),
   ...[
@@ -767,6 +767,12 @@ const specs = [
       "COORDINATION_DELIVERY_NOT_FOUND",
       ...COORDINATION_BASE_CODES,
     ],
+  }),
+  createSpec({
+    name: "orchestration.reattach",
+    description: "Explicitly reattach a persisted Linux local stdio SQLite trace.",
+    schema: strictObject({ traceId: z.string().min(1) }),
+    example: { traceId: "tr-contract-example" },
   }),
 ];
 

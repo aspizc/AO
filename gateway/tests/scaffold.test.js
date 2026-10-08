@@ -52,6 +52,7 @@ test("tool registry exposes orchestration and task tools", () => {
       "coordination.send",
       "coordination.receive",
       "coordination.ack",
+      "orchestration.reattach",
     ],
   );
 });

@@ -1,0 +1,409 @@
+{
+  "status": "unresolved RED; fresh-session budget checkpoint; no review request",
+  "traceId": "tr-r4-a05-fullsuite-28e39a62-09ec-4d36-bea4-b60245de8f6e",
+  "runtime": {
+    "node": "v22.22.1",
+    "tmux": "3.6a-agents.1",
+    "isolation": "default process",
+    "concurrency": 1
+  },
+  "files": {
+    "plan/PROJECT_V6/reviews/v6-a05-r4-attributed-command.json.gz": {
+      "sha256": "8024c3b6a93da6f1ff6377ddaab70c4cacc5263e7b912d684d639910dc9f0b3b",
+      "uncompressedSha256": "10343b4305e2891dbf8860d60e644f2cc448730f0ddaa7372fc89488c8c67d80",
+      "rawLocalPath": "/tmp/v6-a05-r4/attributed-command.json"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-attributed-outcome.json.gz": {
+      "sha256": "ff0f88e1bd61c663276a12b60153b29a7c31e1036e3b5151818f8f7f9b4ae322",
+      "uncompressedSha256": "5732bd8198e484b40bacf557659490a0d2d3cb5b00d779690bc34a55b43055d9",
+      "rawLocalPath": "/tmp/v6-a05-r4/attributed-outcome.json"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-attributed.txt.gz": {
+      "sha256": "d5de194e457b99b5616c46407aa19be3bb91a2737c0cac2a9b26990e598fc23d",
+      "uncompressedSha256": "7b1152b4ea21eef249a728eeaa38c924387e40fc7ab5c6bd385fa3cd6e9b8471",
+      "rawLocalPath": "/tmp/v6-a05-r4/attributed.txt"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-attribution-host.txt.gz": {
+      "sha256": "67f02f96cfc2afd249eb6c739acfe1bc33fac3a43edcd406634c49b334e012cc",
+      "uncompressedSha256": "ad703b981285a5796758146935df4682f56ca80288c46337ae710c9f5e8b985a",
+      "rawLocalPath": "/tmp/v6-a05-r4/attribution-host.txt"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-attribution.txt.gz": {
+      "sha256": "ac73cc6e9eb7ec67f3e697b0be1e0c10ad30f2799d26fedf9bfc9529ae9a6b1d",
+      "uncompressedSha256": "5f0af360fc212c0535a52bc432b6ba21050697a1f8f0e7a5f5e42407205b3184",
+      "rawLocalPath": "/tmp/v6-a05-r4/attribution.txt"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-baseline.json.gz": {
+      "sha256": "be87a713c22f0f179fa92cc6e7006c190b006a8ff4e557d5727f9e28a7c91c8d",
+      "uncompressedSha256": "16977700a82efa9c243765f63748c445abfda38e71d1dc525a3ad71aa3f6f3c9",
+      "rawLocalPath": "/tmp/v6-a05-r4/baseline.json"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-focused-command.json.gz": {
+      "sha256": "6eac1b6f7ff9ed9761ad2e210a40cf7a85911128cad71a9af651d781f16f046e",
+      "uncompressedSha256": "590b7e09006db9d26aa9f898669bba0ec723c120a4bdc78aaccfe0785ae3ecd6",
+      "rawLocalPath": "/tmp/v6-a05-r4/focused-command.json"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-focused-outcome.json.gz": {
+      "sha256": "ff0f88e1bd61c663276a12b60153b29a7c31e1036e3b5151818f8f7f9b4ae322",
+      "uncompressedSha256": "5732bd8198e484b40bacf557659490a0d2d3cb5b00d779690bc34a55b43055d9",
+      "rawLocalPath": "/tmp/v6-a05-r4/focused-outcome.json"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-focused.txt.gz": {
+      "sha256": "4ca5e356f245621c0a66ddbebde8d0d642cfe12ab288c9322376f3f88ab14d17",
+      "uncompressedSha256": "75e8347c44bb235dfd212162af0842542c1486ebf372c2ce0fc169fc2cae0440",
+      "rawLocalPath": "/tmp/v6-a05-r4/focused.txt"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-run.py.gz": {
+      "sha256": "cdbd852af4225bef3c51c39b7f5932c45207e67187e4e19ee868148bd6ebb566",
+      "uncompressedSha256": "831b51db91394355bdb3501700f5ddfaf375019f72b43f576ab0719188cc35d3",
+      "rawLocalPath": "/tmp/v6-a05-r4/run.py"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-timeout-green.txt.gz": {
+      "sha256": "3c5ac4e8b177ff56f54c63f6f12b365a7c0173d53153da9dd96063df0cc64e0e",
+      "uncompressedSha256": "f7efd0cf94ed66782bb556026bdd1cc1e43b7178de70ea9a55ae0767261e51f6",
+      "rawLocalPath": "/tmp/v6-a05-r4/timeout-green.txt"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-r4-timeout-red.txt.gz": {
+      "sha256": "b1264bd635ef182cbc48718cac99ef711c2bd4a965f74148c9ab76192fbc9f39",
+      "uncompressedSha256": "72e20aa58603346f181a439e3c9e44d243ba42042b190e85effe923b2436d217",
+      "rawLocalPath": "/tmp/v6-a05-r4/timeout-red.txt"
+    },
+    "gateway/src/adapters/tmux_client.js": {
+      "sha256": "4285630a3076fa4fc97d504a2a4da7a3e284e7a520c777be00b8d05593f16b58"
+    },
+    "tests/gateway/request_context_reattach.test.js": {
+      "sha256": "2621927478d4d6e9ae71c73c388574bfd96a972b17d8c68c1515f7a9676b9cd1"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-20_trial4_checkpoint.md": {
+      "sha256": "7a168a329bf1f8f8c334bf3560a8dd346f9e9bcf526d398140c036c0d9e660f0"
+    },
+    "plan/PROJECT_V6/reviews/A_0_5-21_trial4_rootcause_checkpoint.md": {
+      "sha256": "c2b25eb27f2fee317b77572e9782aa014bf950421423adb841fd8640e811efed"
+    },
+    "plan/PROJECT_V6/reviews/v6-a05-trial3-manifest.json": {
+      "sha256": "57a53728c3a85eec15337f43e411706ff1d72fdc19ff921cf97d28244ed530c2"
+    }
+  },
+  "changesSinceStart": [
+    "gateway/src/adapters/tmux_client.js",
+    "tests/gateway/request_context_reattach.test.js"
+  ],
+  "exactEmittedPidAbsenceAfterContainment": {
+    "1158221": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1158241": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1158250": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1158355": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1165546": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1165697": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1165712": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1166411": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191110": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191408": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191468": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191793": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191850": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191858": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191890": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1191926": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192098": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192133": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192168": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192214": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192265": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192339": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1192408": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1226342": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1226539": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1226817": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1227037": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1227241": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1227479": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1227751": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1227999": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228161": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228279": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228345": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228537": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228758": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1228799": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229113": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229119": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229434": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229492": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229513": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229532": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229541": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229703": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229718": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229737": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229746": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229875": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1229921": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1230117": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1230419": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1230580": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1230829": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1231040": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1231208": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1231510": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1231705": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1232913": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233072": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233085": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233097": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233173": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233285": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233447": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233538": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233573": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233601": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233629": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233657": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1233684": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241144": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241164": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241173": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241249": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241250": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    },
+    "1241314": {
+      "procStatErrno": 2,
+      "killZeroErrno": 3
+    }
+  },
+  "pending": [
+    "deterministic ordered-reaping RED and narrow fix",
+    "focused GREEN without residue",
+    "Gateway full suite",
+    "root-owned full project gate",
+    "independent review",
+    "operator live acceptance"
+  ]
+}
