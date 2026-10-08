@@ -8,8 +8,9 @@ export function isTmuxAvailable() {
   }
 }
 
-export function buildNewSessionCmd({ target, cwd }) {
-  return ["new-session", "-d", "-s", target, "-c", cwd];
+export function buildNewSessionCmd({ target, cwd, env = {} }) {
+  return ["new-session", "-d", "-s", target, "-c", cwd,
+    ...Object.entries(env).flatMap(([key, value]) => ["-e", `${key}=${value}`])];
 }
 
 export function buildSendKeysCmd({ target, line }) {

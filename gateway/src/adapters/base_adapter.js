@@ -7,6 +7,20 @@ import {
   buildPaneStateCmd, buildPasteBufferCmd, buildSendKeysCmd, buildSubmitCmd, tmuxSync,
 } from "./tmux_client.js";
 
+import { EffectiveAgentSelectionError } from "../core/orchestrator_profile.js";
+
+export function workerEnv({ role, traceId, taskId = null }) {
+  const env = {
+    AGENTS_WORKER_ROLE: role,
+    AGENTS_WORKER_TRACE_ID: traceId,
+    AGENTS_WORKER_TASK_ID: taskId ?? "",
+  };
+  if (Object.values(env).some((value) => typeof value !== "string" || /[\r\n\0]/.test(value))) {
+    throw new EffectiveAgentSelectionError("EFFECTIVE_SELECTION_INVALID", "effectiveSelection");
+  }
+  return env;
+}
+
 const activeSubmissions = new Set();
 const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
 const codexQueueFooter = /^ {2}tab to queue message *$/;

@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { workerEnv } from "../../gateway/src/adapters/base_adapter.js";
+import { buildNewSessionCmd } from "../../gateway/src/adapters/tmux_client.js";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -399,6 +401,7 @@ function spawnAdapterResult(args, overrides = {}) {
     tmuxTarget,
     attachCommand: `tmux attach -t ${tmuxTarget}`,
     launchCommand: "unavailable in dry-run",
+    newSessionArgv: Object.freeze(buildNewSessionCmd({ target: tmuxTarget, cwd: args.cwd, env: workerEnv(args) })),
     dryRun: true,
     effectiveSelection: args.effectiveSelection,
     writeAccess: true,
@@ -562,6 +565,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "tmuxTarget",
       "attachCommand",
       "launchCommand",
+      "newSessionArgv",
       "dryRun",
       "effectiveSelection",
       "writeAccess",
@@ -583,6 +587,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "tmuxTarget",
       "attachCommand",
       "launchCommand",
+      "newSessionArgv",
       "dryRun",
       "effectiveSelection",
       "writeAccess",
@@ -713,7 +718,7 @@ for (const agent of ["codex", "claude-code"]) {
           const baselineSelection = resolveEffectiveAgentSelection({ agent });
           const baseline = method === "delegate"
             ? delegateAdapterResult({ effectiveSelection: baselineSelection })
-            : spawnAdapterResult({ effectiveSelection: baselineSelection });
+            : spawnAdapterResult({ effectiveSelection: baselineSelection, role: "coder", traceId: "tr-fixture", cwd: value.repoRoot });
           validValue = baseline[requiredField];
           field = requiredField;
           invalidValue = scenario.create(validValue, sentinel, reads);
@@ -1152,6 +1157,7 @@ for (const agent of ["codex", "claude-code"]) {
                 sessionId: target,
                 tmuxTarget: target,
                 attachCommand: `tmux attach -t ${target}`,
+                newSessionArgv: Object.freeze(buildNewSessionCmd({ target, cwd: _args.cwd, env: workerEnv(_args) })),
                 launchCommand,
               }
             : result

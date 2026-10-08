@@ -1,5 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { workerEnv } from "../../gateway/src/adapters/base_adapter.js";
+import { buildNewSessionCmd } from "../../gateway/src/adapters/tmux_client.js";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -88,6 +90,7 @@ function buildSubject({ repoRoot, realAntigravity = false }) {
         tmuxTarget: "tmux-fake",
         attachCommand: "tmux attach -t tmux-fake",
         launchCommand: "fake launch",
+        newSessionArgv: Object.freeze(buildNewSessionCmd({ target: "tmux-fake", cwd: args.cwd, env: workerEnv(args) })),
         dryRun: true,
         effectiveSelection: args.effectiveSelection,
         writeAccess: resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries),

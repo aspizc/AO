@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { BaseAdapter, assertSafeCwd } from "./base_adapter.js";
+import { BaseAdapter, assertSafeCwd, workerEnv } from "./base_adapter.js";
 import { buildTmuxTarget } from "./session_naming.js";
 import {
   buildCapturePaneCmd,
@@ -216,6 +216,7 @@ export class ClaudeAdapter extends BaseAdapter {
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "delegate");
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       auditSessionStarted({ traceId, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
@@ -247,6 +248,7 @@ export class ClaudeAdapter extends BaseAdapter {
         {
           cwd: safeCwd,
           encoding: "utf-8",
+          env: { ...process.env, ...markers },
           timeout: this.config.adapterTimeoutMs || DEFAULT_TIMEOUT_MS,
         },
       );
@@ -331,6 +333,7 @@ export class ClaudeAdapter extends BaseAdapter {
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "spawn");
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       const tmuxTarget = buildTmuxTarget({
         traceId,
         agent: AGENT_ID,
@@ -344,10 +347,12 @@ export class ClaudeAdapter extends BaseAdapter {
         writeAccess,
       }).join(" ");
 
+      const newSessionArgv = Object.freeze(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd, env: markers }));
+
       if (!dryRun) {
         this.forgetFreshClaudeSpawn({ tmuxTarget });
         if (!isTmuxAvailable()) throw new Error("tmux is required for claude supervised mode");
-        assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
+        assertTmuxOk(tmuxSync(newSessionArgv), "new-session");
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
         // Only an unadorned executable path can establish a fresh plain launch.
         // Configured shell wrappers/arguments may resume history: stay uncertain.
@@ -362,6 +367,7 @@ export class ClaudeAdapter extends BaseAdapter {
         tmuxTarget,
         attachCommand: `tmux attach -t ${tmuxTarget}`,
         launchCommand,
+        newSessionArgv,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
         writeAccess,

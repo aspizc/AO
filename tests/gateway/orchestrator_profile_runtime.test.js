@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { workerEnv } from "../../gateway/src/adapters/base_adapter.js";
+import { buildNewSessionCmd } from "../../gateway/src/adapters/tmux_client.js";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -86,6 +88,7 @@ function fixture(t, { registries = canonicalRegistries } = {}) {
         tmuxTarget: "profile-runtime",
         attachCommand: "tmux attach -t profile-runtime",
         launchCommand: "unavailable in dry-run",
+        newSessionArgv: Object.freeze(buildNewSessionCmd({ target: "profile-runtime", cwd: args.cwd, env: workerEnv(args) })),
         dryRun: true,
         effectiveSelection: args.effectiveSelection,
         writeAccess: resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries),

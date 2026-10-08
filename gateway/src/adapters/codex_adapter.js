@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { BaseAdapter, assertSafeCwd } from "./base_adapter.js";
+import { BaseAdapter, assertSafeCwd, workerEnv } from "./base_adapter.js";
 import { buildTmuxTarget } from "./session_naming.js";
 import {
   buildCapturePaneCmd,
@@ -246,6 +246,7 @@ export class CodexAdapter extends BaseAdapter {
           });
       this.checkEnabled();
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       assertCodexCwdDoesNotExposeExcludedPaths({
         safeCwd,
         repo,
@@ -292,6 +293,7 @@ export class CodexAdapter extends BaseAdapter {
               {
                 cwd: safeCwd,
                 encoding: "utf-8",
+                env: { ...process.env, ...markers },
                 timeout: this.config.adapterTimeoutMs || DEFAULT_TIMEOUT_MS,
               },
             );
@@ -382,6 +384,7 @@ export class CodexAdapter extends BaseAdapter {
           });
       this.checkEnabled();
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       assertCodexCwdDoesNotExposeExcludedPaths({
         safeCwd,
         repo,
@@ -411,9 +414,11 @@ export class CodexAdapter extends BaseAdapter {
       }).join(" ");
       const dryRun = isDryRun(this.config);
 
+      const newSessionArgv = Object.freeze(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd, env: markers }));
+
       if (!dryRun) {
         if (!isTmuxAvailable()) throw new Error("tmux is required for codex supervised mode");
-        assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
+        assertTmuxOk(tmuxSync(newSessionArgv), "new-session");
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
@@ -431,6 +436,7 @@ export class CodexAdapter extends BaseAdapter {
         tmuxTarget,
         attachCommand: `tmux attach -t ${tmuxTarget}`,
         launchCommand,
+        newSessionArgv,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
         writeAccess,
