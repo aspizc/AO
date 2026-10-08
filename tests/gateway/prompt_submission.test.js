@@ -804,7 +804,6 @@ test("trial2 measured footer changes do not open near misses unknown status or c
   for (const screen of [claude.snapshot.replace("user@host:/workspace/project", "unrecognized status"),
     claude.snapshot.replace("user@host:/workspace/project", "user@host:relative/path"),
     claude.snapshot.replace("user@host:/workspace/project", ""),
-    claude.snapshot.replace("(shift+tab to cycle)", "(shift+tab to cycle) · ← for agents"),
     claude.snapshot.replace("shift+tab to cycle", "shift+tab to confirm"),
     claude.snapshot.replace("⏵⏵ auto mode on", "⏵⏵ auto mode off"),
     claude.snapshot + "unknown overlay\n"]) {
@@ -834,4 +833,264 @@ test("trial2 Claude post-paste decision or unknown status prevents the first Ent
     assert.deepEqual(fx.inputs, [`\x1b[200~${prompt}\x1b[201~`]);
     assert.equal(fx.buffers.size, 0);
   }
+});
+
+const trial3Profiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial3.json", import.meta.url), "utf8"));
+const trial3Codex = trial3Profiles.find((profile) => profile.provider === "codex");
+const trial3Claude = trial3Profiles.find((profile) => profile.provider === "claude-code");
+function trial3Fixture(provider, observations, prompt) {
+  return fixture({ provider, prompt, screens: observations.map((observation) => observation.snapshot),
+    paneFor: (screen) => {
+      const pane = observations.find((observation) => observation.snapshot === screen).pane;
+      return `${pane.cursor}|${pane.height}|${pane.width}|${pane.cursorX}`;
+    } });
+}
+
+test("trial3 observed Codex queue footer is a draft only in the post-paste phase", () => {
+  const { preAsk, error: draft } = trial3Codex;
+  const before = base.classifyProviderPane("codex", preAsk.snapshot, preAsk.pane);
+  assert.equal(before.state, "composer");
+  assert.equal(before.text, "");
+  assert.equal(draft.pane.cursorX, 57);
+  for (const phase of [undefined, "ready", "unrecognized"]) {
+    assert.equal(base.classifyProviderPane("codex", draft.snapshot, draft.pane, phase).state, "unknown_state");
+  }
+  const after = base.classifyProviderPane("codex", draft.snapshot, draft.pane, "draft");
+  assert.equal(after.state, "composer");
+  assert.equal(after.text, draft.prompt);
+  assert.equal(after.identity, before.identity);
+});
+
+test("trial3 observed Claude status plus full footer is ready with recorded metadata", () => {
+  assert.deepEqual(trial3Claude.error, trial3Claude.preAsk);
+  for (const observation of [trial3Claude.preAsk, trial3Claude.error]) {
+    const result = base.classifyProviderPane("claude-code", observation.snapshot, observation.pane);
+    assert.equal(result.state, "composer");
+    assert.equal(result.text, "");
+    assert.equal(base.classifyProviderPane("codex", observation.snapshot, observation.pane).state, "unknown_state");
+  }
+});
+
+test("trial3 observed queue draft supports guarded Enter and bounded retry without claiming acceptance", async () => {
+  const { preAsk, error: draft } = trial3Codex;
+  const fx = trial3Fixture("codex", [preAsk, ...Array(5).fill(draft)], draft.prompt);
+  await assert.rejects(fx.ask, reason("not_submitted"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`, "\r", "\r"]);
+  assert.equal(fx.buffers.size, 0);
+  const disappearance = trial3Fixture("codex", [preAsk, draft, draft, preAsk], draft.prompt);
+  await assert.rejects(disappearance.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(disappearance.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial3 Claude measured ready footer permits exact simulated drafts without false acceptance", async () => {
+  const preAsk = trial3Claude.preAsk;
+  const rows = preAsk.snapshot.split("\n");
+  rows[preAsk.pane.cursor] = "❯\u00a0Enter";
+  // Claude did not receive input in the root capture: this draft is simulated.
+  const draft = { snapshot: rows.join("\n"), pane: { ...preAsk.pane, cursorX: 7 } };
+  const fx = trial3Fixture("claude-code", [preAsk, ...Array(5).fill(draft)], "Enter");
+  await assert.rejects(fx.ask, reason("not_submitted"));
+  assert.deepEqual(fx.inputs, ["\x1b[200~Enter\x1b[201~", "\r", "\r"]);
+  const disappearance = trial3Fixture("claude-code", [preAsk, draft, draft, preAsk], "Enter");
+  await assert.rejects(disappearance.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(disappearance.inputs, ["\x1b[200~Enter\x1b[201~", "\r"]);
+});
+
+test("trial3 queue footer never authorizes a blank placeholder or an initial paste", async () => {
+  const { preAsk, error: draft } = trial3Codex;
+  const placeholderRows = draft.snapshot.split("\n");
+  placeholderRows[36] = "› Ask Codex to do anything";
+  const blankRows = [...placeholderRows];
+  blankRows[36] = "› ";
+  for (const snapshot of [placeholderRows.join("\n"), blankRows.join("\n")]) {
+    const pane = preAsk.pane;
+    assert.equal(base.classifyProviderPane("codex", snapshot, pane, "draft").state, "unknown_state");
+    const fx = trial3Fixture("codex", [{ snapshot, pane }], "Enter");
+    await assert.rejects(fx.ask, reason("unknown_state"));
+    assert.deepEqual(fx.inputs, []);
+    assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+  }
+  const fx = trial3Fixture("codex", [draft], draft.prompt);
+  await assert.rejects(fx.ask, reason("unknown_state"));
+  assert.deepEqual(fx.inputs, []);
+});
+
+test("trial3 queue draft requires measured status geometry exact ASCII cursor and footer", () => {
+  const draft = trial3Codex.error;
+  const variants = [
+    [draft.snapshot.replace("  tab to queue message", "  tab to queue messages"), draft.pane],
+    [draft.snapshot.replace("  tab to queue message", " tab to queue message"), draft.pane],
+    [draft.snapshot.replace("GPT-6.1-Sol medium fast", "unrecognized status"), draft.pane],
+    [draft.snapshot.replace("  GPT-6.1-Sol medium fast · /workspace/project", ""), draft.pane],
+    [draft.snapshot + "unknown overlay\n", draft.pane],
+    [draft.snapshot.replace(draft.prompt, "é".repeat(draft.prompt.length)), draft.pane],
+    [draft.snapshot, { ...draft.pane, cursorX: 56 }],
+    [draft.snapshot, { ...draft.pane, cursor: 37 }],
+    [draft.snapshot, { ...draft.pane, height: 41 }],
+    [draft.snapshot, { ...draft.pane, width: 119 }],
+    [draft.snapshot.replace(draft.prompt, "x".repeat(118)), { ...draft.pane, cursorX: 120 }],
+  ];
+  for (const [snapshot, pane] of variants) {
+    assert.equal(base.classifyProviderPane("codex", snapshot, pane, "draft").state, "unknown_state");
+  }
+  const wrapped = draft.snapshot.split("\n");
+  wrapped[36] = "› first";
+  wrapped[37] = "  second";
+  assert.equal(base.classifyProviderPane("codex", wrapped.join("\n"), { ...draft.pane, cursor: 37, cursorX: 8 }, "draft").state, "unknown_state");
+});
+
+test("trial3 decisions trust busy and unknown still refuse with zero input", async () => {
+  for (const profile of trial3Profiles) {
+    const prefix = profile.provider === "codex" ? "›" : "❯";
+    const titles = profile.provider === "codex"
+      ? ["Retry with a faster model?", "Do you trust this directory?"]
+      : ["Select model", "Do you trust this folder?"];
+    for (const title of titles) {
+      const observation = { snapshot: `${title}\n${prefix} 1. Confirm\n  2. Cancel`,
+        pane: { ...profile.preAsk.pane, cursor: 1 } };
+      const fx = trial3Fixture(profile.provider, [observation], "Enter");
+      await assert.rejects(fx.ask, reason("decision_required"));
+      assert.deepEqual(fx.inputs, []);
+    }
+    const rows = profile.preAsk.snapshot.split("\n");
+    if (profile.provider === "codex") rows[34] = "• Working (0s • esc to interrupt)";
+    else { rows[36] = "❯\u00a0"; rows.splice(38, rows.length, "  esc to interrupt"); }
+    for (const [snapshot, expected] of [[rows.join("\n"), "busy"], ["unknown pane", "unknown_state"]]) {
+      const fx = trial3Fixture(profile.provider, [{ snapshot, pane: profile.preAsk.pane }], "Enter");
+      await assert.rejects(fx.ask, reason(expected));
+      assert.deepEqual(fx.inputs, []);
+      assert.equal(fx.calls.some((call) => call.args[0] === "load-buffer"), false);
+    }
+    for (const mode of ["mode", "inputOff", "synchronized"]) {
+      const observation = { ...profile.preAsk, pane: { ...profile.preAsk.pane, [mode]: "1" } };
+      assert.equal(base.classifyProviderPane(profile.provider, observation.snapshot, observation.pane).state, "unknown_state");
+    }
+  }
+});
+
+test("trial3 queue draft cannot authorize Enter on a fresh decision or changed draft", async () => {
+  const { preAsk, error: draft } = trial3Codex;
+  const changed = { ...draft, snapshot: draft.snapshot.replace(draft.prompt, "x".repeat(draft.prompt.length)) };
+  const decision = { snapshot: "Do you trust this directory?\n› 1. Confirm\n  2. Cancel",
+    pane: { ...preAsk.pane, cursor: 1 } };
+  for (const [guard, expected] of [[decision, "decision_required"], [changed, "unknown_state"]]) {
+    const fx = trial3Fixture("codex", [preAsk, draft, guard], draft.prompt);
+    await assert.rejects(fx.ask, reason(expected));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`]);
+    assert.equal(fx.buffers.size, 0);
+  }
+});
+
+test("trial3 busy queue draft cannot receive Enter or become acceptance evidence", async () => {
+  const { preAsk, error: draft } = trial3Codex;
+  const rows = draft.snapshot.split("\n");
+  rows[34] = "• Working (0s • esc to interrupt)";
+  const busy = { ...draft, snapshot: rows.join("\n") };
+  assert.equal(base.classifyProviderPane("codex", busy.snapshot, busy.pane, "draft").state, "busy");
+  const beforeEnter = trial3Fixture("codex", [preAsk, busy], draft.prompt);
+  await assert.rejects(beforeEnter.ask, reason("busy"));
+  assert.deepEqual(beforeEnter.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`]);
+  const afterEnter = trial3Fixture("codex", [preAsk, draft, draft, busy], draft.prompt);
+  await assert.rejects(afterEnter.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(afterEnter.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial3 measured Claude status full footer still rejects near misses and overlays", () => {
+  const { snapshot, pane } = trial3Claude.preAsk;
+  for (const screen of [snapshot.replace("← for agents", "← for agent"),
+    snapshot.replace("user@host:/workspace/project", "user@host:relative/path"),
+    snapshot.replace("user@host:/workspace/project", "unknown status"),
+    snapshot + "unknown overlay\n"]) {
+    assert.equal(base.classifyProviderPane("claude-code", screen, pane).state, "unknown_state");
+  }
+  assert.equal(base.classifyProviderPane("claude-code", snapshot, { ...pane, height: 41 }).state, "unknown_state");
+});
+
+const trial4Profiles = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial4.json", import.meta.url), "utf8"));
+const trial4Codex = trial4Profiles.find((profile) => profile.provider === "codex");
+const trial4Claude = trial4Profiles.find((profile) => profile.provider === "claude-code");
+
+test("trial4 exact observed capture padding and cursor identify the queue draft", () => {
+  for (const profile of trial4Profiles) {
+    for (const stage of ["preAsk", "error"]) {
+      const observation = profile[stage];
+      assert.deepEqual(observation.snapshot.split("\n").map((row) => row.length - row.replace(/ +$/, "").length),
+        observation.observedTrailingSpacesByRow);
+    }
+  }
+  const draft = trial4Codex.error;
+  const footer = draft.snapshot.split("\n")[39];
+  assert.equal(footer, "  tab to queue message" + " ".repeat(97));
+  assert.equal(footer.length, 119);
+  assert.equal(draft.pane.cursorX, 57);
+  assert.equal(draft.pane.cursor, 36);
+  const result = base.classifyProviderPane("codex", draft.snapshot, draft.pane, "draft");
+  assert.equal(result.state, "composer");
+  assert.equal(result.text, draft.prompt);
+  assert.equal(result.identity, base.classifyProviderPane("codex", trial4Codex.preAsk.snapshot, trial4Codex.preAsk.pane).identity);
+});
+
+test("trial4 padded queue draft reaches guarded Enter without false acceptance", async () => {
+  const { preAsk, error: draft } = trial4Codex;
+  const fx = trial3Fixture("codex", [preAsk, ...Array(5).fill(draft)], draft.prompt);
+  await assert.rejects(fx.ask, reason("not_submitted"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`, "\r", "\r"]);
+  assert.equal(fx.buffers.size, 0);
+  const disappearance = trial3Fixture("codex", [preAsk, draft, draft, preAsk], draft.prompt);
+  await assert.rejects(disappearance.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(disappearance.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`, "\r"]);
+});
+
+test("trial4 queue padding allows trailing literal spaces only with exact indentation and phase", () => {
+  const draft = trial4Codex.error;
+  const row = draft.snapshot.split("\n")[39];
+  for (const suffix of ["", " ", " ".repeat(97)]) {
+    const snapshot = draft.snapshot.replace(row, "  tab to queue message" + suffix);
+    assert.equal(base.classifyProviderPane("codex", snapshot, draft.pane, "draft").state, "composer");
+  }
+  for (const footer of [" tab to queue message", "   tab to queue message", "\ttab to queue message",
+    "  tab to queue messages", "  tab to queue message\t", "  tab to queue message\u00a0", "  tab to queue message extra"]) {
+    assert.equal(base.classifyProviderPane("codex", draft.snapshot.replace(row, footer), draft.pane, "draft").state, "unknown_state");
+  }
+  assert.equal(base.classifyProviderPane("codex", draft.snapshot, draft.pane).state, "unknown_state");
+  const rows = draft.snapshot.split("\n");
+  rows[36] = "› Ask Codex to do anything";
+  assert.equal(base.classifyProviderPane("codex", rows.join("\n"), trial4Codex.preAsk.pane, "draft").state, "unknown_state");
+});
+
+test("trial4 padded queue draft retains status cursor busy decision and unknown refusals", async () => {
+  const { preAsk, error: draft } = trial4Codex;
+  const busyRows = draft.snapshot.split("\n");
+  busyRows[34] = "• Working (0s • esc to interrupt)";
+  const cases = [
+    [{ ...draft, snapshot: busyRows.join("\n") }, "busy"],
+    [{ ...draft, snapshot: draft.snapshot.replace("GPT-6.1-Sol medium fast", "unknown status") }, "unknown_state"],
+    [{ ...draft, pane: { ...draft.pane, cursorX: 56 } }, "unknown_state"],
+    [{ snapshot: "Do you trust this directory?\n› 1. Confirm\n  2. Cancel", pane: { ...preAsk.pane, cursor: 1 } }, "decision_required"],
+  ];
+  for (const [observation, expected] of cases) {
+    const fx = trial3Fixture("codex", [preAsk, observation], draft.prompt);
+    await assert.rejects(fx.ask, reason(expected));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${draft.prompt}\x1b[201~`]);
+    assert.equal(fx.buffers.size, 0);
+  }
+  const initial = trial3Fixture("codex", [draft], draft.prompt);
+  await assert.rejects(initial.ask, reason("unknown_state"));
+  assert.deepEqual(initial.inputs, []);
+  assert.equal(initial.calls.some((call) => call.args[0] === "load-buffer"), false);
+});
+
+test("trial4 observed Claude post-Enter pane is not acceptance evidence", async () => {
+  const { preAsk, error: after } = trial4Claude;
+  assert.equal(after.pane.cursorX, 2);
+  assert.equal(after.snapshot.split("\n")[36], "❯\u00a0" + " ".repeat(61));
+  assert.equal(base.classifyProviderPane("claude-code", after.snapshot, after.pane, "draft").state, "unknown_state");
+  const rows = preAsk.snapshot.split("\n");
+  rows[36] = "❯\u00a0Enter";
+  // The root's intermediate pasted draft was not captured; this is simulated.
+  const draft = { snapshot: rows.join("\n"), pane: { ...preAsk.pane, cursorX: 7 } };
+  const fx = trial3Fixture("claude-code", [preAsk, draft, draft, after], "Enter");
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, ["\x1b[200~Enter\x1b[201~", "\r"]);
+  assert.equal(fx.buffers.size, 0);
 });

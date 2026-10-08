@@ -123,6 +123,33 @@ values, not measured metadata. Paths and status identities are redacted, and
 the prompt marker is replaced with benign ASCII of the same length. The local
 status line is rendering evidence only and grants no path, account or approval
 authority. No successful live acceptance was observed in this capture either.
+The [trial 3 sanitized fixtures](../tests/gateway/fixtures/a04_live_profiles_trial3.json)
+now retain recorded pre-ask and error-state metadata. Codex's observed pasted
+ASCII single-line draft keeps its measured status row but changes the footer
+to exactly `  tab to queue message`. This layout is accepted only during the
+post-paste draft phase, with a nonempty draft, exact end cursor, 120x40 geometry
+and blank trailing rows. Initial readiness and blank placeholders with that
+footer refuse; it is not acceptance evidence. The draft phase also observes
+whether the same draft remains after CR for the existing bounded retry; no
+footer itself confirms success. Claude's measured pre-ask local status row
+also pairs with the full auto-mode footer containing `← for agents`; both
+recorded Claude panes are unchanged placeholders, with no input received.
+Trial 3 replaces the previously inferred post-paste metadata boundary for its
+own Codex fixture with the root's actual error-state cursor (57,36). Local
+paths/identities and the prompt marker remain redacted. These captures still
+do not establish successful live acceptance.
+The [trial 4 sanitized fixtures](../tests/gateway/fixtures/a04_live_profiles_trial4.json)
+correct the queue-row padding omitted from trial 3. The root's current captures
+use the Gateway's exact `capture-pane -N -T` flags: the queue footer row is
+119 characters, including 97 trailing literal spaces. Matching keeps the exact
+two-space leading indentation and permits only trailing literal spaces, with
+all draft-phase and refusal checks unchanged. Sanitization preserves observed
+trailing spaces on every row, including rows whose private text is removed.
+Recorded Codex cursor metadata is unchanged. The current Claude error capture
+follows one Enter and an `acceptance_uncertain` result; it proves neither
+successful acceptance nor permission to replay. Its footer needs no matching
+change. Live acceptance and the independent review of the inherited trial 3
+phase correction remain open.
 Root coordinates live provider launches, including Antigravity `1.3.0`.
 V6 A/0/04 is not closed.
 

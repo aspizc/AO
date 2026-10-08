@@ -1,0 +1,61 @@
+[
+  {
+    "provider": "codex",
+    "version": "codex-cli 0.160.1",
+    "provenance": "root operator rendered panes and recorded preAskState/errorState; successful acceptance not observed",
+    "preAsk": {
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /workspace/project\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 2,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      }
+    },
+    "error": {
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Reply exactly samplesamplesamplesamp. Do not use tools.\n\n  GPT-6.1-Sol medium fast · /workspace/project\n  tab to queue message\n",
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 57,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      },
+      "prompt": "Reply exactly samplesamplesamplesamp. Do not use tools."
+    }
+  },
+  {
+    "provider": "claude-code",
+    "version": "2.1.293 (Claude Code)",
+    "provenance": "root operator rendered panes and recorded preAskState/errorState; successful acceptance not observed",
+    "preAsk": {
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Try \"fix typecheck errors\"\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  user@host:/workspace/project\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n",
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 2,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      }
+    },
+    "error": {
+      "snapshot": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Try \"fix typecheck errors\"\n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  user@host:/workspace/project\n  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents\n",
+      "pane": {
+        "mode": "0",
+        "inputOff": "0",
+        "synchronized": "0",
+        "cursorX": 2,
+        "cursor": 36,
+        "width": 120,
+        "height": 40
+      }
+    }
+  }
+]

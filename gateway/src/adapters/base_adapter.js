@@ -9,13 +9,16 @@ import {
 
 const activeSubmissions = new Set();
 const codexContextFooter = /^\s*(?:\? for shortcuts\s+)?\d{1,3}% context left\s*$/;
+const codexQueueFooter = /^  tab to queue message *$/;
 const codexWarningsFooter = /^\s*\? for shortcuts\s+⚠ \d+ warnings? · f2 to view\s*$/;
 // Measured 0.160.1 status row; this is rendering evidence, not model selection.
 const codexLiveStatus = /^  GPT-6\.1-Sol medium fast · \S+\s*$/;
 function codexGap(rows, cursor, footer) {
-  if (codexWarningsFooter.test(rows[footer]) && !codexLiveStatus.test(rows[footer - 1])) return false;
+  if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+    && !codexLiveStatus.test(rows[footer - 1])) return false;
   return rows.slice(cursor + 1, footer).every((row, index) => row.trim() === ""
-    || (cursor + 1 + index === footer - 1 && codexWarningsFooter.test(rows[footer])
+    || (cursor + 1 + index === footer - 1
+      && (codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
       && codexLiveStatus.test(row)));
 }
 function invalidText(text, allowNewlines) {
@@ -27,7 +30,7 @@ function invalidText(text, allowNewlines) {
 }
 function activeDecision(provider, rows, pane) {
   if (provider === "codex") {
-    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row));
+    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
     if (start >= 0 && pane.cursor >= start && pane.cursor < footer
       && codexGap(rows, pane.cursor, footer)) return false;
@@ -94,14 +97,15 @@ function paneState(run, target) {
 
 // Deliberately narrow source-backed and observed profiles. Unknown layouts/providers stay closed.
 // Evidence and the unverified live/version boundary are recorded in gateway/README.md.
-export function classifyProviderPane(provider, snapshot, pane) {
+export function classifyProviderPane(provider, snapshot, pane, phase = "ready") {
   if (pane.mode !== "0" || pane.inputOff !== "0" || pane.synchronized !== "0") return { state: "unknown_state" };
   const rows = snapshot.split("\n");
   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
   if (provider === "codex") {
-    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row));
+    const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
-    if ((codexWarningsFooter.test(rows[footer]) && (pane.width !== 120 || pane.height !== 40))
+    if (((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+      && (pane.width !== 120 || pane.height !== 40))
       || start < 0 || footer - start < 2 || footer - start > 12
       || pane.cursor < start || pane.cursor >= footer
       || !codexGap(rows, pane.cursor, footer)) return { state: "unknown_state" };
@@ -109,6 +113,12 @@ export function classifyProviderPane(provider, snapshot, pane) {
     if (textRows.slice(1).some((row) => !row.startsWith("  "))) return { state: "unknown_state" };
     let text = [textRows[0].replace(/^\s*[›»] ?/, ""), ...textRows.slice(1).map((row) => row.slice(2))].join("\n");
     if (text === "Ask Codex to do anything" && pane.cursorX === 2 && pane.cursor === start) text = "";
+    // The measured queue footer identifies only a fully visible pasted draft.
+    // It cannot authorize initial input or prove acceptance, even with a placeholder.
+    if (codexQueueFooter.test(rows[footer]) && (phase !== "draft" || !text
+      || pane.cursor !== start || /[^\x20-\x7e]/.test(text)
+      || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width
+      || rows.slice(footer + 1).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
     const status = rows.slice(Math.max(0, start - 2), start).join("\n");
     const busy = /Working \([0-9hms .]+[•·] esc to interrupt\)/.test(status);
     // A cursor outside the measured composer cannot prove that Enter targets it.
@@ -153,11 +163,12 @@ export function classifyProviderPane(provider, snapshot, pane) {
     const footer = rows[bottom + 1]?.trim();
     const busy = footer === "esc to interrupt";
     // 2.1.293 measured idle layouts: blank gap with agents hint, or a local
-    // status row with the shorter footer after paste. Neither proves acceptance.
+    // status row with either observed auto-mode footer. Neither proves acceptance.
     const liveIdle = pane.width === 120 && pane.height === 40
       && ((footer === "" && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents")
         || (/^  [A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\/[A-Za-z0-9_./-]+\s*$/.test(rows[bottom + 1] || "")
-          && rows[bottom + 2]?.trim() === "⏵⏵ auto mode on (shift+tab to cycle)"))
+          && ["⏵⏵ auto mode on (shift+tab to cycle)", "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"]
+            .includes(rows[bottom + 2]?.trim())))
       && rows.slice(bottom + 3).every((row) => row.trim() === "");
     if ((!busy && footer !== "? for shortcuts" && !liveIdle)
       || (!liveIdle && rows.slice(bottom + 2).some((row) => row.trim() !== ""))) return { state: "unknown_state" };
@@ -191,7 +202,7 @@ function capability(run) {
   }
 }
 
-function observe(run, target, provider, owned) {
+function observe(run, target, provider, owned, phase = "ready") {
   const fields = checkedRun(run, buildSubmitStateCmd({ target })).trim().split("|");
   const limits = [9223372036854775807n, null, 9223372036854775807n, 2147483647n, 2147483647n, 2147483647n, 2147483647n];
   if (fields.length !== 7 || fields[1] !== target || !/^%(?:0|[1-9][0-9]*)$/.test(target)
@@ -213,7 +224,7 @@ function observe(run, target, provider, owned) {
     if (!Buffer.isBuffer(raw)) throw new Error("raw capture required");
     snapshot = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(raw);
   } catch { throw submissionError("unknown_state"); }
-  return { ...classifyProviderPane(provider, snapshot, pane), snapshot, buffer,
+  return { ...classifyProviderPane(provider, snapshot, pane, phase), snapshot, buffer,
     serverPid: fields[0], target, panePid: fields[2], width: fields[3], height: fields[4], cursorX: fields[5], cursorY: fields[6] };
 }
 
@@ -274,10 +285,10 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
     checkedRun(run, buildLoadBufferCmd({ buffer }), { input: prompt });
     checkedRun(run, buildPasteBufferCmd({ target, buffer }));
     await wait(boundedDelay(config.tmuxSubmitDelayMs, 150, 1000));
-    const pending = observe(run, target, provider, owned);
+    const pending = observe(run, target, provider, owned, "draft");
     requireComposer(pending, prompt);
     for (let attempt = 0; attempt < 2; attempt++) {
-      const guard = observe(run, target, provider, owned);
+      const guard = observe(run, target, provider, owned, "draft");
       if (attempt === 0) requireComposer(guard, prompt, pending.identity);
       else if (guard.state !== "composer" || guard.text !== prompt || guard.identity !== pending.identity) {
         throw submissionError("acceptance_uncertain");
@@ -285,7 +296,7 @@ export async function submitPrompt({ target, prompt, provider, config = {}, run 
       guardedSubmit(run, guard, attempt);
       delivered = true;
       await wait(boundedDelay(config.tmuxAskDelayMs, 1500, 5000));
-      const after = observe(run, target, provider, owned);
+      const after = observe(run, target, provider, owned, "draft");
       if (after.state === "busy" && after.text === "") return { snapshot: after.snapshot, dryRun: false };
       if (after.state !== "composer" || after.text !== prompt || after.identity !== pending.identity) {
         throw submissionError("acceptance_uncertain");
