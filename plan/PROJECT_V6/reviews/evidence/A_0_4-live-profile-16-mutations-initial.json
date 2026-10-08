@@ -1,0 +1,63 @@
+{
+  "attempt": {
+    "exitCode": 1,
+    "mutantSha256": "4a03d31ff6a1bad061eaeb8713e81c97ebf197a56dd88e74723ab3b562f88e79",
+    "failures": [
+      "not ok 123 - trial16 welcome Working after a second Enter or completed-only reply cannot confirm the first submission"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "mutantSha256": "0498277d05291329c4f8edc450dd3497e7aa17c951af3f027013d05f49405724",
+    "failures": [
+      "not ok 121 - trial16 changed server pane PID or geometry in any ask frame refuses welcome acceptance"
+    ]
+  },
+  "pending-history": {
+    "exitCode": 1,
+    "mutantSha256": "c0f5f017abb1a7544c10c651fad75469e8b8ec9376f3c010ba06fa4e93b44836",
+    "failures": [
+      "not ok 119 - trial16 missing wrong duplicated shifted stale or unrelated echo cannot bind welcome Working to this Enter",
+      "not ok 120 - trial16 prior Working in any pre-Enter frame cannot become new acceptance"
+    ]
+  },
+  "echo-position": {
+    "exitCode": 0,
+    "mutantSha256": "7ff5f11ce8aad60f6e08f88d975909983c74472537613ec08684bc37e8c326e2",
+    "failures": []
+  },
+  "blank-transcript": {
+    "exitCode": 1,
+    "mutantSha256": "4cda49638e281e1448a2e94a351481dfe5d36230d8321b2e0acd38bfe8a0c333",
+    "failures": [
+      "not ok 119 - trial16 missing wrong duplicated shifted stale or unrelated echo cannot bind welcome Working to this Enter",
+      "not ok 122 - trial16 menu decision and unrelated busy layouts cannot borrow welcome acceptance"
+    ]
+  },
+  "header": {
+    "exitCode": 0,
+    "mutantSha256": "7d9d7f403f21b6a6268c48797b49d211845880003cca0f725f8a85b87ba9f0c0",
+    "failures": []
+  },
+  "working": {
+    "exitCode": 1,
+    "mutantSha256": "5443987bcf92ba5f05bec9bd0c25778de5ab455acee0962116bab9778cd91819",
+    "failures": [
+      "not ok 122 - trial16 menu decision and unrelated busy layouts cannot borrow welcome acceptance"
+    ]
+  },
+  "gap34": {
+    "exitCode": 1,
+    "mutantSha256": "9e3c07c7b8fe90329a7646c3c4c285c355565ffeb79a88e8f3c6660ac82b17e8",
+    "failures": [
+      "not ok 122 - trial16 menu decision and unrelated busy layouts cannot borrow welcome acceptance"
+    ]
+  },
+  "gap35": {
+    "exitCode": 1,
+    "mutantSha256": "9aada642502c9ea2e1490e5626f0e0a37751cd11be3c2f49ff408010c3beaafa",
+    "failures": [
+      "not ok 122 - trial16 menu decision and unrelated busy layouts cannot borrow welcome acceptance"
+    ]
+  }
+}
