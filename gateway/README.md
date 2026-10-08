@@ -4,6 +4,9 @@ Node.js support is defined by the repository's
 [canonical runtime contract](../docs/node-runtime.md) and enforced during npm
 installation.
 
+The [worker environment contract](../docs/worker-environment.md) describes the
+informational role, trace and task markers set on every executable child.
+
 The [canonical MCP tool catalog](../docs/mcp-tool-catalog.md) is generated from
 the typed runtime catalog and pins all 33 tool names in protocol order.
 

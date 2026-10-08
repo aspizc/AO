@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { BaseAdapter, assertSafeCwd } from "./base_adapter.js";
+import { BaseAdapter, assertSafeCwd, workerEnv } from "./base_adapter.js";
 import { buildTmuxTarget } from "./session_naming.js";
 import {
   buildCapturePaneCmd,
@@ -225,6 +225,7 @@ export class PiAdapter extends BaseAdapter {
       } = effectiveModel(decision, "delegate", this.id);
       assertModelCredentials(effectiveModelValue);
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
@@ -256,7 +257,7 @@ export class PiAdapter extends BaseAdapter {
         {
           cwd: safeCwd,
           encoding: "utf-8",
-          env: childEnv(effectiveModelValue),
+          env: { ...childEnv(effectiveModelValue), ...markers },
           timeout: this.config.adapterTimeoutMs || DEFAULT_TIMEOUT_MS,
         },
       );
@@ -342,6 +343,7 @@ export class PiAdapter extends BaseAdapter {
       } = effectiveModel(decision, "spawn", this.id);
       assertModelCredentials(effectiveModelValue);
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
+      const markers = workerEnv({ role, traceId, taskId });
       const tmuxTarget = buildTmuxTarget({
         traceId,
         agent: this.id,
@@ -355,9 +357,11 @@ export class PiAdapter extends BaseAdapter {
         writeAccess,
       }).join(" ");
 
+      const newSessionArgv = Object.freeze(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd, env: markers }));
+
       if (!dryRun) {
         if (!isTmuxAvailable()) throw new Error("tmux is required for pi supervised mode");
-        assertTmuxOk(tmuxSync(buildNewSessionCmd({ target: tmuxTarget, cwd: safeCwd })), "new-session");
+        assertTmuxOk(tmuxSync(newSessionArgv), "new-session");
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
@@ -367,6 +371,7 @@ export class PiAdapter extends BaseAdapter {
         tmuxTarget,
         attachCommand: `tmux attach -t ${tmuxTarget}`,
         launchCommand,
+        newSessionArgv,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
         writeAccess,

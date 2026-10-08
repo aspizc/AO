@@ -58,3 +58,10 @@ test("creates and kills a session and reaps its owned server", { skip: !isTmuxAv
     assert.equal(killed.status, 0);
   });
 });
+
+test("buildNewSessionCmd emits -e for each marker without shell interpolation", () => {
+  assert.deepEqual(buildNewSessionCmd({ target: "ag-x", cwd: "/tmp", env: {
+    AGENTS_WORKER_ROLE: "reviewer", AGENTS_WORKER_TRACE_ID: "tr=$literal", AGENTS_WORKER_TASK_ID: "",
+  } }), ["new-session", "-d", "-s", "ag-x", "-c", "/tmp",
+    "-e", "AGENTS_WORKER_ROLE=reviewer", "-e", "AGENTS_WORKER_TRACE_ID=tr=$literal", "-e", "AGENTS_WORKER_TASK_ID="]);
+});

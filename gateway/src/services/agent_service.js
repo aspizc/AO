@@ -19,6 +19,7 @@ import {
 import * as sessionRepo from "../core/repositories/session_repo.js";
 import { append as auditAppend } from "../core/audit.js";
 import { checkForIntervention, recordExpectedAsk } from "../adapters/intervention_detector.js";
+import { workerEnv } from "../adapters/base_adapter.js";
 import { withTimeout } from "./_with_timeout.js";
 
 export class PolicyDeniedError extends Error {
@@ -266,6 +267,7 @@ const SPAWN_RESULT_FIELDS = Object.freeze([
   "tmuxTarget",
   "attachCommand",
   "launchCommand",
+  "newSessionArgv",
   "dryRun",
   "effectiveSelection",
   "writeAccess",
@@ -423,7 +425,33 @@ function assertDelegateResultContract(
   }
 }
 
-function assertSpawnResultContract(result) {
+function assertSpawnResultContract(result, execution) {
+  const argv = result.newSessionArgv;
+  if (!Array.isArray(argv) || utilTypes.isProxy(argv)
+    || Object.getPrototypeOf(argv) !== Array.prototype) rejectInvalidSelection();
+  // Read data properties only: getters/proxies are not adapter evidence.
+  const values = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(argv, String(index));
+    if (!descriptor || !Object.hasOwn(descriptor, "value")
+      || typeof descriptor.value !== "string") rejectInvalidSelection();
+    values.push(descriptor.value);
+  }
+  let markers;
+  try { markers = workerEnv(execution); } catch (_err) { rejectInvalidSelection(); }
+  if (values[0] !== "new-session") rejectInvalidSelection();
+  const targets = [];
+  const env = [];
+  for (let index = 1; index < values.length; index += 1) {
+    if (values[index] === "-s") targets.push(values[++index]);
+    else if (values[index] === "-e") env.push(values[++index]);
+  }
+  if (targets.length !== 1 || targets[0] !== result.tmuxTarget) rejectInvalidSelection();
+  for (const [key, value] of Object.entries(markers)) {
+    const entries = env.filter((entry) => typeof entry === "string" && entry.split("=", 1)[0] === key);
+    if (entries.length !== 1 || entries[0] !== `${key}=${value}`) rejectInvalidSelection();
+  }
+  result.newSessionArgv = Object.freeze(values);
   if (
     typeof result.dryRun !== "boolean"
     || result.sessionId !== result.tmuxTarget
@@ -441,6 +469,7 @@ function assertAdapterSelectionResult(
   effectiveSelection,
   codexSandbox,
   writeAccess,
+  execution,
 ) {
   const provider = effectiveSelection.provider;
   const requiredFields = ADAPTER_RESULT_FIELDS[provider]?.[operation];
@@ -493,7 +522,7 @@ function assertAdapterSelectionResult(
       codexSandbox,
     );
   } else {
-    assertSpawnResultContract(normalized);
+    assertSpawnResultContract(normalized, execution);
   }
   return Object.freeze(normalized);
 }
@@ -685,6 +714,7 @@ export function createAgentService({
           effectiveSelection,
           effectiveCodexSandbox,
           writeAccess,
+          execution,
         );
         createSessionIfTaskProvided({
           sessionId: result.sessionId,

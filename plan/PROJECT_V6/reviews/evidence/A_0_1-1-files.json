@@ -1,0 +1,36 @@
+{
+  "base": "a8e84303130096f3c90d179f69736a0f8247846f",
+  "branch": "feat/V6-A-0-01-worker-marker",
+  "state": "uncommitted; independent review pending",
+  "files": {
+    "docs/worker-environment.md": "fda2128a880b21bc54e5db5b2922908354955c8033ec93e2e6f180a1bff6fede",
+    "gateway/README.md": "1234f0f47d9caa3c617df43461a4492aaeacfc405907c6005255c25f6b574de0",
+    "gateway/src/adapters/antigravity_adapter.js": "7fe3e2d03466137a5e81bf6eee2c5b7d175ab4a23b76532623b2178d176d2f03",
+    "gateway/src/adapters/base_adapter.js": "8bd66d3b8d95bf1a14ce85b368c2b9796bd63cf75982b5f60bd01ac3be18ed2b",
+    "gateway/src/adapters/claude_adapter.js": "4d712773ca313683936da1e47714576bf52bd9b86b953b17a0d6354987b86b57",
+    "gateway/src/adapters/codex_adapter.js": "d7e240d4d8a3ce656827364fddec5be4de108a164e37d2886be7a865f4e387ab",
+    "gateway/src/adapters/opencode_adapter.js": "ab4df45f17803644e3ce944615ac6f1bab6f75bd4719c993ed366d05a2da7a2e",
+    "gateway/src/adapters/pi_adapter.js": "3c9db6a89c0b358f7398f248e15ec559d49234a94cde03cf5eb6b6854f3b7289",
+    "gateway/src/adapters/tmux_client.js": "4a0a038402d4e74c79c2ea3f88add0ef0e5c7a2a76da115e064ef3aba3f67ed9",
+    "gateway/src/services/agent_service.js": "a1b9b4bac5533705c501e39ff35a1b7d2ac6706388a731170d955a212536baf1",
+    "tests/gateway/agent_service_worker_env.test.js": "44343ab0823882e628b2b75231a7bc39f67e52b48f7ba75276d2998ad58961fe",
+    "tests/gateway/orchestrator_profile_authority.test.js": "08f01fcc8d40e3b6a1dfc2f6512be78549241503d749a2d7b2a37f1506811705",
+    "tests/gateway/orchestrator_profile_runtime.test.js": "f86f04dfafcaf9f62c6260dbb59bef0e8810362b7528dcd710febcb27a5adc2f",
+    "tests/gateway/tmux_client.test.js": "b71c697030c0b4a5f9628bcab9777d516b2d1cf71a05694ecffeed1f450fe2bb",
+    "tests/gateway/tool_agent_model.test.js": "f181b8bf7b51a2c065b251edc84738e5e203cfc6139a368b246aab82ef252cae",
+    "tests/gateway/worker_env.test.js": "66a9c2a3e314f091b9075d12c5e28c9e337592a59682a13a01a9cd44816c69a7"
+  },
+  "evidence": {
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-contract-green.log.gz": "c7c8083595d69edee4628bd7b870a2ab6d4b9a9f38ab4a0a90917325d02b1ee1",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-contract-initial.log.gz": "bc0fe56e0ac5b2bacc1a76c55549a852f101dd231a93882aff7bffa4790cd064",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-dependency-failure.log.gz": "688548947e64fadc4860301c8b2e63ae948845aade3cea335d33b8a1144022bc",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-focused-green.log.gz": "5d2bea2cbeb1fbf561294dc2237faf0ff80abdc7c4f808ee8dd04057a7168c9f",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-focused-initial.log.gz": "9f33b454a3564948d86295dcdd6a3c8565c563c5de409b8453c14c8d980fcb4a",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-host-red-complete.log.gz": "d5f6d02081009084cdc703a9fd0d65e7bd91b6fcb08b9fefc03cbad0baac159c",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-host-red.log.gz": "7f05bb695c18eea794b39dbb3e93caf7e213700e778bc3632ec58f74bc795b01",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-red.log.gz": "b049fe0f53e5891b8ab6943e7bb8019e625aa3f3c7215a7a20fc317ed1411445",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-service-red.log.gz": "e3ebccd80a787b50aba08591d46d475e3338b7a69f5453f2fb078e88f3d32c28",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-tmux-red.log.gz": "5d04ae06f3149dc683bd254bf21640ce6df5b8281abff9c1065594d5e56b7cba",
+    "plan/PROJECT_V6/reviews/evidence/A_0_1-1-worker-red.log.gz": "cf279313ad730c6463bbe35c806e4a178a6d5a2ae1298d5d28c7a3b843a7144c"
+  }
+}
