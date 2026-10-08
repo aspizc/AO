@@ -1,0 +1,41 @@
+[
+  {
+    "mutation": "trial12-baseline",
+    "argv": [
+      "node",
+      "--test",
+      "tests/gateway/claude_first_prompt.test.js"
+    ],
+    "exitCode": 1,
+    "sourceSha256": "f3d28c72b3d5545fd81cb3c8444fd1ffdb216d236c6e2ce08179a9e95d6c9ca9",
+    "testSha256": "d85ccd6214343071d7a8bb2b06b73ff9f5c99b487035e846fdf61eaca783c4ef"
+  },
+  {
+    "mutation": "stable-verb",
+    "before": "freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true) !== workingVerb",
+    "after": "!freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true)",
+    "argv": [
+      "node",
+      "--test",
+      "--test-name-pattern=trial13 a changed spinner verb",
+      "tests/gateway/claude_first_prompt.test.js"
+    ],
+    "exitCode": 1,
+    "sourceSha256": "7d648ac811b0727104c9399956c04ab6b5640cd9c68f1b1ee8bce900ae2d2075",
+    "mutantSha256": "26b075a7f92b72efe90b9ddf09238ada0c4f8e99f588def34999157802905dab"
+  },
+  {
+    "mutation": "completion-set",
+    "before": "(?:Baked|Brewed|Churned|Cogitated|Cooked|Crunched|Saut\u00e9ed|Worked)",
+    "after": "[A-Z][A-Za-z]*",
+    "argv": [
+      "node",
+      "--test",
+      "--test-name-pattern=trial13 completion verbs outside",
+      "tests/gateway/claude_first_prompt.test.js"
+    ],
+    "exitCode": 1,
+    "sourceSha256": "7d648ac811b0727104c9399956c04ab6b5640cd9c68f1b1ee8bce900ae2d2075",
+    "mutantSha256": "112375662f181c2767fa441f0677acaa16ff6c5ed7d353f24d320266a41737aa"
+  }
+]

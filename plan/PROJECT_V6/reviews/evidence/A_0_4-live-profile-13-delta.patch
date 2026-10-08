@@ -1,0 +1,118 @@
+--- trial12/gateway/src/adapters/base_adapter.js
++++ trial13/gateway/src/adapters/base_adapter.js
+@@ -348,11 +348,16 @@
+     || rows[39]?.trim() !== "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"
+     || rows[6] !== `❯ ${prompt}` || rows[7] !== "") return false;
+   if (working) {
+-    return rows[8] === "●" && /^✽ Twisting… \(\d+s · ↓ \d+ tokens\)$/.test(rows[33])
+-      && rows.slice(4, 34).every((row, index) => [6, 8, 33].includes(index + 4) || row.trim() === "");
++    // 2.1.294 binary frame set; a strict word also covers configured verbs.
++    // Return the per-turn verb so animated glyphs cannot hide a changed turn.
++    const spinner = /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)… \(\d+s · ↓ \d+ tokens\)$/.exec(rows[33]);
++    return rows[8] === "●" && spinner
++      && rows.slice(4, 34).every((row, index) => [6, 8, 33].includes(index + 4) || row.trim() === "")
++      ? spinner[1] : false;
+   }
+   return /^● [\x21-\x7e][\x20-\x7e]*$/.test(rows[8])
+-    && /^✻ Sautéed for \d+s · done \d{1,2}:\d{2} [AP]M$/.test(rows[10])
++    // Exactly the binary's kg set, gated above by the 2.1.294 header.
++    && /^✻ (?:Baked|Brewed|Churned|Cogitated|Cooked|Crunched|Sautéed|Worked) for \d+s · done \d{1,2}:\d{2} [AP]M$/.test(rows[10])
+     && rows.slice(4, 34).every((row, index) => [6, 8, 10].includes(index + 4) || row.trim() === "");
+ }
+ 
+@@ -391,7 +396,8 @@
+           || freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
+           return { snapshot: after.snapshot, dryRun: false };
+         }
+-        if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true)) {
++        const workingVerb = freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true);
++        if (workingVerb) {
+           // Observation only: never re-enter the retry path after this witness.
+           for (let poll = 0; poll < 8; poll++) {
+             await wait(1000);
+@@ -399,7 +405,7 @@
+             if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
+               return { snapshot: after.snapshot, dryRun: false };
+             }
+-            if (!freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true)) {
++            if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true) !== workingVerb) {
+               throw submissionError("acceptance_uncertain");
+             }
+           }
+--- trial12/tests/gateway/claude_first_prompt.test.js
++++ trial13/tests/gateway/claude_first_prompt.test.js
+@@ -178,6 +178,74 @@
+     assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
+     assert.equal(fx.buffers.size, 0);
+   }
++});
++
++test("trial13 a stable non-Twisting verb with animated glyphs confirms the delayed first reply", async () => {
++  for (const verb of ["Pondering", "Razzle-dazzling"]) {
++    const frames = ["✶", "✻", "✽", "·", "✢", "*"].map((glyph, index) => {
++      const frame = clone(delayedProfile.working);
++      replaceRow(frame, 33, `${glyph} ${verb}… (${index + 1}s · ↓ ${index + 2} tokens)`);
++      return frame;
++    });
++    const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++      ...frames, delayedProfile.after]);
++    assert.equal((await fx.ask()).snapshot, delayedProfile.after.snapshot);
++    assert.deepEqual(fx.waits, [150, 1500, ...Array(6).fill(1000)]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++for (const verb of ["Baked", "Brewed", "Churned", "Cogitated", "Cooked", "Crunched", "Sautéed", "Worked"]) {
++  test(`trial13 immediate completion with ${verb} confirms one first-ask Enter`, async () => {
++    const after = clone(delayedProfile.after);
++    replaceRow(after, 10, `✻ ${verb} for 1s · done 9:00 AM`);
++    const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, after]);
++    assert.equal((await fx.ask()).snapshot, after.snapshot);
++    assert.deepEqual(fx.waits, [150, 1500]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  });
++}
++
++test("trial13 a changed spinner verb cannot borrow a later completed reply", async () => {
++  const changed = clone(delayedProfile.working);
++  replaceRow(changed, 33, "✽ Pondering… (2s · ↓ 3 tokens)");
++  const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++    delayedProfile.working, changed, delayedProfile.after]);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.waits, [150, 1500, 1000]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial13 completion verbs outside the version-bound set remain uncertain", async () => {
++  const after = clone(delayedProfile.after);
++  replaceRow(after, 10, "✻ Finished for 1s · done 9:00 AM");
++  const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, after]);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.waits, [150, 1500]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial13 unknown spinner forms and a different header version remain uncertain", async () => {
++  for (const row of ["✳ Pondering… (1s · ↓ 2 tokens)", "✽ pondering… (1s · ↓ 2 tokens)",
++    "✽ Pondering!… (1s · ↓ 2 tokens)", "✽ Pondering… (1s)"]) {
++    const working = clone(delayedProfile.working);
++    replaceRow(working, 33, row);
++    const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, working]);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.waits, [150, 1500]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++  const records = [delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, delayedProfile.after].map(clone);
++  for (const frame of records) replaceRow(frame, 1, " ▐▛███▛█   Claude Code v2.1.295");
++  const fx = delayedHarness(records);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
+ });
+ 
+ test("trial10 prior rendered conversation, hidden-history reuse and marker spoof cannot prove a first turn", async () => {
