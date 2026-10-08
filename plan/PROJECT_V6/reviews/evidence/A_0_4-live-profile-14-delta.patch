@@ -1,0 +1,111 @@
+--- trial13/gateway/src/adapters/base_adapter.js
++++ trial14/gateway/src/adapters/base_adapter.js
+@@ -350,8 +350,11 @@
+   if (working) {
+     // 2.1.294 binary frame set; a strict word also covers configured verbs.
+     // Return the per-turn verb so animated glyphs cannot hide a changed turn.
+-    const spinner = /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)… \(\d+s · ↓ \d+ tokens\)$/.exec(rows[33]);
+-    return rows[8] === "●" && spinner
++    // Observed pre-assistant transient: empty cell and bare spinner only.
++    const spinner = rows[8] === ""
++      ? /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)…$/.exec(rows[33])
++      : rows[8] === "●" ? /^[·✢*✶✻✽] ([A-Z][A-Za-z]*(?:-[a-z]+)*)… \(\d+s · ↓ \d+ tokens\)$/.exec(rows[33]) : null;
++    return spinner
+       && rows.slice(4, 34).every((row, index) => [6, 8, 33].includes(index + 4) || row.trim() === "")
+       ? spinner[1] : false;
+   }
+--- trial13/tests/gateway/claude_first_prompt.test.js
++++ trial14/tests/gateway/claude_first_prompt.test.js
+@@ -9,6 +9,7 @@
+ 
+ const [profile] = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial9.json", import.meta.url), "utf8"));
+ const delayedProfile = JSON.parse(fs.readFileSync(new URL("./fixtures/claude_2_1_294_first_prompt.json", import.meta.url), "utf8"));
++const preAssistantProfile = JSON.parse(fs.readFileSync(new URL("./fixtures/claude_2_1_294_pre_assistant.json", import.meta.url), "utf8"));
+ const clone = (value) => structuredClone(value);
+ const uncertain = (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED" && error.reason === "acceptance_uncertain";
+ 
+@@ -246,6 +247,84 @@
+   await assert.rejects(fx.ask, uncertain);
+   assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
+   assert.equal(fx.buffers.size, 0);
++});
++
++function preAssistantHarness(records = [preAssistantProfile.ready, preAssistantProfile.postPaste,
++  preAssistantProfile.guard, ...Array(8).fill(preAssistantProfile.working), preAssistantProfile.after]) {
++  const fx = delayedHarness(records);
++  const ask = (spawn = preAssistantProfile.ready.submitState) => submitPrompt({ ...fx.options,
++    prompt: preAssistantProfile.prompt, firstPromptProcess: spawn, wait: async (ms) => { fx.waits.push(ms); } });
++  return { ...fx, ask };
++}
++
++test("trial14 bare pre-assistant Proofing spinner observes the later unique reply without re-Enter", async () => {
++  const fx = preAssistantHarness();
++  assert.equal((await fx.ask()).snapshot, preAssistantProfile.after.snapshot);
++  assert.deepEqual(fx.waits, [150, 1500, ...Array(8).fill(1000)]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${preAssistantProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial14 pre-assistant to assistant transition keeps the same spinner word while glyphs animate", async () => {
++  const bare = clone(preAssistantProfile.working);
++  replaceRow(bare, 33, "✶ Proofing…");
++  const assistant = clone(preAssistantProfile.working);
++  replaceRow(assistant, 8, "●");
++  replaceRow(assistant, 33, "✻ Proofing… (2s · ↓ 3 tokens)");
++  const fx = preAssistantHarness([preAssistantProfile.ready, preAssistantProfile.postPaste,
++    preAssistantProfile.guard, preAssistantProfile.working, bare, assistant, preAssistantProfile.after]);
++  assert.equal((await fx.ask()).snapshot, preAssistantProfile.after.snapshot);
++  assert.deepEqual(fx.waits, [150, 1500, 1000, 1000, 1000]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${preAssistantProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial14 pre-assistant uncertainty exhausts the same finite observation budget without replay", async () => {
++  const fx = preAssistantHarness([preAssistantProfile.ready, preAssistantProfile.postPaste,
++    preAssistantProfile.guard, preAssistantProfile.working]);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.waits, [150, 1500, ...Array(8).fill(1000)]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${preAssistantProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial14 a bare spinner cannot authorize reused processes or prior conversation", async () => {
++  for (const variant of ["reused", "prior", "identity"]) {
++    const records = [preAssistantProfile.ready, preAssistantProfile.postPaste,
++      preAssistantProfile.guard, preAssistantProfile.working, preAssistantProfile.after].map(clone);
++    if (variant === "prior") for (const frame of records.slice(0, 3)) replaceRow(frame, 10, "● prior answer");
++    if (variant === "identity") records[3].submitState.panePid = "999";
++    const fx = preAssistantHarness(records);
++    await assert.rejects(() => fx.ask(variant === "reused" ? null : preAssistantProfile.ready.submitState), uncertain);
++    assert.deepEqual(fx.waits, [150, 1500]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${preAssistantProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++test("trial14 changed word identity or ambiguous cells cannot borrow later completion", async () => {
++  const changes = [
++    (frame) => replaceRow(frame, 33, "* Pondering…"),
++    (frame) => { frame.submitState.serverPid = "999"; },
++    (frame) => replaceRow(frame, 9, `❯ ${preAssistantProfile.prompt}`),
++    (frame) => replaceRow(frame, 8, "●"), // Bare spinner with assistant cell is not the observed transient.
++    (frame) => replaceRow(frame, 33, "* Proofing… (2s · ↓ 3 tokens)"), // No assistant with parenthetical is unproven.
++    (frame) => replaceRow(frame, 33, "* Proofing… (2s)"),
++    (frame) => replaceRow(frame, 33, "✳ Proofing…"),
++    (frame) => replaceRow(frame, 33, "* proofing…"),
++    (frame) => replaceRow(frame, 33, "Select model"),
++    (frame) => replaceRow(frame, 36, "❯\u00a0unexpected draft"),
++  ];
++  for (const change of changes) {
++    const records = [preAssistantProfile.ready, preAssistantProfile.postPaste, preAssistantProfile.guard,
++      preAssistantProfile.working, preAssistantProfile.working, preAssistantProfile.after].map(clone);
++    change(records[4]);
++    const fx = preAssistantHarness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.waits, [150, 1500, 1000]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${preAssistantProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
+ });
+ 
+ test("trial10 prior rendered conversation, hidden-history reuse and marker spoof cannot prove a first turn", async () => {

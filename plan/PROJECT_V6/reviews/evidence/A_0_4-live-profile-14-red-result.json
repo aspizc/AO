@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    "tests/gateway/claude_first_prompt.test.js"
+  ],
+  "exitCode": 1,
+  "baselineSha256": "7d648ac811b0727104c9399956c04ab6b5640cd9c68f1b1ee8bce900ae2d2075",
+  "testSha256": "f019cfe53b72759d9001f190884b4888be55eaf2534f62d53b1480b212739224"
+}
