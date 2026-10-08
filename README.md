@@ -26,7 +26,11 @@ integrated at `343222e`, and A/0/00 (role-derived CLI restrictions) is
 integrated at `a8e8430`. A/0/01 (worker environment markers) is integrated
 at `69f222f`; its [merged-tree gate](plan/PROJECT_V6/reviews/A_0_1-integrated-gate.md)
 passed 3,067 tests, failed 0, and recorded 12 declared infrastructure skips.
-The other three V6 sheets remain unfinished.
+A/0/05 (explicit Linux local stdio/SQLite recovery of supervised sessions
+for the same OS principal, machine and state) and the live Codex prompt
+refinement are integrated at `7982e42`; the [committed-tree acceptance](plan/PROJECT_V6/reviews/A_0_5-integrated-acceptance.md)
+passed 3,265 tests with 12 declared infrastructure skips and a real two-ask,
+restart and reattach check. A/0/06 and A/0/03 remain unfinished.
 V7 A/0/00 adds reviewed [generic project profiles](docs/generic-wave-runbook.md)
 and deterministic preflight, alongside the [cooperative capacity ledger](docs/wave-capacity.md)
 from A/0/01. Both are integrated on the release branch; automated wave dispatch

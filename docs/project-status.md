@@ -79,11 +79,31 @@ gate on that merge exited 0: **2,949 passed, 0 failed, 12 allowed
 infrastructure skips; 2,961 total**; public hygiene found 0 issues. A
 separate hash-bound live check observed one guarded submit and no plain Enter
 for each of Codex and Claude. Its source hash predates the independently reviewed
-syntax-only regex correction in trial 18; that correction preserved behavior. The rare Codex warning-only draft branch has
-fixture coverage but was not observed stable live; it remains a fail-closed
-intermittent limitation. See the [integration verdict](../plan/PROJECT_V6/reviews/A_0_4-integration-1_reviewed_OK.md),
+syntax-only regex correction in trial 18; that correction preserved behavior.
+The Codex warning-only draft branch was later observed in the bounded live
+sequence described below. See the [integration verdict](../plan/PROJECT_V6/reviews/A_0_4-integration-1_reviewed_OK.md),
 [merge gate](../plan/PROJECT_V6/reviews/A_0_4-integration-1-root-gate.md) and
 [bound live evidence](../plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-17-bound-live.json).
+This is integration on the release branch, not promotion or release.
+
+The Codex 0.160.1 live startup and second-turn profiles were independently
+reviewed and merged at `7982e42`. A byte-identical adapter passed a real
+two-ask sequence across Gateway restart and explicit reattach. The merged
+tree's full gate exited 0 with **3,265 passed, 0 failed and 12 declared
+infrastructure skips**; see the [committed-tree acceptance](../plan/PROJECT_V6/reviews/A_0_5-integrated-acceptance.md).
+These profiles are bounded to the measured Codex/tmux viewport and fail
+closed on unknown layouts.
+
+A/0/05 adds explicit Linux local stdio/SQLite recovery for supervised sessions
+under the same OS principal, machine/state binding and repository checks.
+Its reviewed implementation was merged at `b4506d2`; the live check and
+committed-tree gate were completed at `7982e42`. The live check used Codex
+0.160.1, Node 22.22.1 and tmux 3.6a-agents.3; it observed two exact responses
+from one child session with a Gateway process restart and explicit reattach
+between them. The gate passed **3,265/3,277 tests**, with 0 failures and the
+declared nine PostgreSQL plus three Gateway/Temporal infrastructure skips;
+required Redis passed 22/22 and public hygiene found 0 issues. See the
+[acceptance record](../plan/PROJECT_V6/reviews/A_0_5-integrated-acceptance.md).
 This is integration on the release branch, not promotion or release.
 
 ## Unreleased V7 integration
@@ -107,7 +127,7 @@ acceptance remain planned. This is not promotion or a `1.1.0` release.
 |---|---|---|
 | MCP Gateway | 33 typed stdio tools, deterministic policy, audit, SQLite state, artifacts, approvals, tasks and sessions | Local operator trust; no multi-user network service |
 | Agent execution | Codex, Claude Code, Antigravity CLI, pi and OpenCode adapters; model/effort selection; supervised tmux lifecycle | Provider setup and real inference require separate verification; Gemini CLI is registry-only |
-| Request context | Launch-time host principal, task/repository binding and configurable context lifetime | Defaults to `claude-code` and 24 hours; directory discovery must match registered repository IDs |
+| Request context | Launch-time host principal, task/repository binding, configurable context lifetime, and explicit Linux local stdio/SQLite supervised-session reattach | Recovery requires the same OS principal, machine/state and every repository binding; unsupported backends fail closed |
 | Coordination | Eight MCP operations and shared direct Node service; leased presence, addressed delivery, reclaim and ACK | Redis 7 standalone required; messages do not confer action authority |
 | Diagnostics | `agent-run doctor` / `--json`, closed result contract, provider status probes, bootstrap and synthetic sample | Production coordination snapshot is unavailable and no runtime-authority capability is supplied; diagnostics cannot prove full isolation or ownership |
 | LangGraph / Temporal | Optional client/workflow code and deterministic unit/fake coverage | Live Gateway/Temporal integration is not established by the recorded gate |
@@ -146,8 +166,8 @@ with their components.
 ## Planning and release boundary
 
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
-branch descending from `1.0.0`; A/0/00, A/0/01, A/0/02 and A/0/04 are reviewed and
-integrated on the release branch, and the other three sheets remain unfinished.
+branch descending from `1.0.0`; A/0/00, A/0/01, A/0/02, A/0/04 and A/0/05 are
+reviewed and integrated on the release branch. A/0/06 and A/0/03 remain unfinished.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains
