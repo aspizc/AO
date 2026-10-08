@@ -1,0 +1,163 @@
+--- entry/gateway/src/adapters/base_adapter.js
++++ candidate/gateway/src/adapters/base_adapter.js
+@@ -105,6 +105,18 @@
+   const rows = snapshot.split("\n");
+   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
+   if (provider === "codex") {
++    // One measured post-paste footer variant, never initial input or acceptance evidence.
++    if (/^ +⚠ 2 warnings · f2 to view *$/.test(rows[39])) {
++      const text = rows[36]?.startsWith("› ") ? rows[36].slice(2) : "";
++      if (phase !== "draft" || pane.width !== 120 || pane.height !== 40 || pane.cursor !== 36
++        || rows.length !== 41 || rows[40] !== "" || rows[1]?.trim() !== ">_ OpenAI Codex (v0.160.1)"
++        || !codexLiveStatus.test(rows[38]) || rows[37]?.trim() !== ""
++        || rows.slice(13, 36).some((row) => row.trim() !== "")
++        || rows.slice(0, 36).some((row) => codexWorking.test(row))
++        || !text || text === "Ask Codex to do anything" || text.length >= 800 || /[^\x20-\x7e]/.test(text)
++        || pane.cursorX !== text.length + 2 || pane.cursorX >= pane.width) return { state: "unknown_state" };
++      return { state: "composer", text, warningDraft: true, identity: "36:39:120:40" };
++    }
+     const footer = rows.findLastIndex((row) => codexContextFooter.test(row) || codexWarningsFooter.test(row) || codexQueueFooter.test(row));
+     const start = rows.findLastIndex((row, index) => index < footer && /^[›»](?: |$)/.test(row));
+     if (((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
+@@ -405,6 +417,14 @@
+       if (attempt === 0) requireComposer(guard, prompt, pending.identity);
+       else if (guard.state !== "composer" || guard.text !== prompt || guard.identity !== pending.identity) {
+         throw submissionError("acceptance_uncertain");
++      }
++      if (pending.warningDraft || guard.warningDraft) {
++        // No footer transition or process drift can authorize this variant's first Enter.
++        if (attempt !== 0 || !pending.warningDraft || !guard.warningDraft || guard.snapshot !== pending.snapshot
++          || [ready, pending].some((frame) => ["serverPid", "target", "panePid", "width", "height"]
++            .some((key) => frame[key] !== guard[key]))
++          || ready.snapshot.split("\n").slice(0, 36).join("\n") !== pending.snapshot.split("\n").slice(0, 36).join("\n")
++          || ready.snapshot.split("\n")[38] !== pending.snapshot.split("\n")[38]) throw submissionError("unknown_state");
+       }
+       guardedSubmit(run, guard, attempt);
+       delivered = true;
+--- entry/tests/gateway/prompt_submission.test.js
++++ candidate/tests/gateway/prompt_submission.test.js
+@@ -1459,3 +1459,124 @@
+   await assert.rejects(completed.ask, reason("acceptance_uncertain"));
+   trial16OneEnter(completed);
+ });
++
++const trial17Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_warning_only_draft.json", import.meta.url), "utf8"));
++const trial17Records = () => [trial16Codex.ready, trial17Codex.draft, trial17Codex.draft, trial16Codex.after].map((frame) => structuredClone(frame));
++const trial17NoEnter = (fx) => {
++  assert.deepEqual(fx.inputs, [`\x1b[200~${trial17Codex.prompt}\x1b[201~`]);
++  assert.equal(fx.buffers.size, 0);
++};
++
++test("trial17 stable measured warning-only draft reaches guarded first Enter and unchanged acceptance", async () => {
++  const fx = trial16Fixture(trial17Records());
++  assert.equal((await fx.ask()).snapshot, trial16Codex.after.snapshot);
++  trial16OneEnter(fx);
++  const paste = fx.calls.find((call) => call.args[0] === "paste-buffer").args;
++  assert.ok(paste.includes("-G") && paste.includes("-p") && paste.includes("-r"));
++  assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
++  assert.equal(fx.calls.some((call) => call.args[0] === "send-keys"), false);
++});
++
++test("trial17 warning-only draft is phase-bound and cannot authorize initial input", async () => {
++  const { snapshot, pane } = trial17Codex.draft;
++  assert.equal(base.classifyProviderPane("codex", snapshot, pane, "draft").state, "composer");
++  for (const phase of [undefined, "ready", "unrecognized"]) {
++    assert.equal(base.classifyProviderPane("codex", snapshot, pane, phase).state, "unknown_state");
++  }
++  const fx = trial16Fixture([trial17Codex.draft]);
++  await assert.rejects(fx.ask, reason("unknown_state"));
++  assert.deepEqual(fx.inputs, []);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial17 warning-only draft requires measured version footer status history text and exact cursor", async () => {
++  const changes = [{ 1: "  >_ OpenAI Codex (v0.160.2)" }, { 39: "⚠ 2 warnings · f2 to view" },
++    { 39: "  ⚠ 3 warnings · f2 to view" }, { 39: "  ⚠ 2 warnings · f2 to view extra" },
++    { 39: "\t⚠ 2 warnings · f2 to view" }, { 38: "  GPT-6.1-Sol medium fast · /fixture/a04 · ⠇" },
++    { 15: `› ${trial17Codex.prompt}` }, { 14: "• Working (1s • esc to interrupt)" },
++    { 4: "• Working (1s • esc to interrupt)" },
++    { 35: "unexpected state" }, { 36: "› " }, { 36: "› Ask Codex to do anything" },
++    { 37: "unexpected gap" }, { 40: "unexpected overlay" }];
++  for (const changesByRow of changes) {
++    const records = trial17Records();
++    records[1] = trial16Rows(records[1], changesByRow);
++    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("unknown_state"));
++    trial17NoEnter(fx);
++  }
++  for (const key of ["cursorX", "cursor", "width", "height", "mode", "inputOff", "synchronized"]) {
++    const records = trial17Records();
++    const pane = records[1].pane;
++    pane[key] = typeof pane[key] === "number" ? pane[key] + 1 : "1";
++    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, pane, "draft").state, "unknown_state");
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("unknown_state"));
++    trial17NoEnter(fx);
++  }
++});
++
++test("trial17 first Enter requires identical draft re-observation and ready process status and prefix", async () => {
++  for (const [stage, changes] of [[2, { 39: " ".repeat(91) + "⚠ 2 warnings · f2 to view" }],
++    [2, { 36: "› " + "x".repeat(trial17Codex.prompt.length) }],
++    [2, { 38: "  GPT-6.1-Sol medium fast · /fixture/other" }],
++    [0, { 38: "  GPT-6.1-Sol medium fast · /fixture/other" }],
++    [0, { 4: "changed welcome copy" }], [2, { 4: "changed welcome copy" }]]) {
++    const records = trial17Records();
++    records[stage] = trial16Rows(records[stage], changes);
++    const fx = trial16Fixture(records);
++    await assert.rejects(fx.ask, reason("unknown_state"));
++    trial17NoEnter(fx);
++  }
++  for (const stage of [0, 1, 2]) {
++    for (const key of ["serverPid", "panePid"]) {
++      const records = trial17Records();
++      records[stage].submitState[key] = "999";
++      const fx = trial16Fixture(records);
++      await assert.rejects(fx.ask, reason("unknown_state"));
++      trial17NoEnter(fx);
++    }
++  }
++  for (const [pending, guard] of [[trial17Codex.draft, trial16Codex.draft], [trial16Codex.draft, trial17Codex.draft]]) {
++    const fx = trial16Fixture([trial16Codex.ready, pending, guard, trial16Codex.after]);
++    await assert.rejects(fx.ask, reason("unknown_state"));
++    trial17NoEnter(fx);
++  }
++});
++
++test("trial17 menus and decisions cannot receive Enter through warning-only draft", async () => {
++  const decision = trial16Rows(trial17Codex.draft, { 35: "Do you want to proceed?", 36: "› 1. Allow", 37: "  2. Cancel" });
++  decision.pane.cursorX = 2;
++  const fx = trial16Fixture([trial16Codex.ready, trial17Codex.draft, decision]);
++  await assert.rejects(fx.ask, reason("decision_required"));
++  trial17NoEnter(fx);
++});
++
++test("trial17 queue and normal warnings drafts retain their existing guarded behavior", async () => {
++  const warnings = trial16Rows(trial16Codex.draft, { 39: trial16Codex.ready.snapshot.split("\n")[39] });
++  for (const draft of [trial16Codex.draft, warnings]) {
++    const fx = trial16Fixture([trial16Codex.ready, draft, draft, trial16Codex.after]);
++    assert.equal((await fx.ask()).snapshot, trial16Codex.after.snapshot);
++    trial16OneEnter(fx);
++  }
++});
++
++test("trial17 warning-only draft never proves positive acceptance or licenses unguarded paste", async () => {
++  const ambiguous = trial16Fixture([...trial17Records().slice(0, 3), trial16Codex.ready]);
++  await assert.rejects(ambiguous.ask, reason("acceptance_uncertain"));
++  trial16OneEnter(ambiguous);
++  const fx = trial16Fixture(trial17Records());
++  const run = (args, options) => args[0] === "paste-buffer"
++    ? { status: 1, stderr: "agents: bracketed paste unavailable" } : fx.run(args, options);
++  await assert.rejects(() => base.submitPrompt({ provider: "codex", target: "%12", prompt: trial17Codex.prompt, run, wait: async () => {} }), reason("paste_unavailable"));
++  assert.deepEqual(fx.inputs, []);
++  assert.equal(fx.calls.some((call) => call.args[0] === "send-keys" || call.args[0] === "agents-submit-v1"), false);
++  assert.equal(fx.buffers.size, 0);
++});
++
++
++test("trial17 warning-only draft does not authorize a retry Enter when submission remains pending", async () => {
++  const fx = trial16Fixture([...trial17Records().slice(0, 3), trial17Codex.draft, trial17Codex.draft]);
++  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
++  trial16OneEnter(fx);
++});

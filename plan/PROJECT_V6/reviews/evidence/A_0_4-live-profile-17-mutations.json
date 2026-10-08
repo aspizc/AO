@@ -1,0 +1,86 @@
+{
+  "phase": {
+    "exitCode": 1,
+    "mutantSha256": "5201e7eecee14ddffddb215ece6d7806ff84f6ffa5f5faa781a9b76c61b3e38e",
+    "failures": [
+      "not ok 125 - trial17 warning-only draft is phase-bound and cannot authorize initial input"
+    ]
+  },
+  "version": {
+    "exitCode": 1,
+    "mutantSha256": "b125843e05480b3535992d2c42b76553e50f238aeae19940ea26a81a97095244",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "cursor": {
+    "exitCode": 1,
+    "mutantSha256": "80374aaefbf622fe4b93678a210095048953ebc9ef91f9fedc048d869a0c12ed",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "status": {
+    "exitCode": 1,
+    "mutantSha256": "e3b47c1379f9a82986f7eba0ee4f1a85dec294608cd4d73ce2ae8c4406e0e2bb",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "history": {
+    "exitCode": 1,
+    "mutantSha256": "c75ade525043c109a86d5d1deba6e6da65b1478a4dde4d7310d93dd8e589179d",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "prior-working": {
+    "exitCode": 1,
+    "mutantSha256": "756b5454a89170cf0a816fc0961a227e7674511edc66ec7efe4088afa76a7052",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "gap": {
+    "exitCode": 1,
+    "mutantSha256": "7143fce7f49b4edde4e5a65c84683a2c570304859052a5be2e9213cf084d3d39",
+    "failures": [
+      "not ok 126 - trial17 warning-only draft requires measured version footer status history text and exact cursor"
+    ]
+  },
+  "first-enter": {
+    "exitCode": 1,
+    "mutantSha256": "ea392c87250f5b8e80cc6a0c96743d1fe64c723ccdef49107fea823627295aa5",
+    "failures": [
+      "not ok 131 - trial17 warning-only draft does not authorize a retry Enter when submission remains pending"
+    ]
+  },
+  "stable-capture": {
+    "exitCode": 1,
+    "mutantSha256": "95aee77d1fc2f7d6c7e7447aa02dd426391d0e31e089095f90202ec2f044e106",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix"
+    ]
+  },
+  "process": {
+    "exitCode": 1,
+    "mutantSha256": "d25152d4bd320e16bbe4e038f1d77028bb88e7bc1da0f4ee89739b2446070c8f",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix"
+    ]
+  },
+  "ready-prefix": {
+    "exitCode": 1,
+    "mutantSha256": "65702fdf118cad39f59a3edf716ea34622abc007e89568dec196742697194b1b",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix"
+    ]
+  },
+  "ready-status": {
+    "exitCode": 1,
+    "mutantSha256": "b6db430ec5b56055dabf6d0706f3a7f1ddb0342c2e0f22738a0a7f57a971efdb",
+    "failures": [
+      "not ok 127 - trial17 first Enter requires identical draft re-observation and ready process status and prefix"
+    ]
+  }
+}
