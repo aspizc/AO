@@ -6,6 +6,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/06 operator response design | operator-plan-2 | [request](A_0_6-operator-plan-2_to_review.md) | [OK: timeout CAS, ID retirement and CLI delivery reporting specified; human security choice remains pending](A_0_6-operator-plan-2_reviewed_OK.md) |
+| A/0/06 operator response design | operator-plan-1 | [request](A_0_6-operator-plan-1_to_review.md) | [KO: timeout must not clobber in-flight delivery, externally finalized IDs must retire, CLI wrapper must report terminal delivery](A_0_6-operator-plan-1_reviewed_KO.md) |
 | A/0/03 existing V7 lineage | scope-1 | [request](A_0_3-scope-1_to_review.md) | [OK: two reviewed V7 foundations already integrated on selected release branch; no new runtime scope](A_0_3-scope-1_reviewed_OK.md) |
 | A/0/03 changelog candidate | changelog-1 | [request](A_0_3-changelog-1_to_review.md) | [OK: six V6 summaries and historical separation supported; settle already integrated V7 scope before candidate freeze](A_0_3-changelog-1_reviewed_OK.md) |
 | A/0/06 integration status | status-2 | [request](A_0_6-status-2_to_review.md) | [OK: original RED cites Trial 1, V6 status and gate claims supported; live provider check remains open](A_0_6-status-2_reviewed_OK.md) |
