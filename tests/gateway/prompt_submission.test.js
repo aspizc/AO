@@ -1752,3 +1752,105 @@ test("startup2 changed raw padded bytes across ready pending and guard cannot au
     }
   }
 });
+
+const startup3Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_update_welcome_working.json", import.meta.url), "utf8"));
+const startup3Records = (capture = 0) => [startup3Codex.ready, startup3Codex.draft, startup3Codex.draft, startup3Codex.captures[capture]].map((frame) => structuredClone(frame));
+const startup3OneEnter = (fx) => {
+  assert.deepEqual(fx.inputs, [`\x1b[200~${startup3Codex.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
+  assert.equal(fx.calls.some((call) => call.args[0] === "send-keys"), false);
+  assert.equal(fx.buffers.size, 0);
+};
+
+test("startup3 raw fresh update welcome Working confirms the exact prompt after one guarded Enter", async () => {
+  for (const capture of [0, 1]) {
+    const records = startup3Records(capture), after = records[3];
+    const fx = startupFixture(records);
+    assert.equal((await fx.ask()).snapshot, after.snapshot);
+    startup3OneEnter(fx);
+  }
+});
+
+test("startup3 measured Working refuses initial input in every phase", async () => {
+  for (const phase of ["ready", "draft"]) {
+    const after = startup3Codex.captures[0];
+    assert.equal(base.classifyProviderPane("codex", after.snapshot, after.pane, phase).state, "busy");
+  }
+  const fx = startupFixture([startup3Codex.captures[0]]);
+  await assert.rejects(fx.ask, reason("busy"));
+  assert.deepEqual(fx.inputs, []);
+});
+
+test("startup3 missing changed duplicate shifted or old echo and stale Working cannot confirm acceptance", async () => {
+  for (const changes of [{ 15: "" }, { 15: "› unrelated request" }, { 14: `› ${startup3Codex.prompt}` },
+    { 16: `› ${startup3Codex.prompt}` }, { 15: "", 16: `› ${startup3Codex.prompt}` },
+    { 14: "• Working (9s • esc to interrupt)" }, { 16: "unrelated transcript" }]) {
+    const records = startup3Records(); records[3] = trial16Rows(records[3], changes);
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+  }
+  for (const stage of [0, 1, 2]) {
+    for (const changes of [{ 15: `› ${startup3Codex.prompt}` }, { 14: "• Working (9s • esc to interrupt)" }]) {
+      const records = startup3Records(); records[stage] = trial16Rows(records[stage], changes);
+      const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+    }
+  }
+});
+
+test("startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance", async () => {
+  for (const changes of [{ 0: "Update available!" }, { 9: "  >_ OpenAI Codex (v0.160.2)" },
+    { 10: "     /fixture/other" }, { 12: "  Do you want to proceed?" },
+    { 12: "  Shall we put some verbs after that cursor?" }, { 34: "unexpected gap" }, { 35: "unexpected gap" },
+    { 37: "unexpected gap" }, { 33: "• Working on an unrelated task" }, { 33: "" },
+    { 38: "  GPT-6.1-Sol medium fast · /fixture/other · ⠇" },
+    { 38: startup3Codex.ready.snapshot.split("\n")[38] }, { 39: "  ? for shortcuts" },
+    { 40: "unexpected overlay" }, { 36: "› unrelated draft" },
+    { 14: "Do you want to proceed?", 15: "› 1. Allow", 16: "  2. Cancel" }]) {
+    const records = startup3Records(); records[3] = trial16Rows(records[3], changes);
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+  }
+  for (const key of ["cursor", "cursorX", "width", "height", "mode", "inputOff", "synchronized"]) {
+    const records = startup3Records(), pane = records[3].pane;
+    pane[key] = typeof pane[key] === "number" ? pane[key] + 1 : "1";
+    assert.equal(base.classifyProviderPane("codex", records[3].snapshot, pane, "draft").state, "unknown_state");
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+  }
+});
+
+test("startup3 changed server pane or pane PID in every frame denies acceptance", async () => {
+  for (const stage of [0, 1, 2, 3]) {
+    for (const key of ["serverPid", "target", "panePid"]) {
+      const records = startup3Records(); records[stage].submitState[key] = key === "target" ? "%13" : "999";
+      if (key === "target") records[stage].pane.target = "%13";
+      const fx = startupFixture(records);
+      await assert.rejects(fx.ask, (error) => ["unknown_state", "acceptance_uncertain"].includes(error.reason));
+      assert.ok(fx.inputs.filter((input) => input === "\r").length <= 1); assert.equal(fx.buffers.size, 0);
+    }
+  }
+});
+
+test("startup3 circle Working completed reply or pending draft never credits acceptance or retry", async () => {
+  for (const capture of [2, 3]) {
+    const fx = startupFixture(startup3Records(capture));
+    await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+  }
+  const records = startup3Records(); records[3] = structuredClone(startup3Codex.draft); records.push(startup3Codex.captures[0]);
+  const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+});
+
+test("startup3 raw padding bounds glyphs and duplicate notice remain closed", async () => {
+  const after = startup3Codex.captures[0], source = after.snapshot.split("\n");
+  for (const changes of [{ 11: "\t" }, { 12: source[12].trimEnd() + "\t" }, { 13: " ".repeat(121) },
+    { 16: "\t" }, { 37: "\u00a0" }, { 38: source[38] + "  " },
+    { 38: source[38].slice(0, -1) + "?" }, { 14: source[0] },
+    { 36: "› Ask Codex to do anything\t" }, { 39: source[39] + " " }]) {
+    const frame = trial16Rows(after, changes);
+    assert.equal(base.classifyProviderPane("codex", frame.snapshot, frame.pane, "draft").state, "unknown_state");
+    const records = startup3Records(); records[3] = frame;
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("acceptance_uncertain")); startup3OneEnter(fx);
+  }
+});
+
+test("startup3 an absent echo is an unknown layout rather than a busy witness", () => {
+  const frame = trial16Rows(startup3Codex.captures[0], { 15: "" });
+  assert.equal(base.classifyProviderPane("codex", frame.snapshot, frame.pane, "draft").state, "unknown_state");
+});

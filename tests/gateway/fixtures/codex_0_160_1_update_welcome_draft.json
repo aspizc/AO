@@ -1,5 +1,5 @@
 {
-  "sourceKind": "Sanitized captured ready/draft transcripts. Capture final LF restored; cursor coordinates inferred from placeholder and intact 84-character ASCII draft, not recorded in the private transcript event. IDs synthetic; same binding preserved. No live guard or post-Enter frame.",
+  "sourceKind": "Sanitized captured ready/draft transcripts. Capture final LF restored; cursor coordinates inferred from placeholder and intact 84-character ASCII draft, not recorded in the private transcript event. IDs synthetic; same binding preserved. No live guard or post-Enter frame. This transcript-derived reconstruction does not preserve raw trailing-space padding on blank/greeting/status rows, including rows11,12,38; it is not a raw -N -T capture.",
   "privateEvidenceSha256": "8de7b48381e28e0c7bf928913bf609761dc0226a515122c2c1d5220daafc90ce",
   "prompt": "Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.",
   "ready": {

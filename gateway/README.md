@@ -258,7 +258,7 @@ pending/guard byte equality remain required before the first guarded Enter.
 The original transcript fixture reconstructed cursor/LF and omitted raw
 padding; the separate trial-2 fixture records diagnostic cursor/LF metadata
 and raw values for selected padded rows, and labels every reconstruction.
-Neither fixture is a complete raw ready/draft/guard sequence. Current
+Neither fixture is a complete raw ready/draft/guard sequence. Draft-only
 submission checks end in `acceptance_uncertain`; no post-Enter frame was
 available when this draft profile was designed. The operator subsequently
 reported one guarded Enter and delayed prompt history/Working output on the
@@ -267,6 +267,21 @@ separate tested profile and remains unverified by this candidate. Other versions
 or update commands, a YOLO permissions row, truncated or space-containing cwd,
 wrapped notice, menus and changed warning footers remain unsupported. This
 profile never authorizes a retry or infers acceptance from a draft.
+
+The separate startup-notice Working profile recognizes the raw 0.160.1
+header-at-row-9 viewport at 120×40: one user echo at row 15, `• Working` at
+row 33, empty placeholder composer at row 36, matching cwd/spinner status at
+row 38 and the exact shortcuts/warnings footer at row 39. All rows fit pane
+width; gaps accept only U+0020 spaces. It reuses the first-Enter freshness proof:
+unique new exact prompt echo, unchanged preceding rows, no prior Working and
+the same server/pane/PID/geometry in every frame. A matching busy pane refuses
+initial input. The four delayed raw captures are sanitized with equal-length
+cwd/prompt replacements; pre-Enter frames and pane metadata are reconstructed
+and labelled. They establish the rendered shape, not visibility during the
+Gateway's acceptance observation. `◦ Working`, completed-only output, other
+layouts, menus, changed prefixes and stale evidence remain unconfirmed. No
+new polling, timing or retry is added. Independent review and live A05
+acceptance on this candidate remain operator-owned.
 
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)

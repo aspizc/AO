@@ -1,0 +1,142 @@
+{
+  "red": {
+    "exitCode": 1,
+    "sourceSha256": "a470283858303e7e4fdd3b21515d4c7ea495662ba3b3399915de34993a05da62",
+    "failures": [
+      "not ok 143 - startup3 raw fresh update welcome Working confirms the exact prompt after one guarded Enter",
+      "not ok 144 - startup3 measured Working refuses initial input in every phase"
+    ]
+  },
+  "geometry": {
+    "exitCode": 1,
+    "sourceSha256": "fcd1aad159efe6e37eac8dfe73058ad8741b306d0564a3f743b49561057649d4",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  },
+  "cursor": {
+    "exitCode": 1,
+    "sourceSha256": "c846fb7db42f802455940ca16d75d997445feaba24a3e832b388cc733ea1133b",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  },
+  "capture": {
+    "exitCode": 1,
+    "sourceSha256": "588c8cd0425b59b689923edbff59516c7443ad2940b1ffcc300e4b6504b4a840",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  },
+  "width": {
+    "exitCode": 1,
+    "sourceSha256": "0c95f822277345e884f61b6a05d68545f8996ef4cd2f20f184f64042e7a2ab5d",
+    "failures": [
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "header": {
+    "exitCode": 1,
+    "sourceSha256": "0c87b010968574f6bc60c52d10e9f83702c7c38969b746eab231ef1f6e7279cd",
+    "failures": [
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "echo-shape": {
+    "exitCode": 1,
+    "sourceSha256": "2185c7a89a561b94c30aa6ca6dc3ef7a3b4b5ce9ccfd6346740a981f6937b048",
+    "failures": [
+      "not ok 150 - startup3 an absent echo is an unknown layout rather than a busy witness"
+    ]
+  },
+  "working": {
+    "exitCode": 1,
+    "sourceSha256": "1a689598613af18c5c30026d58816124773c9fbeb47c03d3a26fe556bc761517",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  },
+  "blank-history": {
+    "exitCode": 1,
+    "sourceSha256": "0f16e026f98a387b077647f7eb31da7284703c60def54b7b77801a686b039f5c",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance",
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "placeholder": {
+    "exitCode": 1,
+    "sourceSha256": "f03303b79cfe7d6aad02aee5779ae5cd0f7f5adcfa10d3d0094b9b414e2e5e56",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance",
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "gap": {
+    "exitCode": 1,
+    "sourceSha256": "13c79658ee533e04e73ddf3029e735ed406b5d3d378f3443e08ad2ffce3a82f1",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance",
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "spinner": {
+    "exitCode": 1,
+    "sourceSha256": "5efa1ade9a2e088c56b20bd6e835f085ee8128778812b4fc2f9190adf4c5e833",
+    "failures": [
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "cwd-status": {
+    "exitCode": 1,
+    "sourceSha256": "ddba444a47668c06cb3cba5ed8845f0c854b948150b8cef9410cbf4ffd943636",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  },
+  "footer": {
+    "exitCode": 1,
+    "sourceSha256": "1a2936128a9075d9172eb46bdf927423ec9eae06eb339940b540fef2aa3e9913",
+    "failures": [
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance",
+      "not ok 149 - startup3 raw padding bounds glyphs and duplicate notice remain closed"
+    ]
+  },
+  "after-process": {
+    "exitCode": 1,
+    "sourceSha256": "c2eb3463c04dd389d57b4cd08b2e8077f88633637e568d5d54df75cc64119629",
+    "failures": [
+      "not ok 90 - trial5 viewport reflow duplicate echo another user turn and pane replacement refuse acceptance",
+      "not ok 121 - trial16 changed server pane PID or geometry in any ask frame refuses welcome acceptance",
+      "not ok 147 - startup3 changed server pane or pane PID in every frame denies acceptance"
+    ]
+  },
+  "first-enter": {
+    "exitCode": 1,
+    "sourceSha256": "71680938a2bc6cd2103be2b18507a3d322f3670ed22bf487cca4c43931f51f29",
+    "failures": [
+      "not ok 123 - trial16 welcome Working after a second Enter or completed-only reply cannot confirm the first submission"
+    ]
+  },
+  "prior-working": {
+    "exitCode": 1,
+    "sourceSha256": "724dca18abba5c071f526ded5cda4bd670504a66a3e7765b0b49aa3b92fd3984",
+    "failures": [
+      "not ok 89 - trial5 stale source-profile Working history cannot become acceptance after reflow"
+    ]
+  },
+  "new-echo": {
+    "exitCode": 0,
+    "sourceSha256": "e998901bb95b83d204aff7e4bec9605c642accdcbedf18dbe81315ef61901cd8",
+    "failures": []
+  },
+  "prefix": {
+    "exitCode": 1,
+    "sourceSha256": "2bf732d3efd43842ac7b1c98c6eeec2f781c274ec187a9498a8e8a1fbd3b5449",
+    "failures": [
+      "not ok 90 - trial5 viewport reflow duplicate echo another user turn and pane replacement refuse acceptance",
+      "not ok 119 - trial16 missing wrong duplicated shifted stale or unrelated echo cannot bind welcome Working to this Enter",
+      "not ok 146 - startup3 menu spoofed header greeting status footer gaps and cursor cannot borrow acceptance"
+    ]
+  }
+}

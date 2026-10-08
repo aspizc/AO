@@ -135,16 +135,31 @@ const codexStartupNotice = [
   "",
   "  >_ OpenAI Codex (v0.160.1)"
 ];
-function codexUpdateWelcomeDraft(rows, width) {
+function codexUpdateWelcomeHeader(rows, width) {
   const greeting = rows[12]?.trimEnd();
-  const status = `  GPT-6.1-Sol medium fast · ${rows[10]?.slice(5)}`;
-  return [11, 12, 38].every((index) => typeof rows[index] === "string" && rows[index].length <= width)
+  return [11, 12].every((index) => typeof rows[index] === "string" && rows[index].length <= width)
     && codexStartupNotice.every((row, index) => rows[index] === row)
     && /^ {5}(?:\/|~\/)[A-Za-z0-9_./-]+$/.test(rows[10])
     && /^ *$/.test(rows[11]) && codexStartupGreetings.has(greeting)
-    && /^ *$/.test(rows[12].slice(greeting.length))
+    && /^ *$/.test(rows[12].slice(greeting.length));
+}
+function codexUpdateWelcomeDraft(rows, width) {
+  const status = `  GPT-6.1-Sol medium fast · ${rows[10]?.slice(5)}`;
+  return codexUpdateWelcomeHeader(rows, width)
+    && typeof rows[38] === "string" && rows[38].length <= width
     && rows[38].trimEnd() === status && /^ *$/.test(rows[38].slice(status.length))
     && rows[39] === " ".repeat(94) + "⚠ 2 warnings · f2 to view";
+}
+function codexUpdateWelcomeWork(rows, pane) {
+  const status = `  GPT-6.1-Sol medium fast · ${rows[10]?.slice(5)} · `;
+  return pane.width === 120 && pane.height === 40 && pane.cursor === 36 && pane.cursorX === 2
+    && rows.length === 41 && rows[40] === "" && rows.every((row) => row.length <= pane.width)
+    && codexUpdateWelcomeHeader(rows, pane.width)
+    && rows.slice(13, 36).every((row, index) => index + 13 === 15
+      ? /^› [\x20-\x7e]+$/.test(row) : index + 13 === 33 ? codexWorking.test(row) : /^ *$/.test(row))
+    && /^› Ask Codex to do anything *$/.test(rows[36]) && /^ *$/.test(rows[37])
+    && codexSpinnerStatus.test(rows[38]) && rows[38].startsWith(status)
+    && rows[39] === "  ? for shortcuts" + " ".repeat(77) + "⚠ 2 warnings · f2 to view";
 }
 function codexGap(rows, cursor, footer) {
   if ((codexWarningsFooter.test(rows[footer]) || codexQueueFooter.test(rows[footer]))
@@ -235,6 +250,11 @@ export function classifyProviderPane(provider, snapshot, pane, phase = "ready") 
   const rows = snapshot.split("\n");
   if (activeDecision(provider, rows, pane)) return { state: "decision_required" };
   if (provider === "codex") {
+    // Raw 0.160.1 update-notice viewport: use the existing first-Enter freshness proof.
+    if (codexUpdateWelcomeWork(rows, pane)) {
+      return { state: "busy", text: "", modernWork: true, welcomeWork: true,
+        workRow: 33, identity: "36:39:120:40" };
+    }
     // The shifted startup header cannot borrow a generic draft/footer profile.
     if (phase === "draft" && rows[9]?.trim() === ">_ OpenAI Codex (v0.160.1)"
       && !codexUpdateWelcomeDraft(rows, pane.width)) return { state: "unknown_state" };
