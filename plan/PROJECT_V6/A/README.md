@@ -1,10 +1,10 @@
 # Stage A — Worker confinement, worker identity, and AO 1.1.0
 
-Status: **in progress**; A/0/02 and A/0/04 integrated on the release branch.
+Status: **in progress**; A/0/00, A/0/02 and A/0/04 integrated on the release branch.
 
 | Sheet | Outcome | Status | Functional priority |
 |---|---|---|---|
-| [A/0/00](0/00.md) | Children of the five executable providers (Codex, Claude, antigravity, pi, opencode) run read-only unless the resolved policy grants `code.write`; `gemini-cli` stays registry-only | planned | P0 — least privilege for review/plan seats |
+| [A/0/00](0/00.md) | Children of the five executable providers (Codex, Claude, antigravity, pi, opencode) receive policy-derived CLI restrictions; antigravity non-writers fail closed; `gemini-cli` stays registry-only | integrated | P0 — least privilege for review/plan seats |
 | [A/0/01](0/01.md) | Every child of the five executable providers carries `AGENTS_WORKER_ROLE` / `AGENTS_WORKER_TRACE_ID` / `AGENTS_WORKER_TASK_ID` | planned | P1 — plugin worker detection |
 | [A/0/02](0/02.md) | Generic setup removes personal registrations/home paths and preserves reusable planning/workflow knowledge | integrated | P0 — publication hygiene |
 | [A/0/04](0/04.md) | `agent_ask` sends the prompt literally, submits it separately and confirms it was accepted | integrated | P0 — supervised children receive their prompts |

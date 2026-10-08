@@ -20,8 +20,10 @@ AO `1.0.0` is published at
 with an annotated [1.0.0 tag](https://github.com/aspizc/AO/releases/tag/1.0.0).
 The development tag `1.1.0-dev.1` identifies reviewed planning and documentation
 at [`b3aed7c`](https://github.com/aspizc/AO/commit/b3aed7c9365e54587dc4f847f82edff272955bfb)
-on `release/1.1.0`. A/0/02 (generic setup and public hygiene) is now reviewed
-and integrated on that branch. A/0/04 (guarded supervised prompt submission) is also reviewed and integrated at `343222e`; the other five V6 sheets remain unfinished.
+on `release/1.1.0`. A/0/02 (generic setup and public hygiene) is reviewed and
+integrated on that branch. A/0/04 (guarded supervised prompt submission) is
+integrated at `343222e`, and A/0/00 (role-derived CLI restrictions) is
+integrated at `a8e8430`. The other four V6 sheets remain unfinished.
 V7 A/0/00 adds reviewed [generic project profiles](docs/generic-wave-runbook.md)
 and deterministic preflight, alongside the [cooperative capacity ledger](docs/wave-capacity.md)
 from A/0/01. Both are integrated on the release branch; automated wave dispatch

@@ -13,8 +13,8 @@ limits. The imported generation table below preserves historical provenance.
 [Project V6](PROJECT_V6/README.md) plans seven sheets for AO `1.1.0`:
 role-derived CLI restrictions, worker markers, public snapshot hygiene,
 reliable prompt submission, explicit restart reattachment, bounded prompt
-approval, and release assembly. A/0/02 and A/0/04 are reviewed and integrated
-on the release branch; the other five sheets remain unfinished.
+approval, and release assembly. A/0/00, A/0/02 and A/0/04 are reviewed and integrated
+on the release branch; the other four sheets remain unfinished.
 `release/1.1.0` starts from `1.0.0`; the recorded
 [operator decisions](PROJECT_V6/HUMAN_DECISIONS.md) and
 [baseline checks](PROJECT_V6/BASELINE.md) govern preparation. V5 remains a

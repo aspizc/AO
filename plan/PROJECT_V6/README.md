@@ -1,10 +1,13 @@
 # Project V6 — Worker confinement, worker identity, and AO 1.1.0
 
-Status: **in progress**. A/0/02 is reviewed and integrated at
+Status: **in progress**. A/0/00 is reviewed and integrated at
+`a8e84303130096f3c90d179f69736a0f8247846f` on `release/1.1.0`.
+A/0/02 is reviewed and integrated at
 `7df29bda06aa3a139903dbb0cfc61860029f8159`; A/0/04 is reviewed and
 integrated at `343222e869e02b1860a384e52788378e7bb74734` on
-`release/1.1.0`. The other five sheets remain unfinished; no V6 feature is
+`release/1.1.0`. The other four sheets remain unfinished; no V6 feature is
 promoted to main or released as 1.1.0.
+See the [A/0/00 integration verdict](reviews/A_0_0-integration-1_reviewed_OK.md) and [merged-tree gate](reviews/A_0_0-integrated-gate.md).
 See the [A/0/04 integration verdict](reviews/A_0_4-integration-1_reviewed_OK.md) and [merge gate](reviews/A_0_4-integration-1-root-gate.md).
 See the [A/0/02 verdict](reviews/A_0_2-2_reviewed_OK.md) and
 [integration checkpoint](reviews/A_0_2_integration_checkpoint.md).
