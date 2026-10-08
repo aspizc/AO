@@ -1,0 +1,8 @@
+{
+  "gateway/src/adapters/base_adapter.js": "a0d957544f2f7e542ce0d833c35c8cd83d83f1844aca1747d2c96cd5a5515245",
+  "tests/gateway/prompt_submission.test.js": "11fa0115ba528fc6564da44e9d0b88f75fc5482b14a6a0030cbf18a70ed55916",
+  "tests/gateway/fixtures/a04_live_profiles_trial3.json": "d701b65bc77723c63d3de28cf520720e082e255218df61f4ae4b518dc3f48bbf",
+  "gateway/README.md": "d997745f41da25403579b651aeac3f749790b83c0d0b173a7b3c186b50fada03",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-3-red.txt": "64c98b50f6b4ad1423774b28e2b1fd3e1b2c4a8021928437bb99ddc3e8376009",
+  "plan/PROJECT_V6/reviews/evidence/A_0_4-live-profile-3-green.txt": "46d57cf4a518891477246901070b1e3300b7734568f73d19857288dd04e77eb4"
+}

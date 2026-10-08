@@ -1,0 +1,552 @@
+TAP version 13
+# Subtest: ask delivers exact multiline/key-name text without an intermediate submit
+ok 1 - ask delivers exact multiline/key-name text without an intermediate submit
+  ---
+  duration_ms: 5.078719
+  type: 'test'
+  ...
+# Subtest: ask retries Enter once only for the same positively identified pending composer
+ok 2 - ask retries Enter once only for the same positively identified pending composer
+  ---
+  duration_ms: 0.460564
+  type: 'test'
+  ...
+# Subtest: ask fails after a second confirmed unchanged composer and does not resend text
+ok 3 - ask fails after a second confirmed unchanged composer and does not resend text
+  ---
+  duration_ms: 0.616978
+  type: 'test'
+  ...
+# Subtest: permission and model menus receive no keys
+ok 4 - permission and model menus receive no keys
+  ---
+  duration_ms: 0.849572
+  type: 'test'
+  ...
+# Subtest: unknown or busy pane cannot be submitted
+ok 5 - unknown or busy pane cannot be submitted
+  ---
+  duration_ms: 0.431601
+  type: 'test'
+  ...
+# Subtest: a menu appearing after paste receives no Enter
+ok 6 - a menu appearing after paste receives no Enter
+  ---
+  duration_ms: 0.254835
+  type: 'test'
+  ...
+# Subtest: prompt disappearance without acceptance is uncertain and never retried
+ok 7 - prompt disappearance without acceptance is uncertain and never retried
+  ---
+  duration_ms: 1.040561
+  type: 'test'
+  ...
+# Subtest: an unknown observation followed by pending text cannot authorize a retry
+ok 8 - an unknown observation followed by pending text cannot authorize a retry
+  ---
+  duration_ms: 0.33281
+  type: 'test'
+  ...
+# Subtest: stale acceptance text away from the active composer cannot confirm this submission
+ok 9 - stale acceptance text away from the active composer cannot confirm this submission
+  ---
+  duration_ms: 0.379678
+  type: 'test'
+  ...
+# Subtest: bracketed paste disabled or unavailable refuses before input
+ok 10 - bracketed paste disabled or unavailable refuses before input
+  ---
+  duration_ms: 0.422083
+  type: 'test'
+  ...
+# Subtest: unsupported controls refuse before target observation or input
+ok 11 - unsupported controls refuse before target observation or input
+  ---
+  duration_ms: 0.267186
+  type: 'test'
+  ...
+# Subtest: owned buffers are isolated and cleaned on transport failure with safe metadata
+ok 12 - owned buffers are isolated and cleaned on transport failure with safe metadata
+  ---
+  duration_ms: 0.399501
+  type: 'test'
+  ...
+# Subtest: same-target concurrent asks cannot interleave even through target aliases
+ok 13 - same-target concurrent asks cannot interleave even through target aliases
+  ---
+  duration_ms: 6.279892
+  type: 'test'
+  ...
+# Subtest: foreign provider composer layouts stay closed without fabricated readiness
+ok 14 - foreign provider composer layouts stay closed without fabricated readiness
+  ---
+  duration_ms: 0.619776
+  type: 'test'
+  ...
+# Subtest: pi 0.73.1 uses its editor borders and working loader, not a Codex banner
+ok 15 - pi 0.73.1 uses its editor borders and working loader, not a Codex banner
+  ---
+  duration_ms: 0.243693
+  type: 'test'
+  ...
+# Subtest: OpenCode 1.18.20 uses its source composer border, agent metadata and interrupt footer
+ok 16 - OpenCode 1.18.20 uses its source composer border, agent metadata and interrupt footer
+  ---
+  duration_ms: 0.30197
+  type: 'test'
+  ...
+# Subtest: OpenCode overlays, shell mode, paste summaries and cursor drift cannot authorize Enter
+ok 17 - OpenCode overlays, shell mode, paste summaries and cursor drift cannot authorize Enter
+  ---
+  duration_ms: 0.149338
+  type: 'test'
+  ...
+# Subtest: launch sends literal single-line text then separate Enter after settling
+ok 18 - launch sends literal single-line text then separate Enter after settling
+  ---
+  duration_ms: 0.263046
+  type: 'test'
+  ...
+# Subtest: unsupported_runtime_has_no_unguarded_fallback
+ok 19 - unsupported_runtime_has_no_unguarded_fallback
+  ---
+  duration_ms: 0.159439
+  type: 'test'
+  ...
+# Subtest: an unsupported guarded option has a bounded refusal with no raw fallback
+ok 20 - an unsupported guarded option has a bounded refusal with no raw fallback
+  ---
+  duration_ms: 0.1889
+  type: 'test'
+  ...
+# Subtest: bracketed mode disappearing at paste refuses atomically without sending raw multiline
+ok 21 - bracketed mode disappearing at paste refuses atomically without sending raw multiline
+  ---
+  duration_ms: 0.131453
+  type: 'test'
+  ...
+# Subtest: Claude 2.1.292 source profile submits literal key names only after exact draft and fresh loading footer
+ok 22 - Claude 2.1.292 source profile submits literal key names only after exact draft and fresh loading footer
+  ---
+  duration_ms: 0.721239
+  type: 'test'
+  ...
+# Subtest: Claude source placeholder and a typed identical string are distinguished by the composer cursor
+ok 23 - Claude source placeholder and a typed identical string are distinguished by the composer cursor
+  ---
+  duration_ms: 0.140973
+  type: 'test'
+  ...
+# Subtest: Claude retries one unchanged observed draft but never repeats the pasted text
+ok 24 - Claude retries one unchanged observed draft but never repeats the pasted text
+  ---
+  duration_ms: 0.274144
+  type: 'test'
+  ...
+# Subtest: Claude model, effort and folder trust dialogs cannot receive text or Enter
+ok 25 - Claude model, effort and folder trust dialogs cannot receive text or Enter
+  ---
+  duration_ms: 0.274154
+  type: 'test'
+  ...
+# Subtest: Claude loading and unknown panes refuse before any buffer or input
+ok 26 - Claude loading and unknown panes refuse before any buffer or input
+  ---
+  duration_ms: 0.264562
+  type: 'test'
+  ...
+# Subtest: Claude uncertain rendering and cursor states stay closed
+ok 27 - Claude uncertain rendering and cursor states stay closed
+  ---
+  duration_ms: 0.198668
+  type: 'test'
+  ...
+# Subtest: Claude input echo, disappearance and stale loading footer do not confirm acceptance or authorize replay
+ok 28 - Claude input echo, disappearance and stale loading footer do not confirm acceptance or authorize replay
+  ---
+  duration_ms: 0.526719
+  type: 'test'
+  ...
+# Subtest: Claude a decision at the final Enter guard prevents both first submit and retry
+ok 29 - Claude a decision at the final Enter guard prevents both first submit and retry
+  ---
+  duration_ms: 0.372731
+  type: 'test'
+  ...
+# Subtest: Claude summarized or changed drafts refuse before Enter instead of inferring the sent prompt
+ok 30 - Claude summarized or changed drafts refuse before Enter instead of inferring the sent prompt
+  ---
+  duration_ms: 0.28668
+  type: 'test'
+  ...
+# Subtest: Antigravity isolated binary help strings do not establish a composer profile
+ok 31 - Antigravity isolated binary help strings do not establish a composer profile
+  ---
+  duration_ms: 0.214729
+  type: 'test'
+  ...
+# Subtest: decision words in history and literal drafts do not impersonate focused Codex menus
+ok 32 - decision words in history and literal drafts do not impersonate focused Codex menus
+  ---
+  duration_ms: 0.547346
+  type: 'test'
+  ...
+# Subtest: Claude exact decision titles in transcript and draft remain composer text
+ok 33 - Claude exact decision titles in transcript and draft remain composer text
+  ---
+  duration_ms: 0.409481
+  type: 'test'
+  ...
+# Subtest: focused known menus and changed unknown menus remain closed
+ok 34 - focused known menus and changed unknown menus remain closed
+  ---
+  duration_ms: 0.246948
+  type: 'test'
+  ...
+# Subtest: dot2_runtime_refuses_before_prompt_paste
+ok 35 - dot2_runtime_refuses_before_prompt_paste
+  ---
+  duration_ms: 0.196837
+  type: 'test'
+  ...
+# Subtest: capability_probe_rejects_missing_submit_command_before_buffer
+ok 36 - capability_probe_rejects_missing_submit_command_before_buffer
+  ---
+  duration_ms: 0.161875
+  type: 'test'
+  ...
+# Subtest: submit_nondiagnostic_failure_is_uncertain_without_retry
+ok 37 - submit_nondiagnostic_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.559805
+  type: 'test'
+  ...
+# Subtest: submit_fixed_refusal_maps_first_and_retry_public_envelopes
+ok 38 - submit_fixed_refusal_maps_first_and_retry_public_envelopes
+  ---
+  duration_ms: 17.047084
+  type: 'test'
+  ...
+# Subtest: submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant
+ok 39 - submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant
+  ---
+  duration_ms: 0.424295
+  type: 'test'
+  ...
+# Subtest: capability probes require strict raw ASCII and exact empty-stderr success on every operation
+ok 40 - capability probes require strict raw ASCII and exact empty-stderr success on every operation
+  ---
+  duration_ms: 0.632276
+  type: 'test'
+  ...
+# Subtest: invalid UTF-8 captured evidence refuses without replacement inference or keys
+ok 41 - invalid UTF-8 captured evidence refuses without replacement inference or keys
+  ---
+  duration_ms: 0.159626
+  type: 'test'
+  ...
+# Subtest: cleanup attempts every owned buffer but never suppresses a non-missing error or retries
+ok 42 - cleanup attempts every owned buffer but never suppresses a non-missing error or retries
+  ---
+  duration_ms: 0.237812
+  type: 'test'
+  ...
+# Subtest: post_cr_capture_failure_is_uncertain_without_retry
+ok 43 - post_cr_capture_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.26673
+  type: 'test'
+  ...
+# Subtest: post_cr_invalid_metadata_is_uncertain_without_retry
+ok 44 - post_cr_invalid_metadata_is_uncertain_without_retry
+  ---
+  duration_ms: 0.15123
+  type: 'test'
+  ...
+# Subtest: post_cr_invalid_utf8_is_uncertain_without_retry
+ok 45 - post_cr_invalid_utf8_is_uncertain_without_retry
+  ---
+  duration_ms: 0.138474
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_capture_failure_is_uncertain_without_retry
+ok 46 - post_cr_retry_guard_capture_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.123019
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_metadata_failure_is_uncertain_without_retry
+ok 47 - post_cr_retry_guard_metadata_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.106362
+  type: 'test'
+  ...
+# Subtest: post_cr_retry_guard_utf8_failure_is_uncertain_without_retry
+ok 48 - post_cr_retry_guard_utf8_failure_is_uncertain_without_retry
+  ---
+  duration_ms: 0.192355
+  type: 'test'
+  ...
+# Subtest: first_submit_status2_cleanup_success_preserves_uncertainty_and_one_cr
+ok 49 - first_submit_status2_cleanup_success_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.27224
+  type: 'test'
+  ...
+# Subtest: first_submit_status2_cleanup_failure_preserves_uncertainty_and_one_cr
+ok 50 - first_submit_status2_cleanup_failure_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.139917
+  type: 'test'
+  ...
+# Subtest: first_submit_throws_cleanup_success_preserves_uncertainty_and_one_cr
+ok 51 - first_submit_throws_cleanup_success_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.107843
+  type: 'test'
+  ...
+# Subtest: first_submit_throws_cleanup_failure_preserves_uncertainty_and_one_cr
+ok 52 - first_submit_throws_cleanup_failure_preserves_uncertainty_and_one_cr
+  ---
+  duration_ms: 0.112098
+  type: 'test'
+  ...
+# Subtest: first_submit_fixed_refusal_cleanup_success_remains_pre_delivery
+ok 53 - first_submit_fixed_refusal_cleanup_success_remains_pre_delivery
+  ---
+  duration_ms: 0.236777
+  type: 'test'
+  ...
+# Subtest: first_submit_fixed_refusal_cleanup_failure_remains_pre_delivery
+ok 54 - first_submit_fixed_refusal_cleanup_failure_remains_pre_delivery
+  ---
+  duration_ms: 0.135492
+  type: 'test'
+  ...
+# Subtest: codex observed 120x40 ready profile preserves the empty composer
+ok 55 - codex observed 120x40 ready profile preserves the empty composer
+  ---
+  duration_ms: 0.150576
+  type: 'test'
+  ...
+# Subtest: codex observed ready layout retains exact draft checks without claiming live acceptance
+ok 56 - codex observed ready layout retains exact draft checks without claiming live acceptance
+  ---
+  duration_ms: 0.257202
+  type: 'test'
+  ...
+# Subtest: codex observed profile still refuses focused menu trust busy and unknown states before input
+ok 57 - codex observed profile still refuses focused menu trust busy and unknown states before input
+  ---
+  duration_ms: 0.402401
+  type: 'test'
+  ...
+# Subtest: claude-code observed 120x40 ready profile preserves the empty composer
+ok 58 - claude-code observed 120x40 ready profile preserves the empty composer
+  ---
+  duration_ms: 0.076535
+  type: 'test'
+  ...
+# Subtest: claude-code observed ready layout retains exact draft checks without claiming live acceptance
+ok 59 - claude-code observed ready layout retains exact draft checks without claiming live acceptance
+  ---
+  duration_ms: 0.897562
+  type: 'test'
+  ...
+# Subtest: claude-code observed profile still refuses focused menu trust busy and unknown states before input
+ok 60 - claude-code observed profile still refuses focused menu trust busy and unknown states before input
+  ---
+  duration_ms: 0.333177
+  type: 'test'
+  ...
+# Subtest: codex measured footer profile rejects near misses and unmeasured geometry
+ok 61 - codex measured footer profile rejects near misses and unmeasured geometry
+  ---
+  duration_ms: 0.15925
+  type: 'test'
+  ...
+# Subtest: claude-code measured footer profile rejects near misses and unmeasured geometry
+ok 62 - claude-code measured footer profile rejects near misses and unmeasured geometry
+  ---
+  duration_ms: 0.074414
+  type: 'test'
+  ...
+# Subtest: trial2 Codex observed singular warning and variable padding preserve readiness
+ok 63 - trial2 Codex observed singular warning and variable padding preserve readiness
+  ---
+  duration_ms: 0.099071
+  type: 'test'
+  ...
+# Subtest: trial2 Claude observed pre-ask and post-paste layouts retain exact draft and composer identity
+ok 64 - trial2 Claude observed pre-ask and post-paste layouts retain exact draft and composer identity
+  ---
+  duration_ms: 0.09314
+  type: 'test'
+  ...
+# Subtest: trial2 Claude status row allows guarded Enter on the unchanged draft without false acceptance
+ok 65 - trial2 Claude status row allows guarded Enter on the unchanged draft without false acceptance
+  ---
+  duration_ms: 0.420283
+  type: 'test'
+  ...
+# Subtest: trial2 observed layouts keep menus trust busy and unknown states closed before input
+ok 66 - trial2 observed layouts keep menus trust busy and unknown states closed before input
+  ---
+  duration_ms: 0.523421
+  type: 'test'
+  ...
+# Subtest: trial2 measured footer changes do not open near misses unknown status or cursor drift
+ok 67 - trial2 measured footer changes do not open near misses unknown status or cursor drift
+  ---
+  duration_ms: 0.239958
+  type: 'test'
+  ...
+# Subtest: trial2 Claude post-paste decision or unknown status prevents the first Enter
+ok 68 - trial2 Claude post-paste decision or unknown status prevents the first Enter
+  ---
+  duration_ms: 0.468356
+  type: 'test'
+  ...
+# Subtest: trial3 observed Codex queue footer is a draft only in the post-paste phase
+not ok 69 - trial3 observed Codex queue footer is a draft only in the post-paste phase
+  ---
+  duration_ms: 0.896974
+  type: 'test'
+  location: '<repo>/tests/gateway/prompt_submission.test.js:849:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unknown_state'
+    - 'composer'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'composer'
+  actual: 'unknown_state'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file://<repo>/tests/gateway/prompt_submission.test.js:859:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trial3 observed Claude status plus full footer is ready with recorded metadata
+not ok 70 - trial3 observed Claude status plus full footer is ready with recorded metadata
+  ---
+  duration_ms: 0.199073
+  type: 'test'
+  location: '<repo>/tests/gateway/prompt_submission.test.js:864:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unknown_state'
+    - 'composer'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'composer'
+  actual: 'unknown_state'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file://<repo>/tests/gateway/prompt_submission.test.js:868:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trial3 observed queue draft supports guarded Enter and bounded retry without claiming acceptance
+not ok 71 - trial3 observed queue draft supports guarded Enter and bounded retry without claiming acceptance
+  ---
+  duration_ms: 0.305039
+  type: 'test'
+  location: '<repo>/tests/gateway/prompt_submission.test.js:874:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: prompt submission not confirmed
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file://<repo>/tests/gateway/prompt_submission.test.js:877:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trial3 Claude measured ready footer permits exact simulated drafts without false acceptance
+not ok 72 - trial3 Claude measured ready footer permits exact simulated drafts without false acceptance
+  ---
+  duration_ms: 0.19405
+  type: 'test'
+  location: '<repo>/tests/gateway/prompt_submission.test.js:885:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: prompt submission not confirmed
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file://<repo>/tests/gateway/prompt_submission.test.js:892:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trial3 queue footer never authorizes a blank placeholder or an initial paste
+ok 73 - trial3 queue footer never authorizes a blank placeholder or an initial paste
+  ---
+  duration_ms: 0.340315
+  type: 'test'
+  ...
+# Subtest: trial3 queue draft requires measured status geometry exact ASCII cursor and footer
+ok 74 - trial3 queue draft requires measured status geometry exact ASCII cursor and footer
+  ---
+  duration_ms: 0.196516
+  type: 'test'
+  ...
+# Subtest: trial3 decisions trust busy and unknown still refuse with zero input
+ok 75 - trial3 decisions trust busy and unknown still refuse with zero input
+  ---
+  duration_ms: 0.517542
+  type: 'test'
+  ...
+# Subtest: trial3 queue draft cannot authorize Enter on a fresh decision or changed draft
+not ok 76 - trial3 queue draft cannot authorize Enter on a fresh decision or changed draft
+  ---
+  duration_ms: 0.316096
+  type: 'test'
+  location: '<repo>/tests/gateway/prompt_submission.test.js:970:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: prompt submission not confirmed
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file://<repo>/tests/gateway/prompt_submission.test.js:977:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..76
+# tests 76
+# suites 0
+# pass 71
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 173.442981

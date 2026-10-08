@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 bounded live ready-profile correction | 3 | [request](A_0_4-live-profile-3_to_review.md) | [KO, queue footer padding blocker](A_0_4-live-profile-3_reviewed_KO.md) |
 | A/0/04 bounded live ready-profile correction | 2 | [request](A_0_4-live-profile-2_to_review.md) | [OK, source review only](A_0_4-live-profile-2_reviewed_OK.md) |
 | A/0/04 bounded live ready-profile correction | 1 | [request](A_0_4-live-profile-1_to_review.md) | [OK, source review only](A_0_4-live-profile-1_reviewed_OK.md) |
 | A/0/04 prompt submission implementation | 6 | [request](A_0_4-6_to_review.md) | [OK, source review only](A_0_4-6_reviewed_OK.md) |
