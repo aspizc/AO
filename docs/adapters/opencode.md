@@ -82,3 +82,12 @@ opencode does not auto-detect Ollama; it needs the provider declared in
 
 A reference copy lives in `client-config/local-models/opencode.jsonc`. Confirm
 opencode sees them with `opencode models | grep ollama`.
+
+## Role-derived CLI permissions
+
+Both launches derive boolean `writeAccess` from the target agent, role and
+repository policy: only `code.write` = `allow` grants it. Non-writers receive
+`--agent plan` and never `--auto`, even with `AGENTS_OPENCODE_AUTO=1`. Writers
+retain the existing agent and opt-in bypass. The plan agent restricts edits
+except its own plan files; an allowed shell tool can still write. This is not
+an OS sandbox. Results and `SESSION_STARTED` record `writeAccess`.

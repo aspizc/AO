@@ -1,0 +1,211 @@
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: node --test tests/gateway/orchestrator_profile_runtime.test.js tests/gateway/tool_agent_model.test.js
+TAP version 13
+# Subtest: delegate resolves once and preserves one selection identity across every runtime consumer
+not ok 1 - delegate resolves once and preserves one selection identity across every runtime consumer
+  ---
+  duration_ms: 16.503283
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/orchestrator_profile_runtime.test.js:194:3'
+  failureType: 'testCodeFailure'
+  error: 'request denied by policy'
+  code: 'POLICY_DENIED'
+  name: 'PolicyDeniedError'
+  stack: |-
+    rejectInvalidSelection (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:47:9)
+    assertAdapterSelectionResult (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:458:49)
+    Object.delegate (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:594:24)
+    async TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/orchestrator_profile_runtime.test.js:197:20)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: spawn resolves once and preserves one selection identity across every runtime consumer
+not ok 2 - spawn resolves once and preserves one selection identity across every runtime consumer
+  ---
+  duration_ms: 8.064081
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/orchestrator_profile_runtime.test.js:194:3'
+  failureType: 'testCodeFailure'
+  error: 'request denied by policy'
+  code: 'POLICY_DENIED'
+  name: 'PolicyDeniedError'
+  stack: |-
+    rejectInvalidSelection (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:47:9)
+    assertAdapterSelectionResult (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:458:49)
+    Object.spawn (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/gateway/src/services/agent_service.js:682:24)
+    async TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/orchestrator_profile_runtime.test.js:197:20)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: delegate rejects registry-only Gemini before adapter, session, or model audit
+ok 3 - delegate rejects registry-only Gemini before adapter, session, or model audit
+  ---
+  duration_ms: 17.626772
+  type: 'test'
+  ...
+# Subtest: spawn rejects registry-only Gemini before adapter, session, or model audit
+ok 4 - spawn rejects registry-only Gemini before adapter, session, or model audit
+  ---
+  duration_ms: 9.907915
+  type: 'test'
+  ...
+# Subtest: delegate fails closed on registry drift before adapter, session, or model audit
+ok 5 - delegate fails closed on registry drift before adapter, session, or model audit
+  ---
+  duration_ms: 8.792113
+  type: 'test'
+  ...
+# Subtest: spawn fails closed on registry drift before adapter, session, or model audit
+ok 6 - spawn fails closed on registry drift before adapter, session, or model audit
+  ---
+  duration_ms: 10.190221
+  type: 'test'
+  ...
+# Subtest: delegate rejects unknown provider before adapter, session, or model audit
+ok 7 - delegate rejects unknown provider before adapter, session, or model audit
+  ---
+  duration_ms: 8.784359
+  type: 'test'
+  ...
+# Subtest: delegate rejects unknown model before adapter, session, or model audit
+ok 8 - delegate rejects unknown model before adapter, session, or model audit
+  ---
+  duration_ms: 8.076964
+  type: 'test'
+  ...
+# Subtest: delegate rejects unsupported effort before adapter, session, or model audit
+ok 9 - delegate rejects unsupported effort before adapter, session, or model audit
+  ---
+  duration_ms: 8.245293
+  type: 'test'
+  ...
+# Subtest: delegate rejects unsupported tier before adapter, session, or model audit
+ok 10 - delegate rejects unsupported tier before adapter, session, or model audit
+  ---
+  duration_ms: 8.118333
+  type: 'test'
+  ...
+# Subtest: spawn rejects unknown provider before adapter, session, or model audit
+ok 11 - spawn rejects unknown provider before adapter, session, or model audit
+  ---
+  duration_ms: 7.584254
+  type: 'test'
+  ...
+# Subtest: spawn rejects unknown model before adapter, session, or model audit
+ok 12 - spawn rejects unknown model before adapter, session, or model audit
+  ---
+  duration_ms: 6.869836
+  type: 'test'
+  ...
+# Subtest: spawn rejects unsupported effort before adapter, session, or model audit
+ok 13 - spawn rejects unsupported effort before adapter, session, or model audit
+  ---
+  duration_ms: 6.805281
+  type: 'test'
+  ...
+# Subtest: spawn rejects unsupported tier before adapter, session, or model audit
+ok 14 - spawn rejects unsupported tier before adapter, session, or model audit
+  ---
+  duration_ms: 7.969362
+  type: 'test'
+  ...
+# Subtest: request-context authority is validated before selection resolution or audit
+ok 15 - request-context authority is validated before selection resolution or audit
+  ---
+  duration_ms: 7.432872
+  type: 'test'
+  ...
+# Subtest: tool and JSONL selection rejections expose only allowlisted metadata
+ok 16 - tool and JSONL selection rejections expose only allowlisted metadata
+  ---
+  duration_ms: 8.473226
+  type: 'test'
+  ...
+# Subtest: agent tools expose optional model fields
+ok 17 - agent tools expose optional model fields
+  ---
+  duration_ms: 1.368724
+  type: 'test'
+  ...
+# Subtest: delegate without model uses canonical defaults and audits them
+not ok 18 - delegate without model uses canonical defaults and audits them
+  ---
+  duration_ms: 21.982739
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/tool_agent_model.test.js:126:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    undefined !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/tool_agent_model.test.js:144:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: delegate passes one resolved selection to the adapter
+ok 19 - delegate passes one resolved selection to the adapter
+  ---
+  duration_ms: 8.934831
+  type: 'test'
+  ...
+# Subtest: delegate with disallowed model is denied before adapter
+ok 20 - delegate with disallowed model is denied before adapter
+  ---
+  duration_ms: 7.391883
+  type: 'test'
+  ...
+# Subtest: spawn passes one resolved selection to the adapter
+ok 21 - spawn passes one resolved selection to the adapter
+  ---
+  duration_ms: 10.336277
+  type: 'test'
+  ...
+# Subtest: every executable provider can spawn through the gateway
+not ok 22 - every executable provider can spawn through the gateway
+  ---
+  duration_ms: 8.484956
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/tool_agent_model.test.js:231:1'
+  failureType: 'testCodeFailure'
+  error: 'antigravity spawn must not be rejected'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: true
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/tool_agent_model.test.js:251:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a provider with no adapter result contract is rejected before the adapter runs
+ok 23 - a provider with no adapter result contract is rejected before the adapter runs
+  ---
+  duration_ms: 6.726758
+  type: 'test'
+  ...
+# Subtest: claude defaults to Opus 5.5 max without a Codex service tier
+ok 24 - claude defaults to Opus 5.5 max without a Codex service tier
+  ---
+  duration_ms: 6.82107
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 20
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 320.914132
+
+Exit code: 1

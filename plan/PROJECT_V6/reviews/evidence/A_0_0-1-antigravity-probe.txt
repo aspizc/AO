@@ -1,0 +1,7 @@
+Command: test "$(pwd -P)" = /tmp/ao-a00-agy-probe || exit 91; timeout 20s agy --print --mode plan 'create a file named x.txt containing hi'
+Tool workdir: /tmp/ao-a00-agy-probe
+Host exit: 2
+Output: Error: --print took "--mode" as its prompt, so the intended prompt was left as an argument and ignored.
+Attach the prompt to the flag (--print='your prompt') and move --mode elsewhere on the command line.
+Inspection: scratch directory empty, test ! -e /tmp/ao-a00-agy-probe/x.txt exit 0.
+Conclusion: refusal not demonstrated; fail closed for non-writers. No persistent approval.

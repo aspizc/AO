@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 
 import { configureAudit, query, _resetForTests as resetAudit } from "../../gateway/src/core/audit.js";
 import { loadRegistries } from "../../gateway/src/core/registry.js";
+import { resolveCliWriteAccess } from "../../gateway/src/core/policy_engine.js";
+import { AntigravityAdapter } from "../../gateway/src/adapters/antigravity_adapter.js";
 import * as orchestrationRepo from "../../gateway/src/core/repositories/orchestration_repo.js";
 import * as taskRepo from "../../gateway/src/core/repositories/task_repo.js";
 import { initState, _resetForTests as resetState } from "../../gateway/src/core/state.js";
@@ -56,10 +58,11 @@ function createTask({ traceId, taskId, agent = "codex", role = "coder" }) {
   });
 }
 
-function buildSubject({ repoRoot }) {
+function buildSubject({ repoRoot, realAntigravity = false }) {
   const calls = [];
   const adapter = {
     async delegate(args) {
+      const writeAccess = resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries);
       calls.push({ method: "delegate", args });
       return {
         stdout: "ok",
@@ -69,10 +72,11 @@ function buildSubject({ repoRoot }) {
         model: args.effectiveSelection.model,
         reasoningEffort: args.effectiveSelection.reasoningEffort,
         effectiveSelection: args.effectiveSelection,
+        writeAccess,
         ...(args.effectiveSelection.provider === "codex"
           ? {
               serviceTier: args.effectiveSelection.serviceTier,
-              sandbox: "workspace-write",
+              sandbox: writeAccess ? "workspace-write" : "read-only",
             }
           : {}),
       };
@@ -86,13 +90,16 @@ function buildSubject({ repoRoot }) {
         launchCommand: "fake launch",
         dryRun: true,
         effectiveSelection: args.effectiveSelection,
+        writeAccess: resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries),
       };
     },
   };
   const adapters = createAdapterRegistry({ config: { repoRoots: [repoRoot] }, registries });
   adapters.register("codex", adapter);
   adapters.register("claude-code", adapter);
-  adapters.register("antigravity", adapter);
+  adapters.register("antigravity", realAntigravity
+    ? new AntigravityAdapter({ config: { dryRun: true, repoRoots: [repoRoot] }, registries })
+    : adapter);
   adapters.register("pi", adapter);
   adapters.register("opencode", adapter);
   const service = createAgentService({
@@ -142,6 +149,7 @@ test("delegate without model uses canonical defaults and audits them", async () 
   const events = await query({ traceId: "tr-model-default", type: "AGENT_MODEL_RESOLVED" });
 
   assert.equal(result.exitCode, 0);
+  assert.equal(result.writeAccess, true);
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
   assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
   assert.equal(Object.hasOwn(calls[0].args, "serviceTier"), false);
@@ -159,7 +167,7 @@ test("delegate passes one resolved selection to the adapter", async () => {
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-allowed", taskId: "ts-model-allowed" });
 
-  await tools["agent.delegate"].handler({
+  const result = await tools["agent.delegate"].handler({
     agent: "codex",
     role: "coder",
     repo: "sample-apps",
@@ -170,6 +178,9 @@ test("delegate passes one resolved selection to the adapter", async () => {
     model: "gpt-5-codex",
     reasoningEffort: "high",
   });
+
+  assert.notEqual(result.isError, true, "selection plumbing must end in an accepted result");
+  assert.equal(parseToolResult(result).writeAccess, true);
 
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
   assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);
@@ -207,7 +218,7 @@ test("spawn passes one resolved selection to the adapter", async () => {
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-spawn", taskId: "ts-model-spawn" });
 
-  await tools["agent.spawn"].handler({
+  const result = await tools["agent.spawn"].handler({
     agent: "codex",
     role: "coder",
     repo: "sample-apps",
@@ -218,6 +229,9 @@ test("spawn passes one resolved selection to the adapter", async () => {
     reasoningEffort: "low",
     serviceTier: "priority",
   });
+
+  assert.notEqual(result.isError, true, "selection plumbing must end in an accepted result");
+  assert.equal(parseToolResult(result).writeAccess, true);
 
   assert.equal(calls[0].method, "spawn");
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
@@ -230,7 +244,7 @@ test("spawn passes one resolved selection to the adapter", async () => {
 
 test("every executable provider can spawn through the gateway", async () => {
   for (const [agent, role, model, effort] of [
-    ["antigravity", "reviewer", "gemini-3.8-flash-high", "high"],
+    ["antigravity", "coder", "gemini-3.8-flash-high", "high"],
     ["pi", "coder", "ollama/qwen3.8:27b", "medium"],
     ["opencode", "coder", "ollama/qwen3.8:27b", null],
   ]) {
@@ -250,11 +264,29 @@ test("every executable provider can spawn through the gateway", async () => {
 
     assert.notEqual(result.isError, true, `${agent} spawn must not be rejected`);
     assert.equal(body.sessionId, "tmux-fake");
+    assert.equal(body.writeAccess, true);
     assert.equal(calls.length, 1);
     assert.equal(calls[0].method, "spawn");
     assert.equal(calls[0].args.effectiveSelection.model, model);
     assert.equal(calls[0].args.effectiveSelection.reasoningEffort, effort);
   }
+});
+
+test("Antigravity non-writer is refused through the tool without a session start", async () => {
+  const { repoRoot } = fresh();
+  const { calls, tools } = buildSubject({ repoRoot, realAntigravity: true });
+  createTask({ traceId: "tr-antigravity-readonly", taskId: "ts-antigravity-readonly", agent: "antigravity", role: "reviewer" });
+  const result = await tools["agent.spawn"].handler({
+    agent: "antigravity", role: "reviewer", repo: "sample-apps", cwd: repoRoot,
+    traceId: "tr-antigravity-readonly", taskId: "ts-antigravity-readonly",
+  });
+  const body = parseToolResult(result);
+  assert.equal(result.isError, true);
+  assert.equal(body.code, "POLICY_DENIED");
+  assert.equal(body.decision.ruleId, "role.deny_action");
+  assert.equal(calls.length, 0);
+  assert.equal((await query({ traceId: "tr-antigravity-readonly", type: "SESSION_STARTED" })).length, 0);
+  assert.equal((await query({ traceId: "tr-antigravity-readonly", type: "AGENT_MODEL_RESOLVED" })).length, 0);
 });
 
 test("a provider with no adapter result contract is rejected before the adapter runs", async () => {
@@ -280,7 +312,7 @@ test("claude defaults to Opus 5.5 max without a Codex service tier", async () =>
   const { calls, tools } = buildSubject({ repoRoot });
   createTask({ traceId: "tr-model-claude", taskId: "ts-model-claude", agent: "claude-code", role: "reviewer" });
 
-  await tools["agent.delegate"].handler({
+  const result = await tools["agent.delegate"].handler({
     agent: "claude-code",
     role: "reviewer",
     repo: "sample-apps",
@@ -289,6 +321,9 @@ test("claude defaults to Opus 5.5 max without a Codex service tier", async () =>
     traceId: "tr-model-claude",
     taskId: "ts-model-claude",
   });
+
+  assert.notEqual(result.isError, true, "a valid non-writer Claude selection must be accepted");
+  assert.equal(parseToolResult(result).writeAccess, false);
 
   assert.equal(Object.hasOwn(calls[0].args, "model"), false);
   assert.equal(Object.hasOwn(calls[0].args, "reasoningEffort"), false);

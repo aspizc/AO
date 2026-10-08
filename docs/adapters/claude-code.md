@@ -81,3 +81,14 @@ tmux, and the `claude` binary must not be required in dry-run mode.
 - [ ] Adapter dry-run tests pass (`O/0/1`).
 - [ ] A real supervised smoke test can launch `claude` in a tmux session from
       an unrestricted repository.
+
+## Role-derived CLI permissions
+
+Both launches derive boolean `writeAccess` through the policy engine for
+the target agent, role and repository; only `code.write` = `allow` grants it.
+Non-writers receive `--disallowedTools Edit Write NotebookEdit`. Headless
+`--permission-mode dontAsk` stays unchanged; supervised sessions retain their
+interactive task semantics. This is a tool restriction, not an OS sandbox:
+Bash can still write if settings pre-allow it in headless mode, while the
+supervised CLI prompts the operator. Results and `SESSION_STARTED` record
+`writeAccess`.

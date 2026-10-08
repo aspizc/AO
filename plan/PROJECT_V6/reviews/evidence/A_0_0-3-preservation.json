@@ -1,0 +1,283 @@
+{
+  "candidate": "8c7eb3a97d94fcf351b58b1ee4cfa4d3b23b0cc3",
+  "entryHead": "1f29faf22ba1a0dae25dbad74df5871a43e79b19",
+  "changedTrackedPaths": [
+    "tests/gateway/guarded_paste.test.js",
+    "tests/gateway/orchestrator_profile_runtime.test.js",
+    "tests/gateway/tool_agent_model.test.js"
+  ],
+  "gatewayDocsPoliciesGeminiMatchCandidate": true,
+  "immutableTrial1AndTrial2Files": {
+    "plan/PROJECT_V6/reviews/A_0_0-1_reviewed_KO.md": "171749c40fbd66fe91e940e8a3de150c01300e902b08a9d29230596566f47590",
+    "plan/PROJECT_V6/reviews/A_0_0-1_to_review.md": "f288c2d8cf39deb9de00b23c5d8bf4429362387e9734bc5d7a1cb6a768fa76b5",
+    "plan/PROJECT_V6/reviews/A_0_0-2_reviewed_OK.md": "c7f248c3bc83625b40f38e9d7bce4217ff9968ce5fbb7eb5646cdb78ce3069cb",
+    "plan/PROJECT_V6/reviews/A_0_0-2_to_review.md": "0dd763ab795ce6ae10a3f50e9ce225b5207eb2107cdd2fe6fb6a91e97810e1ee",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-anchor-reverification.json": "14383a2fe3373dc9ae7d5335af555aebf07a222fecab426bda724767a1557dd5",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-antigravity-probe.txt": "4ddd50311c66865383fe102985c570702b032c6859b9d8c4cf08bc4b22b14fd1",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-files.json": "e24abe2c3607e0d1ff3f9d58fd74e0ca359f45ec29e57a867093b1cd80cb964c",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-green.txt": "a0e2113e5e51b873a5053140c20100c4cdff01c84a5225b4f39e1af5b6f53a08",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-lint.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-policy.txt": "90fbf58a92cca893ce47861539e5778b52f06f63468db89b813ba214207e2c86",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-red.txt": "bb560c398b2c847a49ab8a9b14e10da7322ea665ff72fb7a032a5f4a7e820bfa",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-files.json": "5316b77faa3f80c08cf1d5226a20fe1fac5de9e63744cfbbbb6ee0f168d9c06a",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-green.txt": "04a9dd49555ea0019a7aa1a50745c1b2c755627af7cf67c054ee81e9e6068fe4",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-lint-runner.mjs": "87851428341774c159b32cca77740e124c199f68e1c055b27d87d77309f6c044",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-lint.txt": "16b32995434df4c26f313ad649071b98fdc23e79a2a3aa8282a507b931b78cf9",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-preservation.json": "011a0ebc99ccfeadb53211d81594b9fd291af9ff951e8397e58010fbaf8dd5b0",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-red-runner.py": "97a41769e4c550475acb0f0ff7fda82cf2e37fb5ecec9a999835e24e29cda45d",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-2-red.txt": "ae2ed9ccf193bffcbdfcbec6c7902acf628f2014c0f40b2171b94e9b7fa49849"
+  },
+  "rootGateLogSha256": "4868fbe4200067202737d2ad6af305f824b1023e51fcf50f6cf2c2d02d55c02d",
+  "rootGateFinalSummary": {
+    "counts": {
+      "failed": 5,
+      "passed": 2993,
+      "skipped": 12,
+      "tests": 3010
+    },
+    "errors": [
+      "test.gateway: 5 tests failed",
+      "test.gateway: command exited with status 1"
+    ],
+    "schemaVersion": 1,
+    "status": "failed",
+    "suites": [
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lock.python",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "release.candidate",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lint.python",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "lint.gateway",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "public.hygiene",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 456,
+          "skipped": 0,
+          "tests": 456
+        },
+        "errors": [],
+        "id": "test.structure",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 5,
+          "passed": 1876,
+          "skipped": 9,
+          "tests": 1890
+        },
+        "errors": [
+          "test.gateway: 5 tests failed",
+          "test.gateway: command exited with status 1"
+        ],
+        "id": "test.gateway",
+        "infrastructureUnavailable": [
+          {
+            "id": "live postgres repository contract: create and read repository aggregate",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: status updates report one changed row",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: foreign key violation fails",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres repository contract: policy decisions are append only",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals round-trip adversarial strings",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals preserve NULL separately from string null",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres literals support named and positional params",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres reports changes for insert update and delete",
+            "service": "postgres"
+          },
+          {
+            "id": "live postgres rejects non-finite numeric literals before execution",
+            "service": "postgres"
+          }
+        ],
+        "status": "failed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 25,
+          "skipped": 0,
+          "tests": 25
+        },
+        "errors": [],
+        "id": "test.e2e",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "smoke.mcp",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "errors": [],
+        "id": "policy.registry",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 442,
+          "skipped": 0,
+          "tests": 442
+        },
+        "errors": [],
+        "id": "test.cli",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 165,
+          "skipped": 3,
+          "tests": 168
+        },
+        "errors": [],
+        "id": "test.langgraph",
+        "infrastructureUnavailable": [
+          {
+            "id": "tests.test_gateway_client::test_real_gateway_smoke",
+            "service": "gateway-integration"
+          },
+          {
+            "id": "tests.test_plan_refine_graph::test_real_gateway_dry_run_smoke",
+            "service": "gateway-integration"
+          },
+          {
+            "id": "tests.test_temporal_crash_recovery::test_temporal_worker_restart_replays_without_duplicate_implement_or_implicit_approval",
+            "service": "temporal"
+          }
+        ],
+        "status": "infrastructure_unavailable"
+      },
+      {
+        "classification": "required",
+        "counts": {
+          "failed": 0,
+          "passed": 22,
+          "skipped": 0,
+          "tests": 22
+        },
+        "errors": [],
+        "id": "test.redis-live",
+        "infrastructureUnavailable": [],
+        "status": "passed"
+      },
+      {
+        "classification": "optional-service",
+        "counts": {
+          "failed": 0,
+          "passed": 0,
+          "skipped": 0,
+          "tests": 0
+        },
+        "errors": [],
+        "id": "test.real-agents",
+        "infrastructureUnavailable": [],
+        "service": "real-agent-providers",
+        "status": "infrastructure_unavailable"
+      }
+    ]
+  }
+}

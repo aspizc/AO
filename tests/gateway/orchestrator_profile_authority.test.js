@@ -383,6 +383,7 @@ function delegateAdapterResult(args, overrides = {}) {
     model: args.effectiveSelection.model,
     reasoningEffort: args.effectiveSelection.reasoningEffort,
     effectiveSelection: args.effectiveSelection,
+    writeAccess: true,
   };
   if (args.effectiveSelection.provider === "codex") {
     result.serviceTier = args.effectiveSelection.serviceTier;
@@ -400,6 +401,7 @@ function spawnAdapterResult(args, overrides = {}) {
     launchCommand: "unavailable in dry-run",
     dryRun: true,
     effectiveSelection: args.effectiveSelection,
+    writeAccess: true,
     ...overrides,
   };
 }
@@ -552,6 +554,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "reasoningEffort",
       "serviceTier",
       "effectiveSelection",
+      "writeAccess",
       "sandbox",
     ]),
     spawn: Object.freeze([
@@ -561,6 +564,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "launchCommand",
       "dryRun",
       "effectiveSelection",
+      "writeAccess",
     ]),
   }),
   "claude-code": Object.freeze({
@@ -572,6 +576,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "model",
       "reasoningEffort",
       "effectiveSelection",
+      "writeAccess",
     ]),
     spawn: Object.freeze([
       "sessionId",
@@ -580,6 +585,7 @@ const RESULT_REQUIRED_FIELDS = Object.freeze({
       "launchCommand",
       "dryRun",
       "effectiveSelection",
+      "writeAccess",
     ]),
   }),
 });
@@ -768,6 +774,7 @@ for (const agent of ["codex", "claude-code"]) {
 test("delegate rejects a result containing only the effective selection", async (t) => {
   const value = serviceFixture(t, (_method, args) => ({
     effectiveSelection: args.effectiveSelection,
+    writeAccess: true,
   }));
 
   await assert.rejects(

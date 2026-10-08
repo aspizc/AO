@@ -20,6 +20,7 @@ import {
 } from "../../gateway/src/core/request_context.js";
 import { ACTION_CATALOG_VERSION } from "../../gateway/src/core/policy_types.js";
 import { loadRegistries } from "../../gateway/src/core/registry.js";
+import { resolveCliWriteAccess } from "../../gateway/src/core/policy_engine.js";
 import {
   initState,
   _resetForTests as resetState,
@@ -57,6 +58,7 @@ function fixture(t, { registries = canonicalRegistries } = {}) {
   };
   const adapter = {
     async delegate(args) {
+      const writeAccess = resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries);
       observed.adapterCalls.push({ consumer: "delegate", selection: args.effectiveSelection });
       observed.adapterCalls.push({ consumer: "dry-run", selection: args.effectiveSelection });
       return {
@@ -67,10 +69,11 @@ function fixture(t, { registries = canonicalRegistries } = {}) {
         model: args.effectiveSelection.model,
         reasoningEffort: args.effectiveSelection.reasoningEffort,
         effectiveSelection: args.effectiveSelection,
+        writeAccess,
         ...(args.effectiveSelection.provider === "codex"
           ? {
               serviceTier: args.effectiveSelection.serviceTier,
-              sandbox: "workspace-write",
+              sandbox: writeAccess ? "workspace-write" : "read-only",
             }
           : {}),
       };
@@ -85,6 +88,7 @@ function fixture(t, { registries = canonicalRegistries } = {}) {
         launchCommand: "unavailable in dry-run",
         dryRun: true,
         effectiveSelection: args.effectiveSelection,
+        writeAccess: resolveCliWriteAccess({ agent: args.effectiveSelection.agent, role: args.role, repo: args.repo }, registries),
       };
     },
   };
@@ -218,6 +222,7 @@ for (const method of ["delegate", "spawn"]) {
     }
     assert.deepEqual(value.observed.auditSelections, [selection]);
     assert.equal(result.effectiveSelection, selection);
+    assert.equal(result.writeAccess, true, "the valid coder fixture must satisfy the write-access contract without changing selection identity");
 
     const [event] = await queryAudit({
       traceId: executionArgs(value, method).traceId,

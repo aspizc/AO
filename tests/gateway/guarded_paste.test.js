@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import { withOwnedTmuxServer } from "./fixtures/owned_tmux_server.js";
 
 const terminalFixture = fileURLToPath(new URL("./guarded_paste_fixture.py", import.meta.url));
@@ -22,7 +23,10 @@ async function ownedServer(runTest) {
     let sequence = 0;
     async function mode(target, terminal, enabled) {
       const marker = `fixture-mode:${++sequence}:${enabled}`;
-      fs.writeFileSync(path.join(terminal, "mode"), `${sequence}:${enabled}`);
+      // Publish a complete record; the Python witness reads this concurrently.
+      const nextMode = path.join(terminal, "mode-next");
+      fs.writeFileSync(nextMode, `${sequence}:${enabled}`);
+      fs.renameSync(nextMode, path.join(terminal, "mode"));
       for (let attempt = 0; attempt < 100; attempt++) {
         // The marker follows the escape sequence: seeing it proves server parsing.
         if (checked(["capture-pane", "-p", "-t", target]).includes(marker)) return;
@@ -77,6 +81,36 @@ test("guarded_paste_rechecks_mode_at_write", async () => {
     checked(["display-message", "-p", "-t", target, "#{pane_id}"]);
     // Disable after the client's last observation, with no fresh client probe.
     await mode(target, terminal, "off");
+    await refused();
+  });
+});
+
+test("guarded_paste_mode_update_does_not_expose_partial_control_record", async () => {
+  await ownedServer(async ({ target, terminal, mode, checked, refused }) => {
+    // Keep a failed fixture visible so a control-record crash has direct evidence.
+    checked(["set-option", "-p", "-t", target, "remain-on-exit", "on"]);
+    const originalWrite = fs.writeFileSync;
+    let staged = false;
+    fs.writeFileSync = (file, data, ...options) => {
+      if (path.dirname(file) === terminal && data === "3:off") {
+        originalWrite(file, "", ...options);
+        // Model a reader scheduled between open(O_TRUNC) and the writer's bytes.
+        const wait = spawnSync("python3", ["-c", "import time; time.sleep(0.15)"]);
+        assert.equal(wait.status, 0);
+        staged = true;
+        const snapshot = checked(["capture-pane", "-p", "-t", target]);
+        assert.doesNotMatch(snapshot, /ValueError: not enough values to unpack/, "publishing a mode update must keep the independent input witness alive");
+      }
+      return originalWrite(file, data, ...options);
+    };
+    try {
+      // Initial setup consumes sequence 1; first establish a distinct observed mode.
+      await mode(target, terminal, "on");
+      await mode(target, terminal, "off");
+    } finally {
+      fs.writeFileSync = originalWrite;
+    }
+    assert.equal(staged, true, "the partial-write interleaving must actually be exercised");
     await refused();
   });
 });

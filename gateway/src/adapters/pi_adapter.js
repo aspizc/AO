@@ -12,6 +12,7 @@ import { append as auditAppend } from "../core/audit.js";
 import {
   evaluate,
   resolveAgentExecutionProfile,
+  resolveCliWriteAccess,
 } from "../core/policy_engine.js";
 import { consumeEffectiveAgentSelection } from "../core/orchestrator_profile.js";
 import {
@@ -36,19 +37,21 @@ function piBin(config) {
  * `--thinking <off|minimal|low|medium|high|xhigh>`; `--print` makes the run
  * non-interactive and `--mode json` gives a parseable event stream.
  */
-function buildPiArgs({ model = null, reasoningEffort = null, prompt = null } = {}) {
+function buildPiArgs({ model = null, reasoningEffort = null, writeAccess, prompt = null } = {}) {
   const args = [];
   if (model) args.push("--model", model);
   if (reasoningEffort) args.push("--thinking", reasoningEffort);
   args.push("--print", "--mode", "json");
+  if (!writeAccess) args.push("--tools", "read,grep,find,ls");
   if (prompt !== null) args.push(prompt);
   return args;
 }
 
-function buildPiLaunch(config, { model = null, reasoningEffort = null } = {}) {
+function buildPiLaunch(config, { model = null, reasoningEffort = null, writeAccess } = {}) {
   const launch = [piBin(config)];
   if (model) launch.push("--model", model);
   if (reasoningEffort) launch.push("--thinking", reasoningEffort);
+  if (!writeAccess) launch.push("--tools", "read,grep,find,ls");
   return launch;
 }
 
@@ -87,13 +90,14 @@ function assertSuppliedSelection({
   });
 }
 
-function auditSessionStarted({ traceId, agentId, role, mode, tmuxTarget = null }) {
+function auditSessionStarted({ traceId, agentId, role, mode, writeAccess, tmuxTarget = null }) {
   auditAppend({
     type: "SESSION_STARTED",
     traceId,
     agent: agentId || AGENT_ID,
     role,
     mode,
+    writeAccess,
     tmuxTarget,
   });
 }
@@ -214,13 +218,14 @@ export class PiAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
       } = effectiveModel(decision, "delegate", this.id);
       assertModelCredentials(effectiveModelValue);
       const safeCwd = assertSafeCwd(cwd, this.config.repoRoots);
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "headless" });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "headless" });
 
       if (isDryRun(this.config)) {
         const result = {
@@ -234,6 +239,7 @@ export class PiAdapter extends BaseAdapter {
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
           effectiveSelection: decision.effectiveSelection,
+          writeAccess,
         };
         auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
         return result;
@@ -244,6 +250,7 @@ export class PiAdapter extends BaseAdapter {
         buildPiArgs({
           model: effectiveModelValue,
           reasoningEffort: effectiveReasoningEffort,
+          writeAccess,
           prompt,
         }),
         {
@@ -261,6 +268,7 @@ export class PiAdapter extends BaseAdapter {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
       auditSessionClosed({ traceId, agentId: this.id, role, mode: "headless", exitCode: result.exitCode });
       return result;
@@ -327,6 +335,7 @@ export class PiAdapter extends BaseAdapter {
             serviceTier,
             effectiveSelection,
           });
+      const writeAccess = resolveCliWriteAccess({ agent: this.id, role, repo }, this.registries);
       const {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
@@ -343,6 +352,7 @@ export class PiAdapter extends BaseAdapter {
       const launchCommand = buildPiLaunch(this.config, {
         model: effectiveModelValue,
         reasoningEffort: effectiveReasoningEffort,
+        writeAccess,
       }).join(" ");
 
       if (!dryRun) {
@@ -351,7 +361,7 @@ export class PiAdapter extends BaseAdapter {
         await this.submitLaunchCommand({ tmuxTarget, line: launchCommand });
       }
 
-      auditSessionStarted({ traceId, agentId: this.id, role, mode: "supervised", tmuxTarget });
+      auditSessionStarted({ traceId, agentId: this.id, role, writeAccess, mode: "supervised", tmuxTarget });
       return {
         sessionId: tmuxTarget,
         tmuxTarget,
@@ -359,6 +369,7 @@ export class PiAdapter extends BaseAdapter {
         launchCommand,
         dryRun,
         effectiveSelection: decision.effectiveSelection,
+        writeAccess,
       };
     } catch (err) {
       if (

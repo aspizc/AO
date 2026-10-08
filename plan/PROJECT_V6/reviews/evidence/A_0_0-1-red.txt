@@ -1,0 +1,523 @@
+TAP version 13
+# Subtest: codex delegate validates target writeAccess in bound and unbound calls
+not ok 1 - codex delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 22.470408
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: codex spawn validates target writeAccess in bound and unbound calls
+not ok 2 - codex spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 11.069577
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: claude-code delegate validates target writeAccess in bound and unbound calls
+not ok 3 - claude-code delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 9.191518
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: claude-code spawn validates target writeAccess in bound and unbound calls
+not ok 4 - claude-code spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 8.703675
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pi delegate validates target writeAccess in bound and unbound calls
+not ok 5 - pi delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 10.643694
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pi spawn validates target writeAccess in bound and unbound calls
+not ok 6 - pi spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 8.545821
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: opencode delegate validates target writeAccess in bound and unbound calls
+not ok 7 - opencode delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 9.59168
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: opencode spawn validates target writeAccess in bound and unbound calls
+not ok 8 - opencode spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 9.737308
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: antigravity delegate validates target writeAccess in bound and unbound calls
+not ok 9 - antigravity delegate validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 11.066198
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: antigravity spawn validates target writeAccess in bound and unbound calls
+not ok 10 - antigravity spawn validates target writeAccess in bound and unbound calls
+  ---
+  duration_ms: 9.559514
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:25:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/agent_service_write_access.test.js:64:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: base reviewer/planner/editor cannot write: independent seats must be confined
+not ok 11 - base reviewer/planner/editor cannot write: independent seats must be confined
+  ---
+  duration_ms: 1.428301
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:35:1'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:37:25)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: derivation ignores role names: synthetic reviewer can write and coder can be denied
+not ok 12 - derivation ignores role names: synthetic reviewer can write and coder can be denied
+  ---
+  duration_ms: 0.22211
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:41:1'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:42:23)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: require_approval and unknown repository do not grant unattended write access
+not ok 13 - require_approval and unknown repository do not grant unattended write access
+  ---
+  duration_ms: 0.094538
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:46:1'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:47:23)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: codex delegate and spawn follow policy, preserving writable reviewer semantics (false)
+not ok 14 - codex delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 96.98356
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: codex delegate and spawn follow policy, preserving writable reviewer semantics (true)
+not ok 15 - codex delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 77.460022
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: claude-code delegate and spawn follow policy, preserving writable reviewer semantics (false)
+not ok 16 - claude-code delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 70.788101
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: claude-code delegate and spawn follow policy, preserving writable reviewer semantics (true)
+not ok 17 - claude-code delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 66.153588
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pi delegate and spawn follow policy, preserving writable reviewer semantics (false)
+not ok 18 - pi delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 70.038362
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pi delegate and spawn follow policy, preserving writable reviewer semantics (true)
+not ok 19 - pi delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 73.568586
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: opencode delegate and spawn follow policy, preserving writable reviewer semantics (false)
+not ok 20 - opencode delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 76.37969
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: opencode delegate and spawn follow policy, preserving writable reviewer semantics (true)
+not ok 21 - opencode delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 71.841603
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: antigravity delegate and spawn follow policy, preserving writable reviewer semantics (false)
+not ok 22 - antigravity delegate and spawn follow policy, preserving writable reviewer semantics (false)
+  ---
+  duration_ms: 73.377549
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:63:56)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: antigravity delegate and spawn follow policy, preserving writable reviewer semantics (true)
+not ok 23 - antigravity delegate and spawn follow policy, preserving writable reviewer semantics (true)
+  ---
+  duration_ms: 69.658314
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:53:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/cli_write_access.test.js:69:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Codex read-only ceiling holds even when policy allows writing
+ok 24 - Codex read-only ceiling holds even when policy allows writing
+  ---
+  duration_ms: 4.06587
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 1
+# fail 23
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 942.886411
