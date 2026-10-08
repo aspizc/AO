@@ -1,0 +1,13 @@
+{
+  "sourceKind": "Private disposable observation reduced to non-identifying timings and identity equality; no raw pane, prompt token, session, PID or home path retained.",
+  "providerVersion": "2.1.294",
+  "initialObservationDelayMs": 1756,
+  "laterObservationDelayMs": 7013,
+  "sameServerPaneIdentityAcrossThreeCaptures": true,
+  "initialOutcome": "acceptance_uncertain",
+  "laterReplyCompleted": true,
+  "fixture": "tests/gateway/fixtures/claude_2_1_294_first_prompt.json",
+  "scratchSetupFailure": "Initial RED scratch copy tried to copy a nonexistent root package.json; no tests ran. Corrected runner copies gateway/package.json only. Excluded from RED claim.",
+  "nodeVersion": "v22.22.1",
+  "tmuxSha256": "6487f795314828f9952cc5ee6fc83c6028beb54bdee28d42dc7c1329246ec386"
+}

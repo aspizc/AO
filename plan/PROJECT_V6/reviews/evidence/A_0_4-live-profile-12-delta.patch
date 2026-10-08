@@ -1,0 +1,188 @@
+--- trial11/gateway/src/adapters/base_adapter.js
++++ trial12/gateway/src/adapters/base_adapter.js
+@@ -326,6 +326,36 @@
+     && prior.every((lines) => rows.slice(0, index).every((row, offset) => row === lines[offset]));
+ }
+ 
++function freshClaude294Response(spawn, ready, pending, guard, after, prompt, working = false) {
++  // Measured first-ask layout only. The launch header is preserved, not history.
++  const identity = ["serverPid", "target", "panePid", "width", "height"];
++  if (!spawn || [ready, pending, guard, after].some((frame) => identity.some((key) => frame[key] !== spawn[key]))
++    || after.mode !== "0" || after.inputOff !== "0" || after.synchronized !== "0"
++    || after.width !== "120" || after.height !== "40" || after.cursorY !== "36" || after.cursorX !== "2"
++    || /[^\x20-\x7e]/.test(prompt) || prompt.endsWith(" ")) return false;
++  const prior = [ready, pending, guard].map((frame) => frame.snapshot.split("\n"));
++  const rows = after.snapshot.split("\n");
++  const header = prior[0].slice(0, 4);
++  if (header[0] !== "" || header[1] !== " ▐▛███▛█   Claude Code v2.1.294"
++    || header[2] !== "▝▜██████▀  Opus 5.5 with medium effort · Claude Max"
++    || !/^ ▝▝   ▝▝   \/[A-Za-z0-9_./-]+$/.test(header[3])
++    || [...prior, rows].some((lines) => lines.length !== 41 || lines[40] !== ""
++      || header.some((row, index) => lines[index] !== row)
++      || lines[34] !== " ".repeat(100) + "◐ medium · /effort")
++    || prior.some((lines) => lines.slice(4, 34).some((row) => row.trim() !== ""))
++    || rows[35] !== "─".repeat(120) || rows[37] !== rows[35]
++    || !/^❯\u00a0 *$/.test(rows[36]) || rows[38] !== prior[2][38]
++    || rows[39]?.trim() !== "⏵⏵ auto mode on (shift+tab to cycle) · ← for agents"
++    || rows[6] !== `❯ ${prompt}` || rows[7] !== "") return false;
++  if (working) {
++    return rows[8] === "●" && /^✽ Twisting… \(\d+s · ↓ \d+ tokens\)$/.test(rows[33])
++      && rows.slice(4, 34).every((row, index) => [6, 8, 33].includes(index + 4) || row.trim() === "");
++  }
++  return /^● [\x21-\x7e][\x20-\x7e]*$/.test(rows[8])
++    && /^✻ Sautéed for \d+s · done \d{1,2}:\d{2} [AP]M$/.test(rows[10])
++    && rows.slice(4, 34).every((row, index) => [6, 8, 10].includes(index + 4) || row.trim() === "");
++}
++
+ export async function submitPrompt({ target, prompt, provider, config = {}, run = tmuxSync, wait = sleep, firstPromptProcess = null }) {
+   if (invalidText(prompt, true)) throw submissionError("invalid_text");
+   const pane = paneState(run, target);
+@@ -355,10 +385,26 @@
+       guardedSubmit(run, guard, attempt);
+       delivered = true;
+       await wait(boundedDelay(config.tmuxAskDelayMs, 1500, 5000));
+-      const after = observe(run, target, provider, owned, "draft");
+-      if (provider === "claude-code" && attempt === 0
+-        && freshClaudeResponse(firstPromptProcess, ready, pending, guard, after, prompt)) {
+-        return { snapshot: after.snapshot, dryRun: false };
++      let after = observe(run, target, provider, owned, "draft");
++      if (provider === "claude-code" && attempt === 0) {
++        if (freshClaudeResponse(firstPromptProcess, ready, pending, guard, after, prompt)
++          || freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
++          return { snapshot: after.snapshot, dryRun: false };
++        }
++        if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true)) {
++          // Observation only: never re-enter the retry path after this witness.
++          for (let poll = 0; poll < 8; poll++) {
++            await wait(1000);
++            after = observe(run, target, provider, owned, "draft");
++            if (freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt)) {
++              return { snapshot: after.snapshot, dryRun: false };
++            }
++            if (!freshClaude294Response(firstPromptProcess, ready, pending, guard, after, prompt, true)) {
++              throw submissionError("acceptance_uncertain");
++            }
++          }
++          throw submissionError("acceptance_uncertain");
++        }
+       }
+       if (after.state === "busy" && after.text === ""
+         && (provider !== "codex" || freshCodexWork(ready, guard, after, prompt))) {
+--- trial11/tests/gateway/claude_first_prompt.test.js
++++ trial12/tests/gateway/claude_first_prompt.test.js
+@@ -8,6 +8,7 @@
+ import { configureAudit } from "../../gateway/src/core/audit.js";
+ 
+ const [profile] = JSON.parse(fs.readFileSync(new URL("./fixtures/a04_live_profiles_trial9.json", import.meta.url), "utf8"));
++const delayedProfile = JSON.parse(fs.readFileSync(new URL("./fixtures/claude_2_1_294_first_prompt.json", import.meta.url), "utf8"));
+ const clone = (value) => structuredClone(value);
+ const uncertain = (error) => error.code === "AGENT_PROMPT_NOT_SUBMITTED" && error.reason === "acceptance_uncertain";
+ 
+@@ -77,6 +78,107 @@
+   rows[row] = text;
+   observation.snapshot = rows.join("\n");
+ }
++
++function delayedHarness(records = [delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++  ...Array(8).fill(delayedProfile.working), delayedProfile.after]) {
++  const fx = harness(records);
++  const waits = [];
++  const ask = (spawn = delayedProfile.ready.submitState) => submitPrompt({ ...fx.options,
++    prompt: delayedProfile.prompt, firstPromptProcess: spawn, wait: async (ms) => { waits.push(ms); } });
++  return { ...fx, ask, waits };
++}
++
++test("trial12 delayed Claude 2.1.294 first reply is observed without another Enter", async () => {
++  const fx = delayedHarness();
++  assert.equal((await fx.ask()).snapshot, delayedProfile.after.snapshot);
++  assert.deepEqual(fx.waits, [150, 1500, ...Array(8).fill(1000)]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial12 unchanged first-turn spinner exhausts a finite poll without replay", async () => {
++  const fx = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, delayedProfile.working]);
++  await assert.rejects(fx.ask, uncertain);
++  assert.deepEqual(fx.waits, [150, 1500, ...Array(8).fill(1000)]);
++  assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(fx.buffers.size, 0);
++});
++
++test("trial12 immediate 2.1.294 completion needs the first Enter and cannot credit a retry", async () => {
++  const completed = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard, delayedProfile.after]);
++  assert.equal((await completed.ask()).snapshot, delayedProfile.after.snapshot);
++  assert.deepEqual(completed.waits, [150, 1500]);
++  assert.deepEqual(completed.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++  assert.equal(completed.buffers.size, 0);
++  const retry = delayedHarness([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++    delayedProfile.postPaste, delayedProfile.guard, delayedProfile.after]);
++  await assert.rejects(retry.ask, uncertain);
++  assert.deepEqual(retry.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r", "\r"]);
++  assert.equal(retry.buffers.size, 0);
++});
++
++test("trial12 reused Claude and stale prior transcript cannot enter the first-turn poll", async () => {
++  const reused = delayedHarness();
++  await assert.rejects(() => reused.ask(null), uncertain);
++  assert.deepEqual(reused.waits, [150, 1500]);
++  assert.equal(reused.buffers.size, 0);
++  for (const row of [4, 8, 10, 33]) {
++    const records = clone([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++      delayedProfile.working, delayedProfile.after]);
++    for (const frame of records.slice(0, 3)) replaceRow(frame, row, "● prior rendered answer");
++    const fx = delayedHarness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.waits, [150, 1500]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++test("trial12 identity drift or ambiguous intermediate cells cannot be rescued by later completion", async () => {
++  const changes = [
++    (frame) => { frame.submitState.serverPid = "999"; },
++    (frame) => { frame.submitState.panePid = "999"; },
++    (frame) => { frame.pane.mode = "1"; },
++    (frame) => { frame.pane.inputOff = "1"; },
++    (frame) => { frame.pane.synchronized = "1"; },
++    (frame) => replaceRow(frame, 2, "changed header"),
++    (frame) => replaceRow(frame, 9, `❯ ${delayedProfile.prompt}`),
++    (frame) => replaceRow(frame, 8, "● prior answer"),
++    (frame) => replaceRow(frame, 33, "Select model"),
++    (frame) => replaceRow(frame, 34, "unexpected status"),
++    (frame) => replaceRow(frame, 36, "❯\u00a0unexpected draft"),
++  ];
++  for (const change of changes) {
++    const records = [delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++      delayedProfile.working, delayedProfile.working, delayedProfile.after].map(clone);
++    change(records[4]);
++    const fx = delayedHarness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.waits, [150, 1500, 1000]);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
++
++test("trial12 completed layout requires unique exact cells and matching first-ask provenance", async () => {
++  const changes = [
++    (frame) => replaceRow(frame, 6, "❯ different prompt"),
++    (frame) => replaceRow(frame, 8, "●"),
++    (frame) => replaceRow(frame, 9, "● duplicate answer"),
++    (frame) => replaceRow(frame, 10, "✻ unknown completion"),
++    (frame) => replaceRow(frame, 2, "changed header"),
++    (frame) => { frame.submitState.panePid = "999"; },
++  ];
++  for (const change of changes) {
++    const records = clone([delayedProfile.ready, delayedProfile.postPaste, delayedProfile.guard,
++      delayedProfile.working, delayedProfile.after]);
++    change(records[4]);
++    const fx = delayedHarness(records);
++    await assert.rejects(fx.ask, uncertain);
++    assert.deepEqual(fx.inputs, [`\x1b[200~${delayedProfile.prompt}\x1b[201~`, "\r"]);
++    assert.equal(fx.buffers.size, 0);
++  }
++});
+ 
+ test("trial10 prior rendered conversation, hidden-history reuse and marker spoof cannot prove a first turn", async () => {
+   for (const prior of ["❯ Summarize this.", "● older answer", "old transcript", "✻ Cogitated for 1s"]) {

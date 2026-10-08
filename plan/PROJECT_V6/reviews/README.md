@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/04 Claude 2.1.294 bounded first-ask observation | 12 | [request](A_0_4-live-profile-12_to_review.md) | [KO, safety boundary sound (identity, blank history, no second Enter, bounded poll, cleanup) and 4 RED / 222/222 focused host reproduced; witness pins per-turn random 2.1.294 wording (completion verb 1 of 8, spinner verb 1 of 188, animated glyph), tests pin one sample; root full gate, live acceptance and integration outstanding](A_0_4-live-profile-12_reviewed_KO.md) |
 | A/0/04 Claude first-prompt guard coverage | 11 | [request](A_0_4-live-profile-11_to_review.md) | [OK, three tests-only guard tests each fail on their isolated mutation (reproduced); source unchanged since trial 10; 216/216 focused host reproduced; root full gate, live acceptance and integration outstanding](A_0_4-live-profile-11_reviewed_OK.md) |
 | A/0/04 Claude first-prompt completed acceptance | 10 | [request](A_0_4-live-profile-10_to_review.md); [operator decision](A_0_4-live-profile-10_operator-decision-memo.md) | [KO, source witness sound; stale-turn, attempt-0 and kill-cleanup guards untested (mutations survive); 213/213 focused host reproduced; root full gate and new live acceptance outstanding](A_0_4-live-profile-10_reviewed_KO.md) |
 | A/0/04 lint correction | 1 | [request](A_0_4-lint-1_to_review.md) | [OK, four regex-space substitutions; lint + affected suites; full gate not run](A_0_4-lint-1_reviewed_OK.md) |
@@ -51,6 +52,10 @@ Codex authoring and a distinct Codex reviewer under the already-authorized
 session-agent fallback; it is not cross-vendor or Gateway-spawned review.
 
 ## Current build checkpoint
+
+Trial 12 refines the observed Claude 2.1.294 first-ask delay. See the
+[immutable handoff](A_0_4-live-profile-12_to_review.md). Implemented; independent
+Opus 5.5 medium review pending. No trial12 verdict or integration is claimed.
 
 A/0/04 implementation trial 1 is independently KO; no candidate code is integrated.
 The operator re-enabled Claude and selected Opus 5.5 medium for new reviews,
