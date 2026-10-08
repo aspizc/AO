@@ -1,0 +1,2 @@
+Pinned runtime: tmux 3.6a-agents.1
+new-session (new) [-AdDEPX] [-c start-directory] [-e environment] [-F format] [-f flags] [-n window-name] [-s session-name] [-t target-session] [-x width] [-y height] [shell-command [argument ...]]
