@@ -1,0 +1,27 @@
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: gateway/node_modules/.bin/eslint --config gateway/eslint.config.js gateway/src/adapters/codex_adapter.js gateway/src/adapters/claude_adapter.js gateway/src/adapters/antigravity_adapter.js gateway/src/adapters/pi_adapter.js gateway/src/adapters/opencode_adapter.js gateway/src/core/policy_engine.js gateway/src/services/agent_service.js
+Exit code: 0
+
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: node /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/plan/PROJECT_V6/reviews/evidence/A_0_0-2-lint-runner.mjs
+ESLint API: existing gateway/eslint.config.js, overrideConfigFile=true, file globs rebased to tests/gateway/**/*.js
+tests/gateway/cli_write_access.test.js: 64 rules; no-unused-vars=[2,{"vars":"all","args":"after-used","ignoreRestSiblings":false,"caughtErrors":"all","ignoreClassWithStaticInitBlock":false,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"argsIgnorePattern":"^_","caughtErrorsIgnorePattern":"^_","varsIgnorePattern":"^_"}]; no-useless-assignment=[2]
+tests/gateway/agent_service_write_access.test.js: 64 rules; no-unused-vars=[2,{"vars":"all","args":"after-used","ignoreRestSiblings":false,"caughtErrors":"all","ignoreClassWithStaticInitBlock":false,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"argsIgnorePattern":"^_","caughtErrorsIgnorePattern":"^_","varsIgnorePattern":"^_"}]; no-useless-assignment=[2]
+
+Linted files: 2; errors: 0; warnings: 0
+Exit code: 0
+
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: node /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/plan/PROJECT_V6/reviews/evidence/A_0_0-2-lint-runner.mjs tests/gateway/orchestrator_profile_authority.test.js
+ESLint API: existing gateway/eslint.config.js, overrideConfigFile=true, file globs rebased to tests/gateway/**/*.js
+tests/gateway/orchestrator_profile_authority.test.js: 64 rules; no-unused-vars=[2,{"vars":"all","args":"after-used","ignoreRestSiblings":false,"caughtErrors":"all","ignoreClassWithStaticInitBlock":false,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"argsIgnorePattern":"^_","caughtErrorsIgnorePattern":"^_","varsIgnorePattern":"^_"}]; no-useless-assignment=[2]
+
+/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/orchestrator_profile_authority.test.js
+  712:15  error  The value assigned to 'validValue' is not used in subsequent statements  no-useless-assignment
+
+✖ 1 problem (1 error, 0 warnings)
+
+Linted files: 1; errors: 1; warnings: 0
+Exit code: 1
+
+The authority-suite no-useless-assignment initializer predates trial1 and is unchanged. Repository Gateway config does not automatically cover root tests/gateway; API run above rebases the existing full rule set and confirms 64 effective rules per test file.

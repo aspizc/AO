@@ -1,0 +1,43 @@
+{
+  "entryHead": "ecf3ab37e6c1e952d568e3c99f62682fafef60f9",
+  "originalImplementationBase": "e42818c2b9d72eebc88d858965fafa45c0fa1417",
+  "trial1HashChanges": [
+    "tests/gateway/cli_write_access.test.js"
+  ],
+  "committedTrial1FilesUnchanged": [
+    "plan/PROJECT_V6/reviews/A_0_0-1_reviewed_KO.md",
+    "plan/PROJECT_V6/reviews/A_0_0-1_to_review.md",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-anchor-reverification.json",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-antigravity-probe.txt",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-files.json",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-green.txt",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-lint.txt",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-policy.txt",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-red.txt"
+  ],
+  "productionDocsAndOtherTestsMatchTrial1": true,
+  "policiesAndGeminiMatchBase": true,
+  "entryHashes": {
+    "docs/adapters/antigravity.md": "63d5a16a3add284c2940c1f1dc5a159c515964de17db91ab472a432da57e4fea",
+    "docs/adapters/claude-code.md": "fe06aa37c75c36b7e3645f8dfb8be467a091d413d4ed49635e5db43d7d1f86f4",
+    "docs/adapters/codex.md": "daead69582e154ade994ffadefb1b08032c30df006073bb5ea7d9e54f7bbe54b",
+    "docs/adapters/opencode.md": "1efa060b362a7b0de6b7a86787109d74ee1c88c84a95ae39644def49c2c73c58",
+    "docs/adapters/pi.md": "409f0a9727eeae756b2252414ce3e08b6ee586001426e0046abace554830c907",
+    "gateway/src/adapters/antigravity_adapter.js": "a67cad21283970bf05dca570c42867b2b948dd9ef0e0f2930e06a192a3c6c5ae",
+    "gateway/src/adapters/claude_adapter.js": "280532efa5405a8151ee6d2bcde4436fdaa686159a2383cb4021fb2ce044c4fb",
+    "gateway/src/adapters/codex_adapter.js": "aa8cafe37ac1e334bd10875bba80b935da7c7392cb4d16fe2e193af4a492cab9",
+    "gateway/src/adapters/opencode_adapter.js": "e60e59e49ccaa5aaa24e0f9e0ca6d328fb862bdc8a753d0c9faf2b102dc06192",
+    "gateway/src/adapters/pi_adapter.js": "0f952a289358ce3bcefc42207cf2830af4616c3077b33ccbc2ad45c3c7dd277a",
+    "gateway/src/core/policy_engine.js": "4ee4968907c9283e30e133aa88daa5a5bf331dfc704379df41fb7a6d56fa4639",
+    "gateway/src/services/agent_service.js": "15aff4fc8b2cc772212ab3e457c41c984f2b05ec9687e8e390ee584140e12833",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-anchor-reverification.json": "14383a2fe3373dc9ae7d5335af555aebf07a222fecab426bda724767a1557dd5",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-antigravity-probe.txt": "4ddd50311c66865383fe102985c570702b032c6859b9d8c4cf08bc4b22b14fd1",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-green.txt": "a0e2113e5e51b873a5053140c20100c4cdff01c84a5225b4f39e1af5b6f53a08",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-lint.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-policy.txt": "90fbf58a92cca893ce47861539e5778b52f06f63468db89b813ba214207e2c86",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-1-red.txt": "bb560c398b2c847a49ab8a9b14e10da7322ea665ff72fb7a032a5f4a7e820bfa",
+    "tests/gateway/agent_service_write_access.test.js": "2fe1d4cf7be4a0911783b649dcb46dce19937a624efe214369e3e4d6fb3edcc5",
+    "tests/gateway/cli_write_access.test.js": "f739f8a77fe8a7f396e37fe7f23b76a644c5c4fbc4d976bb3982e6c2988addcf",
+    "tests/gateway/orchestrator_profile_authority.test.js": "d39ea95f75659053c5e1669ce590b8964509964c27023601c4b3a1901ab9713e"
+  }
+}

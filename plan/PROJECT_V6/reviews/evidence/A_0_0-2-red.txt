@@ -1,0 +1,489 @@
+Base: e42818c2b9d72eebc88d858965fafa45c0fa1417
+Scratch: /tmp/ao-a00-trial2-red-_ros0260
+Command: /usr/bin/node --test --test-name-pattern=profile policy tests/gateway/cli_write_access.test.js
+PATH=/usr/bin:/bin
+TAP version 13
+# Subtest: profile policy base codex reviewer confines independent seats and preserves writers
+not ok 1 - profile policy base codex reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 4.641318
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: profile policy base codex editor confines independent seats and preserves writers
+not ok 2 - profile policy base codex editor confines independent seats and preserves writers
+  ---
+  duration_ms: 0.810256
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: profile policy base codex planner confines independent seats and preserves writers
+not ok 3 - profile policy base codex planner confines independent seats and preserves writers
+  ---
+  duration_ms: 0.621462
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base codex coder confines independent seats and preserves writers
+not ok 4 - profile policy base codex coder confines independent seats and preserves writers
+  ---
+  duration_ms: 1.552674
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base claude-code reviewer confines independent seats and preserves writers
+not ok 5 - profile policy base claude-code reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 1.007498
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base claude-code editor confines independent seats and preserves writers
+not ok 6 - profile policy base claude-code editor confines independent seats and preserves writers
+  ---
+  duration_ms: 0.6066
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base claude-code planner confines independent seats and preserves writers
+not ok 7 - profile policy base claude-code planner confines independent seats and preserves writers
+  ---
+  duration_ms: 0.548951
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base claude-code coder confines independent seats and preserves writers
+not ok 8 - profile policy base claude-code coder confines independent seats and preserves writers
+  ---
+  duration_ms: 0.450342
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base pi reviewer confines independent seats and preserves writers
+not ok 9 - profile policy base pi reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.952996
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base pi editor confines independent seats and preserves writers
+not ok 10 - profile policy base pi editor confines independent seats and preserves writers
+  ---
+  duration_ms: 0.558289
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base pi planner confines independent seats and preserves writers
+not ok 11 - profile policy base pi planner confines independent seats and preserves writers
+  ---
+  duration_ms: 0.41394
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base pi coder confines independent seats and preserves writers
+not ok 12 - profile policy base pi coder confines independent seats and preserves writers
+  ---
+  duration_ms: 0.367907
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base opencode reviewer confines independent seats and preserves writers
+not ok 13 - profile policy base opencode reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.496746
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base opencode editor confines independent seats and preserves writers
+not ok 14 - profile policy base opencode editor confines independent seats and preserves writers
+  ---
+  duration_ms: 0.488403
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base opencode planner confines independent seats and preserves writers
+not ok 15 - profile policy base opencode planner confines independent seats and preserves writers
+  ---
+  duration_ms: 0.397689
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base opencode coder confines independent seats and preserves writers
+not ok 16 - profile policy base opencode coder confines independent seats and preserves writers
+  ---
+  duration_ms: 0.368265
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base antigravity reviewer confines independent seats and preserves writers
+not ok 17 - profile policy base antigravity reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.43641
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base antigravity editor confines independent seats and preserves writers
+not ok 18 - profile policy base antigravity editor confines independent seats and preserves writers
+  ---
+  duration_ms: 0.352269
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base antigravity planner confines independent seats and preserves writers
+not ok 19 - profile policy base antigravity planner confines independent seats and preserves writers
+  ---
+  duration_ms: 0.332286
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy base antigravity coder confines independent seats and preserves writers
+not ok 20 - profile policy base antigravity coder confines independent seats and preserves writers
+  ---
+  duration_ms: 0.360899
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy kya codex reviewer confines independent seats and preserves writers
+not ok 21 - profile policy kya codex reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.35058
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy kya claude-code reviewer confines independent seats and preserves writers
+not ok 22 - profile policy kya claude-code reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.347719
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy kya pi reviewer confines independent seats and preserves writers
+not ok 23 - profile policy kya pi reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.388336
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy kya opencode reviewer confines independent seats and preserves writers
+not ok 24 - profile policy kya opencode reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.359409
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: profile policy kya antigravity reviewer confines independent seats and preserves writers
+not ok 25 - profile policy kya antigravity reviewer confines independent seats and preserves writers
+  ---
+  duration_ms: 0.415839
+  type: 'test'
+  location: '/tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:140:7'
+  failureType: 'testCodeFailure'
+  error: 'policy.resolveCliWriteAccess is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/ao-a00-trial2-red-_ros0260/tests/gateway/cli_write_access.test.js:151:29)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 0
+# fail 25
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 191.74478
+
+Exit code: 1
