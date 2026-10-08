@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { performance } from "node:perf_hooks";
 import path from "node:path";
 
 import {
@@ -12,6 +13,14 @@ export const DEFAULT_REQUEST_CONTEXT_TTL_MS = 86_400_000;
 
 const RUNTIME = new WeakMap();
 const EFFECTIVE_BINDINGS = new WeakSet();
+const DENIAL_REASONS = new Set([
+  "invalid", "execution_binding_mismatch", "revoked", "not_yet_valid", "expired",
+  "audience_mismatch", "connection_mismatch", "action_catalog_version_mismatch",
+  "action_unknown", "capability_denied", "capability_assertion_denied", "agent_mismatch",
+  "role_mismatch", "principal_mismatch", "cwd_denied", "repository_denied", "trace_denied",
+  "task_denied", "session_denied", "artifact_denied", "approval_denied", "task_target_denied",
+  "task_repository_denied", "recovery_denied", "trace_reattachable",
+].map((reason) => `context.${reason}`));
 const PROTECTED_TOOL_PREFIXES = Object.freeze([
   "orchestration.",
   "task.",
@@ -27,6 +36,7 @@ const DEFAULT_ORCHESTRATOR_CAPABILITIES = Object.freeze([
   "orchestration.resume",
   "orchestration.cancel",
   "orchestration.complete",
+  "orchestration.reattach",
   "task.assign",
   "agent.delegate",
   "agent.spawn",
@@ -191,6 +201,7 @@ export function createRequestContext({
   actionCatalogVersion = ACTION_CATALOG_VERSION,
   repositoryBindings = {},
   lineage = {},
+  recovery = null,
   issuedAt = new Date().toISOString(),
   expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 } = {}) {
@@ -229,13 +240,20 @@ export function createRequestContext({
     expiresAt: expires.text,
     repositoryIds: Object.freeze([...bindings.keys()]),
   });
-  RUNTIME.set(context, {
+  const runtime = {
     capabilities: capabilitySet,
     repositories: bindings,
     issuedAt: issued.value,
     expiresAt: expires.value,
     revokedAt: null,
+    recovery,
+    recovered: new Set(),
     ...seedLineage(lineage),
+  };
+  RUNTIME.set(context, runtime);
+  runtime.unsubscribeTerminal = recovery?.subscribeTerminal?.((state) => {
+    if (state.entityType === "orchestration") forgetTrace(runtime, state.traceId);
+    else runtime.sessions.delete(state.entityId);
   });
   return context;
 }
@@ -249,6 +267,8 @@ function runtimeFor(context) {
 export function revokeRequestContext(context, { now = new Date().toISOString() } = {}) {
   const runtime = runtimeFor(context);
   if (runtime.revokedAt === null) runtime.revokedAt = nowTimestamp(now);
+  try { runtime.recovery?.release?.(); }
+  finally { runtime.unsubscribeTerminal?.(); }
   return context;
 }
 
@@ -445,6 +465,9 @@ function bindOrchestration(context, runtime, action, args) {
   if (action === "orchestration.create") {
     assertActor(context, args.callerAgent, args.callerRole);
     return { traceId: null, taskId: null, target: null, repository: null };
+  }
+  if (action === "orchestration.reattach" || (action === "orchestration.view" && args.traceId === undefined)) {
+    return { traceId: args.traceId ?? null, taskId: null, target: null, repository: null };
   }
   ownedTrace(runtime, args.traceId);
   return {
@@ -708,12 +731,17 @@ function bindAction(context, runtime, action, args) {
 
 export function bindRequestContext(context, binding = {}) {
   const runtime = runtimeFor(context);
+  runtime.recovery?.prepare?.();
   assertContextState(context, runtime, binding);
   const args =
     binding.args && typeof binding.args === "object" && !Array.isArray(binding.args)
       ? binding.args
       : {};
   const scoped = bindAction(context, runtime, binding.action, args);
+  if (runtime.recovered.has(scoped.traceId)) {
+    runtime.recovery.check(context, runtime.repositories, scoped.traceId,
+      args.sessionId, binding.now ?? new Date().toISOString());
+  }
   const effective = Object.freeze({
     actor: context.actor,
     target: scoped.target,
@@ -723,7 +751,67 @@ export function bindRequestContext(context, binding = {}) {
     taskId: scoped.taskId,
   });
   EFFECTIVE_BINDINGS.add(effective);
+  // Keep recovery context private; callers cannot select an owner or repository.
+  EFFECTIVE_RUNTIME.set(effective, { context, runtime, now: binding.now, sessionId: args.sessionId,
+    binding: { ...binding, args: { ...args } }, checkedAt: performance.now() });
   return effective;
+}
+
+const EFFECTIVE_RUNTIME = new WeakMap();
+
+export function revalidateRequestContextBinding(effective) {
+  if (effective === null || effective === undefined) return;
+  const bound = EFFECTIVE_RUNTIME.get(effective);
+  if (!bound) deny("context.invalid");
+  const now = new Date(nowTimestamp(bound.now) + Math.max(0, performance.now() - bound.checkedAt)).toISOString();
+  bindRequestContext(bound.context, { ...bound.binding, now });
+}
+
+export function discoverRequestContextTraces(effective) {
+  const bound = EFFECTIVE_RUNTIME.get(effective);
+  if (!bound) deny("context.invalid");
+  return bound.runtime.recovery?.discover(bound.context, bound.runtime.repositories,
+    bound.now ?? new Date().toISOString()) ?? { reattachableTraces: [], truncated: false };
+}
+
+export function reattachRequestContextTrace(effective) {
+  const bound = EFFECTIVE_RUNTIME.get(effective);
+  if (!bound?.runtime.recovery) deny("context.recovery_denied");
+  const { context, runtime } = bound;
+  const staged = runtime.recovery.reattach(context, runtime.repositories, effective.traceId,
+    bound.now ?? new Date().toISOString());
+  // The synchronous immediate transaction has committed before these maps change.
+  forgetTrace(runtime, effective.traceId);
+  runtime.traces.set(effective.traceId, Object.freeze({ traceId: effective.traceId, repositoryId: null }));
+  for (const task of staged.tasks) runtime.tasks.set(task.taskId, Object.freeze({ ...task, traceId: effective.traceId }));
+  for (const session of staged.sessions) {
+    const task = runtime.tasks.get(session.taskId);
+    runtime.sessions.set(session.sessionId, Object.freeze({ ...session, traceId: effective.traceId, repositoryId: task.repositoryId }));
+  }
+  runtime.recovered.add(effective.traceId);
+  return staged.result;
+}
+
+export function requestContextDenialMetadata(context, { tool, reasonCode, args, now } = {}) {
+  const metadata = { tool: isCanonicalAction(tool) ? tool : "unknown",
+    reasonCode: DENIAL_REASONS.has(reasonCode) ? reasonCode : "context.invalid" };
+  const runtime = RUNTIME.get(context);
+  if (!runtime || !["context.trace_denied", "context.session_denied"].includes(reasonCode)) return metadata;
+  try {
+    assertContextState(context, runtime, { action: tool, actionCatalogVersion: context.actionCatalogVersion,
+      audience: context.audience, connectionId: context.connectionId, now });
+    if (runtime.recovery?.denialHint(context, runtime.repositories, args, now)) {
+      metadata.reasonCode = "context.trace_reattachable";
+    }
+  } catch { /* Operator hints never alter denial or grant lineage. */ }
+  return metadata;
+}
+
+function forgetTrace(runtime, traceId) {
+  runtime.traces.delete(traceId); runtime.recovered.delete(traceId);
+  for (const kind of ["tasks", "sessions", "artifacts", "approvals"]) {
+    for (const [id, entry] of runtime[kind]) if (entry.traceId === traceId) runtime[kind].delete(id);
+  }
 }
 
 export function applyEffectiveRequestContext(args, effective) {
@@ -806,8 +894,16 @@ export function recordRequestContextResult(context, effective, value) {
     return;
   }
   const runtime = runtimeFor(context);
+  const bound = EFFECTIVE_RUNTIME.get(effective);
+  runtime.recovery?.record(context, { ...effective, sessionId: bound?.sessionId }, value);
   const repositoryId = effective.repository?.id ?? null;
   switch (effective.action) {
+    case "orchestration.complete": case "orchestration.cancel":
+      forgetTrace(runtime, effective.traceId);
+      break;
+    case "agent.kill":
+      runtime.sessions.delete(bound?.sessionId);
+      break;
     case "orchestration.create":
       if (typeof value.traceId === "string") {
         runtime.traces.set(value.traceId, Object.freeze({
@@ -922,6 +1018,7 @@ export function createGatewayRequestContext({
   actionCatalogVersion = ACTION_CATALOG_VERSION,
   connectionId,
   now = new Date().toISOString(),
+  recovery = null,
 } = {}) {
   const issued = timestamp(now, "now");
   const ttlMs =
@@ -930,7 +1027,7 @@ export function createGatewayRequestContext({
       ? config.requestContextTtlMs
       : DEFAULT_REQUEST_CONTEXT_TTL_MS;
   return createRequestContext({
-    principalId: config.requestPrincipalId || "local-stdio-operator",
+    principalId: recovery?.identity.principalId || config.requestPrincipalId || "local-stdio-operator",
     agent: config.requestPrincipalAgent || "claude-code",
     role: config.requestPrincipalRole || "orchestrator",
     audience: config.gatewayAudience || "agents-gateway",
@@ -938,6 +1035,7 @@ export function createGatewayRequestContext({
     capabilities,
     actionCatalogVersion,
     repositoryBindings: configuredRepositoryBindings(config, registries),
+    recovery,
     issuedAt: issued.text,
     expiresAt: new Date(issued.value + ttlMs).toISOString(),
   });

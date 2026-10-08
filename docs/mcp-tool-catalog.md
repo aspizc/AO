@@ -3,12 +3,12 @@
 This file is generated from `gateway/src/tools/catalog.js`. Edit the catalog,
 then update the versioned projection and this document in the same reviewed change.
 
-The v1 contract contains exactly 33 tools in protocol order.
+The v1 contract contains exactly 34 tools in protocol order.
 
 | # | Tool | Description | Runtime dependency | Audit route |
 |---:|---|---|---|---|
 | 1 | `orchestration.create` | Create a new orchestration session. | gateway-local | legacy |
-| 2 | `orchestration.view` | View an orchestration session by trace ID. | gateway-local | legacy |
+| 2 | `orchestration.view` | View an owned orchestration or discover eligible local restart traces. | gateway-local | legacy |
 | 3 | `orchestration.pause` | Pause an orchestration session. | gateway-local | legacy |
 | 4 | `orchestration.resume` | Resume an orchestration session. | gateway-local | legacy |
 | 5 | `orchestration.cancel` | Cancel an orchestration session. | gateway-local | legacy |
@@ -40,6 +40,7 @@ The v1 contract contains exactly 33 tools in protocol order.
 | 31 | `coordination.send` | Send an addressed message to an active coordination participant. | coordination-redis | local-only |
 | 32 | `coordination.receive` | Receive or reclaim addressed coordination deliveries. | coordination-redis | local-only |
 | 33 | `coordination.ack` | Acknowledge addressed coordination deliveries. | coordination-redis | local-only |
+| 34 | `orchestration.reattach` | Explicitly reattach a persisted Linux local stdio SQLite trace. | gateway-local | legacy |
 
 ## Machine-verifiable examples
 
@@ -243,4 +244,10 @@ are deliberately kept in the typed catalog so prose cannot become authoritative.
 
 ```json mcp-tool-call
 {"tool":"coordination.ack","arguments":{"participantId":"pt-contract-example","leaseToken":"lease-token-with-at-least-32-characters","deliveryIds":["1-0"]}}
+```
+
+### `orchestration.reattach`
+
+```json mcp-tool-call
+{"tool":"orchestration.reattach","arguments":{"traceId":"tr-contract-example"}}
 ```

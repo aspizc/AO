@@ -111,6 +111,7 @@ test("tool guidance is a total exact projection with mutation safety metadata", 
     "orchestration.resume",
     "orchestration.cancel",
     "orchestration.complete",
+    "orchestration.reattach",
     "task.assign",
     "agent.delegate",
     "agent.spawn",
@@ -218,4 +219,16 @@ test("canonical profile contains no owner-personal defaults or hidden KYA path",
   ]) {
     assert.equal(serialized.includes(forbidden), false, forbidden);
   }
+});
+
+test("reattach guidance protects the ownership mutation and missing capability still refuses", () => {
+  assert.ok(CANONICAL_ORCHESTRATOR_PROFILE.workflows.recovery.tools.includes("orchestration.reattach"));
+  assert.deepEqual(CANONICAL_ORCHESTRATOR_PROFILE.toolGuidance["orchestration.reattach"], {
+    effect: "mutation", risk: "high", destructive: false, idempotency: "natural",
+    retry: "same-input-only", protectedEffect: true,
+  });
+  const missing = structuredClone(CANONICAL_ORCHESTRATOR_PROFILE);
+  delete missing.toolGuidance["orchestration.reattach"];
+  assert.throws(() => validateProfileAgainstToolCatalog(missing, TOOL_NAMES),
+    { code: "ORCHESTRATOR_PROFILE_CAPABILITY_DRIFT" });
 });

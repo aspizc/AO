@@ -31,6 +31,40 @@ function createTrace() {
   }).traceId;
 }
 
+for (const action of ["code.read", "code.write"]) {
+  test(`new task persists authoritative ${action} instead of inferring authority from its role`, () => {
+    fresh();
+    const task = assignTask({
+      caller: { agent: "claude-code", role: "orchestrator" },
+      target: { agent: "codex", role: "restricted-coder", action },
+      repo: "cvision",
+      traceId: createTrace(),
+      registries,
+    });
+    assert.equal(taskRepo.getTaskById(task.taskId).target_action, action,
+      "recovery must compare the server's resolved action with an authoritative business row");
+  });
+}
+
+test("ordinary PostgreSQL task creation does not require the SQLite recovery column", () => {
+  resetState();
+  const statements = [];
+  try {
+    initState({
+      env: { AGENTS_DB_URL: "postgres://fixture" },
+      postgresExecutor(sql) { statements.push(sql); return []; },
+    });
+    taskRepo.createTask({
+      taskId: "ts-postgres", traceId: "tr-postgres", assignedAgent: "codex",
+      assignedRole: "coder", targetAction: "code.write", repo: "app",
+      status: "pending", createdAt: "2026-10-07T00:00:00.000Z", closedAt: null,
+    });
+    const insert = statements.find((sql) => /^INSERT INTO tasks/.test(sql));
+    assert.ok(insert, "ordinary task insertion must still reach the PostgreSQL adapter");
+    assert.doesNotMatch(insert, /target_action|code\.write/);
+  } finally { resetState(); }
+});
+
 test("orchestrator can assign restricted coder to Gemini and emits policy audit", async () => {
   fresh();
   const traceId = createTrace();

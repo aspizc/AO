@@ -6,6 +6,8 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/05 feature closure evidence | close-1 | [request](A_0_5-close-1_to_review.md) | [feature-scope OK](A_0_5-close-1_reviewed_OK.md): `.1` feature gate 2,813/0/12 declared skips and live Codex restart/explicit reattach (same task/session, no skips) hash-verified; manual Enter per prompt (pre-A/0/04); uncommitted — not integrated/released, integrated `.3` gate and live run pending |
+| A/0/05 local recovery implementation | 4 | [request](A_0_5-4_to_review.md) | [candidate-scope OK](A_0_5-4_reviewed_OK.md): cp27 binding 606/606 + 42/42, shell-startup RED 0/1 → GREEN 1/1, focused 43/43 and wider 385/385 supervisor completed; not full-sheet — full gate, CI inventory and live Codex acceptance pending root/operator |
 | A/0/05 local recovery implementation | 3 | [request](A_0_5-3_to_review.md) | [candidate-scope OK](A_0_5-3_reviewed_OK.md): KO1–5 and 7 verified, focused 40/40 and service 144/144 under default isolation; not full-sheet — CI inventory, full gate and live Codex acceptance pending root/operator |
 | A/0/05 local recovery implementation | 2 | [checkpoint 18 handoff](A_0_5-18_unreviewed_handoff.md) | [KO](A_0_5-2_reviewed_KO.md): default-isolation test failure, orphaned private delegate server, thread-children gap, denial-envelope override; gate and live check pending |
 | A/0/05 local recovery implementation | 1 | [request](A_0_5-1_to_review.md) | [source-only OK](A_0_5-1_reviewed_OK.md); [full gate failed](A_0_5-1-root-gate-failure.md), trial 2 needed |

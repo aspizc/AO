@@ -74,7 +74,8 @@ test("registry creates exactly one lazy coordination instance shared by eight to
   assert.equal(factoryCalls.length, 1);
   assert.equal(factoryCalls[0].config, config);
   assert.deepEqual(operationCalls, []);
-  assert.equal(registry.length, 33);
+  assert.equal(registry.length, 34);
+  assert.equal(registry.at(-1).name, "orchestration.reattach");
 
   assert.deepEqual(
     parseResult(
@@ -109,7 +110,7 @@ test("registry creates exactly one lazy coordination instance shared by eight to
 
 test("registry construction accepts missing config without connecting to Redis", () => {
   assert.doesNotThrow(() => getToolRegistry());
-  assert.equal(getToolRegistry().length, 33);
+  assert.equal(getToolRegistry().length, 34);
 });
 
 test("registry owns and closes its one coordination service exactly once", async () => {

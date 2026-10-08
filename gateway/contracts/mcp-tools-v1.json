@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "toolCount": 33,
+  "toolCount": 34,
   "names": [
     "orchestration.create",
     "orchestration.view",
@@ -34,7 +34,8 @@
     "coordination.unregister",
     "coordination.send",
     "coordination.receive",
-    "coordination.ack"
+    "coordination.ack",
+    "orchestration.reattach"
   ],
-  "projectionSha256": "sha256:b477c3f825db68a82b3f9bb71e4b37c751033c2de29bdeccd127eba15c052140"
+  "projectionSha256": "sha256:314302ba4d1b5f9dd9a2a1201d706354168626e380193ced490e4e9fd68162fa"
 }

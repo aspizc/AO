@@ -10,8 +10,8 @@ export function buildAgentTools({ agentService }) {
       "agent.spawn",
       (args, requestBinding) => agentService.spawn(args, requestBinding),
     ),
-    bindCatalogTool("agent.ask", (args) => agentService.ask(args)),
-    bindCatalogTool("agent.view", (args) => agentService.view(args)),
-    bindCatalogTool("agent.kill", (args) => agentService.kill(args)),
+    bindCatalogTool("agent.ask", (args, requestBinding) => agentService.ask(args, requestBinding)),
+    bindCatalogTool("agent.view", (args, requestBinding) => agentService.view(args, requestBinding)),
+    bindCatalogTool("agent.kill", (args, requestBinding) => agentService.kill(args, requestBinding)),
   ];
 }
