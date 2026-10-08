@@ -1,0 +1,52 @@
+[
+  {
+    "lane": "full-lint-green",
+    "command": [
+      "npm",
+      "--prefix",
+      "gateway",
+      "run",
+      "lint"
+    ],
+    "exitCode": 0
+  },
+  {
+    "lane": "focused-green",
+    "command": [
+      "node",
+      "--test",
+      "tests/gateway/claude_first_prompt.test.js",
+      "tests/gateway/prompt_submission.test.js",
+      "tests/gateway/prompt_submission_capture.test.js",
+      "tests/gateway/session_prompt.test.js",
+      "tests/gateway/session_prompt_crash.test.js",
+      "tests/gateway/session_prompt_guard.test.js",
+      "tests/gateway/session_prompt_transport.test.js",
+      "tests/gateway/autoapprove_mechanism.test.js",
+      "tests/gateway/approval_service.test.js",
+      "tests/gateway/tool_agent.test.js",
+      "tests/gateway/tool_approval.test.js",
+      "tests/gateway/approval_state.test.js",
+      "tests/gateway/approval_wait.test.js",
+      "tests/gateway/tool_catalog.test.js"
+    ],
+    "exitCode": 0
+  },
+  {
+    "lane": "real-tmux-green",
+    "command": [
+      "node",
+      "--test",
+      "tests/gateway/session_prompt_guard.test.js"
+    ],
+    "exitCode": 0
+  },
+  {
+    "lane": "crash-green",
+    "command": [
+      "node",
+      "tests/gateway/session_prompt_crash.test.js"
+    ],
+    "exitCode": 0
+  }
+]

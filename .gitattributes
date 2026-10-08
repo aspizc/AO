@@ -1,0 +1,1 @@
+tests/gateway/fixtures/session_prompts/*.txt -diff

@@ -20,6 +20,40 @@ import {
   assertServerOwnedExecutionBinding,
 } from "../core/request_context.js";
 
+export function recognizeClaudePrompt(snapshot) {
+  if (typeof snapshot !== "string" || Array.from(snapshot).some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 8 || (code >= 11 && code <= 31);
+  })) return null;
+  const rows = snapshot.split("\n").map((row) => row.trimEnd());
+  const title = rows.findLastIndex((row) => row.trim() === "Bash command");
+  if (title < 0) return null;
+  const tail = rows.slice(title);
+  const question = tail.findIndex((row) => row.trim() === "Do you want to proceed?");
+  if (question < 0 || !/^\s*❯ 1\. Yes$/.test(tail[question + 1] || "")) return null;
+  const four = /^\s*2\. Yes, and always allow access to \/.+ from this project$/.test(tail[question + 2] || "")
+    && /^\s*3\. Yes, and switch to auto mode · auto mode handles these prompts for you$/.test(tail[question + 3] || "");
+  if (!four && !/^\s*2\. Yes, and don't ask again for .+$/.test(tail[question + 2] || "")) return null;
+  const denyIndex = question + (four ? 4 : 3);
+  if (!(new RegExp(`^\\s*${four ? 4 : 3}\\. No$`)).test(tail[denyIndex] || "")
+    || tail.slice(denyIndex + 1).some((row) => row.trim() && row.trim() !== "Esc to cancel · Tab to amend")) return null;
+  const content = tail.slice(1, question).filter((row) => row.trim());
+  let command;
+  if (four) {
+    const separators = content.map((row, index) => /^╌+$/.test(row) ? index : -1).filter((index) => index >= 0);
+    if (separators.length !== 2 || separators[0] !== 2 || separators[1] !== content.length - 1
+      || content[0] !== ' Tip: auto mode handles these prompts for you — choose "switch to auto mode" below'
+      || !/^ \S/.test(content[1])) return null;
+    const commandRows = content.slice(separators[0] + 1, separators[1]);
+    if (!commandRows.length || commandRows.some((row) => !/^ \S/.test(row))) return null;
+    command = commandRows.map((row) => row.slice(1)).join("\n");
+  } else {
+    if (content.length !== 2 || !/^ {2}\S/.test(content[0]) || !/^ {2}\S/.test(content[1])) return null;
+    command = content[0].slice(2);
+  }
+  return { kind: "permission", command, options: four ? ["1", "2", "3", "4"] : ["1", "2", "3"] };
+}
+
 const AGENT_ID = "claude-code";
 const DEFAULT_TIMEOUT_MS = 600_000;
 
@@ -399,6 +433,8 @@ export class ClaudeAdapter extends BaseAdapter {
       throw err;
     }
   }
+
+  recognizePrompt(snapshot) { return recognizeClaudePrompt(snapshot); }
 
   async view({ tmuxTarget }) {
     if (isDryRun(this.config)) {
