@@ -1,0 +1,104 @@
+{
+  "sourceKind": "Partial raw diagnostic reconstruction, not a complete raw pane capture. Draft rows 10,11,12,38 come from raw Gateway -N -T A04PROFILE fields; cwd is synthetic with original length preserved. Rows 0-9 retain exact trial-1 pins confirmed by raw notice=true. Ready/draft row39 comes from raw A04DIAG footer. Cursor, rows=41 and tailEmpty=true are recorded by A04DIAG. Row36 comes from trimmed transcript with synthetic equal-length nonce. Rows13-35 and37 are transcript-derived blanks, their raw padding is unavailable. Ready rows10-12 and38 repeat draft bytes as an explicit stable-prefix hypothesis; they were not captured raw in ready. No post-Enter frame or live stable guard.",
+  "privateEvidenceSha256": "59ccb93f4611897c04c4fff4b55a165bf2432d9d55a51667a96185b5fa4527ba",
+  "prompt": "Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.",
+  "ready": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Welcome to our little rectangle of possibility.                     \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd \n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "draft": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                             \n  Welcome to our little rectangle of possibility.                     \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n\n  GPT-6.1-Sol medium fast · /fixture/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd \n                                                                                              ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 86
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "rawRows": {
+    "draft": [
+      10,
+      11,
+      12,
+      38,
+      39
+    ],
+    "ready": [
+      39
+    ],
+    "exactPinsVerifiedByRawDiagnostic": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "transcriptDerivedRows": [
+      36
+    ],
+    "reconstructedBlankRows": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      37
+    ],
+    "readyStablePrefixHypothesis": [
+      10,
+      11,
+      12,
+      38
+    ]
+  }
+}

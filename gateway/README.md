@@ -245,6 +245,29 @@ refuses without Enter. The variant cannot authorize a retry Enter. Existing
 queue/warnings profiles and positive acceptance checks are unchanged. Live
 reproduction of a stable rare draft, refined-candidate acceptance and fresh
 independent review remain outstanding; reliability is not claimed from fixtures.
+The startup-notice draft profile additionally covers the exact Codex 0.160.1
+→ 0.161.0 static notice and welcome header at rows 0–12 in a 120×40 pane.
+The pinned [notice history cell](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/notices.rs)
+and [session header renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/session%2Ers)
+separate this layout from an interactive update picker. Row 12 varies only
+among the 88 pinned [greetings](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/empty_state_animation/greetings.rs);
+the [fresh-thread OnceLock](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/empty_state_animation.rs)
+retains that selection. Rows 11, 12 and 38 tolerate trailing U+0020 spaces
+only, within pane width. All other pins and exact ready-prefix/status and
+pending/guard byte equality remain required before the first guarded Enter.
+The original transcript fixture reconstructed cursor/LF and omitted raw
+padding; the separate trial-2 fixture records diagnostic cursor/LF metadata
+and raw values for selected padded rows, and labels every reconstruction.
+Neither fixture is a complete raw ready/draft/guard sequence. Current
+submission checks end in `acceptance_uncertain`; no post-Enter frame was
+available when this draft profile was designed. The operator subsequently
+reported one guarded Enter and delayed prompt history/Working output on the
+padding correction. Acceptance of that shifted-header layout requires a
+separate tested profile and remains unverified by this candidate. Other versions
+or update commands, a YOLO permissions row, truncated or space-containing cwd,
+wrapped notice, menus and changed warning footers remain unsupported. This
+profile never authorizes a retry or infers acceptance from a draft.
+
 Codex's Working and user-history markers are grounded in the pinned
 [status renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/status_indicator_widget.rs)
 and [user history renderer](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/tui/src/history_cell/messages.rs).

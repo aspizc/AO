@@ -1,0 +1,45 @@
+{
+  "sourceKind": "Sanitized captured ready/draft transcripts. Capture final LF restored; cursor coordinates inferred from placeholder and intact 84-character ASCII draft, not recorded in the private transcript event. IDs synthetic; same binding preserved. No live guard or post-Enter frame.",
+  "privateEvidenceSha256": "8de7b48381e28e0c7bf928913bf609761dc0226a515122c2c1d5220daafc90ce",
+  "prompt": "Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.",
+  "ready": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n\n  It’s dangerous to code alone. Take a prompt.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Ask Codex to do anything\n\n  GPT-6.1-Sol medium fast · /fixture/ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n  ? for shortcuts                                                                             ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 2
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  },
+  "draft": {
+    "snapshot": "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ✨ Update available! 0.160.1 -> 0.161.0                                                             │\n│ Run sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' to update. │\n│                                                                                                     │\n│ See full release notes:                                                                             │\n│ https://github.com/openai/codex/releases/latest                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n\n\n  >_ OpenAI Codex (v0.160.1)\n     /fixture/ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n\n  It’s dangerous to code alone. Take a prompt.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n› Reverse 0123456789abcdef0123456789abcdef. Reply ACK:<reversed nonce> only. No tools.\n\n  GPT-6.1-Sol medium fast · /fixture/ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n                                                                                              ⚠ 2 warnings · f2 to view\n",
+    "pane": {
+      "target": "%12",
+      "mode": "0",
+      "inputOff": "0",
+      "synchronized": "0",
+      "cursor": 36,
+      "height": 40,
+      "width": 120,
+      "cursorX": 86
+    },
+    "submitState": {
+      "serverPid": "100",
+      "target": "%12",
+      "panePid": "200",
+      "width": "120",
+      "height": "40"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "sourceKind": "Operator message in this conversation; reported, not independently captured or reproduced by coder. No private raw path/nonce included.",
+  "candidateBaseAdapterSha256": "a470283858303e7e4fdd3b21515d4c7ea495662ba3b3399915de34993a05da62",
+  "guardedEnterCount": 1,
+  "askReason": "acceptance_uncertain",
+  "diagnosticHoldAfterFailureMs": 3000,
+  "delayedPane": {
+    "15": "new challenge history (nonce omitted)",
+    "33": "• Working",
+    "36": "empty composer",
+    "38": "spinner status",
+    "9": "Codex 0.160.1 header"
+  },
+  "cleanup": "operator reports exact/unchanged",
+  "limit": "Existing welcomeWork requires header row1; shifted header row9 is unsupported. Delayed frame does not prove what was visible at the bounded acceptance observation. Follow-up profile outside trial-2 scope."
+}

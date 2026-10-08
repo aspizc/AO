@@ -1580,3 +1580,175 @@ test("trial17 warning-only draft does not authorize a retry Enter when submissio
   await assert.rejects(fx.ask, reason("acceptance_uncertain"));
   trial16OneEnter(fx);
 });
+const startupCodex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_update_welcome_draft.json", import.meta.url), "utf8"));
+const startupRecords = () => [startupCodex.ready, startupCodex.draft, startupCodex.draft, startupCodex.ready].map((frame) => structuredClone(frame));
+function startupFixture(records = startupRecords()) {
+  const fx = trial3Fixture("codex", records, startupCodex.prompt);
+  let index = 0;
+  const run = (args, options) => {
+    const frame = records[Math.min(index, records.length - 1)];
+    const result = fx.run(args, options);
+    if (args[0] === "capture-pane") index++;
+    if (args[0] === "display-message" && args.at(-1) !== "#{version}") {
+      const { pane, submitState: state } = frame;
+      return { ...result, stdout: args.at(-1).startsWith("#{pid}|")
+        ? `${state.serverPid}|${state.target}|${state.panePid}|${pane.width}|${pane.height}|${pane.cursorX}|${pane.cursor}\n`
+        : `${pane.target}|${pane.mode}|${pane.inputOff}|${pane.synchronized}|${pane.cursor}|${pane.height}|${pane.width}|${pane.cursorX}\n` };
+    }
+    return result;
+  };
+  return { ...fx, ask: () => base.submitPrompt({ provider: "codex", target: "%12", prompt: startupCodex.prompt, run, wait: async () => {} }) };
+}
+const startupNoEnter = (fx) => {
+  assert.ok(fx.inputs.every((input) => input !== "\r"));
+  assert.equal(fx.buffers.size, 0);
+};
+
+test("startup exact captured update welcome draft permits one guarded Enter without inventing acceptance", async () => {
+  for (const greeting of ["  It’s dangerous to code alone. Take a prompt.", "  Shall we put some verbs after that cursor?"]) {
+    const fx = startupFixture(startupRecords().map((frame) => trial16Rows(frame, { 12: greeting })));
+    await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+    assert.deepEqual(fx.inputs, [`\x1b[200~${startupCodex.prompt}\x1b[201~`, "\r"]);
+    assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
+    assert.equal(fx.calls.some((call) => call.args[0] === "send-keys"), false);
+    assert.equal(fx.buffers.size, 0);
+  }
+});
+
+test("startup exact update draft is phase bound and never authorizes a retry", async () => {
+  const { snapshot, pane } = startupCodex.draft;
+  assert.equal(base.classifyProviderPane("codex", snapshot, pane, "draft").state, "composer");
+  assert.equal(base.classifyProviderPane("codex", snapshot, pane).state, "unknown_state");
+  const records = startupRecords(); records[3] = structuredClone(startupCodex.draft); records.push(structuredClone(startupCodex.draft));
+  const fx = startupFixture(records);
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("startup spoofed notice history footer version status and cursor variants remain closed", async () => {
+  const changes = [{ 0: "Update available!" }, { 1: "│ Update available! 0.160.1 -> 0.161.0 │" },
+    { 2: "│ Run untrusted update │" }, { 3: "│ extra text │" }, { 4: "│ changed notes │" },
+    { 5: "│ https://example.invalid/releases │" }, { 6: "╰──╯" }, { 7: "extra" }, { 8: "extra" },
+    { 9: "  >_ OpenAI Codex (v0.160.2)" }, { 10: "     /fixture/other" }, { 11: "history" },
+    { 12: "changed welcome" }, { 14: "• Working (1s • esc to interrupt)" }, { 15: "› old request" },
+    { 35: "unrelated state" }, { 37: "unexpected gap" }, { 38: "  GPT-6.1-Sol medium fast · /fixture/other" },
+    { 39: "  ⚠ 2 warnings · f2 to view" }, { 39: "  ? for shortcuts" },
+    { 39: startupCodex.ready.snapshot.split("\n")[39] }, { 39: "  tab to queue message" }, { 40: "extra overlay" }];
+  for (const edits of changes) {
+    const records = startupRecords(); records[1] = trial16Rows(records[1], edits);
+    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  for (const key of ["cursorX", "cursor", "width", "height", "mode", "inputOff", "synchronized"]) {
+    const records = startupRecords(); const pane = records[1].pane;
+    pane[key] = typeof pane[key] === "number" ? pane[key] + 1 : "1";
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+});
+
+test("startup changed payload pane server prefix warning transitions or menu prevent Enter", async () => {
+  for (const stage of [0, 1, 2]) {
+    for (const key of ["serverPid", "target", "panePid"]) {
+      const records = startupRecords(); records[stage].submitState[key] = key === "target" ? "%13" : "999";
+      if (key === "target") records[stage].pane.target = "%13";
+      const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+    }
+  }
+  for (const [stage, edits] of [[1, { 36: "› " + "x".repeat(84) }], [2, { 36: "› " + "x".repeat(84) }],
+    [0, { 12: "changed welcome" }], [2, { 12: "changed welcome" }],
+    [2, { 39: startupCodex.ready.snapshot.split("\n")[39] }]]) {
+    const records = startupRecords(); records[stage] = trial16Rows(records[stage], edits);
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  const records = startupRecords();
+  records[2] = trial16Rows(records[2], { 34: "Update available · 0.160.1 → 0.161.0", 35: "› 1. Update now", 36: "  2. Skip", 37: "  3. Skip until next version" });
+  records[2].pane.cursor = 35; records[2].pane.cursorX = 2;
+  const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+});
+
+test("startup greeting slot cannot carry a menu history or a different greeting between captures", async () => {
+  for (const greeting of ["  Do you want to proceed?", "  Update available!", "  Working (1s • esc to interrupt)",
+    "  › prior user request", "  1. Allow", "  arbitrary printable history", "  ", "  x".repeat(120)]) {
+    const records = startupRecords().map((frame) => trial16Rows(frame, { 12: greeting }));
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  for (const stage of [0, 2]) {
+    const records = startupRecords(); records[stage] = trial16Rows(records[stage], { 12: "  Shall we put some verbs after that cursor?" });
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  const records = startupRecords(); records[0] = trial16Rows(records[0], { 39: "  ? for shortcuts  ⚠ 3 warnings · f2 to view" });
+  const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+});
+
+test("startup duplicate notice wrapped payload trailing data and non-ASCII drafts stay closed", async () => {
+  for (const edits of [{ 14: startupCodex.draft.snapshot.split("\n")[0] },
+    { 36: "› " + "x".repeat(118), 37: "  more" }, { 36: "› " + "é".repeat(84) },
+    { 39: " ".repeat(94) + "⚠ 3 warnings · f2 to view" }, { 40: " " }]) {
+    const records = startupRecords(); records[1] = trial16Rows(records[1], edits);
+    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+  // A raw capture/geometry mismatch cannot be hidden by the menu-free prefix.
+  const records = startupRecords(); records[1].snapshot += "\n";
+  const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+});
+
+const startup2Codex = JSON.parse(fs.readFileSync(new URL("./fixtures/codex_0_160_1_update_welcome_raw_padding.json", import.meta.url), "utf8"));
+const startup2Records = () => [startup2Codex.ready, startup2Codex.draft, startup2Codex.draft, startup2Codex.ready].map((frame) => structuredClone(frame));
+
+test("startup2 raw padded rows permit only the guarded first Enter with acceptance uncertain", async () => {
+  const rows = startup2Codex.draft.snapshot.split("\n");
+  assert.equal(rows[11], " ".repeat(61));
+  assert.equal(rows[12], "  Welcome to our little rectangle of possibility." + " ".repeat(21));
+  assert.equal(rows[38].length, 116);
+  assert.ok(rows[38].endsWith(" "));
+  const fx = startupFixture(startup2Records());
+  await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+  assert.deepEqual(fx.inputs, [`\x1b[200~${startup2Codex.prompt}\x1b[201~`, "\r"]);
+  assert.equal(fx.calls.filter((call) => call.args[0] === "agents-submit-v1").length, 1);
+  assert.equal(fx.buffers.size, 0);
+});
+
+test("startup2 each raw padding predicate accepts spaces through the pane width", async () => {
+  for (const row of [11, 12, 38]) {
+    const source = startup2Codex.draft.snapshot.split("\n")[row].trimEnd();
+    for (const length of [source.length, 120]) {
+      const records = startup2Records().map((frame) => trial16Rows(frame, { [row]: source.padEnd(length, " ") }));
+      assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "composer");
+      const fx = startupFixture(records);
+      await assert.rejects(fx.ask, reason("acceptance_uncertain"));
+      assert.equal(fx.inputs.filter((input) => input === "\r").length, 1);
+      assert.equal(fx.buffers.size, 0);
+    }
+  }
+});
+
+test("startup2 non-space tab and beyond-width padding refuses without Enter", async () => {
+  for (const row of [11, 12, 38]) {
+    const source = startup2Codex.draft.snapshot.split("\n")[row].trimEnd();
+    for (const text of [source + "x", source + "\t", source + "\u00a0", source.padEnd(121, " ")]) {
+      const records = startup2Records().map((frame) => trial16Rows(frame, { [row]: text }));
+      assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+      const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+    }
+  }
+});
+
+test("startup2 matching non-path cwd cannot borrow status equality", async () => {
+  for (const cwd of ["›", "not-a-path", "/fixture/space containing", "/fixture/truncated…"]) {
+    const records = startup2Records().map((frame) => trial16Rows(frame, { 10: "     " + cwd, 38: "  GPT-6.1-Sol medium fast · " + cwd + " " }));
+    assert.equal(base.classifyProviderPane("codex", records[1].snapshot, records[1].pane, "draft").state, "unknown_state");
+    const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+  }
+});
+
+test("startup2 changed raw padded bytes across ready pending and guard cannot authorize Enter", async () => {
+  for (const stage of [0, 2]) {
+    for (const row of [11, 12, 38]) {
+      const records = startup2Records(); const rows = records[stage].snapshot.split("\n");
+      records[stage] = trial16Rows(records[stage], { [row]: rows[row] + " " });
+      const fx = startupFixture(records); await assert.rejects(fx.ask, reason("unknown_state")); startupNoEnter(fx);
+    }
+  }
+});
