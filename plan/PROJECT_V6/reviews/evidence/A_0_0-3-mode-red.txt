@@ -1,0 +1,82 @@
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: node --test --test-name-pattern=guarded_paste_mode_update_does_not_expose_partial_control_record tests/gateway/guarded_paste.test.js
+PATH prepend: /tmp/ao-a04-f1-impl/build2/bin
+Verified tmux: tmux 3.6a-agents.3
+TMUX_TMPDIR: /tmp/ao-a00-trial3-tmux-red
+Fixture: foreground owned server with fresh private -S socket, no user-server calls
+TAP version 13
+# Subtest: guarded_paste_mode_update_does_not_expose_partial_control_record
+not ok 1 - guarded_paste_mode_update_does_not_expose_partial_control_record
+  ---
+  duration_ms: 251.70557
+  type: 'test'
+  location: '/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:85:1'
+  failureType: 'testCodeFailure'
+  error: 'publishing a mode update must keep the independent input witness alive'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    fixture-mode:1:on
+    
+    fixture-mode:2:on
+    Traceback (most recent call last):
+      File "/home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste_fixture.py", line 20,
+    in <module>
+        sequence, enabled = mode.split(":")
+        ^^^^^^^^^^^^^^^^^
+    ValueError: not enough values to unpack (expected 2, got 1)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    Pane is dead (status 1, Thu Oct  8 11:58:06 2026)
+  operator: 'doesNotMatch'
+  stack: |-
+    fs.writeFileSync (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:99:16)
+    mode (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:26:10)
+    file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:106:13
+    async file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:52:7
+    async withOwnedTmuxServer (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/fixtures/owned_tmux_server.js:31:5)
+    async ownedServer (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:16:3)
+    async TestContext.<anonymous> (file:///home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build/tests/gateway/guarded_paste.test.js:86:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 366.35371
+
+Exit code: 1

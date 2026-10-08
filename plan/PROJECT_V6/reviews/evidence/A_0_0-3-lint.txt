@@ -1,0 +1,9 @@
+cwd: /home/carase/git/personal/AO/workspace/clones/wt-v6-a00-build
+Command: node plan/PROJECT_V6/reviews/evidence/A_0_0-3-lint-runner.mjs
+Rebase existing Gateway ESLint rules to root tests/gateway; no rules disabled.
+tests/gateway/guarded_paste.test.js: 64 effective rules
+tests/gateway/orchestrator_profile_runtime.test.js: 64 effective rules
+tests/gateway/tool_agent_model.test.js: 64 effective rules
+
+Files: 3; errors: 0; warnings: 0
+Exit code: 0

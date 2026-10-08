@@ -1,0 +1,32 @@
+{
+  "originalImplementationBase": "e42818c2b9d72eebc88d858965fafa45c0fa1417",
+  "committedCandidate": "8c7eb3a97d94fcf351b58b1ee4cfa4d3b23b0cc3",
+  "entryHead": "1f29faf22ba1a0dae25dbad74df5871a43e79b19",
+  "files": {
+    "docs/adapters/antigravity.md": "63d5a16a3add284c2940c1f1dc5a159c515964de17db91ab472a432da57e4fea",
+    "docs/adapters/claude-code.md": "fe06aa37c75c36b7e3645f8dfb8be467a091d413d4ed49635e5db43d7d1f86f4",
+    "docs/adapters/codex.md": "daead69582e154ade994ffadefb1b08032c30df006073bb5ea7d9e54f7bbe54b",
+    "docs/adapters/opencode.md": "1efa060b362a7b0de6b7a86787109d74ee1c88c84a95ae39644def49c2c73c58",
+    "docs/adapters/pi.md": "409f0a9727eeae756b2252414ce3e08b6ee586001426e0046abace554830c907",
+    "gateway/src/adapters/antigravity_adapter.js": "a67cad21283970bf05dca570c42867b2b948dd9ef0e0f2930e06a192a3c6c5ae",
+    "gateway/src/adapters/claude_adapter.js": "280532efa5405a8151ee6d2bcde4436fdaa686159a2383cb4021fb2ce044c4fb",
+    "gateway/src/adapters/codex_adapter.js": "aa8cafe37ac1e334bd10875bba80b935da7c7392cb4d16fe2e193af4a492cab9",
+    "gateway/src/adapters/opencode_adapter.js": "e60e59e49ccaa5aaa24e0f9e0ca6d328fb862bdc8a753d0c9faf2b102dc06192",
+    "gateway/src/adapters/pi_adapter.js": "0f952a289358ce3bcefc42207cf2830af4616c3077b33ccbc2ad45c3c7dd277a",
+    "gateway/src/core/policy_engine.js": "4ee4968907c9283e30e133aa88daa5a5bf331dfc704379df41fb7a6d56fa4639",
+    "gateway/src/services/agent_service.js": "15aff4fc8b2cc772212ab3e457c41c984f2b05ec9687e8e390ee584140e12833",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-attempt1-red.txt": "9c446f0d9d002bb6a6c7726a6d6c3464b122729e3dc851136f897fa8c20a79b9",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-contract-red.txt": "efdedec12c4e59e7016522cad8dd2bc7c969ab1248d0fd9cc8832065204a4ee7",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-focused-green.txt": "29ba2785752ceea389619e5e6342501b6947dad4bf8dadf38a6c104b7ed6b275",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-lint-runner.mjs": "f9c0458e1c59f354a33fa9571fa94557416623f1c41fc32f00914060b62db09d",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-lint.txt": "339726fce0f0f2bd884a9f1128b94dd16ed098a4ae9db17f06da7af50fa3722a",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-mode-red.txt": "8188a3ce88f9ec101b7d481cd4ca7f3307f6e9a84879894f024a4624f24715f7",
+    "plan/PROJECT_V6/reviews/evidence/A_0_0-3-preservation.json": "775504733cc1bd33f9dd6651f84bb38368eb24804dc0230396ca9f952c04401b",
+    "tests/gateway/agent_service_write_access.test.js": "2fe1d4cf7be4a0911783b649dcb46dce19937a624efe214369e3e4d6fb3edcc5",
+    "tests/gateway/cli_write_access.test.js": "364115d04364bd2778f746f43127e894501338538ec44cda8b1a6c2c3e9606e3",
+    "tests/gateway/guarded_paste.test.js": "d0ee418b1c424f4d3db356a912d4d962d5191ab87edf4d9b10205a46ed9844ac",
+    "tests/gateway/orchestrator_profile_authority.test.js": "d39ea95f75659053c5e1669ce590b8964509964c27023601c4b3a1901ab9713e",
+    "tests/gateway/orchestrator_profile_runtime.test.js": "d186ebade19c0cba95a65a0ea4e676df35791cc024f44b633898b99495839bb5",
+    "tests/gateway/tool_agent_model.test.js": "d557df3bebf984ddc0d86f082a5307c0cc6511c54f2d3e99cb3bbe9837a86d36"
+  }
+}
