@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/05 integration status | status-1 | [request](A_0_5-status-1_to_review.md) | [KO: two stale public status counts and unbounded README recovery claim](A_0_5-status-1_reviewed_KO.md) |
 | A/0/04 live startup release merge | merge-1 | [request](A_0_4-live-startup-merge-1_to_review.md) | [OK: staged merge tree aba56557 preserves both parents; full gate and integration remain root-owned](A_0_4-live-startup-merge-1_reviewed_OK.md) |
 | A/0/04 live Codex second-turn confirmation | live-startup-5 | [request](A_0_4-live-startup-5_to_review.md) | [OK: bounded post-Enter second-turn witness, 315/315 focused GREEN; live acceptance remains operator-run](A_0_4-live-startup-5_reviewed_OK.md) |
 | A/0/04 live Codex post-turn Ready | live-startup-4 | [request](A_0_4-live-startup-4_to_review.md) | [OK: bounded second-ask readiness, 307/307 focused GREEN; post-Enter acceptance remains open](A_0_4-live-startup-4_reviewed_OK.md) |
