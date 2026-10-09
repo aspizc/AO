@@ -26,8 +26,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
   the same Linux principal, machine and private SQLite state (A/0/05).
 - Added detection and approval-bound one-time answers for supervised trust
   and command-permission prompts (A/0/06). No command is auto-answered by
-  default, and the "don't ask again" option is never sent. The real-provider
-  automatic/manual approval acceptance remains open.
+  default, and the "don't ask again" option is never sent. `agent-run approve`
+  can answer a pending prompt from a separate process with same-OS-account
+  local authority (not authenticated human presence). It exits zero only for
+  `answered/sent` or an explicit denial. Codex 0.162 command menus are
+  delivered at the tmux pending-wrap cursor, and wrapped persistent options
+  are recognized. Refusals record a fixed, non-sensitive stage code.
+  Real-provider acceptance with Codex 0.162.0 passed.
+- Changed the pinned tmux runtime to `3.6a-agents.4` (linux/amd64 only for
+  this release). Its guarded submit accepts the observed cursor at
+  `x == width`. A Gateway refuses guarded input against a still-running
+  `3.6a-agents.3` server until the operator restarts it manually.
 - Added generic project profiles and deterministic preflight for wave
   planning (PROJECT_V7 A/0/00). Automated wave dispatch remains planned.
 - Added cooperative local wave capacity accounting and `agent-run wave
