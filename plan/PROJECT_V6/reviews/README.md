@@ -6,6 +6,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 | Scope | Trial | Submission | Verdict |
 |---|---:|---|---|
+| A/0/06 operator response | operator-1 | [request](A_0_6-operator-1_to_review.md) | [KO, uncommitted on ebe5535: no source defect; RED 0/3 reproduced on base, focused 50/50, CLI 28/28, contract 11/11, lint/ruff clean; 32/39 mutants red; blocking: lost-timeout-CAS re-read untested (mutant reports uncertain for a delivered answer) and Node script prompt exit predicate never observed directly; host full gate and live acceptance open](A_0_6-operator-1_reviewed_KO.md) |
 | A/0/06 operator response design | operator-plan-2 | [request](A_0_6-operator-plan-2_to_review.md) | [OK: timeout CAS, ID retirement and CLI delivery reporting specified; human security choice remains pending](A_0_6-operator-plan-2_reviewed_OK.md) |
 | A/0/06 operator response design | operator-plan-1 | [request](A_0_6-operator-plan-1_to_review.md) | [KO: timeout must not clobber in-flight delivery, externally finalized IDs must retire, CLI wrapper must report terminal delivery](A_0_6-operator-plan-1_reviewed_KO.md) |
 | A/0/03 existing V7 lineage | scope-1 | [request](A_0_3-scope-1_to_review.md) | [OK: two reviewed V7 foundations already integrated on selected release branch; no new runtime scope](A_0_3-scope-1_reviewed_OK.md) |
