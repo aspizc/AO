@@ -79,7 +79,8 @@ run. On conflict, this file wins over a skill's inline defaults. Keep it current
 
 - **Orchestrator:** the human-facing LLM session (Claude Code in current practice). There is no
   standalone orchestrator process (ADR-002).
-- **Coder:** agent `codex`, model `gpt-6.1-sol`, reasoningEffort `max`, serviceTier `priority`
+- **Coder:** agent `codex`, model `gpt-6.1-sol`, reasoningEffort `medium` (operator choice
+  2026-10-09; audits stay `max`), serviceTier `priority`
   (policy defaults; `gpt-5.6` aliases to `gpt-5.6-sol`).
 - **Reviewer:** agent `claude-code`, model `claude-opus-5-5`, reasoningEffort `max` — cross-vendor
   review is this project's supported pairing (Codex codes, Claude reviews). Owner-approved

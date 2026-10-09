@@ -1,6 +1,6 @@
 ---
 name: ao-build-orchestration
-description: Implement and review agents-orchestrator plan sheets through the repo's own agents-gateway using a SPAWN-based coder/reviewer loop (persistent tmux sessions via agent_spawn + agent_ask + agent_view), never one-shot delegate for iterative work. Codex (gpt-6.1-sol, max, priority) codes test-first; a distinct Claude (claude-opus-5-5, max) session reviews; verdicts land as a committed review trail with up to 15 trials per sheet; the orchestrator gates with bash scripts/ci.sh and commits only reviewed-OK work with explicit pathspecs. Trigger when the user asks to implement/build/code a plan sheet or wave, run the implementation loop, "implementar la hoja/tarea/slice", "que el coder haga X", or review a coder's sheet. Do NOT use to write/refine plans (use ao-plan-orchestration) or run audits (use ao-audit-orchestration).
+description: Implement and review agents-orchestrator plan sheets through the repo's own agents-gateway using a SPAWN-based coder/reviewer loop (persistent tmux sessions via agent_spawn + agent_ask + agent_view), never one-shot delegate for iterative work. Codex (gpt-6.1-sol, medium, priority) codes test-first; a distinct Claude (claude-opus-5-5, max) session reviews; verdicts land as a committed review trail with up to 15 trials per sheet; the orchestrator gates with bash scripts/ci.sh and commits only reviewed-OK work with explicit pathspecs. Trigger when the user asks to implement/build/code a plan sheet or wave, run the implementation loop, "implementar la hoja/tarea/slice", "que el coder haga X", or review a coder's sheet. Do NOT use to write/refine plans (use ao-plan-orchestration) or run audits (use ao-audit-orchestration).
 ---
 
 # agents-orchestrator Build Orchestration (spawn-based coder/reviewer loop)
@@ -49,7 +49,7 @@ clock deadlines**: a transport timeout is not evidence the agent stopped.
 orchestration_create({callerAgent, callerRole:"orchestrator", goal, prefix})            → traceId
 task_assign({traceId, caller:{...,"orchestrator"}, target:{agent:"codex", role:"coder",
              action:"implement"}, repo:"agents-orchestrator"})                          → taskId
-agent_spawn({agent:"codex", role:"coder", model:"gpt-6.1-sol", reasoningEffort:"max",
+agent_spawn({agent:"codex", role:"coder", model:"gpt-6.1-sol", reasoningEffort:"medium",
              serviceTier:"priority", repo:"agents-orchestrator", cwd:<scoped>,
              traceId, taskId})                                                          → coderSession
 agent_ask({sessionId:coderSession, prompt:<coder brief>, traceId})
