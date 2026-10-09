@@ -1,7 +1,7 @@
 › Run exactly this one shell command and nothing else, requesting approval if …
 • I’ll run the exact command and request approval if the sandbox blocks it.
 
-• Running touch /home/tester/git/personal/AO/workspace/a06-live/run-154702/outs…
+• Running touch /tmp/a06-fix/git/personal/AO/workspace/a06-live/run-154702/outs…
     + Show details
 
 
@@ -13,11 +13,11 @@
   read-only. Allow creating the outside-marker file?
 
   $ touch
-  /home/tester/git/personal/AO/workspace/a06-live/run-154702/outside-marker
+  /tmp/a06-fix/git/personal/AO/workspace/a06-live/run-154702/outside-marker
 
 
 › 1. Yes, proceed (y)
-  2. Yes, and don't ask again for commands that start with `touch /home/tester/
+  2. Yes, and don't ask again for commands that start with `touch /tmp/a06-fix/
      git/personal/AO/workspace/a06-live/run-154702/outside-marker` (p)
   3. No, and tell Codex what to do differently (esc)
 
