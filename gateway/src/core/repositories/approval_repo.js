@@ -136,3 +136,16 @@ export function promptAnswerResult(row) {
   if (!row?.action.startsWith("session.prompt.")) return null;
   try { return JSON.parse(row.payload)?.promptAnswer || null; } catch (_error) { return null; }
 }
+
+// Only an unattempted grant can expire externally. Never overwrite an owner
+// attempt token: its exact payload must remain available for finalization.
+export function timeoutUnattemptedPrompt(row) {
+  if (!row?.action.startsWith("session.prompt.")) return false;
+  let context;
+  try { context = JSON.parse(row.payload); } catch (_error) { return false; }
+  if (!context || context.consumed || context.promptAnswer) return false;
+  const promptAnswer = { status: "not_answered", reason: "prompt_no_longer_bound", detail: "external_response_timeout" };
+  return getDb().prepare(
+    "UPDATE approvals SET payload = ? WHERE approval_id = ? AND status = 'granted' AND payload = ?",
+  ).run(JSON.stringify({ ...context, promptAnswer }), row.approval_id, row.payload).changes === 1;
+}

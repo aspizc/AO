@@ -243,14 +243,32 @@ def approve(
     except json.JSONDecodeError:
         fail(proc.stdout, exit_code=1)
 
+    if not isinstance(data, dict):
+        fail("invalid approval response", exit_code=1)
+    prompt = data.get("isSessionPrompt") is True
+    answer = data.get("promptAnswer")
+    answer = answer if isinstance(answer, dict) else {}
+    delivered = answer.get("status") == "answered" and answer.get("outcome") == "sent"
     if output_json:
         emit(data, json_mode=True)
     elif "error" in data:
         fail(data["error"], exit_code=1)
+    elif prompt:
+        if data.get("status") == "denied":
+            typer.echo(f"{approval_id}: denied")
+        else:
+            status = answer.get("status", "not_answered")
+            outcome = answer.get("outcome")
+            reason = answer.get("reason")
+            typer.echo(f"{approval_id}: {status}" + (f"/{outcome}" if outcome else "")
+                       + (f" ({reason})" if reason else ""))
     else:
         typer.echo(f"{approval_id}: {data.get('status', 'unknown')}")
 
-    raise typer.Exit(code=0 if proc.returncode == 0 and "error" not in data else 1)
+    success = proc.returncode == 0 and "error" not in data
+    if prompt:
+        success = success and (delivered or data.get("status") == "denied")
+    raise typer.Exit(code=0 if success else 1)
 
 
 if __name__ == "__main__":
