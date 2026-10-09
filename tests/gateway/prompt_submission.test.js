@@ -10,7 +10,7 @@ const pending = (prompt) => `\n\n› ${prompt.split("\n").join("\n  ")}\n\n     
 const working = "• Working (0s • esc to interrupt)\n\n› Ask Codex to do anything\n\n  ? for shortcuts                  100% context left";
 const menu = "Retry with a faster model?\n› 1. Switch model\n  2. Keep current model";
 
-function fixture({ prompt = "Enter", screens, paste = "1", fail = null, target = "%12", provider = "codex", paneFor = null, version = "3.6a-agents.3", submitResult = null } = {}) {
+function fixture({ prompt = "Enter", screens, paste = "1", fail = null, target = "%12", provider = "codex", paneFor = null, version = "3.6a-agents.4", submitResult = null } = {}) {
   const calls = [];
   const inputs = [];
   const buffers = new Map();
@@ -503,11 +503,12 @@ test("submit_evidence_cleanup_is_owned_and_missing_buffer_tolerant", async () =>
 });
 
 test("capability probes require strict raw ASCII and exact empty-stderr success on every operation", async () => {
-  for (const result of [{ status: 1, stdout: Buffer.from("3.6a-agents.3\n") },
-    { status: 0, stdout: Buffer.from("3.6a-agents.3\n"), stderr: "warning" },
+  for (const result of [{ status: 1, stdout: Buffer.from("3.6a-agents.4\n") },
+    { status: 0, stdout: Buffer.from("3.6a-agents.4\n"), stderr: "warning" },
     { status: 0, stdout: Buffer.from([0xff]) },
-    { status: 0, stdout: "3.6a-agents.3" },
-    { status: 0, stdout: Buffer.from("3.6a-agents.30") }]) {
+    { status: 0, stdout: "3.6a-agents.4" },
+    { status: 0, stdout: Buffer.from("3.6a-agents.3") },
+    { status: 0, stdout: Buffer.from("3.6a-agents.40") }]) {
     const fx = fixture();
     const run = (args, options) => args.at(-1) === "#{version}" ? result : fx.run(args, options);
     await assert.rejects(() => base.submitPrompt({ target: "%12", prompt: "Enter", provider: "codex", run }), reason("paste_unavailable"));
@@ -2062,3 +2063,35 @@ test("startup5 raw space padding cannot exceed width or hide non-space suffixes"
     }
   }
 });
+
+const boundaryComposers = {
+  codex: (text) => `\n\n› ${text}\n\n  ? for shortcuts                  100% context left`,
+  pi: (text) => `pi v0.73.1\n──────────────────\n ${text}\n──────────────────\n/tmp`,
+  opencode: (text) => `┃\n┃  ${text}\n┃\n┃  Build · GPT-6 OpenAI\n╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n/tmp tab agents ctrl+p commands`,
+};
+for (const [provider, screen] of Object.entries(boundaryComposers)) {
+  for (const phase of ["ready", "guard"]) test(`composer ${provider} pending-wrap ${phase} observation cannot submit on .4`, async () => {
+    const ready = screen(""), draft = screen("Enter");
+    let draftStates = 0;
+    const fx = fixture({ provider, screens: [ready, draft, draft], version: "3.6a-agents.4",
+      paneFor: (snapshot) => {
+        const isDraft = snapshot === draft;
+        if (isDraft) draftStates++;
+        const x = phase === "ready" ? 80 : isDraft && draftStates > 2 ? 80 : 79;
+        return `${provider === "opencode" ? 1 : 2}|24|80|${x}`;
+      } });
+    await assert.rejects(fx.ask, reason("unknown_state"));
+    const calls = fx.calls.map((call) => call.args[0]);
+    assert.equal(calls.includes("agents-submit-v1"), false);
+    assert.equal(calls.includes("send-keys"), false);
+    assert.equal(calls.includes("load-buffer"), phase === "guard");
+    assert.equal(calls.includes("paste-buffer"), phase === "guard");
+  });
+  test(`composer ${provider} width-minus-one control reaches load and paste on .4`, async () => {
+    const fx = fixture({ provider, screens: [screen(""), screen("Enter"), screen("Enter")],
+      version: "3.6a-agents.4", paneFor: () => `${provider === "opencode" ? 1 : 2}|24|80|79` });
+    await assert.rejects(fx.ask); // No provider completion witness is rendered by this fixture.
+    assert.ok(fx.calls.some((call) => call.args[0] === "load-buffer"));
+    assert.ok(fx.calls.some((call) => call.args[0] === "paste-buffer"));
+  });
+}

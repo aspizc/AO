@@ -6,7 +6,7 @@ built binary and performs no download.
 
 The input is the upstream `tmux-3.6a.tar.gz` archive whose SHA-256 is fixed in
 `manifest.json`. `cmd-agents-capture.c` and
-`tmux-3.6a-agents.3.patch` are the complete maintained delta. The patch also
+`tmux-3.6a-agents.4.patch` are the complete maintained delta. The patch also
 keeps the shared default server alive when its last session is retired;
 cleanup still never issues `kill-server` and never removes the default
 socket.
@@ -41,7 +41,7 @@ gateway/vendor/tmux-agents/build-offline.sh \
 
 The build verifies the source, patch, and extension digests, applies the patch
 with zero fuzz, uses `--network none`, does not invoke a package manager, and
-emits `tmux-3.6a-agents.3-linux-amd64`.
+emits `tmux-3.6a-agents.4-linux-amd64`.
 
 Darwin artifacts must be produced on the matching native architecture with an
 already provisioned compiler, tmux build dependencies, and no package-manager
@@ -64,8 +64,8 @@ TMUX_AGENTS_NO_NETWORK=1 TMUX_AGENTS_PACKAGE_MANAGER=none \
 Each native build verifies the same three digests, copies the extension before
 applying the active patch with zero fuzz, preserves the generated parser,
 and checks the exact custom version. It emits
-`darwin/amd64/tmux-3.6a-agents.3` or
-`darwin/arm64/tmux-3.6a-agents.3`. A Linux build does not verify either native
+`darwin/amd64/tmux-3.6a-agents.4` or
+`darwin/arm64/tmux-3.6a-agents.4`. A Linux build does not verify either native
 Darwin artifact.
 
 The resulting compatible binary must be configured as the user's default

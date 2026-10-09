@@ -97,11 +97,11 @@ single-line text followed by a separate Enter; newline/control bytes are refused
 
 Framed delivery requires the agents tmux runtime's atomic `paste-buffer -G -p -r`
 guard and the consuming `agents-submit-v1` command for the final CR. Every
-operation probes the same server for exact `.3` and both commands before
-creating any buffer. Older runtimes, including `.2`, refuse with
+operation probes the same server for exact `.4` and both commands before
+creating any buffer. Older runtimes, including `.3` and `.2`, refuse with
 `paste_unavailable` before input. Raw captured screen evidence and pane metadata
 are checked again inside submit before enqueue; nondiagnostic failures are
-`acceptance_uncertain` and never replay input. Runtime `3.6a-agents.3` supplies these guards;
+`acceptance_uncertain` and never replay input. Runtime `3.6a-agents.4` supplies these guards;
 the real emitted-byte fixture covers framing and refusals. See
 [`docs/tmux-runtime.md`](../docs/tmux-runtime.md) for the isolated build/test
 instructions. Terminal byte proof does not establish provider acceptance.
@@ -723,7 +723,7 @@ confirm only the observed selected first one-time choice with a single guarded C
 used.
 
 Before input, the separate approval-bound answer path uses the pinned tmux
-`3.6a-agents.3` runtime. It captures the current grid into a uniquely owned
+`3.6a-agents.4` runtime. It captures the current grid into a uniquely owned
 `agents-submit-<uuid>` buffer with `capture-pane -b ... -N -T`, then decodes
 those exact buffer bytes for the recognizer and approval binding check. The
 approval compare-and-set consumes the decision and persists a `promptAnswer`
@@ -736,6 +736,13 @@ server/pane PIDs, geometry, cursor and input modes, checks pending output, and
 enqueues only one CR. It never uses composer `submitPrompt` or plain
 `send-keys`. Missing runtime support fails closed. Owned evidence buffers are
 consumed or cleaned on every path.
+
+The answer path accepts an observed cursor at x equal to the pane width (the
+tmux pending-wrap column; Codex 0.162 leaves its hidden cursor there on command
+menus). It still refuses x greater than the width and y at or beyond the
+height, and `agents-submit-v1` re-verifies the exact observed x/y with the grid
+and identities in the same command. Geometry never establishes a recognized
+or approved prompt. Composer `submitPrompt` keeps x < width.
 
 A known guard refusal records outcome `refused`; a timeout, unexpected failure
 or uncertain cleanup records `uncertain`. Neither is retried or emits

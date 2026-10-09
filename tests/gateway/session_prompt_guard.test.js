@@ -40,17 +40,21 @@ function setup(kind, adapter) {
 }
 
 for (const kind of Object.keys(menus)) {
-  for (const redraw of [true, false]) {
-    test(`real pinned tmux ${kind}: ${redraw ? "redraw after evidence refuses all bytes" : "unchanged selected one-time choice receives exactly one guarded CR"}`, async () => {
+  for (const variant of ["redraw", "unchanged", "pending-wrap"]) {
+    const redraw = variant === "redraw", pendingWrap = variant === "pending-wrap";
+    test(`real pinned tmux ${kind}: ${redraw ? "redraw after evidence refuses all bytes" : `${pendingWrap ? "pending-wrap" : "unchanged"} selected one-time choice receives exactly one guarded CR`}`, async () => {
       await withOwnedTmuxServer(tmux, async ({ directory, run }) => {
-        assert.match(run(["-V"]).stdout, /^tmux 3\.6a-agents\.3\n$/);
+        assert.match(run(["-V"]).stdout, /^tmux 3\.6a-agents\.4\n$/);
         fs.writeFileSync(path.join(directory, "pane.txt"), menus[kind]);
-        const created = run(["new-session", "-d", "-s", "guard-test", "-x", "120", "-y", "40", "-P", "-F", "#{pane_id}", "--", "python3", terminal, directory, kind]);
+        if (pendingWrap) fs.writeFileSync(path.join(directory, "pending-wrap"), "1");
+        const created = run(["new-session", "-d", "-s", "guard-test", "-x", pendingWrap ? "80" : "120", "-y", pendingWrap ? "24" : "40", "-P", "-F", "#{pane_id}", "--", "python3", terminal, directory, kind]);
         assert.equal(created.status, 0, created.stderr);
         const target = created.stdout.trim();
         for (let i = 0; i < 100 && !fs.existsSync(path.join(directory, "drawn")); i++) await pause(10);
         const recognizer = kind === "permission" ? recognizeClaudePrompt : recognizeCodexPrompt;
         for (let i = 0; i < 100 && !recognizer(captureSessionPrompt({ tmuxTarget: target, run })?.snapshot); i++) await pause(10);
+        if (pendingWrap) assert.equal(run(["display-message", "-p", "-t", target,
+          "#{pane_width}|#{pane_height}|#{cursor_x}|#{cursor_y}"]).stdout.trim(), "80|24|80|23");
         const writes = [];
         let interleaved = false;
         const intercepted = (args, options) => {

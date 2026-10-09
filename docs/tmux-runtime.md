@@ -1,6 +1,6 @@
 # Pinned tmux runtime
 
-The retained-control session tests require `tmux 3.6a-agents.3`, including
+The retained-control session tests require `tmux 3.6a-agents.4`, including
 the unchanged `agents-capture-v1` extension and the atomic
 `paste-buffer -G -p -r` guard and consuming `agents-submit-v1` final-CR command. A distribution's unmodified tmux cannot
 provide that contract. The source archive, patch, extension, and Linux builder
@@ -23,7 +23,7 @@ curl --fail --location --retry 3 --proto '=https' --tlsv1.2 \
 gateway/vendor/tmux-agents/build-offline.sh \
   "$tmux_build_dir/tmux-3.6a.tar.gz" "$tmux_build_dir"
 mkdir -p "$tmux_build_dir/bin"
-ln -s ../tmux-3.6a-agents.3-linux-amd64 "$tmux_build_dir/bin/tmux"
+ln -s ../tmux-3.6a-agents.4-linux-amd64 "$tmux_build_dir/bin/tmux"
 export PATH="$tmux_build_dir/bin:$PATH"
 export D007C_TEST_TMUX_PATH="$tmux_build_dir/bin"
 export D007C_RUN_REAL_TMUX_PROBE=1
@@ -47,9 +47,31 @@ only that isolated server afterward. It preserves the required disposable
 Redis service and the normal gate error summary.
 
 For a runtime deployment, configure the compatible binary as `tmux` on the
-Gateway's executable search path. The Linux build does not verify Darwin
-artifacts; the native Darwin build instructions remain in the
-[vendor README](../gateway/vendor/tmux-agents/README.md).
+Gateway's executable search path. AO 1.1.0 claims `3.6a-agents.4` support only
+on linux/amd64, where it is built and tested. Darwin `.4` support is excluded
+from that release claim until a native build exists; retaining native builder
+instructions in the [vendor README](../gateway/vendor/tmux-agents/README.md)
+does not establish Darwin support.
+
+### Manual cutover from a running .3 server
+
+Installing `.4` or changing PATH does not upgrade a running `.3` tmux server.
+Its `exit-empty=0` default keeps it alive even without sessions. The operator
+must wait until no sessions are live on the designated server, then manually
+restart that server with the configured `.4` binary. Confirm the server's
+`#{version}` is exactly `3.6a-agents.4` before resuming Gateway use. Restarting
+ends sessions on that server: never restart a server with live sessions or
+stop unrelated servers. The Gateway performs no automatic restart.
+
+Until the manual restart, a `.4` Gateway fails closed against a `.3` server:
+no prompt answers, composer submits or retained relay handshake are sent.
+This is the operator decision recorded at release/1.1.0 commit `6212f72`,
+`plan/PROJECT_V6/reviews/A_0_6_pending_wrap_cutover_decision.md`.
+
+Approved session-prompt submission accepts an observed cursor at x=width
+(the pending-wrap column) while retaining exact cursor/grid/identity binding.
+It still refuses x>width and y>=height. Composer submission retains x<width;
+geometry does not establish a recognized or approved prompt.
 
 The V6 A/0/04 real-input tests use an owned socket per fixture and require the
 same custom binary on `PATH` (or an explicit `A04_TEST_TMUX` binary path):

@@ -12,6 +12,7 @@ directory = Path(sys.argv[1])
 previous = termios.tcgetattr(0)
 tty.setraw(0)
 last_mode = None
+last_output = None
 try:
     with (directory / "received").open("ab", buffering=0) as received:
         while True:
@@ -21,6 +22,14 @@ try:
                 os.write(1, b"\x1b[?2004h" if enabled == "on" else b"\x1b[?2004l")
                 os.write(1, f"\r\nfixture-mode:{sequence}:{enabled}\r\n".encode())
                 last_mode = mode
+            output = directory / "output"
+            if output.exists():
+                value = output.read_text()
+                if value != last_output:
+                    sequence, data = value.split(":", 1)
+                    os.write(1, bytes.fromhex(data))
+                    (directory / "output-ack").write_text(sequence)
+                    last_output = value
             if select.select([0], [], [], 0.01)[0]:
                 data = os.read(0, 65536)
                 if not data:

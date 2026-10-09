@@ -39,7 +39,7 @@ diff --git a/tmux.c b/tmux.c
 +++ b/tmux.c
 @@ -346 +346 @@
 -	return (TMUX_VERSION);
-+	return (TMUX_VERSION "-agents.3");
++	return (TMUX_VERSION "-agents.4");
 diff --git a/cmd-paste-buffer.c b/cmd-paste-buffer.c
 --- a/cmd-paste-buffer.c
 +++ b/cmd-paste-buffer.c
@@ -188,7 +188,7 @@ diff --git a/cmd-agents-submit.c b/cmd-agents-submit.c
 +	s = &wp->base;
 +	if (server_pid != getpid() || pane_pid != wp->pid ||
 +	    width != screen_size_x(s) || height != screen_size_y(s) ||
-+	    cx >= width || cy >= height || cx != s->cx || cy != s->cy ||
++	    cx > width || cy >= height || cx != s->cx || cy != s->cy ||
 +	    window_pane_exited(wp) || wp->fd == -1 || wp->event == NULL ||
 +	    (wp->flags & PANE_INPUTOFF) || !TAILQ_EMPTY(&wp->modes) ||
 +	    options_get_number(wp->options, "synchronize-panes") ||

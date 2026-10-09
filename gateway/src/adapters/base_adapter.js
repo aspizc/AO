@@ -402,7 +402,7 @@ function capability(run) {
     }
     return result.stdout.toString("ascii").trim();
   };
-  if (probe(["display-message", "-p", "#{version}"]) !== "3.6a-agents.3") throw submissionError("paste_unavailable");
+  if (probe(["display-message", "-p", "#{version}"]) !== "3.6a-agents.4") throw submissionError("paste_unavailable");
   const lines = probe(["list-commands"]).split("\n");
   if (!lines.some((line) => /^agents-submit-v1(?: |$)/.test(line))
     || !lines.some((line) => /^paste-buffer(?: |$)/.test(line) && /\[-[^\]]*G[^\]]*\]/.test(line))) {

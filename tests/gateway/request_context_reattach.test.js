@@ -170,7 +170,7 @@ test("A04 guarded ask after A05 reattach preserves A01 markers and creation rece
   const f = fixture(t);
   const traceId = await f.seed();
   const tmux = await ownedTmuxFixture(t);
-  assert.equal(tmux.run(["-V"]).stdout.trim(), "tmux 3.6a-agents.3");
+  assert.equal(tmux.run(["-V"]).stdout.trim(), "tmux 3.6a-agents.4");
   const markers = workerEnv({ role: "coder", traceId, taskId: "ts-one" });
   const receipts = [];
   const created = withTmuxCreationObserver((receipt) => receipts.push(receipt), () =>

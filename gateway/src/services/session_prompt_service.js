@@ -69,9 +69,9 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
     let promptAnswer;
     let inFlightPayload = null;
     let terminalRecorded = false;
-    function finish(outcome, reason = null) {
+    function finish(outcome, reason = null, detail = null) {
       promptAnswer = { status: outcome === "sent" ? "answered" : "not_answered",
-        outcome, ...(reason || outcome !== "sent" ? { reason: reason || (outcome === "uncertain" ? "transport_uncertain" : "guard_refused") } : {}) };
+        outcome, ...(detail ? { detail } : {}), ...(reason || outcome !== "sent" ? { reason: reason || (outcome === "uncertain" ? "transport_uncertain" : "guard_refused") } : {}) };
       terminalRecorded = approvals.recordPromptAnswer(approvalId, promptAnswer, inFlightPayload);
       if (!terminalRecorded) {
         promptAnswer = approvals.promptAnswerResult(approvals.getApproval(approvalId))
@@ -81,12 +81,14 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
         auditAppend({ type: "SESSION_PROMPT_ANSWER_ATTEMPT", traceId: binding.traceId,
           sessionId: binding.sessionId, approvalId, command: binding.prompt.command,
           options: binding.prompt.options, tmuxTarget: binding.tmuxTarget, target: binding.capture.target,
-          response: "Enter", decidedBy: decision.decided_by, outcome, reason: promptAnswer.reason });
+          response: "Enter", decidedBy: decision.decided_by, outcome, reason: promptAnswer.reason,
+          ...(promptAnswer.detail ? { detail: promptAnswer.detail } : {}) });
       }
     }
     if (binding.prompt.kind === "unknown" || !resolved.allowed
       || (decision.decided_by === "operator-autonomous-mode" && !resolved.auto)) {
-      finish("refused", binding.prompt.kind === "unknown" ? "human_intervention_required" : "policy_denied");
+      finish("refused", binding.prompt.kind === "unknown" ? "human_intervention_required" : "policy_denied",
+        binding.prompt.kind === "unknown" ? "unknown_prompt" : "policy_denied");
       return { approvalId, ...promptAnswer };
     }
     const adapter = adapters.get(binding.agent);
@@ -94,24 +96,34 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
       tmuxTarget: binding.tmuxTarget,
       expected: binding.capture,
       response: "Enter",
-      onOutcome: finish,
-      authorize(capture) {
-        if (!samePromptCapture(capture, binding.capture)
-          || JSON.stringify(adapter.recognizePrompt(capture.snapshot)) !== JSON.stringify(binding.prompt)) return false;
+      onOutcome: (outcome, detail) => finish(outcome, null, detail),
+      authorize(capture, diagnose) {
+        diagnose("capture_mismatch");
+        if (!samePromptCapture(capture, binding.capture)) return false;
+        diagnose("recognizer_mismatch");
+        if (JSON.stringify(adapter.recognizePrompt(capture.snapshot)) !== JSON.stringify(binding.prompt)) return false;
+        diagnose("approval_not_granted");
         const latest = approvals.getApproval(approvalId);
-        if (latest?.status !== "granted" || latest.trace_id !== binding.traceId
-          || latest.action !== `session.prompt.${binding.prompt.kind}` || !live(binding.sessionId)
-          || !policy(binding).allowed || (latest.decided_by === "operator-autonomous-mode" && !policy(binding).auto)) return false;
+        if (latest?.status !== "granted") return false;
+        diagnose("approval_binding_mismatch");
+        if (latest.trace_id !== binding.traceId || latest.action !== `session.prompt.${binding.prompt.kind}`) return false;
+        diagnose("session_not_live");
+        if (!live(binding.sessionId)) return false;
+        diagnose("policy_denied");
+        if (!policy(binding).allowed || (latest.decided_by === "operator-autonomous-mode" && !policy(binding).auto)) return false;
+        diagnose("payload_mismatch");
         let context;
         try { context = JSON.parse(latest.payload); } catch (_error) { return false; }
         if (context?.sessionId !== binding.sessionId || context.command !== binding.prompt.command
           || context.target !== binding.capture.target || context.tmuxTarget !== binding.tmuxTarget
           || JSON.stringify(context.options) !== JSON.stringify(binding.prompt.options)) return false;
+        diagnose("consume_lost");
         inFlightPayload = approvals.consumePromptApproval(approvalId, latest.payload, {
           status: "in_flight", outcome: "attempting", response: "Enter", target: capture.target,
           attemptedAt: new Date().toISOString(),
         }) || null;
         if (!inFlightPayload) return false;
+        diagnose("audit_failed");
         // Failure here aborts authorize: no guarded input may follow a missing
         // write-ahead audit. The durable marker survives process death.
         auditAppend({ type: "SESSION_PROMPT_ANSWER_ATTEMPT", traceId: binding.traceId,

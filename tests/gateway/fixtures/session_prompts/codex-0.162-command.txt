@@ -1,0 +1,24 @@
+› New task. Run exactly this one shell command and nothing else, requesting
+  approval if the sandbox blocks it: touch ~/a06m
+
+
+• I’ll run the exact command and request approval if the sandbox blocks it.
+
+• Running touch ~/a06m
+
+
+  Would you like to run the following command?
+
+  Environment: local
+
+  Reason: The sandbox blocked the command because your home directory is
+  read-only. Allow running touch ~/a06m outside the sandbox?
+
+  $ touch ~/a06m
+
+
+› 1. Yes, proceed (y)
+  2. Yes, and don't ask again for commands that start with `touch ~/a06m` (p)
+  3. No, and tell Codex what to do differently (esc)
+
+  Press enter to confirm or esc to cancel

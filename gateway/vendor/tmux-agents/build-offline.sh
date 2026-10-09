@@ -3,7 +3,7 @@ set -eu
 
 builder_image='node@sha256:0625f79a0c9f5005e31dba1761260b9f66ea8a3293e5f645eb4550a4c7dcdbb9'
 source_sha256='b6d8d9c76585db8ef5fa00d4931902fa4b8cbe8166f528f44fc403961a3f3759'
-patch_sha256='e8139a40bc2badcc95475d003158906444d2b33a7ad8553dcae1e9371b97955d'
+patch_sha256='785a1df2c91e05448a60d69b1ae8fab52f2f3088bc730be3b74da678e7ebd02d'
 extension_sha256='4d80a8610651a1dd304b9b0e9b45d6832e115d9827d5166f26b4f9dbcdec27e2'
 
 if [ "$#" -ne 2 ]; then
@@ -52,20 +52,20 @@ docker run \
     sh -eu -c "
         printf '%s  %s\\n' '$source_sha256' /input/tmux-3.6a.tar.gz |
             sha256sum -c -
-        printf '%s  %s\\n' '$patch_sha256' /package/tmux-3.6a-agents.3.patch |
+        printf '%s  %s\\n' '$patch_sha256' /package/tmux-3.6a-agents.4.patch |
             sha256sum -c -
         printf '%s  %s\\n' '$extension_sha256' /package/cmd-agents-capture.c |
             sha256sum -c -
         tar -xzf /input/tmux-3.6a.tar.gz -C /build
         cp /package/cmd-agents-capture.c /build/tmux-3.6a/
         patch --fuzz=0 -d /build/tmux-3.6a -p1 \
-            < /package/tmux-3.6a-agents.3.patch
+            < /package/tmux-3.6a-agents.4.patch
         cd /build/tmux-3.6a
         YACC=true ./configure --disable-static
         parser_before=\$(sha256sum cmd-parse.c | cut -d ' ' -f1)
         make -j1
         parser_after=\$(sha256sum cmd-parse.c | cut -d ' ' -f1)
         test "\$parser_before" = "\$parser_after"
-        test \"\$(./tmux -V)\" = 'tmux 3.6a-agents.3'
-        install -m 0755 ./tmux /output/tmux-3.6a-agents.3-linux-amd64
+        test \"\$(./tmux -V)\" = 'tmux 3.6a-agents.4'
+        install -m 0755 ./tmux /output/tmux-3.6a-agents.4-linux-amd64
     "
