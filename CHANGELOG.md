@@ -31,12 +31,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
   local authority (not authenticated human presence). It exits zero only for
   `answered/sent` or an explicit denial. Codex 0.162 command menus are
   delivered at the tmux pending-wrap cursor, and wrapped persistent options
-  are recognized. Refusals record a fixed, non-sensitive stage code.
+  are recognized. Refusals before input record a fixed, non-sensitive stage code.
   Real-provider acceptance with Codex 0.162.0 passed.
 - Changed the pinned tmux runtime to `3.6a-agents.4` (linux/amd64 only for
   this release). Its guarded submit accepts the observed cursor at
-  `x == width`. A Gateway refuses guarded input against a still-running
-  `3.6a-agents.3` server until the operator restarts it manually.
+  `x == width`. Guarded input and the retained relay require a running
+  server that reports exactly `3.6a-agents.4`. Against a still-running older
+  server, including 1.0.0's `3.6a-agents.1`, a 1.1.0 Gateway fails closed (no
+  prompt answers, composer submits or retained relay handshake) until the
+  operator manually restarts that server with `.4`.
 - Added generic project profiles and deterministic preflight for wave
   planning (PROJECT_V7 A/0/00). Automated wave dispatch remains planned.
 - Added cooperative local wave capacity accounting and `agent-run wave
