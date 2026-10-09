@@ -413,7 +413,7 @@ test("live Codex 0.162 short command grant reaches write-ahead audit and one gua
 });
 
 const wrappedLiveCommand = fs.readFileSync(new URL("./fixtures/session_prompts/codex-0.162-wrapped-command.txt", import.meta.url), "utf8");
-const wrappedExpected = { kind: "command", command: "touch\n/home/tester/git/personal/AO/workspace/a06-live/run-154702/outside-marker", options: ["y", "p", "esc"] };
+const wrappedExpected = { kind: "command", command: "touch\n/tmp/a06-fix/git/personal/AO/workspace/a06-live/run-154702/outside-marker", options: ["y", "p", "esc"] };
 test("live Codex 0.162 persistent option wraps without changing exact command or selecting p", async () => {
   assert.deepEqual(codex.recognizeCodexPrompt(wrappedLiveCommand), wrappedExpected);
   assert.deepEqual(codex.recognizeCodexPrompt(wrappedLiveCommand.replace("outside-marker`", "outside-\n     marker`")), wrappedExpected);
