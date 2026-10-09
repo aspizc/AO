@@ -9,9 +9,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) lite.
 
 - Added role-derived CLI write restrictions for Codex, Claude Code,
   Antigravity, pi and OpenCode (A/0/00). Codex uses a read-only OS sandbox for
-  non-writers; the other providers use CLI tool restrictions. Claude,
-  Antigravity and OpenCode can still expose a shell that writes, so their
-  read-only profile is not an OS sandbox.
+  non-writers. Claude Code, pi and OpenCode use CLI tool restrictions; Claude
+  Code and OpenCode can still expose a shell that writes, so their read-only
+  profile is not an OS sandbox. Antigravity non-writer seats (for example
+  reviewer and planner) are refused with `POLICY_DENIED` before launch,
+  because its plan mode is not verified to refuse writes.
 - Added informational worker role, trace and task environment markers for
   headless and supervised children (A/0/01). These markers do not grant
   authority.

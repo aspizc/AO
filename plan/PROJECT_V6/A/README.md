@@ -1,7 +1,7 @@
 # Stage A — Worker confinement, worker identity, and AO 1.1.0
 
 Status: **in progress**; A/0/00, A/0/01, A/0/02, A/0/04, A/0/05 and A/0/06
-integrated on the release branch. The A/0/06 real-provider check remains open.
+integrated on the release branch. The A/0/06 real-provider acceptance passed.
 
 | Sheet | Outcome | Status | Functional priority |
 |---|---|---|---|
@@ -10,7 +10,7 @@ integrated on the release branch. The A/0/06 real-provider check remains open.
 | [A/0/02](0/02.md) | Generic setup removes personal registrations/home paths and preserves reusable planning/workflow knowledge | integrated | P0 — publication hygiene |
 | [A/0/04](0/04.md) | `agent_ask` sends the prompt literally, submits it separately and confirms it was accepted | integrated | P0 — supervised children receive their prompts |
 | [A/0/05](0/05.md) | A persisted trace can be explicitly re-attached by its principal after a host restart | integrated | P0 — control of live children survives a restart |
-| [A/0/06](0/06.md) | Children's trust and permission prompts become approval requests decided by policy | integrated; live check open | P1 — unattended supervision |
+| [A/0/06](0/06.md) | Children's trust and permission prompts become approval requests decided by policy | integrated; live check passed | P1 — unattended supervision |
 | [A/0/03](0/03.md) | Release verifier accepts unprefixed tags; AO `1.1.0` released with A/0/00–02 and A/0/04–06 | planned | P1 |
 
 Dependencies: `A/0/00 → A/0/01`; `A/0/00, A/0/04 → A/0/06`; `A/0/00, A/0/01, A/0/02, A/0/04, A/0/05, A/0/06 → A/0/03`.

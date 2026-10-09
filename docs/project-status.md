@@ -115,9 +115,9 @@ binds the source and target blobs and the sole review-index conflict. The
 [committed-tree gate](../plan/PROJECT_V6/reviews/A_0_6-merged-gate.md) on
 `6187aca` exited 0: **3,312 passed, 0 failed, 12 declared infrastructure
 skips; 3,324 total**, with Redis 22/22 and zero public hygiene findings.
-The real-provider check of automatic and manually granted commands is still
-open; the optional provider lane ran zero tests. This is integration, not
-promotion or release.
+The real-provider acceptance with Codex 0.162.0 later passed on the pinned
+`3.6a-agents.4` runtime ([live-3](../plan/PROJECT_V6/reviews/A_0_6-operator-live-3.md));
+the optional provider lane ran zero tests.
 
 ## Unreleased V7 integration
 
@@ -181,8 +181,8 @@ with their components.
 [Project V6](../plan/PROJECT_V6/README.md) plans the `1.1.0` increment on a
 branch descending from `1.0.0`; A/0/00, A/0/01, A/0/02, A/0/04 and A/0/05 are
 reviewed and integrated on the release branch. A/0/06 is also integrated,
-with its real-provider approval check pending. A/0/03 release assembly
-remains unfinished.
+and its real-provider acceptance passed. A/0/03 assembles and reviews the
+`1.1.0` release.
 Generic workflow requirements include
 epic/story/task decomposition and persistent wave execution. Automatic wave
 launching remains planned. [Project V5](../plan/PROJECT_V5/README.md) remains

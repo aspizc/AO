@@ -53,9 +53,10 @@ from that release claim until a native build exists; retaining native builder
 instructions in the [vendor README](../gateway/vendor/tmux-agents/README.md)
 does not establish Darwin support.
 
-### Manual cutover from a running .3 server
+### Manual cutover from a running older server
 
-Installing `.4` or changing PATH does not upgrade a running `.3` tmux server.
+Installing `.4` or changing PATH does not upgrade a running older tmux server,
+including 1.0.0's `3.6a-agents.1` and the unreleased `.3`.
 Its `exit-empty=0` default keeps it alive even without sessions. The operator
 must wait until no sessions are live on the designated server, then manually
 restart that server with the configured `.4` binary. Confirm the server's
@@ -63,7 +64,7 @@ restart that server with the configured `.4` binary. Confirm the server's
 ends sessions on that server: never restart a server with live sessions or
 stop unrelated servers. The Gateway performs no automatic restart.
 
-Until the manual restart, a `.4` Gateway fails closed against a `.3` server:
+Until the manual restart, a `.4` Gateway fails closed against any older server:
 no prompt answers, composer submits or retained relay handshake are sent.
 This is the operator decision recorded at release/1.1.0 commit `6212f72`,
 `plan/PROJECT_V6/reviews/A_0_6_pending_wrap_cutover_decision.md`.

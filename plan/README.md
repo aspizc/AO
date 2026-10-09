@@ -14,8 +14,8 @@ limits. The imported generation table below preserves historical provenance.
 role-derived CLI restrictions, worker markers, public snapshot hygiene,
 reliable prompt submission, explicit restart reattachment, bounded prompt
 approval, and release assembly. A/0/00, A/0/01, A/0/02, A/0/04, A/0/05 and
-A/0/06 are reviewed and integrated on the release branch. A/0/06 still needs
-its real-provider approval check; A/0/03 release assembly remains unfinished.
+A/0/06 are reviewed and integrated on the release branch. A/0/06's real-provider
+acceptance passed; A/0/03 assembles and reviews the `1.1.0` release.
 `release/1.1.0` starts from `1.0.0`; the recorded
 [operator decisions](PROJECT_V6/HUMAN_DECISIONS.md) and
 [baseline checks](PROJECT_V6/BASELINE.md) govern preparation. V5 remains a

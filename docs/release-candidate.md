@@ -18,6 +18,13 @@ regular, repository-relative, and free of symlink or traversal components. A
 checkout, ref, tree, file digest, lock, suite inventory/topology, or review
 subject mismatch fails closed.
 
+AO 1.1.0 uses an operator-countersignature model: the independent review is the
+committed `reviewed_OK` verdict from a separate reviewer session, and the
+operator's Ed25519 signature (trust root `ao-release-reviewer-2026`) attests that
+it is bound to the exact candidate commit and tree. The key is held with
+same-OS-account custody; see
+`plan/PROJECT_V6/reviews/A_0_3_signing_decision.md`.
+
 The technical subject may be followed by review-request and review-verdict
 commits on the evidence branch. Those post-freeze commits may change only
 canonical `plan/PROJECT_V*/reviews/*_{to_review,reviewed_OK,reviewed_KO}.md`
