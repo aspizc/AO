@@ -34,8 +34,18 @@ export function recognizeCodexPrompt(snapshot) {
     const tail = rows.slice(commandTitle);
     const menu = tail.findIndex((row) => /^\s*› 1\. Yes, proceed \(y\)$/.test(row));
     if (menu < 0) return null;
-    const persistent = /^\s*2\. Yes, and don't ask again for (?:this exact command|commands that start with .+) \(p\)$/.test(tail[menu + 1] || "");
-    const denyIndex = menu + (persistent ? 2 : 1);
+    let option = tail[menu + 1] || "";
+    let optionEnd = menu + 1;
+    // Codex indents wrapped option text by five columns. Only the observed
+    // backtick-delimited command suffix may continue onto those rows.
+    if (/^\s*2\. Yes, and don't ask again for commands that start with `[^`]+$/.test(option)) {
+      while (/^ {5}\S/.test(tail[optionEnd + 1] || "")) {
+        option += tail[++optionEnd].slice(5);
+      }
+      if (!/^\s*2\. Yes, and don't ask again for commands that start with `[^`]+` \(p\)$/.test(option)) return null;
+    }
+    const persistent = /^\s*2\. Yes, and don't ask again for (?:this exact command|commands that start with .+) \(p\)$/.test(option);
+    const denyIndex = persistent ? optionEnd + 1 : menu + 1;
     if (!(new RegExp(`^\\s*${persistent ? 3 : 2}\\. No, and tell Codex what to do differently \\(esc\\)$`)).test(tail[denyIndex] || "")
       || tail.slice(denyIndex + 1).some((row) => row.trim() && row.trim() !== "Press enter to confirm or esc to cancel")) return null;
     const start = tail.findIndex((row) => /^ {2}\$ \S/.test(row));

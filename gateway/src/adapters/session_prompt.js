@@ -44,16 +44,21 @@ export function answerSessionPrompt({ permit, run = tmuxSync }) {
   let buffer;
   let attempted = false;
   let outcome;
+  let detail;
   try {
+    detail = "invalid_response";
     if (response !== "Enter" || typeof authorize !== "function") throw new Error("invalid prompt response");
-    if (checked(run, ["display-message", "-p", "#{version}"]) !== "3.6a-agents.3\n"
+    detail = "transport_unavailable";
+    if (checked(run, ["display-message", "-p", "#{version}"]) !== "3.6a-agents.4\n"
       || !checked(run, ["list-commands"]).split("\n").some((row) => /^agents-submit-v1(?: |$)/.test(row))) {
       throw new Error("guarded prompt transport unavailable");
     }
+    detail = "target_unavailable";
     const before = checked(run, ["display-message", "-p", "-t", tmuxTarget, stateFormat]);
     const identity = /^([1-9]\d*)\|(%\d+)\|([1-9]\d*)\|0\|0\|0\n$/.exec(before);
     if (!identity) throw new Error("prompt target unavailable");
     const target = identity[2];
+    detail = "geometry_unavailable";
     const state = checked(run, buildSubmitStateCmd({ target }));
     const fields = state.trim().split("|");
     if (fields.length !== 7 || fields[0] !== identity[1] || fields[1] !== target || fields[2] !== identity[3]
@@ -61,9 +66,10 @@ export function answerSessionPrompt({ permit, run = tmuxSync }) {
       || fields.some((value, index) => index !== 1 && (!/^(?:0|[1-9]\d*)$/.test(value)
         || BigInt(value) > (index < 3 ? 9223372036854775807n : 2147483647n)
         || BigInt(value) < (index < 3 ? 2n : index < 5 ? 1n : 0n)))
-      || Number(fields[5]) >= Number(fields[3]) || Number(fields[6]) >= Number(fields[4])) {
+      || Number(fields[5]) > Number(fields[3]) || Number(fields[6]) >= Number(fields[4])) {
       throw new Error("prompt geometry unavailable");
     }
+    detail = "evidence_unavailable";
     buffer = `agents-submit-${randomUUID()}`;
     checked(run, buildSubmitEvidenceCmd({ target, buffer }));
     const saved = run(["save-buffer", "-b", buffer, "-"], { encoding: null, timeout: 1000, maxBuffer: 262144 });
@@ -73,9 +79,14 @@ export function answerSessionPrompt({ permit, run = tmuxSync }) {
     const snapshot = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(saved.stdout);
     const capture = { snapshot, target, serverPid: fields[0], panePid: fields[2],
       width: fields[3], height: fields[4], cursorX: fields[5], cursorY: fields[6], buffer };
+    detail = "state_changed";
     if (before !== checked(run, ["display-message", "-p", "-t", tmuxTarget, stateFormat])
-      || state !== checked(run, buildSubmitStateCmd({ target }))
-      || !samePromptCapture(expected, capture) || !authorize(capture)) throw new Error("prompt no longer bound");
+      || state !== checked(run, buildSubmitStateCmd({ target }))) throw new Error("prompt no longer bound");
+    detail = "capture_mismatch";
+    if (!samePromptCapture(expected, capture)) throw new Error("prompt no longer bound");
+    detail = "authorization_refused";
+    if (!authorize(capture, (stage) => { detail = stage; })) throw new Error("prompt no longer bound");
+    detail = undefined;
     attempted = true;
     const result = run(buildGuardedSubmitCmd(capture), { timeout: 1000, maxBuffer: 8192 });
     const diagnostic = Buffer.isBuffer(result?.stderr) ? result.stderr.toString("utf8") : result?.stderr;
@@ -97,7 +108,7 @@ export function answerSessionPrompt({ permit, run = tmuxSync }) {
       } catch (_error) { outcome = attempted ? "uncertain" : "refused"; }
     }
   }
-  onOutcome?.(outcome);
+  onOutcome?.(outcome, detail);
   return outcome === "sent";
 }
 

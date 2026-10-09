@@ -20,6 +20,8 @@ try:
         if state != requested:
             pane = changed if requested == 'redraw' else initial
             os.write(1, ('\x1b[?2004h\x1b[2J\x1b[H' + pane.replace('\n', '\r\n')).encode())
+            if (root / 'pending-wrap').exists():
+                os.write(1, b"\x1b[?7h\x1b[?25l\x1b[23;1H" + b"X" * 80 + b"\x1b[2K\n")
             state = requested
             (root / 'drawn').write_text(requested)
         if select.select([0], [], [], 0.005)[0]:

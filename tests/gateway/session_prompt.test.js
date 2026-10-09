@@ -395,3 +395,47 @@ test("responder-path failure audit retains the session trace for investigation",
     assert.deepEqual(fx.inputs, [], "policy failure must never authorize transport");
   } finally { fx.watcher.close(); }
 });
+
+// Live Codex 0.162 acceptance pane; the transport remains deterministic.
+test("live Codex 0.162 short command grant reaches write-ahead audit and one guarded CR", async () => {
+  const pane = fs.readFileSync(new URL("./fixtures/session_prompts/codex-0.162-command.txt", import.meta.url), "utf8");
+  const fx = await fresh({ auto: false, scope: false, pane });
+  try {
+    const pending = fx.watcher.observe({ sessionId: "session" });
+    assert.equal(pending.kind, "command");
+    assert.equal(pending.command, "touch ~/a06m");
+    approvals.decideApproval(pending.approvalId, "granted", "operator");
+    fx.watcher.observe({ sessionId: "session" });
+    assert.deepEqual(fx.inputs, ["\r"]);
+    assert.deepEqual((await query({ type: "SESSION_PROMPT_ANSWER_ATTEMPT" })).map((event) => event.outcome), ["attempting", "sent"]);
+    assert.equal(approvals.promptAnswerResult(approvals.getApproval(pending.approvalId)).status, "answered");
+  } finally { fx.watcher.close(); }
+});
+
+const wrappedLiveCommand = fs.readFileSync(new URL("./fixtures/session_prompts/codex-0.162-wrapped-command.txt", import.meta.url), "utf8");
+const wrappedExpected = { kind: "command", command: "touch\n/home/tester/git/personal/AO/workspace/a06-live/run-154702/outside-marker", options: ["y", "p", "esc"] };
+test("live Codex 0.162 persistent option wraps without changing exact command or selecting p", async () => {
+  assert.deepEqual(codex.recognizeCodexPrompt(wrappedLiveCommand), wrappedExpected);
+  assert.deepEqual(codex.recognizeCodexPrompt(wrappedLiveCommand.replace("outside-marker`", "outside-\n     marker`")), wrappedExpected);
+  const fx = await fresh({ auto: false, scope: false, pane: wrappedLiveCommand });
+  try {
+    const pending = fx.watcher.observe({ sessionId: "session" });
+    assert.equal(pending.status, "pending");
+    approvals.decideApproval(pending.approvalId, "granted", "operator");
+    fx.watcher.observe({ sessionId: "session" });
+    fx.watcher.observe({ sessionId: "session" });
+    assert.deepEqual(fx.inputs, ["\r"], "the persistent choice is recognized but never sent");
+    assert.equal((await query({ type: "SESSION_PROMPT_ANSWERED" }))[0].command, wrappedExpected.command);
+  } finally { fx.watcher.close(); }
+});
+test("wrapped persistent option remains fail closed for malformed continuation and menu", () => {
+  // The sanitized fixture changes only the path; retain its observed row shape.
+  const row = wrappedLiveCommand.split("\n").find((line) => line.startsWith("     "));
+  assert.ok(row);
+  for (const replacement of [row.slice(1), " " + row, row.trimStart(), row.replace("(p)", "(y)"), row.replace("` (p)", " (p)"), "     3. No, and tell Codex what to do differently (esc)", "     ", row + "\n     injected", "     \n" + row] ) {
+    assert.equal(codex.recognizeCodexPrompt(wrappedLiveCommand.replace(row, replacement)), null, replacement);
+  }
+  for (const pane of [wrappedLiveCommand.replace("start with `", "start with "), wrappedLiveCommand.replace("  3. No,", "  2. No,"), wrappedLiveCommand + "unexpected footer\n", wrappedLiveCommand.replace("› 1.", "  1."), wrappedLiveCommand.replace("  $ touch", " $ touch")]) {
+    assert.equal(codex.recognizeCodexPrompt(pane), null);
+  }
+});

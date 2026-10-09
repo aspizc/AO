@@ -9,7 +9,7 @@ import { withOwnedTmuxServer } from "./fixtures/owned_tmux_server.js";
 const tmux = process.env.A04_TEST_TMUX || "tmux";
 const fixture = fileURLToPath(new URL("./guarded_paste_fixture.py", import.meta.url));
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function terminalTest(exercise) {
+async function terminalTest(exercise, width = "120", height = "40") {
   await withOwnedTmuxServer(tmux, async ({ directory, run }) => {
     const checked = (args, options) => {
       const result = run(args, options);
@@ -20,7 +20,7 @@ async function terminalTest(exercise) {
     const terminal = path.join(directory, "target");
     fs.mkdirSync(terminal);
     fs.writeFileSync(path.join(terminal, "mode"), "0:on");
-    const target = checked(["new-session", "-d", "-s", "submit", "-x", "120", "-y", "40",
+    const target = checked(["new-session", "-d", "-s", "submit", "-x", width, "-y", height,
       "-P", "-F", "#{pane_id}", "--", "python3", fixture, terminal]);
     const received = (where = terminal) => fs.existsSync(path.join(where, "received"))
       ? fs.readFileSync(path.join(where, "received")) : Buffer.alloc(0);
@@ -63,7 +63,20 @@ async function terminalTest(exercise) {
       assert.equal(result.stderr.trim(), "agents: guarded submit refused");
       assert.equal(run(["save-buffer", "-b", ev.buffer, "-"]).status, 1, "refused evidence is consumed");
     };
-    await exercise({ run, checked, directory, target, terminal, received, mode, evidence, success, refusal });
+    const state = () => checked(["display-message", "-p", "-t", target,
+      "#{pane_width}|#{pane_height}|#{cursor_x}|#{cursor_y}"]);
+    const emit = async (data, expected) => {
+      const sequence = String(++serial);
+      fs.writeFileSync(path.join(terminal, "output-next"), `${sequence}:${Buffer.from(data).toString("hex")}`);
+      fs.renameSync(path.join(terminal, "output-next"), path.join(terminal, "output"));
+      for (let i = 0; i < 100; i++) {
+        if (fs.existsSync(path.join(terminal, "output-ack"))
+          && fs.readFileSync(path.join(terminal, "output-ack"), "utf8") === sequence && state() === expected) return;
+        await pause(10);
+      }
+      assert.equal(state(), expected, "child output must be parsed into observed geometry");
+    };
+    await exercise({ run, checked, directory, target, terminal, received, mode, evidence, success, refusal, state, emit });
   });
 }
 
@@ -178,4 +191,48 @@ test("ordinary_send_keys_preserves_upstream_sibling_fanout", async () => {
     assert.deepEqual(fx.received(), Buffer.from("\r"));
     assert.deepEqual(fx.received(sibling), Buffer.from("\r"));
   });
+});
+
+test("real tmux pending-wrap guarded submit delivers exactly one CR for the bound observed cursor", async () => {
+  await terminalTest(async (fx) => {
+    await fx.emit("\x1b[?7h\x1b[?25l\x1b[24;1H" + "X".repeat(80), "80|24|80|23");
+    await fx.success();
+    assert.equal(fx.state(), "80|24|80|23", "raw noecho input CR does not redraw tmux");
+    await fx.emit("\r", "80|24|0|23");
+    await fx.emit("X".repeat(80), "80|24|80|23");
+    await fx.emit("Y", "80|24|1|23"); // Bottom-row printable consumes wrap and scrolls.
+  }, "80", "24");
+});
+for (const x of [81, 90]) test(`real tmux alternate-screen shrink refuses observed cursor beyond width ${x}`, async () => {
+  await terminalTest(async (fx) => {
+    await fx.emit(`\x1b[?1049h\x1b[?2004h\x1b[1;${x + 1}H`, `100|30|${x}|0`);
+    await fx.success(); // Same cursor is in range before shrink.
+    fx.checked(["resize-window", "-t", fx.target, "-x", "80", "-y", "30"]);
+    assert.equal(fx.state(), `80|30|${x}|0`);
+    assert.ok(Number(fx.state().split("|")[2]) > Number(fx.state().split("|")[0]));
+    await fx.refusal(fx.evidence()); // Every argument matches actual state; only x bound refuses.
+  }, "100", "30");
+});
+for (const [control, expected] of [["\b", "80|24|79|4"], ["\n", "80|24|80|5"], ["\x1bM", "80|24|80|3"]]) {
+  test(`real pending-wrap cursor-only drift ${JSON.stringify(control)} refuses stale binding`, async () => {
+    await terminalTest(async (fx) => {
+      await fx.emit("\x1b[2J\x1b[5;1H" + "X".repeat(80), "80|24|80|4");
+      const ev = fx.evidence();
+      const grid = fx.checked(["capture-pane", "-p", "-N", "-T", "-t", fx.target]);
+      await fx.emit(control, expected);
+      assert.equal(fx.checked(["capture-pane", "-p", "-N", "-T", "-t", fx.target]), grid);
+      await fx.refusal(ev);
+      const current = fx.evidence();
+      // Same saved grid with current cursor succeeds, isolating the stale cursor predicate.
+      await fx.success(current);
+    }, "80", "24");
+  });
+}
+for (const [flag, value] of [["-c", "81"], ["-l", "24"]]) test(`real pending-wrap rejects invalid ${flag} ${value}`, async () => {
+  await terminalTest(async (fx) => {
+    await fx.emit("\x1b[24;1H" + "X".repeat(80), "80|24|80|23");
+    const ev = fx.evidence();
+    ev.args[ev.args.indexOf(flag) + 1] = value;
+    await fx.refusal(ev);
+  }, "80", "24");
 });

@@ -21,7 +21,7 @@ function harness(records = [profile.ready, profile.postPaste, profile.guard, pro
     const observation = records[Math.min(index, records.length - 1)];
     const { pane, submitState: state } = observation;
     if (args[0] === "display-message") {
-      if (args.at(-1) === "#{version}") return { status: 0, stderr: "", stdout: Buffer.from("3.6a-agents.3\n") };
+      if (args.at(-1) === "#{version}") return { status: 0, stderr: "", stdout: Buffer.from("3.6a-agents.4\n") };
       return { status: 0, stdout: args.at(-1).startsWith("#{pid}|")
         ? `${state.serverPid}|${state.target}|${state.panePid}|${pane.width}|${pane.height}|${pane.cursorX}|${pane.cursor}\n`
         : `${pane.target}|${pane.mode}|${pane.inputOff}|${pane.synchronized}|${pane.cursor}|${pane.height}|${pane.width}|${pane.cursorX}\n` };

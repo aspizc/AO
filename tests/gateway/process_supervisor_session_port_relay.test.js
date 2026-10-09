@@ -1786,7 +1786,7 @@ test(
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
     assert.deepEqual(manifest, {
       schemaVersion: 1,
-      productVersion: "3.6a-agents.3",
+      productVersion: "3.6a-agents.4",
       source: {
         archive: "tmux-3.6a.tar.gz",
         sha256:
@@ -1794,7 +1794,7 @@ test(
         version: "3.6a",
       },
       patch: {
-        file: "tmux-3.6a-agents.3.patch",
+        file: "tmux-3.6a-agents.4.patch",
         sha256: manifest.patch.sha256,
       },
       extensionSource: {
@@ -1814,8 +1814,8 @@ test(
         packageManager: "none",
         builder: "build-offline-darwin.sh",
         outputs: [
-          "darwin/amd64/tmux-3.6a-agents.3",
-          "darwin/arm64/tmux-3.6a-agents.3",
+          "darwin/amd64/tmux-3.6a-agents.4",
+          "darwin/arm64/tmux-3.6a-agents.4",
         ],
       },
     });
@@ -1867,7 +1867,7 @@ test(
         ),
         "utf8",
       ),
-      /reported_version != "3\.6a-agents\.3"/,
+      /reported_version != "3\.6a-agents\.4"/,
     );
     assert.match(builder, /parser_before.*parser_after/s);
     assert.doesNotMatch(
@@ -1879,7 +1879,7 @@ test(
 
 test("gate RED: patch whitespace is clean", () => {
   const patchText = fs.readFileSync(
-    path.join(TMUX_PACKAGE, "tmux-3.6a-agents.3.patch"),
+    path.join(TMUX_PACKAGE, "tmux-3.6a-agents.4.patch"),
     "utf8",
   );
   assert.doesNotMatch(patchText, /^.* +\t.*$/m);
@@ -1919,7 +1919,7 @@ test("gate RED: exact custom runtime version and protocol are required", () => {
     helperSource,
     /\["refresh-client", "-f", "no-detach-on-destroy"\]/,
   );
-  assert.match(helperSource, /reported_version != "3\.6a-agents\.3"/);
+  assert.match(helperSource, /reported_version != "3\.6a-agents\.4"/);
   assert.match(helperSource, /agents-capture-v1/);
 });
 
@@ -1932,8 +1932,8 @@ test("gate RED: Linux and Darwin offline build contracts are checked in", () => 
   assert.equal(fs.existsSync(darwinBuilder), true);
   const darwinBuilderText = fs.readFileSync(darwinBuilder, "utf8");
   assert.deepEqual(manifest.offlineDarwinBuilder.outputs, [
-    "darwin/amd64/tmux-3.6a-agents.3",
-    "darwin/arm64/tmux-3.6a-agents.3",
+    "darwin/amd64/tmux-3.6a-agents.4",
+    "darwin/arm64/tmux-3.6a-agents.4",
   ]);
   assert.match(darwinBuilderText, /test "\$\(uname -s\)" = Darwin/);
   assert.match(darwinBuilderText, /darwin\/amd64\).*expected_arch=x86_64/);
@@ -2120,7 +2120,7 @@ test(
   "rejects real outer pane width drift before capture",
   async () => {
     const binding = await runFixtureProbe("bound-relay-host-probe");
-    assert.equal(binding.version, "tmux 3.6a-agents.3");
+    assert.equal(binding.version, "tmux 3.6a-agents.4");
     assert.match(binding.socketName, /^d007c-bound-/);
     assert.deepEqual(binding.widthDrift, {
       dimensions: "121\t40",
@@ -2528,7 +2528,7 @@ test(
   "preserves two rendered row-end spaces through real tmux capture-pane -N -T",
   async () => {
     const host = await runFixtureProbe("host-tmux-probe");
-    assert.equal(host.version, "tmux 3.6a-agents.3");
+    assert.equal(host.version, "tmux 3.6a-agents.4");
     assert.match(host.socketName, /^d007c-/);
     assert.equal(host.cases.untouched.rawBytes, 40);
     assert.deepEqual(

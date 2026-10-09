@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "productVersion": "3.6a-agents.3",
+  "productVersion": "3.6a-agents.4",
   "source": {
     "archive": "tmux-3.6a.tar.gz",
     "sha256": "b6d8d9c76585db8ef5fa00d4931902fa4b8cbe8166f528f44fc403961a3f3759",
     "version": "3.6a"
   },
   "patch": {
-    "file": "tmux-3.6a-agents.3.patch",
-    "sha256": "e8139a40bc2badcc95475d003158906444d2b33a7ad8553dcae1e9371b97955d"
+    "file": "tmux-3.6a-agents.4.patch",
+    "sha256": "785a1df2c91e05448a60d69b1ae8fab52f2f3088bc730be3b74da678e7ebd02d"
   },
   "extensionSource": {
     "file": "cmd-agents-capture.c",
@@ -29,8 +29,8 @@
     "packageManager": "none",
     "builder": "build-offline-darwin.sh",
     "outputs": [
-      "darwin/amd64/tmux-3.6a-agents.3",
-      "darwin/arm64/tmux-3.6a-agents.3"
+      "darwin/amd64/tmux-3.6a-agents.4",
+      "darwin/arm64/tmux-3.6a-agents.4"
     ]
   }
 }

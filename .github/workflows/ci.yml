@@ -71,7 +71,7 @@ jobs:
           gateway/vendor/tmux-agents/build-offline.sh \
             "$RUNNER_TEMP/tmux-3.6a.tar.gz" "$RUNNER_TEMP/ao-tools"
           mkdir -p "$RUNNER_TEMP/ao-tools/bin"
-          ln -s ../tmux-3.6a-agents.3-linux-amd64 "$RUNNER_TEMP/ao-tools/bin/tmux"
+          ln -s ../tmux-3.6a-agents.4-linux-amd64 "$RUNNER_TEMP/ao-tools/bin/tmux"
           echo "$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_PATH"
           echo "D007C_TEST_TMUX_PATH=$RUNNER_TEMP/ao-tools/bin" >> "$GITHUB_ENV"
 
