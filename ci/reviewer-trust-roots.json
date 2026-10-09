@@ -1,1 +1,1 @@
-{"keys":[],"schemaVersion":"reviewer-trust-roots/v1"}
+{"keys":[{"algorithm":"ed25519","keyId":"ao-release-reviewer-2026","publicKey":"OtPpJRB8YJLxDZ/Sp4JBkcWHI9f7kkdbs4GRD9PfeXI=","roles":["independent-reviewer"],"subjects":["mailto:release-reviewer@ao.invalid"],"validFrom":"2026-10-09T21:09:14Z","validUntil":"2027-10-09T00:00:00Z"}],"schemaVersion":"reviewer-trust-roots/v1"}
