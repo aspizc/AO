@@ -94,6 +94,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 
 - [A_0_5: reattachment](A_0_5_human_decision.md)
 - [A_0_6: command scopes](A_0_6_human_decision.md)
+- [A_0_6: operator response, same-account CLI accepted](A_0_6_operator_response_decision.md)
 - [A_0_3: release lineage](A_0_3_human_decision.md)
 - [A_0_2: original snapshot questions](A_0_2_to_check_by_human.md)
 - [A_0_2: generic workflow direction](A_0_2_human_decision.md)
