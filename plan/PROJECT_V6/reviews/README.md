@@ -22,6 +22,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 | A/0/06 operator response design | operator-plan-2 | [request](A_0_6-operator-plan-2_to_review.md) | [OK: timeout CAS, ID retirement and CLI delivery reporting specified; human security choice remains pending](A_0_6-operator-plan-2_reviewed_OK.md) |
 | A/0/06 operator response design | operator-plan-1 | [request](A_0_6-operator-plan-1_to_review.md) | [KO: timeout must not clobber in-flight delivery, externally finalized IDs must retire, CLI wrapper must report terminal delivery](A_0_6-operator-plan-1_reviewed_KO.md) |
 | A/0/03 existing V7 lineage | scope-1 | [request](A_0_3-scope-1_to_review.md) | [OK: two reviewed V7 foundations already integrated on selected release branch; no new runtime scope](A_0_3-scope-1_reviewed_OK.md) |
+| A/0/03 release candidate | 1 | [request](A_0_3-candidate-1_to_review.md) | [KO on 2d9d7ca: lineage, contents, merges, verifier and hygiene hold; KO-1 reviewer trust root out of scope without an operator decision; KO-2 release docs still say A/0/06 live acceptance open and tmux cutover omits 1.0.0 .1; KO-3 CHANGELOG misstates Antigravity non-writers (refused before launch); candidate gate green, see A_0_3-candidate-gate.md](A_0_3-candidate-1_reviewed_KO.md) |
 | A/0/03 changelog | 3 | [request](A_0_3-changelog-3_to_review.md) | [OK: cutover covers any older server including 1.0.0's 3.6a-agents.1; stage codes scoped to refusals before input; remaining A/0/06 and tmux-runtime entries match the evidence](A_0_3-changelog-3_reviewed_OK.md) |
 | A/0/03 changelog | 2 | [request](A_0_3-changelog-2_to_review.md) | [KO: cutover note must cover 1.0.0's 3.6a-agents.1 runtime, not only .3; only refusals before input record a stage code](A_0_3-changelog-2_reviewed_KO.md) |
 | A/0/03 changelog candidate | changelog-1 | [request](A_0_3-changelog-1_to_review.md) | [OK: six V6 summaries and historical separation supported; settle already integrated V7 scope before candidate freeze](A_0_3-changelog-1_reviewed_OK.md) |
@@ -113,6 +114,7 @@ KO is preserved; corrections use the next trial number. Stop and page the human 
 - [A_0_6: pending-wrap cursor, fix vendored tmux patch now](A_0_6_pending_wrap_decision.md)
 - [A_0_6: .4 cutover manual restart; Darwin excluded from 1.1.0](A_0_6_pending_wrap_cutover_decision.md)
 - [A_0_3: release lineage](A_0_3_human_decision.md)
+- [A_0_3: release review signing (countersignature, same-account custody)](A_0_3_signing_decision.md)
 - [A_0_2: original snapshot questions](A_0_2_to_check_by_human.md)
 - [A_0_2: generic workflow direction](A_0_2_human_decision.md)
 - [A_0_2: history retention answered](A_0_2_history_decision.md)
