@@ -142,8 +142,24 @@ export function createSessionPromptWatcher({ adapters, registries, config = {} }
     const prompt = adapter.recognizePrompt(capture.snapshot)
       || (isUnknownPrompt(capture.snapshot) ? { kind: "unknown", command: capture.snapshot, options: [] } : null);
     if (!prompt) { invalidate(sessionId); return null; }
-    const previous = current.get(sessionId);
+    let previous = current.get(sessionId);
+    if (previous) {
+      const decision = approvals.getApproval(previous.approvalId);
+      let context;
+      try { context = JSON.parse(decision?.payload); } catch (_error) { context = null; }
+      const result = context?.promptAnswer;
+      if (result?.status === "not_answered" && result.detail === "external_response_timeout"
+        && !context.consumed && !result.attemptedAt && !result.response && !result.target) {
+        bindings.delete(previous.approvalId);
+        previous.unregister?.();
+        current.delete(sessionId);
+        previous = null;
+      }
+    }
     if (previous && samePromptCapture(previous.capture, capture)) {
+      if (approvals.getApproval(previous.approvalId)?.status === "granted") {
+        answer({ approvalId: previous.approvalId });
+      }
       return description(previous, previous.consumed ? "not_answered" : approvals.getApproval(previous.approvalId)?.status);
     }
     invalidate(sessionId);

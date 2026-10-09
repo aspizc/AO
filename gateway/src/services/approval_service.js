@@ -120,6 +120,10 @@ export function request({ traceId, action, requestedBy, context = null, config =
 }
 
 export function respond({ approvalId, decision, decidedBy = null, note = null }) {
+  return decide({ approvalId, decision, decidedBy, note });
+}
+
+function decide({ approvalId, decision, decidedBy = null, note = null }, external = false) {
   if (!["granted", "denied"].includes(decision)) {
     throw new Error(`invalid decision ${decision}`);
   }
@@ -127,7 +131,7 @@ export function respond({ approvalId, decision, decidedBy = null, note = null })
   const row = repo.getApproval(approvalId);
   if (!row) throw notFound(`approval ${approvalId} not found`);
   if (row.action.startsWith("session.prompt.") && decision === "granted"
-    && !promptResponders.has(approvalId) && (!repo.promptAnswerResult(row) || repo.hasUnfinishedPromptAttempt(row))) {
+    && !external && !promptResponders.has(approvalId) && (!repo.promptAnswerResult(row) || repo.hasUnfinishedPromptAttempt(row))) {
     invalidatePromptApproval(approvalId);
     return poll({ approvalId });
   }
@@ -152,6 +156,37 @@ export function respond({ approvalId, decision, decidedBy = null, note = null })
   if (promptAnswer) result.promptAnswer = promptAnswer;
   approvalBus.emit(approvalId, result);
   return result;
+}
+
+// Local operator CLI only; this entry point is not bound to an MCP tool.
+export async function respondExternal(args, { timeoutMs = 10_000 } = {}) {
+  const result = decide(args, true);
+  const row = repo.getApproval(args.approvalId);
+  const isSessionPrompt = row.action.startsWith("session.prompt.");
+  if (!isSessionPrompt) return { ...result, isSessionPrompt };
+  const deadline = Date.now() + Math.max(0, Math.min(timeoutMs, 10_000));
+  while (true) {
+    const latest = repo.getApproval(args.approvalId);
+    const answer = repo.promptAnswerResult(latest);
+    if (latest.status === "denied" || (answer && answer.status !== "in_flight")) {
+      return { ...poll(args), isSessionPrompt };
+    }
+    if (Date.now() >= deadline) {
+      if (repo.timeoutUnattemptedPrompt(latest)) {
+        auditAppend({ type: "SESSION_PROMPT_INVALIDATED", traceId: latest.trace_id,
+          approvalId: args.approvalId, reason: "prompt_no_longer_bound", detail: "external_response_timeout" });
+      }
+      // A failed CAS may mean the owner started or completed delivery.
+      const finalRow = repo.getApproval(args.approvalId);
+      const finalAnswer = repo.promptAnswerResult(finalRow);
+      if (finalRow.status === "denied" || (finalAnswer && finalAnswer.status !== "in_flight")) {
+        return { ...poll(args), isSessionPrompt };
+      }
+      return { ...poll(args), isSessionPrompt,
+        promptAnswer: { status: "uncertain", outcome: "uncertain", reason: "external_response_timeout" } };
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
 }
 
 export function poll({ approvalId }) {

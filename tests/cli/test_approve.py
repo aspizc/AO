@@ -106,3 +106,47 @@ def test_approve_rejects_invalid_decision():
 
     assert result.exit_code == 2
     assert "--decision must be granted|denied" in result.stderr
+
+
+@pytest.mark.parametrize("json_mode", [False, True])
+@pytest.mark.parametrize("answer,status,returncode,expected", [
+    ({"status": "answered", "outcome": "sent"}, "granted", 0, 0),
+    ({"status": "answered", "outcome": "refused"}, "granted", 0, 1),
+    ({"status": "not_answered", "reason": "prompt_no_longer_bound"}, "granted", 0, 1),
+    ({"status": "uncertain", "outcome": "uncertain"}, "granted", 0, 1),
+    (None, "granted", 0, 1),
+    ({"status": "in_flight", "outcome": "attempting"}, "granted", 0, 1),
+    (None, "denied", 0, 0),
+    ({"status": "answered", "outcome": "sent"}, "granted", 1, 1),
+])
+def test_prompt_wrapper_reports_delivery_and_enforces_exit(monkeypatch, json_mode, answer, status, returncode, expected):
+    data = {"isSessionPrompt": True, "status": status}
+    if answer is not None:
+        data["promptAnswer"] = answer
+
+    def respond(args, **kwargs):
+        assert args[args.index("--decided-by") + 1] == "operator"
+        return subprocess.CompletedProcess(args, returncode, json.dumps(data), "")
+
+    monkeypatch.setattr(subprocess, "run", respond)
+    result = runner.invoke(app, ["approve", "apr-prompt", "--decision", "granted"] + (["--json"] if json_mode else []))
+    assert result.exit_code == expected
+    if json_mode:
+        assert json.loads(result.stdout) == data
+    elif status == "denied":
+        assert "denied" in result.stdout
+    else:
+        assert "granted" not in result.stdout
+        assert (answer or {}).get("status", "not_answered") in result.stdout
+        if (answer or {}).get("outcome"):
+            assert "/" + answer["outcome"] in result.stdout
+        if (answer or {}).get("reason"):
+            assert answer["reason"] in result.stdout
+
+
+@pytest.mark.parametrize("payload", ["not JSON", "[]", "null", '{"error":"script error"}'])
+@pytest.mark.parametrize("json_mode", [False, True])
+def test_prompt_wrapper_script_error_or_malformed_response_fails(monkeypatch, payload, json_mode):
+    monkeypatch.setattr(subprocess, "run", lambda args, **kwargs: subprocess.CompletedProcess(args, 0, payload, ""))
+    result = runner.invoke(app, ["approve", "apr-prompt", "--decision", "granted"] + (["--json"] if json_mode else []))
+    assert result.exit_code == 1

@@ -258,7 +258,16 @@ agent-run approve <approvalId> --decision granted --note "release plan reviewed"
 agent-run approve <approvalId> --decision denied --note "do not push yet"
 ```
 
-The Gateway records the decision in audit and state.
+The Gateway records the decision in audit and state. For `session.prompt.command`,
+`session.prompt.trust`, `session.prompt.permission` and `session.prompt.unknown`
+approvals, the CLI waits up to 10 seconds for the owning watcher and reports
+`answered/sent`, explicit denial, or the failure/uncertain outcome. A stored
+`granted` decision alone does not prove delivery. An uncertain timeout may
+still be finalized by the owner; do not treat it as proof that input did not run.
+This CLI is same-OS-account local authority, not authenticated human presence:
+any process with that account and access to the SQLite state, including a
+shell-capable child agent, can answer a pending prompt. Default MCP response
+authority and automatic command scopes remain unchanged.
 
 Auto-approval is off by default. Operators may opt into bounded scopes at
 Gateway launch with `AGENTS_AUTOAPPROVE=scope1,scope2`; see
