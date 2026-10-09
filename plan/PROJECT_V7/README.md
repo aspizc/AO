@@ -59,9 +59,10 @@ Standing assumptions for this bounded increment:
   authenticate a review verdict, prove candidate freshness, integrate code,
   or satisfy V5's authoritative review/completion gates. A receipt or artifact
   never grants the controller authority it did not already hold.
-- Codex authors and a separately assigned Codex session reviews while the
-  operator's no-Claude restriction applies. Product selections remain explicit;
-  this exception does not rewrite canonical provider defaults.
+- Codex authors and a separately assigned Claude session reviews, as resolved
+  in `.claude/orchestration-profile.md` (the earlier no-Claude restriction no
+  longer applies). Product selections remain explicit; this does not rewrite
+  canonical provider defaults.
 
 ## Existing mechanisms and gaps
 
